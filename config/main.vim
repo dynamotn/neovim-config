@@ -55,3 +55,26 @@ highlight clear LineNr
 set background=dark
 colorscheme hybrid " Set to end of UI section to correct color
 " ---------------------------- }
+
+" ---- File manipulation ----- {
+" End of line setting
+set fileformat=unix
+
+" Accept modeline of each file
+set modeline
+set modelines=1
+
+" Return to last edit position when opening files
+augroup LastPosition
+  autocmd BufReadPost * silent! normal! g`"zv
+augroup END
+
+" Not backup
+set nobackup
+set nowritebackup
+set noswapfile
+
+if !empty(glob($VIMHOME . 'config/file_specific.vim'))
+  source $VIMHOME/config/file_specific.vim
+end
+" ---------------------------- }
