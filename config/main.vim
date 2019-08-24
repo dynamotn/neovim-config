@@ -42,6 +42,9 @@ syntax on
 set list
 set listchars=tab:→\ ,eol:↵,trail:·,extends:↷,precedes:↶
 
+" Not show redundant mode line with airline
+set noshowmode
+
 " -- Current position -- {
 " Show number of line
 set number

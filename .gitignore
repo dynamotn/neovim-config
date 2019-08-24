@@ -1,4 +1,4 @@
 bundles
-autoload
+autoload/plug.vim
 *viminfo
 .netrwhist

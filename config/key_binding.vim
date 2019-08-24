@@ -75,3 +75,12 @@ map <Enter> o<Esc>
 vnoremap < <gv
 vnoremap > >gv
 " ---------------------------- }
+
+" --------- Airline ---------- {
+" Switch tab
+for i in range(1,9)
+  exec 'nmap <leader>' . i . ' <Plug>AirlineSelectTab' . i
+endfor
+nmap <leader>- <Plug>AirlineSelectPrevTab
+nmap <leader>+ <Plug>AirlineSelectNextTab
+" ---------------------------- }
