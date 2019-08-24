@@ -17,6 +17,7 @@ endif
 call plug#begin($VIMHOME . '/bundles')
 source $VIMHOME/config/plugin.vim
 call plug#end()
+source $VIMHOME/config/key_binding.vim
 " ---------------------------- }
 
 " ------------ UI ------------ {
