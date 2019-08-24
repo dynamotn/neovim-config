@@ -84,3 +84,12 @@ endfor
 nmap <leader>- <Plug>AirlineSelectPrevTab
 nmap <leader>+ <Plug>AirlineSelectNextTab
 " ---------------------------- }
+
+" --------- Terminal --------- {
+if v:version >= 800
+  tnoremap <Esc><Esc> <C-\><C-n>
+  noremap <F4> :Deol<CR>
+else
+  noremap <F4> :VimShell<CR>
+endif
+" ---------------------------- }

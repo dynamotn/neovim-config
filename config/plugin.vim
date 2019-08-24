@@ -54,3 +54,11 @@ Plug 'vim-airline/vim-airline'
   " ---------------- }
 " ----------------- }
 " ---------------------------- }
+
+" --------- Terminal --------- {
+if v:version >= 800
+  Plug 'Shougo/deol.nvim'
+else
+  Plug 'Shougo/vimshell.vim' | Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+endif
+" ---------------------------- }
