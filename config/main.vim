@@ -6,18 +6,14 @@ endif
 " ---------------------------- }
 
 " ------ Plugin Manager ------ {
-" Auto install vim-plug
-if empty(glob($VIMHOME . '/autoload/plug.vim'))
-  silent !curl -fLo $VIMHOME/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
+" Automatically install vim-plug
+call dynamo#file#DownloadPluginManager()
 
 " Load plugin
 call plug#begin($VIMHOME . '/bundles')
-source $VIMHOME/config/plugin.vim
+call dynamo#file#LoadConfig('plugin')
 call plug#end()
-source $VIMHOME/config/key_binding.vim
+call dynamo#file#LoadConfig('key_binding')
 " ---------------------------- }
 
 " ------------ UI ------------ {
@@ -78,9 +74,7 @@ set nobackup
 set nowritebackup
 set noswapfile
 
-if !empty(glob($VIMHOME . 'config/file_specific.vim'))
-  source $VIMHOME/config/file_specific.vim
-end
+call dynamo#file#LoadConfig('file_specific')
 " ---------------------------- }
 
 " ---------- Tweaks ---------- {
@@ -152,26 +146,7 @@ set foldmethod=marker
 set foldmarker={,}
 " What movements open folds
 set foldopen=block,hor,mark,percent,quickfix,tag,jump,search,undo
-" Custom fold text function (cleaner than default)
-function! SimpleFoldText()
-  let fs = v:foldstart
-  while getline(fs) =~# '^\s*$' | let fs = nextnonblank(fs + 1)
-  endwhile
-  if fs > v:foldend
-    let line = getline(v:foldstart)
-  else
-    let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
-  endif
-
-  let repeat_symbol = '·'
-  let fold_size = 1 + v:foldend - v:foldstart
-  let fold_size_str = ' ' . fold_size . ' lines '
-  let fold_level_str = repeat('|', v:foldlevel)
-  let w = winwidth(0) - &foldcolumn - (&number ? 8 : 0) " 8: max character for number line
-  let expansion_string = repeat(repeat_symbol, w - strwidth(fold_size_str . line . fold_level_str))
-  return line . expansion_string . fold_size_str . fold_level_str
-endfunction
-set foldtext=SimpleFoldText()
+set foldtext=dynamo#ui#FoldText()
 " ------------- }
 " ---------------------------- }
 
