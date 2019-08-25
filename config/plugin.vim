@@ -62,3 +62,19 @@ else
   Plug 'Shougo/vimshell.vim' | Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 endif
 " ---------------------------- }
+
+" ---------- Guide ----------- {
+Plug 'hecal3/vim-leader-guide'
+  " Base SPACE menu
+  let g:guide_space_map={}
+
+  " Base leader menu
+  let g:guide_leader_map={}
+
+  " All menus
+  let g:guide_map={}
+  let g:guide_map[' ']=g:guide_space_map
+  let g:guide_map[' ']['name']='Space'
+  let g:guide_map[get(g:, 'mapleader', '\')]=g:guide_leader_map
+  let g:guide_map[get(g:, 'mapleader', '\')]['name']='Leader'
+" ---------------------------- }
