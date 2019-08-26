@@ -48,6 +48,11 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
+" Layout
+call dynamo#mapping#Define('nnoremap', '<Space>', 'w2', ":silent only | vs | wincmd w<CR>", 'Layout 2 columns')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'w3', ":silent only | vs | vs | wincmd H<CR>", 'Layout 3 columns')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'w=', ":wincmd = <CR>", 'Layout 3 columns')
+
 " Interactive choose window
 call dynamo#mapping#Define('nmap', '<Space>', 'wc', '<Plug>(choosewin)', 'Choose window')
 " ---------------------------- }
