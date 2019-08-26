@@ -53,6 +53,13 @@ Plug 'vim-airline/vim-airline'
   "                          +--------------- Current % into file
   " ---------------- }
 " ----------------- }
+
+" -- Text -- {
+Plug 'chrisbra/Colorizer'
+  " Automatically show color
+  let g:colorizer_auto_color=1
+  let g:colorizer_auto_filetype='*'
+" ---------- }
 " ---------------------------- }
 
 " --------- Terminal --------- {
