@@ -37,6 +37,10 @@ Plug 'vim-airline/vim-airline'
   let g:airline#extensions#tabline#show_close_button=0
   " ------------- }
 
+  " Git branch
+  let g:airline#extensions#branch#empty_message=''
+  let g:airline#extensions#branch#format=2
+
   " -- Status bar -- {
   " Show encoding and buffer number
   let g:airline_section_y='BN: %{bufnr("%")} %{&fileencoding} %{&ff}'
@@ -93,7 +97,7 @@ Plug 't9md/vim-choosewin'
 
 " -------- Navigation -------- {
 " -- File explorer -- {
-Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree' | Plug 'Xuyuanp/nerdtree-git-plugin'
   " Show bookmarks
   let g:NERDTreeShowBookmarks=1
 
@@ -109,4 +113,18 @@ Plug 'scrooloose/nerdtree'
   " Position
   let g:NERDTreeWinPos='right'
 " ------------------- }
+" ---------------------------- }
+
+" ----------- Git ------------ {
+" Show git hunks at ruler
+if has('signs')
+  Plug 'airblade/vim-gitgutter'
+    " Use silver searcher
+    if executable('ag')
+      let g:gitgutter_grep_command='ag'
+    end
+endif
+
+" Wrapper
+Plug 'tpope/vim-fugitive'
 " ---------------------------- }
