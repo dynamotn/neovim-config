@@ -78,3 +78,8 @@ Plug 'hecal3/vim-leader-guide'
   let g:guide_map[get(g:, 'mapleader', '\')]=g:guide_leader_map
   let g:guide_map[get(g:, 'mapleader', '\')]['name']='Leader'
 " ---------------------------- }
+
+" ---------- Window ---------- {
+" Interactive choose window
+Plug 't9md/vim-choosewin'
+" ---------------------------- }

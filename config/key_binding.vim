@@ -47,6 +47,9 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
+
+" Interactive choose window
+call dynamo#mapping#Define('nmap', '<Space>', 'wc', '<Plug>(choosewin)', 'Choose window')
 " ---------------------------- }
 
 " ----------- Tab ------------ {
