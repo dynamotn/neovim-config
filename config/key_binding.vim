@@ -38,7 +38,7 @@ cnoreabbrev Qall qall
 " ---------------------------- }
 
 " --------- Window ----------- {
-call dynamo#mapping#Group('<Space>', 'w', '+Window')
+call dynamo#mapping#Group('<Space>', 'w', 'Window')
 " Switch between the last two files
 call dynamo#mapping#Define('nnoremap', '<Space>', 'ws', '<C-^>', 'Switch buffer')
 
@@ -58,7 +58,7 @@ call dynamo#mapping#Define('nmap', '<Space>', 'wc', '<Plug>(choosewin)', 'Choose
 " ---------------------------- }
 
 " ----------- Tab ------------ {
-call dynamo#mapping#Group('<leader>', 't', '+Tab')
+call dynamo#mapping#Group('<leader>', 't', 'Tab')
 " Useful mappings for managing tabs
 call dynamo#mapping#Define('map', '<leader>', 'tn', ':tabnew<CR>', 'New tab')
 call dynamo#mapping#Define('map', '<leader>', 'to', ':tabonly<CR>', 'Close other tabs')

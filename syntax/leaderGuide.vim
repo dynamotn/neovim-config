@@ -1,3 +1,4 @@
+scriptencoding utf-8
 if exists('b:current_syntax')
   finish
 endif
@@ -7,7 +8,7 @@ syn region LeaderGuideKeys start="\["hs=e+1 end="\]\s"he=s-1
             \ contained
 syn match LeaderGuideBrackets /\[[^ ]\+\]/
             \ contains=LeaderGuideKeys keepend
-syn match LeaderGuideGroupDesc / +[^\[^\]]\+/ contained
+syn match LeaderGuideGroupDesc / ⍟ [^\[^\]]\+/ contained
 syn region LeaderGuideDesc start="^" end="$"
             \ contains=LeaderGuideBrackets,LeaderGuideGroupDesc
 
