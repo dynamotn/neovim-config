@@ -6,7 +6,8 @@ function! dynamo#mapping#Define(type, main_key, follow_key, command, description
   if map =~# 'nore'
     let feedkeys_mode = 'n'
   endif
-  exec a:type . ' ' . a:main_key . a:follow_key . ' ' . a:command
+  let gexe = substitute(a:command, '|', '\\|', 'g')
+  exec a:type . ' ' . a:main_key . a:follow_key . ' ' . gexe
 
   let list_map = g:guide_map[dynamo#string#GetKeyStroke(a:main_key)]
   let follow_keys = dynamo#string#GetKeyStroke(a:follow_key)
@@ -19,7 +20,7 @@ function! dynamo#mapping#Define(type, main_key, follow_key, command, description
       let list_map = get(list_map, last_follow_key, {})
     endif
   endfor
-  let gexe = substitute(a:command, '<\([a-zA-Z-]\+\)>', '\\<\1>', 'g')
+  let gexe = substitute(gexe, '<\([a-zA-Z-]\+\)>', '\\<\1>', 'g')
   call extend(list_map, { last_follow_key :
         \ ['call feedkeys("' . gexe . '", "' . feedkeys_mode . '")'
         \ , a:description]
