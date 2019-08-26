@@ -31,6 +31,8 @@ function! dynamo#mapping#Define(type, main_key, follow_key, command, description
 
   " With feedkeys function, must have backslash with special key
   let gexe = substitute(gexe, '<\([a-zA-Z-]\+\)>', '\\<\1>', 'g')
+  " Create escape char for magic pattern
+  let gexe = substitute(gexe, '\\\([vVmM]\)', '\\\\\1', 'g')
   let feedkeys_mode = 'm'
   let map = split(a:type)[0]
   " If type have nore keyword, then not remap key
