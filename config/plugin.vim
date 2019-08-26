@@ -90,3 +90,23 @@ Plug 'hecal3/vim-leader-guide'
 " Interactive choose window
 Plug 't9md/vim-choosewin'
 " ---------------------------- }
+
+" -------- Navigation -------- {
+" -- File explorer -- {
+Plug 'scrooloose/nerdtree'
+  " Show bookmarks
+  let g:NERDTreeShowBookmarks=1
+
+  " Open automatically when starts up with no files
+  augroup NERDTreeStartup
+    autocmd StdinReadPre * let s:std_in=1
+    autocmd VimEnter * if !argc() && !exists("s:std_in") | NERDTree | endif
+  augroup END
+
+  " Close vim if is the only window open
+  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+  " Position
+  let g:NERDTreeWinPos='right'
+" ------------------- }
+" ---------------------------- }
