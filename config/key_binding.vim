@@ -119,3 +119,8 @@ call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Up>', '<Plug>GitGutterPrevH
 call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Down>', '<Plug>GitGutterNextHunk', 'Next hunk')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'gc', '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict')
 " ---------------------------- }
+
+" --------- Language --------- {
+call dynamo#mapping#Group('<Space>', 'l', 'Language')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'lm', '<Plug>MarkdownPreview', 'Preview markdown')
+" ---------------------------- }

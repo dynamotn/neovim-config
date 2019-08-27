@@ -128,3 +128,14 @@ endif
 " Wrapper
 Plug 'tpope/vim-fugitive'
 " ---------------------------- }
+
+" --------- Language --------- {
+" Markdown
+if has('python') || has('python3')
+  if v:version >= 800
+    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
+  else
+    Plug 'iamcco/markdown-preview.vim'
+  endif
+endif
+" ---------------------------- }
