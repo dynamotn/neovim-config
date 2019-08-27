@@ -52,8 +52,14 @@ highlight clear LineNr
 " ---------------------- }
 
 " Elegant view
-set background=dark
-colorscheme hybrid " Set to end of UI section to correct color
+" Set to end of UI section to correct color
+if has("termguicolors")
+  set termguicolors
+  call dynamo#time#AutoDayNight('colorscheme PaperColor', 'colorscheme one')
+else
+  set background=dark
+  colorscheme hybrid
+endif
 " ---------------------------- }
 
 " ---- File manipulation ----- {

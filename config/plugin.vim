@@ -1,18 +1,27 @@
 " vim:foldmethod=marker:foldmarker={,}
 " ------- Color scheme ------- {
+" For 256 color
 Plug 'w0ng/vim-hybrid'
   let g:hybrid_custom_term_colors=1
   let g:hybrid_reduced_contrast=1
+" For day time
+Plug 'NLKNguyen/papercolor-theme'
+" For night time
+Plug 'rakr/vim-one'
 " ---------------------------- }
 
 " -------- Eyecandy ---------- {
 " -- General GUI -- {
-Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
   " Use Powerline fonts
   let g:airline_powerline_fonts=1
 
   " Set theme
-  let g:airline_theme='hybridline'
+  if has("termguicolors")
+    call dynamo#time#AutoDayNight("let g:airlinetheme='papercolor'", "let g:airlinetheme='one'")
+  else
+    let g:airline_theme='hybridline'
+  endif
 
   " Preview window should be excluded
   let g:airline_exclude_preview=1
