@@ -73,6 +73,22 @@ Plug 'chrisbra/Colorizer'
   let g:colorizer_auto_color=1
   let g:colorizer_auto_filetype='*'
 " ---------- }
+
+" -- Icon -- {
+Plug 'ryanoasis/vim-devicons'
+" ---------- }
+
+" -- Indent -- {
+if v:version >= 702
+  Plug 'nathanaelkane/vim-indent-guides'
+    let g:indent_guides_enable_on_vim_startup = 1
+end
+" ------------ }
+
+" -- Parentheses -- {
+Plug 'luochen1990/rainbow'
+  let g:rainbow_active = 1
+" ----------------- }
 " ---------------------------- }
 
 " --------- Terminal --------- {
