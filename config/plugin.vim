@@ -100,7 +100,9 @@ endif
 " ---------------------------- }
 
 " ---------- Guide ----------- {
-Plug 'hecal3/vim-leader-guide'
+Plug 'liuchengxu/vim-which-key'
+  " Better name
+  let g:which_key_default_group_name='No name'
   " Base SPACE menu
   let g:guide_space_map={}
 
@@ -109,10 +111,8 @@ Plug 'hecal3/vim-leader-guide'
 
   " All menus
   let g:guide_map={}
-  let g:guide_map[' ']=g:guide_space_map
-  let g:guide_map[' ']['name']='Space'
-  let g:guide_map[get(g:, 'mapleader', '\')]=g:guide_leader_map
-  let g:guide_map[get(g:, 'mapleader', '\')]['name']='Leader'
+  let g:guide_map['<Space>']=g:guide_space_map
+  let g:guide_map['<leader>']=g:guide_leader_map
 " ---------------------------- }
 
 " ---------- Window ---------- {

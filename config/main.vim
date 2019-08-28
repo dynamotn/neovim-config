@@ -118,6 +118,9 @@ else
   set viminfo+=n$VIMHOME/viminfo
 end
 
+" Timeout of key sequence
+set timeoutlen=500
+
 " -- Search -- {
 " Find as you type search
 set incsearch

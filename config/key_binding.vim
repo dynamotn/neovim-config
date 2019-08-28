@@ -105,18 +105,19 @@ endif
 " ---------------------------- }
 
 " ----------- Guide ---------- {
-call leaderGuide#register_prefix_descriptions('', 'g:guide_map')
-nnoremap <silent> <Space> :<C-u>LeaderGuide '<Space>'<CR>
-vnoremap <silent> <Space> :<C-u>LeaderGuideVisual '<Space>'<CR>
-nnoremap <silent> <leader> :<C-u>LeaderGuide get(g:, 'mapleader', '\')<CR>
-vnoremap <silent> <leader> :<C-u>LeaderGuideVisual get(g:, 'mapleader', '\')<CR>
+call which_key#register('<Space>', 'g:guide_space_map')
+call which_key#register(get(g:, 'mapleader', '\'), 'g:guide_leader_map')
+nnoremap <silent> <Space> :<C-u>WhichKey '<Space>'<CR>
+vnoremap <silent> <Space> :<C-u>WhichKeyVisual '<Space>'<CR>
+nnoremap <silent> <leader> :<C-u>WhichKey get(g:, 'mapleader', '\')<CR>
+vnoremap <silent> <leader> :<C-u>WhichKeyVisual get(g:, 'mapleader', '\')<CR>
 " ---------------------------- }
 
 " ------------ Git ----------- {
 " Move to hunks
 call dynamo#mapping#Group('<Space>', 'g', 'Git')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Up>', ':GitGutterPrevHunk<CR>', 'Previous hunk')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Down>', ':GitGutterNextHunk<CR>', 'Next hunk')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'gk', ':GitGutterPrevHunk<CR>', 'Previous hunk')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'gj', ':GitGutterNextHunk<CR>', 'Next hunk')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'gc', '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict')
 " ---------------------------- }
 
