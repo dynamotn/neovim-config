@@ -95,6 +95,18 @@ elseif v:version >= 703 && has('lua')
 endif
 " ---------- }
 
+" -- Snippet -- {
+" Engine
+if v:version >= 704
+  Plug 'Shougo/neosnippet'
+  call dynamo#file#RegisterPlugin('neosnippet')
+endif
+
+" List
+Plug 'Shougo/neosnippet-snippets'
+Plug 'honza/vim-snippets'
+" ------------- }
+
 " -- Typing -- {
 " Automatically insert/delete brackets, parentheses, quotes
 Plug 'jiangmiao/auto-pairs'

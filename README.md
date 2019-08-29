@@ -34,4 +34,4 @@ Note
 
 - Not use for neovim/vim GUI
 - Use for Linux only
-- Vim version >= 7.3
+- Vim version >= 7.4 to use all features
