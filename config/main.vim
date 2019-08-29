@@ -175,7 +175,7 @@ set wildignorecase
 " ------------------ }
 
 " -- Edit mode -- {
-set completeopt=menu,menuone,longest
+set completeopt=menu,menuone,preview
 " Limit completion menu height
 set pumheight=15
 " --------------- }
