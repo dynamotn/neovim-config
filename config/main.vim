@@ -53,10 +53,17 @@ highlight clear LineNr
 
 " Elegant view
 " Set to end of UI section to correct color
-if has("termguicolors")
+if has('termguicolors')
+  if !has('nvim')
+    let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+  endif
   set termguicolors
   call dynamo#time#AutoDayNight('colorscheme PaperColor', 'colorscheme one')
 else
+  set t_Co=256
+  let &t_AB="\<Esc>[48;5;%dm"
+  let &t_AF="\<Esc>[38;5;%dm"
   set background=dark
   colorscheme hybrid
 endif
