@@ -4,6 +4,11 @@ scriptencoding utf-8
 if &compatible
   set nocompatible
 endif
+let g:dynamo_plugins_folder='bundles'
+let g:dynamo_list_plugins_file='list_plugins'
+let g:dynamo_plugin_configs_folder='plugins'
+let g:dynamo_list_key_bindings_folder='key_bindings'
+let g:dynamo_common_key_bindings_file='common'
 " ---------------------------- }
 
 " ------ Plugin Manager ------ {
@@ -11,10 +16,8 @@ endif
 call dynamo#file#DownloadPluginManager()
 
 " Load plugin
-call plug#begin($VIMHOME . '/bundles')
-call dynamo#file#LoadConfig('plugin')
-call plug#end()
-call dynamo#file#LoadConfig('key_binding')
+call dynamo#file#InitPluginOption()
+call dynamo#file#InitPluginKeyBinding()
 " ---------------------------- }
 
 " ------------ UI ------------ {

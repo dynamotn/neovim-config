@@ -27,14 +27,14 @@ imap <C-s> <Esc>:w<CR>a
 " No one is really happy until you have this shortcuts
 cnoreabbrev W! w!
 cnoreabbrev Q! q!
-cnoreabbrev Qall! qall!
+cnoreabbrev Qa! qa!
 cnoreabbrev Wq wq
 cnoreabbrev Wa wa
 cnoreabbrev wQ wq
 cnoreabbrev WQ wq
 cnoreabbrev W w
 cnoreabbrev Q q
-cnoreabbrev Qall qall
+cnoreabbrev Qa qa
 " ---------------------------- }
 
 " --------- Window ----------- {
@@ -52,9 +52,6 @@ nnoremap <C-l> <C-w>l
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w2', ':silent only | vs | wincmd w<CR>', 'Layout 2 columns')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w3', ':silent only | vs | vs | wincmd H<CR>', 'Layout 3 columns')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w=', ':wincmd = <CR>', 'Layout 3 columns')
-
-" Interactive choose window
-call dynamo#mapping#Define('nmap', '<Space>', 'wc', '<Plug>(choosewin)', 'Choose window')
 " ---------------------------- }
 
 " ----------- Tab ------------ {
@@ -86,48 +83,15 @@ vnoremap < <gv
 vnoremap > >gv
 " ---------------------------- }
 
-" --------- Airline ---------- {
-" Switch tab
-for i in range(1,9)
-  call dynamo#mapping#Define('nmap', '<leader>', i, '<Plug>AirlineSelectTab' . i, 'Tab index ' . i)
-endfor
-call dynamo#mapping#Define('nmap', '<leader>', '-', '<Plug>AirlineSelectPrevTab' . i, 'Previous tab')
-call dynamo#mapping#Define('nmap', '<leader>', '+', '<Plug>AirlineSelectNextTab' . i, 'Next tab')
-" ---------------------------- }
-
-" --------- Terminal --------- {
-if v:version >= 800
-  tnoremap <Esc><Esc> <C-\><C-n>
-  noremap <F4> :Deol<CR>
-else
-  noremap <F4> :VimShell<CR>
-endif
-" ---------------------------- }
-
-" ----------- Guide ---------- {
-call which_key#register('<Space>', 'g:guide_space_map')
-call which_key#register(get(g:, 'mapleader', '\'), 'g:guide_leader_map')
-nnoremap <silent> <Space> :<C-u>WhichKey '<Space>'<CR>
-vnoremap <silent> <Space> :<C-u>WhichKeyVisual '<Space>'<CR>
-nnoremap <silent> <leader> :<C-u>WhichKey get(g:, 'mapleader', '\')<CR>
-vnoremap <silent> <leader> :<C-u>WhichKeyVisual get(g:, 'mapleader', '\')<CR>
-" ---------------------------- }
-
 " -------- Navigation -------- {
-" Open file explorer
 call dynamo#mapping#Group('<Space>', 'f', 'File')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'fe', ':NERDTreeToggle<CR>', 'File explorer')
 " ---------------------------- }
 
 " ------------ Git ----------- {
 " Move to hunks
 call dynamo#mapping#Group('<Space>', 'g', 'Git')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'gk', ':GitGutterPrevHunk<CR>', 'Previous hunk')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'gj', ':GitGutterNextHunk<CR>', 'Next hunk')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'gc', '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict')
 " ---------------------------- }
 
 " --------- Language --------- {
 call dynamo#mapping#Group('<Space>', 'l', 'Language')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'lm', ':MarkdownPreview<CR>', 'Preview markdown')
 " ---------------------------- }
