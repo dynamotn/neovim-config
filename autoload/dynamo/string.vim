@@ -7,7 +7,7 @@ function! dynamo#string#GetKeyStroke(input_keys) abort
   let is_special_key = 0
 
   while i < len(a:input_keys)
-    if a:input_keys[i] == '<'
+    if a:input_keys[i] ==? '<'
       let is_special_key = 1
     endif
     if is_special_key == 1
@@ -15,7 +15,7 @@ function! dynamo#string#GetKeyStroke(input_keys) abort
     else
       let keystrokes_list = add(keystrokes_list, a:input_keys[i])
     endif
-    if a:input_keys[i] == '>'
+    if a:input_keys[i] ==? '>'
       let is_special_key = 0
       let keystrokes_list = add(keystrokes_list,
             \ dynamo#string#ReplaceKeyStroke(current_special_key))

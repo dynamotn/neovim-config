@@ -1,6 +1,7 @@
 " vim:foldmethod=marker:foldmarker={,}
+scriptencoding utf-8
 " Custom fold text function (cleaner than default) {
-function! dynamo#ui#FoldText()
+function! dynamo#ui#FoldText() abort
   let fs = v:foldstart
   while getline(fs) =~# '^\s*$' | let fs = nextnonblank(fs + 1)
   endwhile

@@ -4,7 +4,9 @@ function! dynamo#file#DownloadPluginManager() abort
   if empty(glob($VIMHOME . '/autoload/plug.vim'))
     silent !curl -fLo $VIMHOME/autoload/plug.vim --create-dirs
       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup ReloadAndInstallVimPlug
+      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup END
   endif
 endfunction " }
 

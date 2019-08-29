@@ -1,4 +1,5 @@
 " vim:foldmethod=marker:foldmarker={,}
+scriptencoding utf-8
 " ------- Color scheme ------- {
 " For 256 color
 Plug 'w0ng/vim-hybrid'
@@ -17,7 +18,7 @@ Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
   let g:airline_powerline_fonts=1
 
   " Set theme
-  if has("termguicolors")
+  if has('termguicolors')
     call dynamo#time#AutoDayNight("let g:airlinetheme='papercolor'", "let g:airlinetheme='one'")
   else
     let g:airline_theme='hybridline'
@@ -107,6 +108,7 @@ endif
 Plug 'liuchengxu/vim-which-key'
   " Better name
   let g:which_key_default_group_name='No name'
+  let g:which_key_use_floating_win=1
   " Base SPACE menu
   let g:guide_space_map={}
 
@@ -137,7 +139,9 @@ Plug 'scrooloose/nerdtree' | Plug 'Xuyuanp/nerdtree-git-plugin'
   augroup END
 
   " Close vim if is the only window open
-  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+  augroup NERDTreeAutoQuit
+    autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+  augroup END
 
   " Position
   let g:NERDTreeWinPos='right'
@@ -159,6 +163,17 @@ Plug 'tpope/vim-fugitive'
 " ---------------------------- }
 
 " --------- Language --------- {
+" -- Linter -- {
+Plug 'dense-analysis/ale'
+  " Symbol
+  let g:ale_sign_error='✗✗'
+  let g:ale_sign_warning='∆∆'
+  let g:ale_sign_info='🛈🛈'
+
+  " Check when save file
+  let g:ale_lint_on_save=1
+" ------------ }
+
 " Markdown
 if has('python') || has('python3')
   if v:version >= 800

@@ -1,4 +1,5 @@
 " vim:foldmethod=marker:foldmarker={,}
+scriptencoding utf-8
 " --------- General ---------- {
 if &compatible
   set nocompatible

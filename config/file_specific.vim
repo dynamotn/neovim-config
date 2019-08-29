@@ -4,5 +4,7 @@ function! CommitFast()
   set noreadonly
   normal! gg
 endfunction
-autocmd BufNewFile,BufRead COMMIT_EDITMSG,MERGE_MSG exec CommitFast()
+augroup FastCommitMessage
+  autocmd BufNewFile,BufRead COMMIT_EDITMSG,MERGE_MSG exec CommitFast()
+augroup END
 " }
