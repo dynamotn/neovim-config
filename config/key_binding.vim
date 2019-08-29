@@ -113,6 +113,12 @@ nnoremap <silent> <leader> :<C-u>WhichKey get(g:, 'mapleader', '\')<CR>
 vnoremap <silent> <leader> :<C-u>WhichKeyVisual get(g:, 'mapleader', '\')<CR>
 " ---------------------------- }
 
+" -------- Navigation -------- {
+" Open file explorer
+call dynamo#mapping#Group('<Space>', 'f', 'File')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'fe', ":NERDTreeToggle<CR>", 'File explorer')
+" ---------------------------- }
+
 " ------------ Git ----------- {
 " Move to hunks
 call dynamo#mapping#Group('<Space>', 'g', 'Git')
