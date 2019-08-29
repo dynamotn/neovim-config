@@ -68,10 +68,14 @@ Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 " ----------------- }
 
 " -- Text -- {
-Plug 'chrisbra/Colorizer'
-  " Automatically show color
-  let g:colorizer_auto_color=1
-  let g:colorizer_auto_filetype='*'
+if v:version >= 800
+  Plug 'chrisbra/Colorizer'
+    " Automatically show color
+    let g:colorizer_auto_color=1
+    let g:colorizer_auto_filetype='*'
+else
+  Plug 'lilydjwg/colorizer'
+endif
 " ---------- }
 
 " -- Icon -- {
