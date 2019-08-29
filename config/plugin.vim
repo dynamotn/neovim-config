@@ -98,9 +98,9 @@ Plug 'luochen1990/rainbow'
 
 " --------- Terminal --------- {
 if v:version >= 800
-  Plug 'Shougo/deol.nvim'
+  Plug 'Shougo/deol.nvim', { 'on': 'Deol' }
 else
-  Plug 'Shougo/vimshell.vim' | Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+  Plug 'Shougo/vimshell.vim', { 'on': 'VimShell' } | Plug 'Shougo/vimproc.vim', { 'do' : 'make', 'on': 'VimShell' }
 endif
 " ---------------------------- }
 
@@ -121,14 +121,14 @@ Plug 'liuchengxu/vim-which-key'
   let g:guide_map['<leader>']=g:guide_leader_map
 " ---------------------------- }
 
-" ---------- Window ---------- {
-" Interactive choose window
-Plug 't9md/vim-choosewin'
-" ---------------------------- }
-
 " -------- Navigation -------- {
+" -- Window -- {
+" Interactive choose window
+Plug 't9md/vim-choosewin', { 'on': '<Plug>(choosewin)' }
+" ------------ }
+
 " -- File explorer -- {
-Plug 'scrooloose/nerdtree' | Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' } | Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
   " Show bookmarks
   let g:NERDTreeShowBookmarks=1
 
@@ -177,9 +177,9 @@ Plug 'dense-analysis/ale'
 " Markdown
 if has('python') || has('python3')
   if v:version >= 800
-    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
+    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 'markdown' }
   else
-    Plug 'iamcco/markdown-preview.vim'
+    Plug 'iamcco/markdown-preview.vim', { 'for': 'markdown' }
   endif
 endif
 " ---------------------------- }
