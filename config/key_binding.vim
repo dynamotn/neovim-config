@@ -115,12 +115,12 @@ vnoremap <silent> <leader> :<C-u>LeaderGuideVisual get(g:, 'mapleader', '\')<CR>
 " ------------ Git ----------- {
 " Move to hunks
 call dynamo#mapping#Group('<Space>', 'g', 'Git')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Up>', '<Plug>GitGutterPrevHunk', 'Previous hunk')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Down>', '<Plug>GitGutterNextHunk', 'Next hunk')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Up>', ':GitGutterPrevHunk<CR>', 'Previous hunk')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'g<Down>', ':GitGutterNextHunk<CR>', 'Next hunk')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'gc', '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict')
 " ---------------------------- }
 
 " --------- Language --------- {
 call dynamo#mapping#Group('<Space>', 'l', 'Language')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'lm', '<Plug>MarkdownPreview', 'Preview markdown')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'lm', ':MarkdownPreview<CR>', 'Preview markdown')
 " ---------------------------- }
