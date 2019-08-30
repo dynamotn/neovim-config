@@ -78,6 +78,18 @@ call dynamo#file#RegisterPlugin('nerdtree')
 " ------------------- }
 " ---------------------------- }
 
+" -------- Efficiency -------- {
+" Show tags and LSP symbols
+if executable('ctags')
+  if v:version >= 800
+    Plug 'liuchengxu/vista.vim'
+    call dynamo#file#RegisterPlugin('vista')
+  else
+    Plug 'majutsushi/tagbar'
+  endif
+endif
+" ---------------------------- }
+
 " ----------- Git ------------ {
 " Show git hunks at ruler
 if has('signs')

@@ -7,4 +7,4 @@ augroup NERDTreeAutoQuit
 augroup END
 
 " Position
-let g:NERDTreeWinPos='right'
+let g:NERDTreeWinPos='left'
