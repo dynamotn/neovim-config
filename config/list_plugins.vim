@@ -43,6 +43,11 @@ end
 Plug 'luochen1990/rainbow'
 call dynamo#file#RegisterPlugin('rainbow')
 " ----------------- }
+
+" -- Mark -- {
+Plug 'kshenoy/vim-signature'
+call dynamo#file#RegisterPlugin('signature')
+" ---------- }
 " ---------------------------- }
 
 " --------- Terminal --------- {
