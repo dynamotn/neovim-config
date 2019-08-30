@@ -64,7 +64,7 @@ call dynamo#file#RegisterPlugin('choosewin')
 " ------------ }
 
 " -- File explorer -- {
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' } | Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree' | Plug 'Xuyuanp/nerdtree-git-plugin'
 call dynamo#file#RegisterPlugin('nerdtree')
 " ------------------- }
 " ---------------------------- }
