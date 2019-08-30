@@ -10,10 +10,14 @@ call dynamo#file#RegisterPlugin('colorscheme')
 " ---------------------------- }
 
 " -------- Eyecandy ---------- {
-" -- General GUI -- {
+" -- Status line -- {
 Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 call dynamo#file#RegisterPlugin('airline')
 " ----------------- }
+
+" -- Startup screen -- {
+Plug 'mhinz/vim-startify'
+" -------------------- }
 
 " -- Text -- {
 if v:version >= 800
