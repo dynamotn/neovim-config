@@ -81,6 +81,20 @@ map <Enter> o<Esc>
 " Change indentation with multiple level
 vnoremap < <gv
 vnoremap > >gv
+nnoremap < <<_
+nnoremap > >>_
+
+" Remove all trailing spaces
+nnoremap <silent> ,<Space> :<C-u>silent! keeppatterns %substitute/\s\+$//e<CR>
+
+" Better search replace when in select mode
+xnoremap <C-r> :<C-u>call <SID>VSetSearch()<CR>:,$s/<C-R>=@/<CR>//gc<left><left><left>
+function! s:VSetSearch() abort
+  let temp = @s
+  norm! gv"sy
+  let @/ = '\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
+  let @s = temp
+endfunction
 " ---------------------------- }
 
 " -------- Navigation -------- {
