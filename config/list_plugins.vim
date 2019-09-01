@@ -99,6 +99,11 @@ endif
 
 " Fast comment
 Plug 'scrooloose/nerdcommenter'
+
+" Show matching keyword, parentheses..., move between them
+if exists('*matchaddpos')
+  Plug 'andymass/vim-matchup'
+endif
 " ---------------------------- }
 
 " ----------- Git ------------ {
