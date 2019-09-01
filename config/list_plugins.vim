@@ -111,6 +111,7 @@ Plug 'tpope/vim-fugitive'
 
 " -------- Completion -------- {
 " -- Code -- {
+" Engine
 if v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_version >= 306.01
   if has('nvim')
     let plug_param_for_deoplete = { 'do': 'UpdateRemotePlugins' }
@@ -125,6 +126,12 @@ if v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_versi
 elseif v:version >= 703 && has('lua')
   Plug 'Shougo/neocomplete.vim'
   call dynamo#file#RegisterPlugin('neocomplete')
+endif
+
+" Display function signatures
+if has('patch-7.4.774')
+  Plug 'Shougo/echodoc.vim'
+  call dynamo#file#RegisterPlugin('echodoc')
 endif
 " ---------- }
 
@@ -161,4 +168,7 @@ if has('python') || has('python3')
   endif
   call dynamo#file#RegisterPlugin('markdown_preview')
 endif
+
+" Vim
+Plug 'Shougo/neco-vim', { 'for': 'vim' }
 " ---------------------------- }
