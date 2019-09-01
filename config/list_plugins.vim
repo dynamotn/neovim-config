@@ -96,6 +96,9 @@ if executable('ctags')
     Plug 'majutsushi/tagbar'
   endif
 endif
+
+" Fast comment
+Plug 'scrooloose/nerdcommenter'
 " ---------------------------- }
 
 " ----------- Git ------------ {
