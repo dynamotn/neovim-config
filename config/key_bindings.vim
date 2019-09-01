@@ -95,6 +95,14 @@ function! s:VSetSearch() abort
   let @/ = '\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
   let @s = temp
 endfunction
+
+" Quickly add empty lines
+nnoremap <silent> [<Space>  :<c-u>put! =repeat(nr2char(10), v:count1)<cr>
+nnoremap <silent> ]<Space>  :<c-u>put =repeat(nr2char(10), v:count1)<cr>
+
+" Move current line after/before lines
+nnoremap <silent>[e  :<c-u>execute 'move -1-'. v:count1<cr>
+nnoremap <silent>]e  :<c-u>execute 'move +'. v:count1<cr>
 " ---------------------------- }
 
 " -------- Navigation -------- {
