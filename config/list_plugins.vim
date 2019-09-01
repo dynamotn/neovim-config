@@ -1,4 +1,11 @@
 " vim:foldmethod=marker:foldmarker={,}
+" ---------- General --------- {
+" Vim 8 remote plugin
+if !has('nvim')
+  Plug 'roxma/nvim-yarp' |  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+" ---------------------------- }
+
 " ------- Color scheme ------- {
 " For 256 color
 Plug 'w0ng/vim-hybrid'
@@ -9,7 +16,7 @@ Plug 'rakr/vim-one'
 call dynamo#file#RegisterPlugin('colorscheme')
 " ---------------------------- }
 
-" -------- Eyecandy ---------- {
+" --------- Eyecandy --------- {
 " -- Status line -- {
 Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 call dynamo#file#RegisterPlugin('airline')
@@ -60,7 +67,8 @@ else
 endif
 " ---------------------------- }
 
-" ---------- Guide ----------- {
+" --------- Framework -------- {
+" Guide
 Plug 'liuchengxu/vim-which-key'
 call dynamo#file#RegisterPlugin('which_key')
 " ---------------------------- }
@@ -103,11 +111,15 @@ Plug 'tpope/vim-fugitive'
 
 " -------- Completion -------- {
 " -- Code -- {
-if v:version >= 800 && has('python3') && has('timers')
+if v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_version >= 306.01
   if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    let plug_param_for_deoplete = { 'do': 'UpdateRemotePlugins' }
+    if !has('nvim-0.3')
+      let plug_param_for_deoplete.tag = '4.1'
+    endif
+    Plug 'Shougo/deoplete.nvim', plug_param_for_deoplete
   else
-    Plug 'Shougo/deoplete.nvim' | Plug 'roxma/nvim-yarp' |  Plug 'roxma/vim-hug-neovim-rpc'
+    Plug 'Shougo/deoplete.nvim'
   endif
   call dynamo#file#RegisterPlugin('deoplete')
 elseif v:version >= 703 && has('lua')

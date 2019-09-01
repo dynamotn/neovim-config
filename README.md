@@ -34,4 +34,5 @@ Note
 
 - Not use for neovim/vim GUI
 - Use for Linux only
-- Vim version >= 7.4 to use all features
+- Vim version >= 7.4 or NVim version >= 0.3 to use all features
+- Must install pynvim if want to use with Nvim

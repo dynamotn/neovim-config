@@ -1,5 +1,5 @@
 " vim:foldmethod=marker:foldmarker={,}
-" Get keystroke instead <leader>, <Space>...
+" Get keystroke instead <leader>, <Space>... {
 function! dynamo#string#GetKeyStroke(input_keys) abort
   let keystrokes_list = []
   let i = 0
@@ -24,9 +24,9 @@ function! dynamo#string#GetKeyStroke(input_keys) abort
     let i += 1
   endwhile
   return keystrokes_list
-endfunction
+endfunction " }
 
-" Replace <leader>, <Space> ... to right char
+" Replace <leader>, <Space> ... to right char {
 function! dynamo#string#ReplaceKeyStroke(input_key) abort
   let must_replace_keys = ['<leader>', '<space>']
   let result_keys = [get(g:, 'mapleader', '\'), ' ']
@@ -39,4 +39,4 @@ function! dynamo#string#ReplaceKeyStroke(input_key) abort
     let i += 1
   endfor
   return a:input_key
-endfunction
+endfunction " }

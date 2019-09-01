@@ -9,6 +9,7 @@ let g:dynamo_list_plugins_file='list_plugins'
 let g:dynamo_plugin_configs_folder='plugins'
 let g:dynamo_list_key_bindings_folder='key_bindings'
 let g:dynamo_common_key_bindings_file='common'
+call dynamo#misc#InitPythonVersion()
 " ---------------------------- }
 
 " ------ Plugin Manager ------ {
