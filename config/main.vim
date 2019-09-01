@@ -6,9 +6,10 @@ if &compatible
 endif
 let g:dynamo_plugins_folder='bundles'
 let g:dynamo_list_plugins_file='list_plugins'
-let g:dynamo_plugin_configs_folder='plugins'
-let g:dynamo_list_key_bindings_folder='key_bindings'
-let g:dynamo_common_key_bindings_file='common'
+let g:dynamo_plugin_configs_folder='plugins/options'
+let g:dynamo_list_key_bindings_folder='plugins/key_bindings'
+let g:dynamo_common_key_bindings_file='key_bindings'
+let g:dynamo_language_plugins_folder='plugins/languages'
 call dynamo#misc#InitPythonVersion()
 " ---------------------------- }
 

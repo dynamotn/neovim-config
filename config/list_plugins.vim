@@ -159,16 +159,8 @@ Plug 'dense-analysis/ale'
 call dynamo#file#RegisterPlugin('ale')
 " ------------ }
 
-" Markdown
-if has('python') || has('python3')
-  if v:version >= 800
-    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 'markdown' }
-  else
-    Plug 'iamcco/markdown-preview.vim', { 'for': 'markdown' }
-  endif
-  call dynamo#file#RegisterPlugin('markdown_preview')
-endif
-
-" Vim
-Plug 'Shougo/neco-vim', { 'for': 'vim' }
+" Load each language
+call dynamo#file#LoadLanguagePlugin('markdown')
+call dynamo#file#LoadLanguagePlugin('vim')
+call dynamo#file#EndLoadPlugin()
 " ---------------------------- }

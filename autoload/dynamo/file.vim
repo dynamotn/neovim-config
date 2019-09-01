@@ -19,15 +19,15 @@ endfunction " }
 
 " Register plugin to load config of plugin {
 function! dynamo#file#RegisterPlugin(file) abort
-  if !exists('g:dynamo_plugin_map')
-    let g:dynamo_plugin_map = []
+  if !exists('s:dynamo_plugin_map')
+    let s:dynamo_plugin_map = []
   endif
-  let g:dynamo_plugin_map = add(g:dynamo_plugin_map, a:file)
+  let s:dynamo_plugin_map = add(s:dynamo_plugin_map, a:file)
 endfunction " }
 
 " Read config after register plugin {
 function! dynamo#file#InitPluginAfterRegister(folder) abort
-  for plugin in g:dynamo_plugin_map
+  for plugin in s:dynamo_plugin_map
     call dynamo#file#LoadConfig(a:folder . '/' . plugin)
   endfor
 endfunction " }
@@ -42,7 +42,20 @@ endfunction " }
 
 " Load key bindings for plugins {
 function! dynamo#file#InitPluginKeyBinding() abort
-  call dynamo#file#LoadConfig(g:dynamo_list_key_bindings_folder .
-        \ '/' . g:dynamo_common_key_bindings_file)
+  call dynamo#file#LoadConfig(g:dynamo_common_key_bindings_file)
   call dynamo#file#InitPluginAfterRegister(g:dynamo_list_key_bindings_folder)
 endfunction " }
+
+" Load plugin list for specific language {
+function! dynamo#file#LoadLanguagePlugin(filetype) abort
+  let g:dynamo_language_plug_param = { 'for': a:filetype }
+  call dynamo#file#LoadConfig(g:dynamo_language_plugins_folder .
+        \ '/' . a:filetype)
+endfunction
+" }
+
+" End of load plugin list {
+function! dynamo#file#EndLoadPlugin() abort
+  unlet g:dynamo_language_plug_param
+endfunction
+" }
