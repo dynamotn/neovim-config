@@ -9,11 +9,7 @@ augroup Startup
 augroup END
 
 " Git commit faster, always start with first line, avoid augroup LastPosition {
-function! CommitFast()
-  set noreadonly
-  normal! gg
-endfunction
 augroup FastCommitMessage
-  autocmd BufNewFile,BufRead COMMIT_EDITMSG,MERGE_MSG exec CommitFast()
+  autocmd BufNewFile,BufRead COMMIT_EDITMSG,MERGE_MSG set noreadonly | normal! gg
 augroup END
 " }
