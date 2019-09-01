@@ -39,3 +39,40 @@ function! dynamo#mapping#Group(main_key, follow_key, description) abort
   let g:guide_map[a:main_key]
         \[dynamo#string#GetKeyStroke(a:follow_key)[0]] = { 'name' : '⍟ ' . a:description }
 endfunction " }
+
+" Smart key bindings for Tab in edit mode {
+function! dynamo#mapping#Tab() abort
+  if getline('.')[col('.')-2] ==# '{'&& pumvisible()
+    return "\<C-n>"
+  endif
+  if neosnippet#expandable() && getline('.')[col('.')-2] ==# '(' && !pumvisible()
+    return "\<Plug>(neosnippet_expand)"
+  elseif neosnippet#jumpable()
+        \ && getline('.')[col('.')-2] ==# '(' && !pumvisible()
+        \ && !neosnippet#expandable()
+    return "\<Plug>(neosnippet_jump)"
+  elseif neosnippet#expandable_or_jumpable() && getline('.')[col('.')-2] !=#'('
+    return "\<Plug>(neosnippet_expand_or_jump)"
+  elseif pumvisible()
+    return "\<C-n>"
+  else
+    return "\<Tab>"
+  endif " }
+endfunction " }
+
+" Smart key bindings for Enter in edit mode {
+function! dynamo#mapping#Enter() abort
+  if pumvisible()
+    if neosnippet#expandable()
+      return "\<Plug>(neosnippet_expand)"
+    else
+      return "\<C-y>"
+    endif
+  elseif getline('.')[col('.') - 2]==#'{'&&getline('.')[col('.')-1]==#'}'
+    return "\<CR>\<Esc>ko"
+  elseif getline('.')[col('.') - 2]==#'('&&getline('.')[col('.')-1]==#')'
+    return "\<CR>\<Esc>ko"
+  else
+    return "\<CR>"
+  endif
+endfunction " }

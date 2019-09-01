@@ -75,8 +75,8 @@ call dynamo#mapping#Define('nnoremap', '<leader>', 'fn', "i<C-r>=expand(\'%:t:n\
 call dynamo#mapping#Define('nnoremap', '<leader>', 'fp', "i<C-r>=expand(\'%:p:h\')<CR>", 'Insert path of file')
 
 " Insert new line
-map <S-Enter> O<Esc>
-map <Enter> o<Esc>
+nnoremap <S-CR> O<Esc>
+nnoremap <CR> o<Esc>
 
 " Change indentation with multiple level
 vnoremap < <gv
