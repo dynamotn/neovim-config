@@ -107,6 +107,10 @@ Plug 'scrooloose/nerdcommenter'
 if exists('*matchaddpos')
   Plug 'andymass/vim-matchup'
 endif
+
+" Test code
+Plug 'janko/vim-test' | Plug 'tpope/vim-dispatch'
+call dynamo#file#RegisterPlugin('test')
 " ---------------------------- }
 
 " ----------- VCS ------------ {
