@@ -97,6 +97,9 @@ if executable('ctags')
   endif
 endif
 
+" Automatically update tags
+Plug 'craigemery/vim-autotag'
+
 " Fast comment
 Plug 'scrooloose/nerdcommenter'
 
