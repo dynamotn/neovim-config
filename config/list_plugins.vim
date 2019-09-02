@@ -115,6 +115,9 @@ call dynamo#file#RegisterPlugin('test')
 " Alignment
 Plug 'junegunn/vim-easy-align'
 call dynamo#file#RegisterPlugin('easy_align')
+
+" Fuzzy finder
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } | Plug 'junegunn/fzf.vim'
 " ---------------------------- }
 
 " ----------- VCS ------------ {
