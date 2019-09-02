@@ -112,6 +112,7 @@ call dynamo#mapping#Group('<Space>', 'f', 'File')
 " ------------ Git ----------- {
 " Move to hunks
 call dynamo#mapping#Group('<Space>', 'g', 'Git')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'gc', '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict')
 " ---------------------------- }
 
 " --------- Language --------- {

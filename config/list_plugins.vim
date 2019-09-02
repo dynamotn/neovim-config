@@ -106,15 +106,14 @@ if exists('*matchaddpos')
 endif
 " ---------------------------- }
 
-" ----------- Git ------------ {
-" Show git hunks at ruler
+" ----------- VCS ------------ {
+" Show hunks at ruler
 if has('signs')
-  Plug 'airblade/vim-gitgutter'
-  call dynamo#file#RegisterPlugin('gitgutter')
+  Plug 'mhinz/vim-signify'
 endif
 
-" Wrapper
-Plug 'tpope/vim-fugitive'
+" Wrapper tool for Git
+Plug 'tpope/vim-fugitive' | Plug 'junegunn/gv.vim'
 " ---------------------------- }
 
 " -------- Completion -------- {
