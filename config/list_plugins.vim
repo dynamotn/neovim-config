@@ -170,5 +170,6 @@ call dynamo#file#RegisterPlugin('ale')
 " Load each language
 call dynamo#file#LoadLanguagePlugin('markdown')
 call dynamo#file#LoadLanguagePlugin('vim')
+call dynamo#file#LoadLanguagePlugin('fish')
 call dynamo#file#EndLoadPlugin()
 " ---------------------------- }
