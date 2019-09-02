@@ -111,6 +111,10 @@ endif
 " Test code
 Plug 'janko/vim-test' | Plug 'tpope/vim-dispatch'
 call dynamo#file#RegisterPlugin('test')
+
+" Alignment
+Plug 'junegunn/vim-easy-align'
+call dynamo#file#RegisterPlugin('easy_align')
 " ---------------------------- }
 
 " ----------- VCS ------------ {
