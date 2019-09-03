@@ -191,5 +191,6 @@ Plug 'sheerun/vim-polyglot'
 call dynamo#file#LoadLanguagePlugin('markdown')
 call dynamo#file#LoadLanguagePlugin('vim')
 call dynamo#file#LoadLanguagePlugin('ansible')
+call dynamo#file#LoadLanguagePlugin('yaml')
 call dynamo#file#EndLoadPlugin()
 " ---------------------------- }
