@@ -162,6 +162,7 @@ if v:version >= 704
   Plug 'Shougo/neosnippet'
   call dynamo#file#RegisterPlugin('neosnippet')
 endif
+Plug 'SirVer/ultisnips'
 
 " List
 Plug 'Shougo/neosnippet-snippets'
