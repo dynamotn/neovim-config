@@ -150,7 +150,7 @@ elseif v:version >= 703 && has('lua')
 endif
 
 " Display function signatures
-if has('patch-7.4.774')
+if v:version >= 800
   Plug 'Shougo/echodoc.vim'
   call dynamo#file#RegisterPlugin('echodoc')
 endif
