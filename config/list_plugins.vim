@@ -172,7 +172,6 @@ Plug 'honza/vim-snippets'
 " -- Typing -- {
 " Automatically insert/delete brackets, parentheses, quotes
 Plug 'jiangmiao/auto-pairs'
-call dynamo#file#RegisterPlugin('auto_pairs')
 " Automatically insert 'end' keyword
 Plug 'tpope/vim-endwise'
 " ----------------- }
