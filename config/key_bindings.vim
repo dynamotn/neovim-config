@@ -51,7 +51,7 @@ nnoremap <C-l> <C-w>l
 " Layout
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w2', ':silent only | vs | wincmd w<CR>', 'Layout 2 columns')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w3', ':silent only | vs | vs | wincmd H<CR>', 'Layout 3 columns')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'w=', ':wincmd = <CR>', 'Layout 3 columns')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'w=', ':wincmd = <CR>', 'Balance windows')
 " ---------------------------- }
 
 " ----------- Tab ------------ {
@@ -73,10 +73,6 @@ call dynamo#mapping#Define('map', '<leader>', 'te', ":tabedit <C-r>=expand(\'%:p
 call dynamo#mapping#Group('<leader>', 'f', 'File')
 call dynamo#mapping#Define('nnoremap', '<leader>', 'fn', "i<C-r>=expand(\'%:t:n\')<CR>", 'Insert name of file')
 call dynamo#mapping#Define('nnoremap', '<leader>', 'fp', "i<C-r>=expand(\'%:p:h\')<CR>", 'Insert path of file')
-
-" Insert new line
-nnoremap <S-CR> O<Esc>
-nnoremap <CR> o<Esc>
 
 " Change indentation with multiple level
 vnoremap < <gv

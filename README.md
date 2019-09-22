@@ -20,6 +20,11 @@ With vim, you must create ~/.vimrc link from vimrc of this repository
 ln -sf ~/.vim/vimrc ~/.vimrc
 ```
 
+Key bindings
+=============
+
+See at [KEY_BINDING.md](../KEY_BINDING.md)
+
 License
 ========
 
