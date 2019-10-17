@@ -9,6 +9,13 @@ function! dynamo#ui#FoldText() abort
     let line = getline(v:foldstart)
   else
     let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
+    if &filetype ==# 'conf'
+      if v:foldlevel == 1
+        let line = getline(v:foldstart+1)[2:-2]
+      else
+        let line = getline(v:foldstart)[(v:foldlevel + 1):]
+      endif
+    endif
   endif
 
   let repeat_symbol = '·'
