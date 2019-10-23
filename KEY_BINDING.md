@@ -28,6 +28,7 @@ Note: Mode abbrev in below tables:
 |Ctrl+H|N|Switch to left window|
 |Ctrl+L|N|Switch to right window|
 |Ctrl+R|V|Replace selected text|
+|Ctrl+SPC|I|LSP autocomplete with coc|
 
 ### Leader key
 `n` is number key

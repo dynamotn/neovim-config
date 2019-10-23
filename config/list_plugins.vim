@@ -137,26 +137,21 @@ Plug 'tpope/vim-fugitive' | Plug 'junegunn/gv.vim'
 " -------- Completion -------- {
 " -- Code -- {
 " Engine
-if v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_version >= 306.01
-  if has('nvim')
-    let plug_param_for_deoplete = { 'do': 'UpdateRemotePlugins' }
-    if !has('nvim-0.3')
-      let plug_param_for_deoplete.tag = '4.1'
-    endif
-    Plug 'Shougo/deoplete.nvim', plug_param_for_deoplete
-  else
-    Plug 'Shougo/deoplete.nvim'
+if (v:version >= 800 && !has('nvim')) || has('nvim-0.3.1')
+  Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+  call dynamo#file#RegisterPlugin('coc')
+endif
+if !dynamo#misc#HasEngine() && v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_version >= 306.01
+  let plug_param_for_deoplete = { 'do': 'UpdateRemotePlugins' }
+  if !has('nvim-0.3')
+    let plug_param_for_deoplete.tag = '4.1'
   endif
+  Plug 'Shougo/deoplete.nvim', plug_param_for_deoplete
   call dynamo#file#RegisterPlugin('deoplete')
-elseif v:version >= 703 && has('lua')
+endif
+if !dynamo#misc#HasEngine() || (v:version >= 703 && has('lua'))
   Plug 'Shougo/neocomplete.vim'
   call dynamo#file#RegisterPlugin('neocomplete')
-endif
-
-" Display function signatures
-if v:version >= 800
-  Plug 'Shougo/echodoc.vim'
-  call dynamo#file#RegisterPlugin('echodoc')
 endif
 " ---------- }
 
@@ -181,6 +176,15 @@ Plug 'tpope/vim-endwise'
 " ---------------------------- }
 
 " --------- Language --------- {
+" -- LSP -- {
+if g:dynamo_complete_engine ==? 'coc'
+  " Not need because coc is LSP client
+elseif g:dynamo_complete_engine ==? 'deoplete'
+  Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
+  let g:LanguageClient_serverCommands = {}
+  call dynamo#file#RegisterPlugin('languageclient')
+endif
+" --------- }
 " -- Linter -- {
 Plug 'dense-analysis/ale'
 call dynamo#file#RegisterPlugin('ale')
@@ -198,5 +202,6 @@ call dynamo#file#LoadLanguagePlugin('markdown')
 call dynamo#file#LoadLanguagePlugin('vim')
 call dynamo#file#LoadLanguagePlugin('ansible')
 call dynamo#file#LoadLanguagePlugin('yaml')
+call dynamo#file#LoadLanguagePlugin('ruby')
 call dynamo#file#EndLoadPlugin()
 " ---------------------------- }

@@ -5,6 +5,7 @@ Feature
 - Keep configuration organized with separated and corresponded file
 - Key bindings are useful and organized with mnemonic prefixes
 - Minimalistic and awesome GUI
+- LSP to use same with IDE
 
 Installation
 =============
@@ -40,4 +41,5 @@ Note
 - Not use for neovim/vim GUI
 - Use for Linux only
 - Vim version >= 7.4 or NVim version >= 0.3 to use all features
+- To use LSP features with neovim, must install nodejs and yarn
 - Must install pynvim if want to use with Nvim

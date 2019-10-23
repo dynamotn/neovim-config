@@ -23,6 +23,9 @@ function! dynamo#file#RegisterPlugin(file) abort
     let s:dynamo_plugin_map = []
   endif
   let s:dynamo_plugin_map = add(s:dynamo_plugin_map, a:file)
+  if index(['coc', 'deoplete', 'neocomplete'], a:file) >= 0
+    call dynamo#misc#RegisterEngine(a:file)
+  endif
 endfunction " }
 
 " Read config after register plugin {

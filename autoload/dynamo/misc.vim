@@ -9,3 +9,13 @@ function! dynamo#misc#InitPythonVersion() abort
     endif
   endfor
 endfunction " }
+
+" Register code complete engine {
+function! dynamo#misc#RegisterEngine(engine) abort
+  let g:dynamo_complete_engine = a:engine
+endfunction
+
+function! dynamo#misc#HasEngine() abort
+  return exists('g:dynamo_complete_engine')
+endfunction
+" }
