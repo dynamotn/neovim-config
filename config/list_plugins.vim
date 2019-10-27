@@ -166,7 +166,6 @@ if v:version >= 704
   Plug 'Shougo/neosnippet'
   call dynamo#file#RegisterPlugin('neosnippet')
 endif
-Plug 'SirVer/ultisnips'
 
 " List
 Plug 'Shougo/neosnippet-snippets'
@@ -189,6 +188,7 @@ call dynamo#file#RegisterPlugin('ale')
 
 " Collection of language packs: syntax, indent ...
 Plug 'sheerun/vim-polyglot'
+Plug 'Shougo/neco-syntax'
 
 " Load each language
 call dynamo#file#LoadLanguagePlugin('markdown')
