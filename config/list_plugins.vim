@@ -190,6 +190,9 @@ call dynamo#file#RegisterPlugin('ale')
 Plug 'sheerun/vim-polyglot'
 Plug 'Shougo/neco-syntax'
 
+" Syntax for context in file
+Plug 'Shougo/context_filetype.vim'
+
 " Load each language
 call dynamo#file#LoadLanguagePlugin('markdown')
 call dynamo#file#LoadLanguagePlugin('vim')
