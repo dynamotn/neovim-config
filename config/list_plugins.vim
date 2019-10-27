@@ -118,6 +118,10 @@ call dynamo#file#RegisterPlugin('easy_align')
 
 " Fuzzy finder
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } | Plug 'junegunn/fzf.vim'
+call dynamo#file#RegisterPlugin('fzf')
+
+" Yank history
+Plug 'Shougo/neoyank.vim' | Plug 'justinhoward/fzf-neoyank'
 " ---------------------------- }
 
 " ----------- VCS ------------ {
