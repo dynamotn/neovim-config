@@ -131,6 +131,7 @@ endif
 
 " Wrapper tool for Git
 Plug 'tpope/vim-fugitive' | Plug 'junegunn/gv.vim'
+call dynamo#file#RegisterPlugin('git')
 " ---------------------------- }
 
 " -------- Completion -------- {

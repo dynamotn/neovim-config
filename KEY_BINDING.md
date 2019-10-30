@@ -55,7 +55,10 @@ Note: Mode abbrev in below tables:
 |-------------|------|-------------|
 |SPC f e|N|Open file explorer|
 |||
+|SPC g b|N|View blame|
 |SPC g c|N|Move to next git conflict|
+|SPC g l|N|View log of repository|
+|SPC g L|N|View log of current file|
 |||
 |SPC l m|N|Preview Markdown file on browser|
 |||
