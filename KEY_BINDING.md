@@ -63,6 +63,10 @@ Note: Mode abbrev in below tables:
 |SPC w 2|N|Create windows layout with 2 columns|
 |SPC w 3|N|Create windows layout with 3 columns|
 |SPC w =|N|Resize all windows to balance|
+|||
+|SPC z f|N|Search file in current folder|
+|SPC z l|N|Search line in files of current folder|
+|SPC z y|N|Search yank history|
 
 ### Square bracket key
 `n` is number key, if doesn't have, it's equivalent with 1

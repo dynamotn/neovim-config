@@ -70,7 +70,7 @@ call dynamo#mapping#Define('map', '<leader>', 'te', ":tabedit <C-r>=expand(\'%:p
 
 " --------- Editing ---------- {
 " Automatically add filename or path file
-call dynamo#mapping#Group('<leader>', 'f', 'File')
+call dynamo#mapping#Group('<leader>', 'f', 'File modifying')
 call dynamo#mapping#Define('nnoremap', '<leader>', 'fn', "i<C-r>=expand(\'%:t:n\')<CR>", 'Insert name of file')
 call dynamo#mapping#Define('nnoremap', '<leader>', 'fp', "i<C-r>=expand(\'%:p:h\')<CR>", 'Insert path of file')
 
@@ -113,4 +113,8 @@ call dynamo#mapping#Define('nnoremap', '<Space>', 'gc', '/\v^[<|=>]{7}( .*|$ )<C
 
 " --------- Language --------- {
 call dynamo#mapping#Group('<Space>', 'l', 'Language')
+" ---------------------------- }
+
+" ------- Fuzzy search ------- {
+call dynamo#mapping#Group('<Space>', 'z', 'Fuzzy search')
 " ---------------------------- }
