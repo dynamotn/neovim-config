@@ -128,6 +128,9 @@ if executable('ibus')
   Plug 'h-youhei/vim-ibus'
   call dynamo#file#RegisterPlugin('ibus')
 endif
+
+" Table mode formatter
+Plug 'dhruvasagar/vim-table-mode'
 " ---------------------------- }
 
 " ----------- VCS ------------ {
