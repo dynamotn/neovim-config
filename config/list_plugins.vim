@@ -124,8 +124,10 @@ Plug 'Shougo/neoyank.vim' | Plug 'justinhoward/fzf-neoyank'
 call dynamo#file#RegisterPlugin('fzf')
 
 " IM framework
-Plug 'h-youhei/vim-ibus'
-call dynamo#file#RegisterPlugin('ibus')
+if executable('ibus')
+  Plug 'h-youhei/vim-ibus'
+  call dynamo#file#RegisterPlugin('ibus')
+endif
 " ---------------------------- }
 
 " ----------- VCS ------------ {
