@@ -138,7 +138,7 @@ call dynamo#file#RegisterPlugin('git')
 " -------- Completion -------- {
 " -- Code -- {
 " Engine
-if (v:version >= 800 && !has('nvim')) || has('nvim-0.3.1')
+if executable('node') && (v:version >= 800 && !has('nvim')) || has('nvim-0.3.1')
   Plug 'neoclide/coc.nvim', { 'branch': 'release' }
   call dynamo#file#RegisterPlugin('coc')
 endif
