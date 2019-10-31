@@ -185,10 +185,15 @@ elseif g:dynamo_complete_engine ==? 'deoplete'
   call dynamo#file#RegisterPlugin('languageclient')
 endif
 " --------- }
+
 " -- Linter -- {
 Plug 'dense-analysis/ale'
 call dynamo#file#RegisterPlugin('ale')
 " ------------ }
+
+" -- Convention -- {
+Plug 'editorconfig/editorconfig-vim'
+" ---------------- }
 
 " Collection of language packs: syntax, indent ...
 Plug 'sheerun/vim-polyglot'
