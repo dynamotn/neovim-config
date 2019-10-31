@@ -1,7 +1,7 @@
 " vim:foldmethod=marker:foldmarker={,}
 " ---------- General --------- {
 " Vim 8 remote plugin
-if !has('nvim')
+if v:version >= 800 && !has('nvim')
   Plug 'roxma/nvim-yarp' |  Plug 'roxma/vim-hug-neovim-rpc'
 endif
 " ---------------------------- }
@@ -29,9 +29,10 @@ Plug 'mhinz/vim-startify'
 " -- Text -- {
 if v:version >= 800
   Plug 'chrisbra/Colorizer'
-  call dynamo#file#RegisterPlugin('colorizer')
+  call dynamo#file#RegisterPlugin('colorizer-nvim')
 else
   Plug 'lilydjwg/colorizer'
+  call dynamo#file#RegisterPlugin('colorizer-vim')
 endif
 " ---------- }
 
