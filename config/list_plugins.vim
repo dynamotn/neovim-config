@@ -56,6 +56,10 @@ call dynamo#file#RegisterPlugin('rainbow')
 Plug 'kshenoy/vim-signature'
 call dynamo#file#RegisterPlugin('signature')
 " ---------- }
+"
+" -- Space -- {
+Plug 'ntpeters/vim-better-whitespace'
+" ----------- }
 " ---------------------------- }
 
 " --------- Terminal --------- {
