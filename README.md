@@ -9,17 +9,23 @@ Feature
 
 Installation
 =============
-
-Clone this repository to ~/.config/nvim (for neovim) or ~/.vim (for vim).
+- Clone this repository to ~/.config/nvim (for neovim) or ~/.vim (for vim).
 ```
 rm -rf ~/.config/nvim
 git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim
 ```
-With vim, you must create ~/.vimrc link from vimrc of this repository
-
+- With vim, you must create ~/.vimrc link from vimrc of this repository
 ```
 ln -sf ~/.vim/vimrc ~/.vimrc
 ```
+- After that, install plugins with command
+```
+# for vim
+vim +PlugInstall +qa
+# for neovim
+nvim +PlugInstall +UpdateRemotePlugins +qa
+```
+That's all! Hope you enjoy with vim :smile:!
 
 Key bindings
 =============
