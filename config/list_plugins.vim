@@ -122,6 +122,10 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } | Plug 'junegu
 " Yank history
 Plug 'Shougo/neoyank.vim' | Plug 'justinhoward/fzf-neoyank'
 call dynamo#file#RegisterPlugin('fzf')
+
+" IM framework
+Plug 'h-youhei/vim-ibus'
+call dynamo#file#RegisterPlugin('ibus')
 " ---------------------------- }
 
 " ----------- VCS ------------ {
