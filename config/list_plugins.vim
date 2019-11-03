@@ -115,6 +115,9 @@ endif
 
 " Test code
 Plug 'janko/vim-test' | Plug 'tpope/vim-dispatch'
+if has('nvim')
+  Plug 'radenling/vim-dispatch-neovim'
+endif
 call dynamo#file#RegisterPlugin('test')
 
 " Alignment
@@ -127,14 +130,8 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } | Plug 'junegu
 Plug 'Shougo/neoyank.vim' | Plug 'justinhoward/fzf-neoyank'
 call dynamo#file#RegisterPlugin('fzf')
 
-" IM framework
-if executable('ibus')
-  Plug 'h-youhei/vim-ibus'
-  call dynamo#file#RegisterPlugin('ibus')
-endif
-
 " Table mode formatter
-Plug 'dhruvasagar/vim-table-mode'
+Plug 'dhruvasagar/vim-table-mode', { 'on': ['TableModeEnable', 'TableModeToggle'] }
 " ---------------------------- }
 
 " ----------- VCS ------------ {
