@@ -1,2 +1,2 @@
-let $VIMHOME = fnamemodify(expand('<sfile>'), ':h')
+let $VIMHOME=fnamemodify(expand('<sfile>'), ':h')
 source $VIMHOME/config/main.vim

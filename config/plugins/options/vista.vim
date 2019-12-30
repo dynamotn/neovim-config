@@ -4,4 +4,4 @@ augroup VistaTag
 augroup END
 
 " Default use universal-ctags as executive
-let g:vista_default_executive = 'ctags'
+let g:vista_default_executive='ctags'

@@ -24,15 +24,15 @@ augroup END
 " # Just a comment
 augroup FoldConfigFile
   function! ConfigFileFolds()
-    let this_line = getline(v:lnum)
+    let this_line=getline(v:lnum)
     if match(this_line, '^#\{2,} ') >= 0
       return '>' . (len(this_line) - len(substitute(this_line, '^#\{2,}', '', 'g')))
     endif
-    let two_following_lines = 0
+    let two_following_lines=0
     if line(v:lnum) + 2 <= line('$')
-      let line_1_after = getline(v:lnum+1)
-      let line_2_after = getline(v:lnum+2)
-      let two_following_lines = 1
+      let line_1_after=getline(v:lnum+1)
+      let line_2_after=getline(v:lnum+2)
+      let two_following_lines=1
     endif
     if !two_following_lines
       return '='

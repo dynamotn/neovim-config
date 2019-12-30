@@ -51,7 +51,7 @@ nnoremap <C-l> <C-w>l
 " Layout
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w2', ':silent only | vs | wincmd w<CR>', 'Layout 2 columns')
 call dynamo#mapping#Define('nnoremap', '<Space>', 'w3', ':silent only | vs | vs | wincmd H<CR>', 'Layout 3 columns')
-call dynamo#mapping#Define('nnoremap', '<Space>', 'w=', ':wincmd = <CR>', 'Balance windows')
+call dynamo#mapping#Define('nnoremap', '<Space>', 'w=', ':wincmd =<CR>', 'Balance windows')
 " ---------------------------- }
 
 " ----------- Tab ------------ {
@@ -86,10 +86,10 @@ nnoremap <silent> ,<Space> :<C-u>silent! keeppatterns %substitute/\s\+$//e<CR>
 " Better search replace when in select mode
 xnoremap <C-r> :<C-u>call <SID>VSetSearch()<CR>:,$s/<C-R>=@/<CR>//gc<left><left><left>
 function! s:VSetSearch() abort
-  let temp = @s
+  let temp=@s
   normal! gv"sy
-  let @/ = '\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
-  let @s = temp
+  let @/='\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
+  let @s=temp
 endfunction
 
 " Quickly add empty lines

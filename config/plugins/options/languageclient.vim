@@ -1,1 +1,1 @@
-let g:LanguageClient_hoverPreview = 'Always'
+let g:LanguageClient_hoverPreview='Always'

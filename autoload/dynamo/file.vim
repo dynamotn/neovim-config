@@ -8,32 +8,36 @@ function! dynamo#file#DownloadPluginManager() abort
       autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
     augroup END
   endif
-endfunction " }
+endfunction
+" }
 
 " Load file in config folder {
 function! dynamo#file#LoadConfig(file) abort
   if filereadable($VIMHOME . '/config/' . a:file . '.vim')
     execute 'source ' . $VIMHOME . '/config/' . a:file . '.vim'
   endif
-endfunction " }
+endfunction
+" }
 
 " Register plugin to load config of plugin {
 function! dynamo#file#RegisterPlugin(file) abort
   if !exists('s:dynamo_plugin_map')
-    let s:dynamo_plugin_map = []
+    let s:dynamo_plugin_map=[]
   endif
-  let s:dynamo_plugin_map = add(s:dynamo_plugin_map, a:file)
+  let s:dynamo_plugin_map=add(s:dynamo_plugin_map, a:file)
   if index(['coc', 'deoplete', 'neocomplete'], a:file) >= 0
     call dynamo#misc#RegisterEngine(a:file)
   endif
-endfunction " }
+endfunction
+" }
 
 " Read config after register plugin {
 function! dynamo#file#InitPluginAfterRegister(folder) abort
   for plugin in s:dynamo_plugin_map
     call dynamo#file#LoadConfig(a:folder . '/' . plugin)
   endfor
-endfunction " }
+endfunction
+" }
 
 " Declare plugins and register config of its {
 function! dynamo#file#InitPluginOption() abort
@@ -41,17 +45,19 @@ function! dynamo#file#InitPluginOption() abort
   call dynamo#file#LoadConfig(g:dynamo_list_plugins_file)
   call plug#end()
   call dynamo#file#InitPluginAfterRegister(g:dynamo_plugin_configs_folder)
-endfunction " }
+endfunction
+" }
 
 " Load key bindings for plugins {
 function! dynamo#file#InitPluginKeyBinding() abort
   call dynamo#file#LoadConfig(g:dynamo_common_key_bindings_file)
   call dynamo#file#InitPluginAfterRegister(g:dynamo_list_key_bindings_folder)
-endfunction " }
+endfunction
+" }
 
 " Load plugin list for specific language {
 function! dynamo#file#LoadLanguagePlugin(filetype) abort
-  let g:dynamo_language_plug_param = { 'for': a:filetype }
+  let g:dynamo_language_plug_param={ 'for': a:filetype }
   call dynamo#file#LoadConfig(g:dynamo_language_plugins_folder .
         \ '/' . a:filetype)
 endfunction

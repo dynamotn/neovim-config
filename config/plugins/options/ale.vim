@@ -10,8 +10,8 @@ let g:ale_fix_on_save=1
 
 " Support virtual text for Neovim
 if has('nvim-0.3.2')
-  let g:ale_virtualtext_cursor = 1
+  let g:ale_virtualtext_cursor=1
 endif
 
 " Message on cmd line
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_echo_msg_format='[%linter%] %s [%severity%]'

@@ -1,7 +1,7 @@
 if exists('g:which_key_ftplugin')
   finish
 else
-  let g:which_key_ftplugin = 1
+  let g:which_key_ftplugin=1
 endif
 function! which_key#statusline(...)
     if &filetype ==# 'which_key'

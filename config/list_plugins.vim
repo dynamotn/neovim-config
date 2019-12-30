@@ -153,9 +153,9 @@ if executable('node') && (v:version >= 800 && !has('nvim')) || has('nvim-0.3.1')
   call dynamo#file#RegisterPlugin('coc')
 endif
 if !dynamo#misc#HasEngine() && v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_version >= 306.01
-  let plug_param_for_deoplete = { 'do': 'UpdateRemotePlugins' }
+  let plug_param_for_deoplete={ 'do': 'UpdateRemotePlugins' }
   if !has('nvim-0.3')
-    let plug_param_for_deoplete.tag = '4.1'
+    let plug_param_for_deoplete.tag='4.1'
   endif
   Plug 'Shougo/deoplete.nvim', plug_param_for_deoplete
   call dynamo#file#RegisterPlugin('deoplete')
@@ -192,7 +192,7 @@ if g:dynamo_complete_engine ==? 'coc'
   " Not need because coc is LSP client
 elseif g:dynamo_complete_engine ==? 'deoplete'
   Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
-  let g:LanguageClient_serverCommands = {}
+  let g:LanguageClient_serverCommands={}
   call dynamo#file#RegisterPlugin('languageclient')
 endif
 " --------- }
