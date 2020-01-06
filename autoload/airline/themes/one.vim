@@ -60,12 +60,10 @@ function! airline#themes#one#refresh()
   let g:airline#themes#one#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
   let g:airline#themes#one#palette.visual_modified = g:airline#themes#one#palette.normal_modified
 
-  let s:IA1 = [ '#282C34', '#ABB2BF', s:term_black, s:term_white ]
-  let s:IA2 = [ '#ABB2BF', '#3E4452', s:term_white, s:term_grey ]
-  let s:IA3 = s:N2
-  let g:airline#themes#one#palette.inactive = airline#themes#generate_color_map(s:IA1, s:IA2, s:IA3)
+  let s:IA = [ '#282C34', '#c6deb5', s:term_black, s:term_green ]
+  let g:airline#themes#one#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA, s:IA)
   let g:airline#themes#one#palette.inactive_modified = {
-        \ 'airline_c': [ group[0], '', group[2], '', '' ]
+        \ 'airline_c': [ '#282C34', '#c6deb5', s:term_black, s:term_green ]
         \ }
 
   " Warning/Error styling code from vim-airline's ["base16" theme](https://github.com/vim-airline/vim-airline-themes/blob/master/autoload/airline/themes/base16.vim)

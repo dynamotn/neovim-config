@@ -47,19 +47,8 @@ let g:airline#themes#papercolor#palette.visual_modified = {
       \ }
 
 " Inactive:
-let s:IA = [ '#585858' , '#e4e4e4' , 240 , 254 , '' ]
+let s:IA = [ '#e4e4e4' , '#4596d1' , 254 , 12 , '' ]
 let g:airline#themes#papercolor#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA, s:IA)
 let g:airline#themes#papercolor#palette.inactive_modified = {
-      \ 'airline_c': [ '#585858' , '#e4e4e4' , 240 , 254 , '' ] ,
+      \ 'airline_c': [ '#e4e4e4' , '#4596d1' , 254 , 12 , '' ] ,
       \ }
-
-
-" CtrlP:
-if !get(g:, 'loaded_ctrlp', 0)
-  finish
-endif
-let g:airline#themes#papercolor#palette.ctrlp = airline#extensions#ctrlp#generate_color_map(
-      \ [ '#e4e4e4' , '#005f87' , 254 , 24  , ''     ] ,
-      \ [ '#e4e4e4' , '#0087af' , 254 , 31  , ''     ] ,
-      \ [ '#585858' , '#e4e4e4' , 240 , 254 , 'bold' ] )
-
