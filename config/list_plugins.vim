@@ -18,7 +18,7 @@ call dynamo#file#RegisterPlugin('colorscheme')
 
 " --------- Eyecandy --------- {
 " -- Status line -- {
-Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
 call dynamo#file#RegisterPlugin('airline')
 " ----------------- }
 
