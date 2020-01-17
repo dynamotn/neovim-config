@@ -20,3 +20,50 @@ function! dynamo#misc#HasEngine() abort
   return exists('g:dynamo_complete_engine')
 endfunction
 " }
+
+" Get position of cursor of file when it is opened by vim {
+function! dynamo#misc#LastPosition() abort
+  " Ignore when diff
+  if &diff
+    return
+  endif
+
+  " Ignore of some special buffer
+  if index(['quickfix', 'nofile', 'help'], &buftype) != -1
+    return
+  endif
+
+  " Ignore git commit/merge, rebase file
+  if index(['gitcommit','gitrebase'], &filetype) != -1
+    return
+  endif
+
+  " Do nothing when file does not exist
+  try
+    if empty(glob(@%))
+      return
+    endif
+  catch
+    return
+  endtry
+
+  " The last edit position is set and is less than the number of lines of buffer
+  if line("'\"") > 0 && line("'\"") <= line('$')
+    " The last line of current buffer is also the last line visible of window
+    if line('w$') == line('$')
+      execute "normal! g`\""
+    " At the middle or top of the file, center the cursor on the screen
+    elseif line('$') - line("'\"") > ((line('w$') - line('w0')) / 2) - 1
+      execute "normal! g`\"zz"
+    " At the bottom of the file
+    else
+      execute "normal! \G'\"\<c-e>"
+    endif
+  endif
+
+  " In a fold, make the current line visible and recenter screen
+  if foldclosed('.') != -1
+    execute 'normal! zvzz'
+  endif
+endfunction
+" }

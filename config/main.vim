@@ -85,7 +85,7 @@ set modelines=1
 
 " Return to last edit position when opening files
 augroup LastPosition
-  autocmd BufReadPost * silent! normal! g`"zv
+  autocmd BufWinEnter * call dynamo#misc#LastPosition()
 augroup END
 
 " Not backup

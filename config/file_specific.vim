@@ -9,12 +9,6 @@ augroup Startup
 augroup END
 " }
 
-" Git commit faster, always start with first line, avoid augroup LastPosition {
-augroup FastCommitMessage
-  autocmd BufNewFile,BufRead COMMIT_EDITMSG,MERGE_MSG set noreadonly | normal! gg
-augroup END
-" }
-
 " Custom fold level of config file {
 " ############
 " # Category #
