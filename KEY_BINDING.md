@@ -51,25 +51,26 @@ Note: Mode abbrev in below tables:
 | \ f p       | N    | Insert path of file in cursor position   |
 
 ### Space key
-| Key binding | Mode   | Description                                |
-|-------------|--------|--------------------------------------------|
-| SPC f e     | N      | Open file explorer                         |
-|             |        |                                            |
-| SPC g b     | N      | View blame                                 |
-| SPC g c     | N      | Move to next git conflict                  |
-| SPC g l     | N      | View log of repository                     |
-| SPC g L     | N      | View log of current file                   |
-|             |        |                                            |
-| SPC l m     | N      | Preview Markdown file on browser           |
-|             |        |                                            |
-| SPC w s     | N      | Switch to other buffer                     |
-| SPC w 2     | N      | Create windows layout with 2 columns       |
-| SPC w 3     | N      | Create windows layout with 3 columns       |
-| SPC w =     | N      | Resize all windows to balance              |
-|             |        |                                            |
-| SPC z f     | N      | Search file in current folder              |
-| SPC z l     | N      | Search line in files of current folder     |
-| SPC z y     | N      | Search yank history                        |
+| Key binding | Mode | Description                                                                    |
+|-------------|------|--------------------------------------------------------------------------------|
+| SPC f e     | N    | Open file explorer                                                             |
+|             |      |                                                                                |
+| SPC g b     | N    | View blame                                                                     |
+| SPC g c     | N    | Move to next git conflict                                                      |
+| SPC g h     | N V  | Open Github URL of project (of current Git folder or selected text) on browser |
+| SPC g l     | N    | View log of repository                                                         |
+| SPC g L     | N    | View log of current file                                                       |
+|             |      |                                                                                |
+| SPC l m     | N    | Preview Markdown file on browser                                               |
+|             |      |                                                                                |
+| SPC w s     | N    | Switch to other buffer                                                         |
+| SPC w 2     | N    | Create windows layout with 2 columns                                           |
+| SPC w 3     | N    | Create windows layout with 3 columns                                           |
+| SPC w =     | N    | Resize all windows to balance                                                  |
+|             |      |                                                                                |
+| SPC z f     | N    | Search file in current folder                                                  |
+| SPC z l     | N    | Search line in files of current folder                                         |
+| SPC z y     | N    | Search yank history                                                            |
 
 ### Square bracket key
 `n` is number key, if doesn't have, it's equivalent with 1

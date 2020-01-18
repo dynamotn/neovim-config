@@ -132,6 +132,9 @@ call dynamo#file#RegisterPlugin('fzf')
 
 " Table mode formatter
 Plug 'dhruvasagar/vim-table-mode', { 'on': ['TableModeEnable', 'TableModeToggle'] }
+
+Plug 'tyru/open-browser-github.vim' | Plug 'tyru/open-browser.vim'
+call dynamo#file#RegisterPlugin('open-browser')
 " ---------------------------- }
 
 " ----------- VCS ------------ {

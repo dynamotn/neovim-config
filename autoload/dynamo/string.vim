@@ -42,3 +42,9 @@ function! dynamo#string#ReplaceKeyStroke(input_key) abort
   return a:input_key
 endfunction
 " }
+
+" Prepare search text with VimL substitute from input text {
+function! dynamo#string#PrepareSearchText(input) abort
+  return '\V' . substitute(escape(a:input, '/\'), '\n', '\\n', 'g')
+endfunction
+" }

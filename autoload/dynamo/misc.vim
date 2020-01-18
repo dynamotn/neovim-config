@@ -67,3 +67,16 @@ function! dynamo#misc#LastPosition() abort
   endif
 endfunction
 " }
+
+" Get text of visual block {
+function! dynamo#misc#GetTextVisualBlock(...) abort
+  let temp=@s
+  normal! gv"sy
+  if a:0 >= 1
+    let @/=a:1(@s)
+  else
+    let @/=@s
+  end
+  let @s=temp
+endfunction
+" }

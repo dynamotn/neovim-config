@@ -84,13 +84,7 @@ nnoremap > >>_
 nnoremap <silent> ,<Space> :<C-u>silent! keeppatterns %substitute/\s\+$//e<CR>
 
 " Better search replace when in select mode
-xnoremap <C-r> :<C-u>call <SID>VSetSearch()<CR>:,$s/<C-R>=@/<CR>//gc<left><left><left>
-function! s:VSetSearch() abort
-  let temp=@s
-  normal! gv"sy
-  let @/='\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
-  let @s=temp
-endfunction
+xnoremap <C-r> :<C-u>call dynamo#misc#GetTextVisualBlock(function ('dynamo#string#PrepareSearchText'))<CR>:,$s/<C-R>=@/<CR>//gc<left><left><left>
 
 " Quickly add empty lines
 nnoremap <silent> [<Space>  :<c-u>put! =repeat(nr2char(10), v:count1)<cr>
