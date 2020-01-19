@@ -1,6 +1,6 @@
 " Better name
 let g:which_key_default_group_name='No name'
-let g:which_key_use_floating_win=1
+let g:which_key_use_floating_win=0
 " Base SPACE menu
 let g:guide_space_map={}
 
