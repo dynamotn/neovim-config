@@ -24,6 +24,7 @@ call dynamo#file#RegisterPlugin('airline')
 
 " -- Startup screen -- {
 Plug 'mhinz/vim-startify'
+call dynamo#file#RegisterPlugin('startify')
 " -------------------- }
 
 " -- Text -- {
