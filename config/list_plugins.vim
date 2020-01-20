@@ -188,6 +188,11 @@ Plug 'jiangmiao/auto-pairs'
 " Automatically insert 'end' keyword
 Plug 'tpope/vim-endwise'
 " ----------------- }
+
+" -- Source -- {
+" Text from tmux
+Plug 'wellle/tmux-complete.vim'
+" ------------ }
 " ---------------------------- }
 
 " --------- Language --------- {
