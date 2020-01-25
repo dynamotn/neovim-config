@@ -54,12 +54,15 @@ call dynamo#file#RegisterPlugin('rainbow')
 " ----------------- }
 
 " -- Mark -- {
-Plug 'kshenoy/vim-signature'
-call dynamo#file#RegisterPlugin('signature')
+if has('signs')
+  Plug 'kshenoy/vim-signature'
+  call dynamo#file#RegisterPlugin('signature')
+endif
 " ---------- }
 "
 " -- Space -- {
 Plug 'ntpeters/vim-better-whitespace'
+call dynamo#file#RegisterPlugin('better_whitespace')
 " ----------- }
 " ---------------------------- }
 
@@ -135,7 +138,7 @@ call dynamo#file#RegisterPlugin('fzf')
 Plug 'dhruvasagar/vim-table-mode', { 'on': ['TableModeEnable', 'TableModeToggle'] }
 
 Plug 'tyru/open-browser-github.vim' | Plug 'tyru/open-browser.vim'
-call dynamo#file#RegisterPlugin('open-browser')
+call dynamo#file#RegisterPlugin('open_browser')
 " ---------------------------- }
 
 " ----------- VCS ------------ {

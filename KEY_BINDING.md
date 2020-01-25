@@ -71,6 +71,8 @@ Note: Mode abbrev in below tables:
 | SPC z f     | N    | Search file in current folder                                                  |
 | SPC z l     | N    | Search line in files of current folder                                         |
 | SPC z y     | N    | Search yank history                                                            |
+| SPC u i     | N    | Toggle indentation guide                                                       |
+| SPC u w     | N    | Toggle whitespace highlighting                                                 |
 
 ### Square bracket key
 `n` is number key, if doesn't have, it's equivalent with 1

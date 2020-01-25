@@ -112,3 +112,7 @@ call dynamo#mapping#Group('<Space>', 'l', 'Language')
 " ------- Fuzzy search ------- {
 call dynamo#mapping#Group('<Space>', 'z', 'Fuzzy search')
 " ---------------------------- }
+
+" ------------ UI ------------ {
+call dynamo#mapping#Group('<Space>', 'u', 'UI')
+" ---------------------------- }
