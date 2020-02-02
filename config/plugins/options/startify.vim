@@ -11,3 +11,13 @@ let g:startify_list_order = [
       \ ['   These are my bookmarks:'],
       \ 'bookmarks',
       \ ]
+
+" Startify when startup
+augroup StartifyStartup
+  function! StartifyStartup() abort
+    if !exists('g:dynamo_has_std_in') && argc() == 1 && isdirectory(argv()[0])
+      Startify
+    endif
+  endfunction
+  autocmd VimEnter * call StartifyStartup()
+augroup END

@@ -4,9 +4,12 @@ function! dynamo#file#DownloadPluginManager() abort
   if empty(glob($VIMHOME . '/autoload/plug.vim'))
     silent !curl -fLo $VIMHOME/autoload/plug.vim --create-dirs
       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    augroup ReloadAndInstallVimPlug
-      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-    augroup END
+  endif
+endfunction
+
+function! dynamo#file#InstallPlugin() abort
+  if empty(glob($VIMHOME . '/' . g:dynamo_plugins_folder))
+    PlugInstall | source $MYVIMRC
   endif
 endfunction
 " }
@@ -29,6 +32,10 @@ function! dynamo#file#RegisterPlugin(file) abort
     call dynamo#misc#RegisterEngine(a:file)
   endif
 endfunction
+
+function! dynamo#file#IsRegisteredPlugin(plugin) abort
+  return index(s:dynamo_plugin_map, a:plugin) >= 0
+endfunction
 " }
 
 " Read config after register plugin {
@@ -44,6 +51,7 @@ function! dynamo#file#InitPluginOption() abort
   call plug#begin($VIMHOME . '/' . g:dynamo_plugins_folder)
   call dynamo#file#LoadConfig(g:dynamo_list_plugins_file)
   call plug#end()
+  call dynamo#file#InstallPlugin()
   call dynamo#file#InitPluginAfterRegister(g:dynamo_plugin_configs_folder)
 endfunction
 " }

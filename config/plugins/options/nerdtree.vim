@@ -8,3 +8,26 @@ augroup END
 
 " Position
 let g:NERDTreeWinPos='left'
+
+" NERDTree when startup
+augroup NERDTreeStartup
+  function! NERDTreeStartup() abort
+    if !exists('g:dynamo_has_std_in')
+      " Open automatically NERDTree when not have vim argument
+      if !argc()
+        NERDTree | wincmd w
+      endif
+
+      " Open automatically NERDTree when vim argument is a folder
+      if argc() == 1 && isdirectory(argv()[0])
+        exec 'NERDTree' argv()[0] | wincmd p
+        " Change current folder to input folder
+        exec 'cd '.argv()[0]
+        if !dynamo#file#IsRegisteredPlugin('startify')
+          enew
+        endif
+      endif
+    endif
+  endfunction
+  autocmd VimEnter * call NERDTreeStartup()
+augroup END
