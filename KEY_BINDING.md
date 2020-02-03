@@ -17,6 +17,7 @@ Note: Mode abbrev in below tables:
 | F1          | N    | Same as `Esc`                                                                     |
 | F3          | N I  | Toggle paste mode                                                                 |
 | F4          | N    | Show terminal in vim, use `Esc Esc` to return vim from editing or running command |
+| F5          | N    | Toggle show tags and LSP symbols or Markdown TOC in sidebar                       |
 
 ### Ctrl key
 | Key binding | Mode | Description                                  |

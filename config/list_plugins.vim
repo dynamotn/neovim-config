@@ -103,6 +103,7 @@ if executable('ctags')
     call dynamo#file#RegisterPlugin('vista')
   else
     Plug 'majutsushi/tagbar'
+    call dynamo#file#RegisterPlugin('tagbar')
   endif
 endif
 
