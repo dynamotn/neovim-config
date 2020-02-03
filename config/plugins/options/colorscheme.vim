@@ -4,7 +4,7 @@ let g:hybrid_reduced_contrast=1
 " One
 let g:one_allow_italics=1
 " PaperColor
-let g:PaperColor_Theme_Options = {
+let g:PaperColor_Theme_Options={
   \   'theme': {
   \     'default': {
   \       'transparent_background': 0,
