@@ -1,6 +1,7 @@
 " vim:foldmethod=marker:foldmarker={,}
 " Something on startup {
 augroup Startup
+  autocmd!
   " Check has stdin from cmd
   autocmd StdinReadPre * let g:dynamo_has_std_in=1
 augroup END
@@ -38,6 +39,7 @@ augroup FoldConfigFile
     endif
   endfunction
 
+  autocmd!
   autocmd FileType conf setlocal foldmethod=expr | setlocal foldexpr=ConfigFileFolds()
 augroup END
 " }

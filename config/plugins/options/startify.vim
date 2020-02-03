@@ -19,5 +19,7 @@ augroup StartifyStartup
       Startify
     endif
   endfunction
+
+  autocmd!
   autocmd VimEnter * call StartifyStartup()
 augroup END

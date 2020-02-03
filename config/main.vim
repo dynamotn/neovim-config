@@ -85,6 +85,7 @@ set modelines=1
 
 " Return to last edit position when opening files
 augroup LastPosition
+  autocmd!
   autocmd BufWinEnter * call dynamo#misc#LastPosition()
 augroup END
 
