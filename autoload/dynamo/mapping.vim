@@ -1,13 +1,19 @@
 " vim:foldmethod=marker:foldmarker={,}
 scriptencoding utf-8
 " Define key binding and add to guide {
-function! dynamo#mapping#Define(type, main_key, follow_key, command, description, ...) abort
+function! dynamo#mapping#Define(map_cmds, main_key, follow_key, command, description, ...) abort
   " Create escape char for pipe of command
   let gexe=substitute(a:command, '|', '\\|', 'g')
 
   " Map key binding
   let map_attr=get(a:, 1, 'silent')
-  exec a:type . ' <' . map_attr . '> ' . a:main_key . a:follow_key . ' ' . gexe
+  let map_cmds=a:map_cmds
+  if type(a:map_cmds) == 1
+    let map_cmds=[a:map_cmds]
+  endif
+  for map_cmd in map_cmds
+    exec map_cmd . ' <' . map_attr . '> ' . a:main_key . a:follow_key . ' ' . gexe
+  endfor
 
   " Get mapping key of guide
   let list_map=g:guide_map[a:main_key] " Only get first key of main_key

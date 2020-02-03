@@ -111,7 +111,10 @@ endif
 Plug 'craigemery/vim-autotag'
 
 " Fast comment
-Plug 'scrooloose/nerdcommenter'
+if v:version >= 700
+  Plug 'scrooloose/nerdcommenter'
+  call dynamo#file#RegisterPlugin('nerdcommenter')
+endif
 
 " Show matching keyword, parentheses..., move between them
 if exists('*matchaddpos')
