@@ -10,7 +10,7 @@ noremap <F1> <Esc>
 set pastetoggle=<F3>
 
 " Load config and install plugin
-nmap <C-i> :source $MYVIMRC<CR>:PlugInstall<CR>
+nmap <silent> <C-i> :call dynamo#file#InstallPlugin('now')<CR>
 " ---------------------------- }
 
 " ------ Save and Exit ------- {

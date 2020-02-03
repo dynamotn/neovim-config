@@ -41,3 +41,11 @@ augroup FoldConfigFile
   autocmd FileType conf setlocal foldmethod=expr | setlocal foldexpr=ConfigFileFolds()
 augroup END
 " }
+
+" Autoinstall when change list plugins file {
+augroup AutoInstallWhenChangeListPlugins
+  autocmd!
+  autocmd BufWritePost $VIMHOME/config/list_plugins.vim call dynamo#file#InstallPlugin('now')
+  autocmd BufWritePost $VIMHOME/*.vim source $MYVIMRC
+augroup END
+" }

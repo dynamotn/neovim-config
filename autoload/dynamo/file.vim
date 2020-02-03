@@ -7,7 +7,10 @@ function! dynamo#file#DownloadPluginManager() abort
   endif
 endfunction
 
-function! dynamo#file#InstallPlugin() abort
+function! dynamo#file#InstallPlugin(...) abort
+  if (a:0 >= 1 && a:1 ==# 'now')
+    source $MYVIMRC | PlugInstall --sync | q
+  endif
   if empty(glob($VIMHOME . '/' . g:dynamo_plugins_folder))
     PlugInstall | source $MYVIMRC
   endif
