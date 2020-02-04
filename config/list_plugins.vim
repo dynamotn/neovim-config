@@ -124,6 +124,9 @@ if exists('*matchaddpos')
   Plug 'andymass/vim-matchup'
 endif
 
+" Switching between a single-line statement and a multi-line one
+Plug 'AndrewRadev/splitjoin.vim'
+
 " Test code
 Plug 'janko/vim-test' | Plug 'tpope/vim-dispatch'
 if has('nvim')
