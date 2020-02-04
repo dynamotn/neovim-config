@@ -10,6 +10,7 @@ let g:dynamo_plugin_configs_folder='plugins/options'
 let g:dynamo_list_key_bindings_folder='plugins/key_bindings'
 let g:dynamo_common_key_bindings_file='key_bindings'
 let g:dynamo_language_plugins_folder='plugins/languages'
+let g:dynamo_lsp_server_install_cmd=[]
 call dynamo#misc#InitPythonVersion()
 " ---------------------------- }
 

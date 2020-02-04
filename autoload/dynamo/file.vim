@@ -9,7 +9,11 @@ endfunction
 
 function! dynamo#file#InstallPlugin(...) abort
   if (a:0 >= 1 && a:1 ==# 'now')
-    source $MYVIMRC | PlugInstall --sync | q
+    source $MYVIMRC | PlugInstall --sync
+    for lsp_server_cmd in get(g:, 'dynamo_lsp_server_install_cmd', [])
+      execute '!' . lsp_server_cmd
+    endfor
+    quit
   endif
   if empty(glob($VIMHOME . '/' . g:dynamo_plugins_folder))
     PlugInstall | source $MYVIMRC

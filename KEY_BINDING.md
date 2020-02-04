@@ -20,16 +20,16 @@ Note: Mode abbrev in below tables:
 | F5          | N    | Toggle show tags and LSP symbols or Markdown TOC in sidebar                       |
 
 ### Ctrl key
-| Key binding | Mode | Description                                  |
-|-------------|------|----------------------------------------------|
-| Ctrl+I      | N    | Reload vim configuration and install plugins |
-| Ctrl+S      | N I  | Save file (same with other editor)           |
-| Ctrl+J      | N    | Switch to below window                       |
-| Ctrl+K      | N    | Switch to above window                       |
-| Ctrl+H      | N    | Switch to left window                        |
-| Ctrl+L      | N    | Switch to right window                       |
-| Ctrl+R      | V    | Replace selected text                        |
-| Ctrl+SPC    | I    | LSP autocomplete with coc                    |
+| Key binding | Mode | Description                                                    |
+|-------------|------|----------------------------------------------------------------|
+| Ctrl+I      | N    | Reload vim configuration and install plugins, language servers |
+| Ctrl+S      | N I  | Save file (same with other editor)                             |
+| Ctrl+J      | N    | Switch to below window                                         |
+| Ctrl+K      | N    | Switch to above window                                         |
+| Ctrl+H      | N    | Switch to left window                                          |
+| Ctrl+L      | N    | Switch to right window                                         |
+| Ctrl+R      | V    | Replace selected text                                          |
+| Ctrl+SPC    | I    | LSP autocomplete with coc                                      |
 
 ### Leader key
 `n` is number key
