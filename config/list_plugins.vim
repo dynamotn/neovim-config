@@ -28,7 +28,10 @@ call dynamo#file#RegisterPlugin('startify')
 " -------------------- }
 
 " -- Text -- {
-if v:version >= 800
+if has('termguicolors') && executable('go')
+  Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
+  call dynamo#file#RegisterPlugin('hexokinase')
+elseif v:version >= 800
   Plug 'chrisbra/Colorizer'
   call dynamo#file#RegisterPlugin('colorizer-nvim')
 else
