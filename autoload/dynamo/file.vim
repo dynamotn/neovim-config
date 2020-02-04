@@ -69,6 +69,9 @@ endfunction
 " Load plugin list for specific language {
 function! dynamo#file#LoadLanguagePlugin(filetype) abort
   let g:dynamo_language_plug_param={ 'for': a:filetype }
+  if g:dynamo_complete_engine ==? 'coc'
+    let g:dynamo_language_plug_param.do='yarn install --frozen-lockfile'
+  endif
   call dynamo#file#LoadConfig(g:dynamo_language_plugins_folder .
         \ '/' . a:filetype)
 endfunction
