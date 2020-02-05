@@ -98,18 +98,3 @@ function! dynamo#misc#AsciiArt() abort
       \ ]
 endfunction
 " }
-
-" Install language server {
-function! dynamo#misc#InstallLanguageServer(tool, package) abort
-  let install_cmd='true'
-  if executable(a:tool)
-    if a:tool ==? 'yarn'
-      let install_cmd=a:tool . ' global add ' . a:package
-    elseif a:tool ==? 'gem'
-      let install_cmd=a:tool . ' install ' . a:package
-    endif
-    call add(g:dynamo_lsp_server_install_cmd, install_cmd)
-  endif
-  let g:dynamo_language_plug_param.do=install_cmd . ' && ' . copy(g:dynamo_language_plug_param.do)
-endfunction
-" }

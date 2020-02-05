@@ -16,11 +16,11 @@ call dynamo#misc#InitPythonVersion()
 
 " ------ Plugin Manager ------ {
 " Automatically install vim-plug
-call dynamo#file#DownloadPluginManager()
+call dynamo#plugin#DownloadPluginManager()
 
 " Load plugin
-call dynamo#file#InitPluginOption()
-call dynamo#file#InitPluginKeyBinding()
+call dynamo#plugin#InitOption()
+call dynamo#plugin#InitKeyBinding()
 " ---------------------------- }
 
 " ------------ UI ------------ {
@@ -95,7 +95,7 @@ set nobackup
 set nowritebackup
 set noswapfile
 
-call dynamo#file#LoadConfig('file_specific')
+call dynamo#plugin#LoadConfig('file_specific')
 " ---------------------------- }
 
 " ---------- Tweaks ---------- {

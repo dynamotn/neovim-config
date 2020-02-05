@@ -13,30 +13,30 @@ Plug 'w0ng/vim-hybrid'
 Plug 'NLKNguyen/papercolor-theme'
 " For night time
 Plug 'rakr/vim-one'
-call dynamo#file#RegisterPlugin('colorscheme')
+call dynamo#plugin#Register('colorscheme')
 " ---------------------------- }
 
 " --------- Eyecandy --------- {
 " -- Status line -- {
 Plug 'vim-airline/vim-airline'
-call dynamo#file#RegisterPlugin('airline')
+call dynamo#plugin#Register('airline')
 " ----------------- }
 
 " -- Startup screen -- {
 Plug 'mhinz/vim-startify'
-call dynamo#file#RegisterPlugin('startify')
+call dynamo#plugin#Register('startify')
 " -------------------- }
 
 " -- Text -- {
 if has('termguicolors') && executable('go')
   Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
-  call dynamo#file#RegisterPlugin('hexokinase')
+  call dynamo#plugin#Register('hexokinase')
 elseif v:version >= 800
   Plug 'chrisbra/Colorizer'
-  call dynamo#file#RegisterPlugin('colorizer-nvim')
+  call dynamo#plugin#Register('colorizer-nvim')
 else
   Plug 'lilydjwg/colorizer'
-  call dynamo#file#RegisterPlugin('colorizer-vim')
+  call dynamo#plugin#Register('colorizer-vim')
 endif
 " ---------- }
 
@@ -47,54 +47,54 @@ Plug 'ryanoasis/vim-devicons'
 " -- Indent -- {
 if v:version >= 702
   Plug 'nathanaelkane/vim-indent-guides'
-  call dynamo#file#RegisterPlugin('indent_guide')
+  call dynamo#plugin#Register('indent_guide')
 end
 " ------------ }
 
 " -- Parentheses -- {
 Plug 'luochen1990/rainbow'
-call dynamo#file#RegisterPlugin('rainbow')
+call dynamo#plugin#Register('rainbow')
 " ----------------- }
 
 " -- Mark -- {
 if has('signs')
   Plug 'kshenoy/vim-signature'
-  call dynamo#file#RegisterPlugin('signature')
+  call dynamo#plugin#Register('signature')
 endif
 " ---------- }
 "
 " -- Space -- {
 Plug 'ntpeters/vim-better-whitespace'
-call dynamo#file#RegisterPlugin('better_whitespace')
+call dynamo#plugin#Register('better_whitespace')
 " ----------- }
 " ---------------------------- }
 
 " --------- Terminal --------- {
 if v:version >= 800
   Plug 'Shougo/deol.nvim', { 'on': 'Deol' }
-  call dynamo#file#RegisterPlugin('deol')
+  call dynamo#plugin#Register('deol')
 else
   Plug 'Shougo/vimshell.vim', { 'on': 'VimShell' } | Plug 'Shougo/vimproc.vim', { 'do' : 'make', 'on': 'VimShell' }
-  call dynamo#file#RegisterPlugin('vimshell')
+  call dynamo#plugin#Register('vimshell')
 endif
 " ---------------------------- }
 
 " --------- Framework -------- {
 " Guide
 Plug 'liuchengxu/vim-which-key'
-call dynamo#file#RegisterPlugin('which_key')
+call dynamo#plugin#Register('which_key')
 " ---------------------------- }
 
 " -------- Navigation -------- {
 " -- Window -- {
 " Interactive choose window
 Plug 't9md/vim-choosewin', { 'on': '<Plug>(choosewin)' }
-call dynamo#file#RegisterPlugin('choosewin')
+call dynamo#plugin#Register('choosewin')
 " ------------ }
 
 " -- File explorer -- {
 Plug 'scrooloose/nerdtree' | Plug 'Xuyuanp/nerdtree-git-plugin'
-call dynamo#file#RegisterPlugin('nerdtree')
+call dynamo#plugin#Register('nerdtree')
 " ------------------- }
 " ---------------------------- }
 
@@ -103,10 +103,10 @@ call dynamo#file#RegisterPlugin('nerdtree')
 if executable('ctags')
   if v:version >= 800
     Plug 'liuchengxu/vista.vim'
-    call dynamo#file#RegisterPlugin('vista')
+    call dynamo#plugin#Register('vista')
   else
     Plug 'majutsushi/tagbar'
-    call dynamo#file#RegisterPlugin('tagbar')
+    call dynamo#plugin#Register('tagbar')
   endif
 endif
 
@@ -116,7 +116,7 @@ Plug 'craigemery/vim-autotag'
 " Fast comment
 if v:version >= 700
   Plug 'scrooloose/nerdcommenter'
-  call dynamo#file#RegisterPlugin('nerdcommenter')
+  call dynamo#plugin#Register('nerdcommenter')
 endif
 
 " Show matching keyword, parentheses..., move between them
@@ -132,23 +132,23 @@ Plug 'janko/vim-test' | Plug 'tpope/vim-dispatch'
 if has('nvim')
   Plug 'radenling/vim-dispatch-neovim'
 endif
-call dynamo#file#RegisterPlugin('test')
+call dynamo#plugin#Register('test')
 
 " Alignment
 Plug 'junegunn/vim-easy-align'
-call dynamo#file#RegisterPlugin('easy_align')
+call dynamo#plugin#Register('easy_align')
 
 " Fuzzy finder
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } | Plug 'junegunn/fzf.vim'
 " Yank history
 Plug 'Shougo/neoyank.vim' | Plug 'justinhoward/fzf-neoyank'
-call dynamo#file#RegisterPlugin('fzf')
+call dynamo#plugin#Register('fzf')
 
 " Table mode formatter
 Plug 'dhruvasagar/vim-table-mode', { 'on': ['TableModeEnable', 'TableModeToggle'] }
 
 Plug 'tyru/open-browser-github.vim' | Plug 'tyru/open-browser.vim'
-call dynamo#file#RegisterPlugin('open_browser')
+call dynamo#plugin#Register('open_browser')
 " ---------------------------- }
 
 " ----------- VCS ------------ {
@@ -159,7 +159,7 @@ endif
 
 " Wrapper tool for Git
 Plug 'tpope/vim-fugitive' | Plug 'junegunn/gv.vim'
-call dynamo#file#RegisterPlugin('git')
+call dynamo#plugin#Register('git')
 " ---------------------------- }
 
 " -------- Completion -------- {
@@ -167,7 +167,7 @@ call dynamo#file#RegisterPlugin('git')
 " Engine
 if executable('node') && executable('yarn') && (v:version >= 800 && !has('nvim')) || has('nvim-0.3.1')
   Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-  call dynamo#file#RegisterPlugin('coc')
+  call dynamo#plugin#Register('coc')
 endif
 if !dynamo#misc#HasEngine() && v:version >= 800 && has('python3') && has('timers') && g:dynamo_python3_version >= 306.01
   let plug_param_for_deoplete={ 'do': 'UpdateRemotePlugins' }
@@ -175,11 +175,11 @@ if !dynamo#misc#HasEngine() && v:version >= 800 && has('python3') && has('timers
     let plug_param_for_deoplete.tag='4.1'
   endif
   Plug 'Shougo/deoplete.nvim', plug_param_for_deoplete
-  call dynamo#file#RegisterPlugin('deoplete')
+  call dynamo#plugin#Register('deoplete')
 endif
 if !dynamo#misc#HasEngine() || (v:version >= 703 && has('lua'))
   Plug 'Shougo/neocomplete.vim'
-  call dynamo#file#RegisterPlugin('neocomplete')
+  call dynamo#plugin#Register('neocomplete')
 endif
 " ---------- }
 
@@ -187,7 +187,7 @@ endif
 " Engine
 if v:version >= 704
   Plug 'Shougo/neosnippet'
-  call dynamo#file#RegisterPlugin('neosnippet')
+  call dynamo#plugin#Register('neosnippet')
 endif
 
 " List
@@ -215,13 +215,13 @@ if g:dynamo_complete_engine ==? 'coc'
 elseif g:dynamo_complete_engine ==? 'deoplete'
   Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
   let g:LanguageClient_serverCommands={}
-  call dynamo#file#RegisterPlugin('languageclient')
+  call dynamo#plugin#Register('languageclient')
 endif
 " --------- }
 
 " -- Linter -- {
 Plug 'dense-analysis/ale'
-call dynamo#file#RegisterPlugin('ale')
+call dynamo#plugin#Register('ale')
 " ------------ }
 
 " -- Convention -- {
@@ -236,10 +236,10 @@ Plug 'Shougo/neco-syntax'
 Plug 'Shougo/context_filetype.vim'
 
 " Load each language
-call dynamo#file#LoadLanguagePlugin('markdown')
-call dynamo#file#LoadLanguagePlugin('vim')
-call dynamo#file#LoadLanguagePlugin('ansible')
-call dynamo#file#LoadLanguagePlugin('yaml')
-call dynamo#file#LoadLanguagePlugin('ruby')
-call dynamo#file#EndLoadPlugin()
+call dynamo#plugin#LoadLanguage('markdown')
+call dynamo#plugin#LoadLanguage('vim')
+call dynamo#plugin#LoadLanguage('ansible')
+call dynamo#plugin#LoadLanguage('yaml')
+call dynamo#plugin#LoadLanguage('ruby')
+call dynamo#plugin#EndLoad()
 " ---------------------------- }

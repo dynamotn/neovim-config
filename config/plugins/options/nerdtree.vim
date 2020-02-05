@@ -24,7 +24,7 @@ augroup NERDTreeStartup
         exec 'NERDTree' argv()[0] | wincmd p
         " Change current folder to input folder
         exec 'cd '.argv()[0]
-        if !dynamo#file#IsRegisteredPlugin('startify')
+        if !dynamo#plugin#IsRegistered('startify')
           enew
         endif
       endif

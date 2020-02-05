@@ -9,8 +9,8 @@ noremap <F1> <Esc>
 " Copy paste, stackoverflow =]]
 set pastetoggle=<F3>
 
-" Load config and install plugin
-nmap <silent> <C-i> :call dynamo#file#InstallPlugin('now')<CR>
+" Load config and update plugin
+nmap <silent> <C-i> :call dynamo#plugin#Update()<CR>
 " ---------------------------- }
 
 " ------ Save and Exit ------- {
