@@ -12,6 +12,9 @@ let g:startify_list_order=[
       \ 'bookmarks',
       \ ]
 
+" Not change directory
+let g:startify_change_to_dir=0
+
 " Startify when startup
 augroup StartifyStartup
   function! StartifyStartup() abort
