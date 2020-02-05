@@ -116,3 +116,7 @@ call dynamo#mapping#Group('<Space>', 'z', 'Fuzzy search')
 " ------------ UI ------------ {
 call dynamo#mapping#Group('<Space>', 'u', 'UI')
 " ---------------------------- }
+
+" ---------- Project --------- {
+call dynamo#mapping#Group('<Space>', 'p', 'Project')
+" ---------------------------- }

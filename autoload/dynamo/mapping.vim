@@ -29,7 +29,7 @@ function! dynamo#mapping#Define(map_cmds, main_key, follow_key, command, descrip
     endif
     " Create group name description when don't have group of key
     if !has_key(list_map, follow_keystroke)
-      let list_map[follow_keystroke]={ 'name' : 'new group' }
+      let list_map[follow_keystroke]={ 'name' : '⍟ new group' }
     endif
     " Get children mapping key of group
     let list_map=get(list_map, follow_keystroke, {})
@@ -43,8 +43,19 @@ endfunction
 
 " Add a group key to guide {
 function! dynamo#mapping#Group(main_key, follow_key, description) abort
-  let g:guide_map[a:main_key]
-        \[dynamo#string#GetKeyStroke(a:follow_key)[0]]={ 'name' : '⍟ ' . a:description }
+  let list_follow_keystrokes=dynamo#string#GetKeyStroke(a:follow_key)
+  let i=0
+  let list_map=g:guide_map[a:main_key]
+  for keystroke in list_follow_keystrokes
+    let i+=1
+    if i != len(list_follow_keystrokes)
+      if !has_key(list_map, keystroke)
+        return
+      endif
+      let list_map=list_map[keystroke]
+    endif
+  endfor
+  let list_map[keystroke]={ 'name' : '⍟ ' . a:description }
 endfunction
 " }
 
