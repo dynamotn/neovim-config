@@ -101,6 +101,9 @@ function! dynamo#plugin#InstallLanguageServer(tool, package) abort
       let install_cmd=a:tool . ' install ' . a:package
     endif
     call add(g:dynamo_lsp_server_install_cmd, install_cmd)
+  elseif a:tool ==? 'bin'
+    let install_cmd='bash ' . $VIMHOME . '/../bin/update.sh -s ' . a:package
+    call add(g:dynamo_lsp_server_install_cmd, install_cmd)
   endif
   let g:dynamo_language_plug_param.do=install_cmd . ' && ' . copy(g:dynamo_language_plug_param.do)
 endfunction

@@ -241,5 +241,6 @@ call dynamo#plugin#LoadLanguage('vim')
 call dynamo#plugin#LoadLanguage('ansible')
 call dynamo#plugin#LoadLanguage('yaml')
 call dynamo#plugin#LoadLanguage('ruby')
+call dynamo#plugin#LoadLanguage('terraform')
 call dynamo#plugin#EndLoad()
 " ---------------------------- }
