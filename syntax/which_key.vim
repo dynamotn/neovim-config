@@ -4,7 +4,7 @@ if exists('b:current_syntax')
 endif
 let b:current_syntax='which_key'
 
-let s:sep=which_key#util#get_sep()
+let s:sep=which_key#get_sep()
 
 execute 'syntax match WhichKeySeperator' '/'.s:sep.'/' 'contained'
 execute 'syntax match WhichKey' '/[^\s].\{1,3}'.s:sep.'/' 'contains=WhichKeySeperator'
