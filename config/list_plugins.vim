@@ -67,6 +67,12 @@ endif
 Plug 'ntpeters/vim-better-whitespace'
 call dynamo#plugin#Register('better_whitespace')
 " ----------- }
+
+" -- Smooth scroll -- {
+if has('nvim-0.3') || (!has('nvim') && v:version >= 800)
+  Plug 'psliwka/vim-smoothie'
+end
+"  }
 " ---------------------------- }
 
 " --------- Terminal --------- {
