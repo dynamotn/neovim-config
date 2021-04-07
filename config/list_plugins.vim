@@ -162,6 +162,7 @@ call dynamo#plugin#Register('open_browser')
 
 " Quick project navigation
 Plug 'tpope/vim-projectionist' | Plug 'c-brenn/fuzzy-projectionist.vim'
+call dynamo#plugin#Register('projectionist')
 " ---------------------------- }
 
 " ----------- VCS ------------ {
