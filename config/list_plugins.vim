@@ -73,6 +73,10 @@ if has('nvim-0.3') || (!has('nvim') && v:version >= 800)
   Plug 'psliwka/vim-smoothie'
 end
 "  }
+
+" -- Highlight -- {
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" ----------- }
 " ---------------------------- }
 
 " --------- Terminal --------- {
@@ -155,6 +159,9 @@ Plug 'dhruvasagar/vim-table-mode', { 'on': ['TableModeEnable', 'TableModeToggle'
 
 Plug 'tyru/open-browser-github.vim' | Plug 'tyru/open-browser.vim'
 call dynamo#plugin#Register('open_browser')
+
+" Quick project navigation
+Plug 'tpope/vim-projectionist' | Plug 'c-brenn/fuzzy-projectionist.vim'
 " ---------------------------- }
 
 " ----------- VCS ------------ {
