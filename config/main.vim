@@ -43,7 +43,7 @@ syntax on
 
 " Highlight unwanted space
 set list
-set listchars=tab:→\ ,eol:↵,trail:·,extends:↷,precedes:↶
+set listchars=tab:→\ ,trail:·,extends:↷,precedes:↶
 
 " Not show redundant mode line with airline
 set noshowmode
