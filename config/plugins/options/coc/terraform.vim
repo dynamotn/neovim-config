@@ -1,5 +1,6 @@
 call coc#config('languageserver.terraform', {
-      \   'command': 'terraform-lsp',
+      \   'command': 'terraform-ls',
+      \   'args': ['serve'],
       \   'initializationOptions': {},
       \   'filetypes': [ 'terraform' ]
       \ })
