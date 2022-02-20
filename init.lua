@@ -1,5 +1,6 @@
 local core_modules = {
     "core.options",
+    "core.keymaps",
 }
 
 for _, module in ipairs(core_modules) do
