@@ -51,6 +51,12 @@ return {
         'ms-jpq/coq.artifacts',
         branch = 'artifacts',
     },
+    { -- Convention
+        'gpanders/editorconfig.nvim',
+        config = function()
+            require('editorconfig')
+        end,
+    },
     ------- }
     ----------------------------- }
 }
