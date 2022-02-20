@@ -1,11 +1,14 @@
 local core_modules = {
-    "core.options",
-    "core.keymaps",
+    'options',
+    'keymaps',
+    'bootstrap',
 }
 
 for _, module in ipairs(core_modules) do
-   local ok, err = pcall(require, module)
+   local ok, err = pcall(require, 'core.' .. module)
    if not ok then
-      error("Error loading " .. module .. "\n\n" .. err)
+      error('Error loading core.' .. module .. '\n\n' .. err)
    end
 end
+
+require('plugins')
