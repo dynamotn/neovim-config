@@ -1,4 +1,4 @@
-local present, onedark = pcall(require, "onedark")
+local present, onedark = pcall(require, 'onedark')
 
 if not present then
    return
