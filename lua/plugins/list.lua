@@ -32,6 +32,10 @@ return {
     { -- Programming icons
         'kyazdani42/nvim-web-devicons',
     },
+    { -- Indent guide
+        'glepnir/indent-guides.nvim',
+        config = register_config('indent'),
+    },
     --------------- }
     ----------------------------- }
 
