@@ -4,12 +4,18 @@
 ---------------------------------------
 local opt = vim.opt                         -- Set options (global/buffer/windows-scoped)
 local g = vim.g                             -- Global variables
-local map = vim.api.nvim_set_keymap         -- Map command
-local default_opts = { noremap = true }
 
 local function cabbrev(input, replace)
-  cmd = 'cnoreabbrev %s %s'
-  vim.cmd(cmd:format(input, replace))
+    cmd = 'cnoreabbrev %s %s'
+    vim.cmd(cmd:format(input, replace))
+end
+
+local function map(mode, input, replace, opts)
+    local options = { noremap = true, silent = true }
+    if opts then
+        options = vim.tbl_extend('force', options, opts)
+    end
+    vim.api.nvim_set_keymap(mode, input, replace, options)
 end
 
 ----------- Base ------------ {
@@ -17,7 +23,7 @@ end
 g.leader = '\\'
 
 -- Need help, but I can type on my own
-map('', '<F1>', '<Esc>', default_opts)
+map('', '<F1>', '<Esc>')
 
 -- Copy paste, stackoverflow =]]
 opt.pastetoggle = '<F3>'
@@ -25,7 +31,7 @@ opt.pastetoggle = '<F3>'
 
 ------ Save and Exit -------- {
 -- Save with root permission
-map('c', 'w!!', 'w ! sudo tee % > /dev/null', default_opts)
+map('c', 'w!!', 'w ! sudo tee % > /dev/null')
 
 -- No one is really happy until you have this shortcuts
 cabbrev('W!', 'w!')
@@ -42,23 +48,23 @@ cabbrev('Qa', 'qa')
 
 ---------- Window ----------- {
 -- Navigate splited window easier
-map('n', '<C-j>', '<C-w>j', default_opts)
-map('n', '<C-k>', '<C-w>k', default_opts)
-map('n', '<C-h>', '<C-w>h', default_opts)
-map('n', '<C-l>', '<C-w>l', default_opts)
+map('n', '<C-j>', '<C-w>j')
+map('n', '<C-k>', '<C-w>k')
+map('n', '<C-h>', '<C-w>h')
+map('n', '<C-l>', '<C-w>l')
 ----------------------------- }
 
 ---------- Editing ---------- {
 -- Change indentation with multiple level
-map('v', '<', '<gv', default_opts)
-map('v', '>', '>gv', default_opts)
-map('n', '<', '<<_', default_opts)
-map('n', '>', '>>_', default_opts)
+map('v', '<', '<gv')
+map('v', '>', '>gv')
+map('n', '<', '<<_')
+map('n', '>', '>>_')
 
 -- Copy to system clipboard
-map('v', '<C-c>', '"+y', default_opts)
-map('n', '<C-c>', '"+yy', default_opts)
+map('v', '<C-c>', '"+y')
+map('n', '<C-c>', '"+yy')
 
 -- Replace selected text without copying it
-map('v', 'p', '"_dP', default_opts)
------------------------------ }
+map('v', 'p', '"_dP')
+--------------------------- }
