@@ -1,3 +1,5 @@
+vim.api.nvim_command[[let $NVIMHOME=fnamemodify(expand('<sfile>'), ':h')]]
+
 local core_modules = {
     'options',
     'keymaps',
@@ -12,3 +14,4 @@ for _, module in ipairs(core_modules) do
 end
 
 require('plugins')
+require('misc.automatic')

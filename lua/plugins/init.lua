@@ -15,7 +15,7 @@ local list = require('plugins.list')
 
 return packer.startup({function(use)
     -- Automatically reload config when update plugin
-    vim.cmd[[autocmd User PackerComplete source $MYVIMRC]]
+    vim.cmd[[autocmd User PackerComplete source $MYVIMRC | redraw]]
 
     for _, v in pairs(list) do
         use(v)
