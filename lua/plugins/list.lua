@@ -30,4 +30,15 @@ return {
     },
 -------- }
 ----------------------------- }
+
+-------- Completion --------- {
+-- Code {
+    { -- Engine
+        'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq'),
+    },
+    { -- Snippet
+        'ms-jpq/coq.artifacts', branch = 'artifacts',
+    },
+------- }
+----------------------------- }
 }
