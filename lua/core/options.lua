@@ -2,9 +2,9 @@
 ---------------------------------------
 --       General Neovim options      --
 ---------------------------------------
-local opt = vim.opt                         -- Set options (global/buffer/windows-scoped)
-local cmd = vim.cmd                         -- Execute Vim commands
-local exec = vim.api.nvim_exec              -- Execute Vimscript
+local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+local cmd = vim.cmd -- Execute Vim commands
+local exec = vim.api.nvim_exec -- Execute Vimscript
 
 ------------ UI ------------- {
 -- Status line look nicer
@@ -14,15 +14,15 @@ opt.laststatus = 2
 opt.splitbelow = true
 opt.splitright = true
 
--- Show shorten messages in UI 
-opt.shortmess:append 'filmnrxoOtT'
+-- Show shorten messages in UI
+opt.shortmess:append('filmnrxoOtT')
 
 -- View specific settings to save and restore view of a file
 -- Better Unix / Windows compatibility
 opt.viewoptions = 'folds,options,cursor,unix,slash'
 
 -- Enable syntax of file
-cmd [[syntax on]]
+cmd([[syntax on]])
 
 -- Highlight unwanted space
 opt.list = true
@@ -112,7 +112,7 @@ opt.shiftwidth = 2
 opt.softtabstop = 2
 -- Automatically indent
 opt.autoindent = true
-cmd [[filetype plugin indent on]]
+cmd([[filetype plugin indent on]])
 --------- }
 
 -- Size {

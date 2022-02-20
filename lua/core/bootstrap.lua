@@ -2,28 +2,28 @@
 ---------------------------------------
 --   General Neovim bootstrapping    --
 ---------------------------------------
-local g = vim.g                             -- Global variables
+local g = vim.g -- Global variables
 
 ---------- Packer ----------- {
-local packer_path = vim.fn.stdpath 'data' .. '/site/pack/packer/opt/packer.nvim'
+local packer_path = vim.fn.stdpath('data') .. '/site/pack/packer/opt/packer.nvim'
 if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
-    print 'Cloning packer..'
+    print('Cloning packer..')
     -- Remove the dir before cloning
     vim.fn.delete(packer_path, 'rf')
-    vim.fn.system {
+    vim.fn.system({
         'git',
         'clone',
         'https://github.com/wbthomason/packer.nvim',
         '--depth',
         '1',
         packer_path,
-    }
+    })
 
-    vim.cmd[[packadd packer.nvim]]
+    vim.cmd([[packadd packer.nvim]])
     present, packer = pcall(require, 'packer')
 
     if present then
-        print 'Packer cloned successfully.'
+        print('Packer cloned successfully.')
         g.dynamo_bootstrap_packer = true
     else
         error("Couldn't clone packer !\nPacker path: " .. packer_path .. '\n' .. packer)

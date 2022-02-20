@@ -1,10 +1,10 @@
 local present, bufferline = pcall(require, 'bufferline')
 
 if not present then
-   return
+    return
 end
 
-bufferline.setup {
+bufferline.setup({
     options = {
         numbers = function(opts)
             return string.format('%s', opts.raise(opts.id))
@@ -14,4 +14,4 @@ bufferline.setup {
         separator_style = 'slant',
         sort_by = 'tabs',
     },
-}
+})

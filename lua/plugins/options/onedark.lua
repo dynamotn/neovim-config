@@ -1,10 +1,10 @@
 local present, onedark = pcall(require, 'onedark')
 
 if not present then
-   return
+    return
 end
 
-onedark.setup {
+onedark.setup({
     style = 'cool',
     term_colors = false,
     code_style = {
@@ -12,8 +12,8 @@ onedark.setup {
         keywords = 'italic',
         functions = 'bold',
         strings = 'none',
-        variables = 'none'
+        variables = 'none',
     },
-}
+})
 
 onedark.load()

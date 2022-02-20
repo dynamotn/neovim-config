@@ -2,8 +2,8 @@
 ---------------------------------------
 --    General Neovim key mappings    --
 ---------------------------------------
-local opt = vim.opt                         -- Set options (global/buffer/windows-scoped)
-local g = vim.g                             -- Global variables
+local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
     cmd = 'cnoreabbrev %s %s'
