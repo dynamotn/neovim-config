@@ -21,5 +21,5 @@ whichkey.setup({
     },
     layout = {
         align = 'center',
-    }
+    },
 })
