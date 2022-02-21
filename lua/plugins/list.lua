@@ -5,10 +5,25 @@
 local register_config = require('plugins.register').register_config
 
 return {
-    {
+    ----------- Base ------------ {
+    { -- Plugin manager
         'wbthomason/packer.nvim',
         event = 'VimEnter',
     },
+    { -- Base Lua functions
+        'nvim-lua/plenary.nvim',
+    },
+    { -- Detect filetype
+        'nathom/filetype.nvim',
+    },
+    -- { -- View startup timing
+    --     'dstein64/vim-startuptime',
+    -- },
+    { -- Improve startup time
+        'lewis6991/impatient.nvim',
+    },
+    ----------------------------- }
+
     -------- Eyecandy ----------- {
     -- Color scheme {
     { -- OneDark for both Dark and Light colorscheme
