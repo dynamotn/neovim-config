@@ -68,7 +68,7 @@ return {
     { -- Convention
         'gpanders/editorconfig.nvim',
         config = function()
-            require('editorconfig')
+            pcall(require, 'editorconfig')
         end,
     },
     { -- TreeSitter
