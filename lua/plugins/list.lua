@@ -75,15 +75,21 @@ return {
     ------- }
 
     -- Syntax highlight {
-    { -- Syntax collection
+    { -- For all basic filetypes
         'sheerun/vim-polyglot',
     },
-    { -- TreeSitter
+    { -- For gentoo filetypes
+        'gentoo/gentoo-syntax',
+    },
+    ------------------- }
+
+    -- TreeSitter {
+    {
         'nvim-treesitter/nvim-treesitter',
         run = ':TSUpdate',
         config = register_config('treesitter'),
     },
-    ------------------- }
+    ------------- }
     ----------------------------- }
 
     -------- Integration -------- {
