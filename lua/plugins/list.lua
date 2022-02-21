@@ -54,9 +54,8 @@ return {
     --------------- }
     ----------------------------- }
 
-    -------- Completion --------- {
-    -- Code {
-    { -- Engine
+    ---------- Editing ---------- {
+    { -- Code complete engine
         'ms-jpq/coq_nvim',
         branch = 'coq',
         run = ':COQdeps',
@@ -72,8 +71,11 @@ return {
             require('editorconfig')
         end,
     },
-    ------- }
-
+    { -- TreeSitter
+        'nvim-treesitter/nvim-treesitter',
+        run = ':TSUpdate',
+        config = register_config('treesitter'),
+    },
     -- Syntax highlight {
     { -- For all basic filetypes
         'sheerun/vim-polyglot',
@@ -82,14 +84,6 @@ return {
         'gentoo/gentoo-syntax',
     },
     ------------------- }
-
-    -- TreeSitter {
-    {
-        'nvim-treesitter/nvim-treesitter',
-        run = ':TSUpdate',
-        config = register_config('treesitter'),
-    },
-    ------------- }
     ----------------------------- }
 
     -------- Integration -------- {
