@@ -75,6 +75,9 @@ return {
     ------- }
 
     -- Syntax highlight {
+    { -- Syntax collection
+        'sheerun/vim-polyglot',
+    },
     { -- TreeSitter
         'nvim-treesitter/nvim-treesitter',
         run = ':TSUpdate',
