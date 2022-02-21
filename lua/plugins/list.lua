@@ -73,6 +73,14 @@ return {
         end,
     },
     ------- }
+
+    -- Syntax highlight {
+    { -- TreeSitter
+        'nvim-treesitter/nvim-treesitter',
+        run = ':TSUpdate',
+        config = register_config('treesitter'),
+    },
+    ------------------- }
     ----------------------------- }
 
     -------- Integration -------- {
