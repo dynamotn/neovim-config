@@ -46,7 +46,7 @@ opt.cursorline = true
 
 ---- File manipulation ------ {
 -- End of file setting
-opt.fileformat = unix
+opt.fileformat = 'unix'
 
 -- Accept modeline of each file
 opt.modeline = true
