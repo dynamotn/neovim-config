@@ -9,6 +9,7 @@ local light_gui_colors = { '#E1E1E1', '#CACACA' }
 
 indent.setup({
     indent_guide_size = 8,
+    exclude_filetypes = { 'help', 'CHADTree' },
     even_colors = vim.go.background == 'dark' and {
         fg = dark_gui_colors[1],
         bg = dark_gui_colors[2],

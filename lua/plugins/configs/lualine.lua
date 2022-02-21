@@ -30,5 +30,5 @@ lualine.setup({
         },
         lualine_z = { 'progress', 'location' },
     },
-    extensions = { 'quickfix' },
+    extensions = { 'quickfix', 'chadtree' },
 })

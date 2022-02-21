@@ -54,6 +54,16 @@ return {
     --------------- }
     ----------------------------- }
 
+    --------- Navigation -------- {
+    { -- File explorer
+        'ms-jpq/chadtree',
+        branch = 'chad',
+        opt = true,
+        run = ':CHADdeps',
+        cmd = { 'CHADopen' },
+    },
+    ----------------------------- }
+
     ---------- Editing ---------- {
     { -- Code complete engine
         'ms-jpq/coq_nvim',
