@@ -90,7 +90,7 @@ opt.iskeyword:remove('.#-')
 opt.virtualedit = 'onemore'
 
 -- Timeout of key sequence
-opt.timeoutlen = 500
+opt.timeoutlen = 200
 
 -- Highlight matching parenthesis
 opt.showmatch = true
