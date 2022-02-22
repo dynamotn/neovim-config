@@ -6,93 +6,46 @@ local register_config = require('plugins.register').register_config
 
 return {
     ----------- Base ------------ {
-    { -- Plugin manager
-        'wbthomason/packer.nvim',
-        event = 'VimEnter',
-    },
-    { -- Base Lua functions
-        'nvim-lua/plenary.nvim',
-    },
-    { -- Detect filetype
-        'nathom/filetype.nvim',
-    },
-    -- { -- View startup timing
-    --     'dstein64/vim-startuptime',
-    -- },
-    { -- Improve startup time
-        'lewis6991/impatient.nvim',
-    },
+    { 'wbthomason/packer.nvim', event = 'VimEnter' }, -- Plugin manager
+    { 'nvim-lua/plenary.nvim' }, -- Base Lua functions
+    { 'nathom/filetype.nvim' }, -- Detect filetype
+    -- {'dstein64/vim-startuptime'}, -- View startup timing
+    { 'lewis6991/impatient.nvim' }, -- Improve startup time
     ----------------------------- }
 
     -------- Eyecandy ----------- {
     -- Color scheme {
-    { -- OneDark for both Dark and Light colorscheme
-        'navarasu/onedark.nvim',
-        config = register_config('onedark'),
-    },
+    { 'navarasu/onedark.nvim', config = register_config('onedark') }, -- OneDark for both Dark and Light colorscheme
     --------------- }
 
     -- Status and tab/buffer line {
-    { -- Status line
-        'nvim-lualine/lualine.nvim',
-        config = register_config('lualine'),
-    },
-    { -- Buffer and tab line
-        'akinsho/bufferline.nvim',
-        config = register_config('bufferline'),
-    },
+    { 'nvim-lualine/lualine.nvim', config = register_config('lualine') }, -- Status line
+    { 'akinsho/bufferline.nvim', config = register_config('bufferline') }, -- Buffer and tab line
     ----------------------------- }
 
     -- Miscellaneous {
-    { -- Programming icons
-        'kyazdani42/nvim-web-devicons',
-    },
-    { -- Indent guide
-        'glepnir/indent-guides.nvim',
-        config = register_config('indent'),
-    },
+    { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
+    { 'glepnir/indent-guides.nvim', config = register_config('indent') }, -- Indent guide
     --------------- }
     ----------------------------- }
 
     --------- Navigation -------- {
-    { -- File explorer
-        'ms-jpq/chadtree',
-        branch = 'chad',
-        opt = true,
-        run = ':CHADdeps',
-        cmd = { 'CHADopen' },
-    },
+    { 'ms-jpq/chadtree', branch = 'chad', opt = true, run = ':CHADdeps', cmd = { 'CHADopen' } }, -- File explorer
     ----------------------------- }
 
     ---------- Editing ---------- {
-    { -- Code complete engine
-        'ms-jpq/coq_nvim',
-        branch = 'coq',
-        run = ':COQdeps',
-        config = register_config('coq'),
-    },
-    { -- Snippet
-        'ms-jpq/coq.artifacts',
-        branch = 'artifacts',
-    },
+    { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
+    { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
     { -- Convention
         'gpanders/editorconfig.nvim',
         config = function()
             pcall(require, 'editorconfig')
         end,
     },
-    { -- TreeSitter
-        'nvim-treesitter/nvim-treesitter',
-        run = ':TSUpdate',
-        config = register_config('treesitter'),
-    },
+    { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = register_config('treesitter') }, -- TreeSitter
     -- Syntax highlight {
-    { -- For all basic filetypes
-        'sheerun/vim-polyglot',
-    },
-    { -- For gentoo filetypes
-        'gentoo/gentoo-syntax',
-    },
+    { 'sheerun/vim-polyglot' }, -- For all basic filetypes
+    { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
     ------------------- }
     ----------------------------- }
 
@@ -104,9 +57,6 @@ return {
         end,
         config = register_config('firefox'),
     },
-    { -- Show guide of keymaps
-        'folke/which-key.nvim',
-        config = register_config('whichkey'),
-    },
+    { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
     ----------------------------- }
 }
