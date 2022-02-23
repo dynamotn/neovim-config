@@ -35,7 +35,7 @@ return {
     ----------------------------- }
 
     ------------- VCS ----------- {
-    { 'TimUntersberger/neogit', config = register_config('neogit') }, -- Git TUI
+    { 'TimUntersberger/neogit', config = register_config('neogit'), cmd = { 'Neogit' } }, -- Git TUI
     { 'sindrets/diffview.nvim' }, -- Diff view
     { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git dcoration
     ----------------------------- }
