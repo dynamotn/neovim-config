@@ -30,3 +30,19 @@ if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
     end
 end
 ----------------------------- }
+
+-- Disable builtin plugins -- {
+-- See in https://github.com/neovim/neovim/tree/master/runtime/plugin
+local unwanted_plugins = {
+    '2html_plugin',
+    'gzip',
+    'matchit',
+    'netrwPlugin',
+    'tarPlugin',
+    'tutor_mode_plugin',
+    'zipPlugin',
+}
+for _, plugin in pairs(unwanted_plugins) do
+   g["loaded_" .. plugin] = 1
+end
+----------------------------- }

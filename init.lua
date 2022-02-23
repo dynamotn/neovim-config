@@ -1,9 +1,9 @@
 vim.api.nvim_command([[let $NVIMHOME=fnamemodify(expand('<sfile>'), ':h')]])
 
 local core_modules = {
+    'bootstrap',
     'options',
     'keymaps',
-    'bootstrap',
 }
 
 for _, module in ipairs(core_modules) do
