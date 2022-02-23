@@ -26,13 +26,7 @@ return {
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
     { 'glepnir/indent-guides.nvim', config = register_config('indent') }, -- Indent guide
-    { -- Color highlight
-        'norcalli/nvim-colorizer.lua',
-        config = function()
-            local present, colorizer = pcall(require, 'colorizer')
-            colorizer.setup()
-        end,
-    },
+    { 'norcalli/nvim-colorizer.lua', config = register_config('colorizer') }, -- Color highlight
     --------------- }
     ----------------------------- }
 
@@ -49,12 +43,7 @@ return {
     ---------- Editing ---------- {
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
-    { -- Convention
-        'gpanders/editorconfig.nvim',
-        config = function()
-            pcall(require, 'editorconfig')
-        end,
-    },
+    { 'gpanders/editorconfig.nvim', config = register_config('editorconfig') }, -- Convention
     { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = register_config('treesitter') }, -- TreeSitter
     -- Syntax highlight {
     { 'sheerun/vim-polyglot' }, -- For all basic filetypes
