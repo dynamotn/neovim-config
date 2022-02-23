@@ -4,6 +4,4 @@ if not present then
     return
 end
 
-gitsigns.setup({
-})
-
+gitsigns.setup({})

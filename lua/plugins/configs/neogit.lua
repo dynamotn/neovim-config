@@ -6,6 +6,6 @@ end
 
 neogit.setup({
     integrations = {
-        diffview = true
-    }
+        diffview = true,
+    },
 })

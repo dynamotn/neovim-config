@@ -43,6 +43,6 @@ local unwanted_plugins = {
     'zipPlugin',
 }
 for _, plugin in pairs(unwanted_plugins) do
-   g["loaded_" .. plugin] = 1
+    g['loaded_' .. plugin] = 1
 end
 ----------------------------- }
