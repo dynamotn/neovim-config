@@ -2,7 +2,7 @@
 ---------------------------------------
 --    General Neovim key mappings    --
 ---------------------------------------
-local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+local opt = vim.opt -- Set options (global/buffer/windowS-scoped)
 local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
@@ -67,4 +67,13 @@ map('n', '<C-c>', '"+yy')
 
 -- Replace selected text without copying it
 map('v', 'p', '"_dP')
+--------------------------- }
+
+-------- Completion ------- {
+map('i', '<Esc>', [[pumvisible() ? "<C-e><Esc>" : "<Esc>"]], { expr = true })
+map('i', '<C-c>', [[pumvisible() ? "<C-e><C-c>" : "<C-c>"]], { expr = true })
+map('i', '<Tab>', [[pumvisible() ? "<C-n>" : "<Tab>"]], { expr = true })
+map('i', '<S-Tab>', [[pumvisible() ? "<C-p>" : "<BS>"]], { expr = true })
+map('i', '<CR>', 'v:lua.MUtils.CR()', { expr = true })
+map('i', '<BS>', 'v:lua.MUtils.BS()', { expr = true })
 --------------------------- }

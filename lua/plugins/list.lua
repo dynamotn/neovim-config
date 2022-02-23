@@ -49,6 +49,9 @@ return {
     { 'sheerun/vim-polyglot' }, -- For all basic filetypes
     { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
     ------------------- }
+    -- Typing {
+    { 'windwp/nvim-autopairs', config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
+    --------- }
     ----------------------------- }
 
     -------- Integration -------- {

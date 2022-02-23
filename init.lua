@@ -14,4 +14,15 @@ for _, module in ipairs(core_modules) do
 end
 
 require('plugins')
-require('misc.automatic')
+
+local misc_modules = {
+    'automatic',
+    'completion',
+}
+
+for _, module in ipairs(misc_modules) do
+    local ok, err = pcall(require, 'misc.' .. module)
+    if not ok then
+        error('Error loading misc.' .. module .. '\n\n' .. err)
+    end
+end

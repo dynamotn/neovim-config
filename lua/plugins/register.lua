@@ -28,11 +28,13 @@ M.register_keymaps = function(name)
     end
 
     local present, keymaps = pcall(require, 'plugins.keymaps.' .. name)
-    if not present or not keymaps then
+    if not present then
         return
     end
 
-    whichkey.register(keymaps)
+    if type(keymaps) == 'table' then
+        whichkey.register(keymaps)
+    end
 end
 
 return M
