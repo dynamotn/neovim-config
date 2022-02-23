@@ -1,4 +1,4 @@
-_G.MUtils= {}
+_G.MUtils = {}
 
 MUtils.CR = function()
     local autopairs = require('nvim-autopairs')

@@ -5,6 +5,6 @@ vim.api.nvim_set_var('chadtree_settings', {
 })
 
 return {
-    ['<F1>'] = { '<cmd>CHADopen<cr>', 'File explorer'},
-    ['<space>ft'] = { '<cmd>CHADopen<cr>', 'File explorer'},
+    ['<F1>'] = { '<cmd>CHADopen<cr>', 'File explorer' },
+    ['<space>ft'] = { '<cmd>CHADopen<cr>', 'File explorer' },
 }

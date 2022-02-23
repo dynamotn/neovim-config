@@ -31,7 +31,14 @@ return {
     ----------------------------- }
 
     --------- Navigation -------- {
-    { 'ms-jpq/chadtree', branch = 'chad', opt = true, run = ':CHADdeps', cmd = { 'CHADopen' }, config = register_config('chadtree') }, -- File explorer
+    {
+        'ms-jpq/chadtree',
+        branch = 'chad',
+        opt = true,
+        run = ':CHADdeps',
+        cmd = { 'CHADopen' },
+        config = register_config('chadtree'),
+    }, -- File explorer
     ----------------------------- }
 
     ------------- VCS ----------- {
