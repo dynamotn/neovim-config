@@ -26,6 +26,7 @@ return {
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
     { 'glepnir/indent-guides.nvim', config = register_config('indent') }, -- Indent guide
+    { 'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }, -- Color highlight
     --------------- }
     ----------------------------- }
 
