@@ -33,6 +33,12 @@ return {
     { 'ms-jpq/chadtree', branch = 'chad', opt = true, run = ':CHADdeps', cmd = { 'CHADopen' } }, -- File explorer
     ----------------------------- }
 
+    ------------- VCS ----------- {
+    { 'TimUntersberger/neogit', config = register_config('neogit') }, -- Git TUI
+    { 'sindrets/diffview.nvim' }, -- Diff view
+    { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git dcoration
+    ----------------------------- }
+
     ---------- Editing ---------- {
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
