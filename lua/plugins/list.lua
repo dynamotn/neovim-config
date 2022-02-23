@@ -60,6 +60,6 @@ return {
         config = register_config('firefox'),
     },
     { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
-    { 'akinsho/nvim-toggleterm.lua' },
+    { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
     ----------------------------- }
 }
