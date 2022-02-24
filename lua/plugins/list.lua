@@ -49,6 +49,9 @@ return {
 
     ---------- Editing ---------- {
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
+    -- Complete source {
+    { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
+    -- }
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
     { 'gpanders/editorconfig.nvim', config = register_config('editorconfig') }, -- Convention
     { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = register_config('treesitter') }, -- TreeSitter
