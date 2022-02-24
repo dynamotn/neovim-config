@@ -3,7 +3,7 @@ vim.g.coq_settings = {
     keymap = { recommended = false },
     clients = {
         tabnine = { enabled = true },
-    }
+    },
 }
 local present, coq = pcall(require, 'coq')
 

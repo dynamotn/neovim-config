@@ -4,7 +4,7 @@ if not present then
     return
 end
 
-coq_3rd ({
+coq_3rd({
     { src = 'repl', short_name = 'REPL' },
     { src = 'nvimlua', short_name = 'NVIM' },
     { src = 'bc', short_name = 'MATH' },
