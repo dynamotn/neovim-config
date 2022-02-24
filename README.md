@@ -16,7 +16,7 @@ TBD
 - Clone this repository to ~/.config/nvim.
 ```
 rm -rf ~/.config/nvim
-git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim
+git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
 ```
 - After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
 
