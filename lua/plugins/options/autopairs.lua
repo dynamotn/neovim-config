@@ -83,4 +83,10 @@ autopairs.add_rules({
         :with_del(cond.none()),
 })
 
+local present, languages = pcall(require, 'languages')
+
+if present then
+    autopairs.add_rules(languages.autopairs(rule, cond))
+end
+
 return autopairs
