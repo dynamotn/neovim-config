@@ -81,6 +81,17 @@ autopairs.add_rules({
         :set_end_pair_length(0)
         :with_move(cond.none())
         :with_del(cond.none()),
+
+    -- Add space after comma when have following text after comma
+    rule(',', ' ')
+        :replace_endpair(function(opts)
+            local next_char = opts.line:sub(opts.col, opts.col)
+            if next_char:match('%w$') then
+                return ' '
+            end
+            return ''
+        end)
+        :set_end_pair_length(0),
 })
 
 local present, languages = pcall(require, 'languages')
