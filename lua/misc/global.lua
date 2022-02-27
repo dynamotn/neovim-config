@@ -6,7 +6,13 @@
 -- Reload neovim configuration {
 _G.dynamo_reload_nvim_config = function(has_changed_plugins)
     for name, _ in pairs(package.loaded) do
-        if name:match('^core') or name:match('^lsp') or name:match('^plugins') then
+        if
+            name:match('^core')
+            or name:match('^lsp')
+            or name:match('^plugins')
+            or name:match('^misc')
+            or name:match('^languages')
+        then
             package.loaded[name] = nil
         end
     end
@@ -15,8 +21,8 @@ _G.dynamo_reload_nvim_config = function(has_changed_plugins)
     vim.notify('Nvim configuration reloaded!', vim.log.levels.WARNING)
 
     if has_changed_plugins then
-        vim.api.nvim_command('redraw')
         require('packer').sync()
+        vim.api.nvim_command('redraw')
     end
 end
 ------------------------------ }
