@@ -10,6 +10,10 @@ vim.g.firenvim_config = {
             selector = 'textarea:not([readonly]):not([class="handsontableInput"]), div[role="textbox"]',
             takeover = 'always',
         },
+        [ [[.*facebook.com.*]] ] = {
+            priority = 9,
+            takeover = 'never',
+        },
         [ [[.*notion\.so.*]] ] = {
             priority = 9,
             takeover = 'never',
