@@ -25,8 +25,8 @@ return {
 
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
-    { 'glepnir/indent-guides.nvim', config = register_config('indent') }, -- Indent guide
-    { 'norcalli/nvim-colorizer.lua', config = register_config('colorizer') }, -- Color highlight
+    { 'glepnir/indent-guides.nvim', event = 'BufRead', config = register_config('indent') }, -- Indent guide
+    { 'norcalli/nvim-colorizer.lua', event = 'BufRead', config = register_config('colorizer') }, -- Color highlight
     --------------- }
     ----------------------------- }
 
@@ -43,7 +43,7 @@ return {
 
     ------------- VCS ----------- {
     { 'TimUntersberger/neogit', config = register_config('neogit'), cmd = { 'Neogit' } }, -- Git TUI
-    { 'sindrets/diffview.nvim' }, -- Diff view
+    { 'sindrets/diffview.nvim', cmd = { 'DiffviewOpen', 'DiffviewFileHistory' } }, -- Diff view
     { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git dcoration
     ----------------------------- }
 
@@ -54,8 +54,13 @@ return {
     { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
     -- }
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
-    { 'gpanders/editorconfig.nvim', config = register_config('editorconfig') }, -- Convention
-    { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = register_config('treesitter') }, -- TreeSitter
+    { 'gpanders/editorconfig.nvim', event = 'BufRead', config = register_config('editorconfig') }, -- Convention
+    { -- TreeSitter
+        'nvim-treesitter/nvim-treesitter',
+        event = 'BufRead',
+        run = ':TSUpdate',
+        config = register_config('treesitter'),
+    },
     -- Syntax highlight {
     { 'sheerun/vim-polyglot' }, -- For all basic filetypes
     { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
