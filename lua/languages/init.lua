@@ -39,9 +39,21 @@ M.setup_ls = function()
     local result = {}
     for language, _ in pairs(languages) do
         local ok, lsp = pcall(require, 'languages.' .. language .. '.lsp')
-        if ok and type(lsp) then
+        if ok and type(lsp) == 'table' then
             result[lsp.ls] = lsp.config
         end
+    end
+    return result
+end
+
+M.setup_treesitter = function()
+    local result = {}
+    for language, _ in pairs(languages) do
+        local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
+        if not ok or type(treesitter) ~= 'string' then
+            treesitter = language
+        end
+        table.insert(result, treesitter)
     end
     return result
 end

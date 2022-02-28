@@ -7,6 +7,13 @@ end
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 
+local present, languages = pcall(require, 'languages')
+local parsers = {}
+
+if present then
+    parsers = languages.setup_treesitter()
+end
+
 treesitter.setup({
     highlight = {
         enable = true,
@@ -21,9 +28,7 @@ treesitter.setup({
     autotag = {
         enable = true,
     },
-    ensure_installed = {
-        'lua',
-    },
+    ensure_installed = parsers,
 })
 
 require('nvim-treesitter.install').prefer_git = true
