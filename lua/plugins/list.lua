@@ -52,6 +52,7 @@ return {
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     -- Complete source {
     { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
+    { 'neovim/nvim-lspconfig' }, -- LSP
     -- }
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
     { 'gpanders/editorconfig.nvim', event = 'BufRead', config = register_config('editorconfig') }, -- Convention
@@ -80,5 +81,6 @@ return {
     },
     { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
     { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
+    { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
     ----------------------------- }
 }

@@ -6,6 +6,6 @@ end
 
 coq_3rd({
     { src = 'repl', short_name = 'REPL' },
-    { src = 'nvimlua', short_name = 'NVIM' },
+    { src = 'nvimlua', short_name = 'NVIM', conf_only = false },
     { src = 'bc', short_name = 'MATH' },
 })

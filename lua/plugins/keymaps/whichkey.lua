@@ -1,15 +1,23 @@
 return {
-    -- Space key
-    ['<space>'] = { name = 'Dynamo Trigger' },
-    ['<space>b'] = { name = 'Buffer' },
-    ['<space>d'] = { name = 'Debug / Quick fix / Test' },
-    ['<space>f'] = { name = 'File' },
-    ['<space>p'] = { name = 'Project' },
-    ['<space>s'] = { name = 'Search' },
-    ['<space>l'] = { name = 'Language tool' },
-    ['<space>t'] = { name = 'Tab' },
-    ['<space>x'] = { name = 'Text manipulation' },
+    -- Space key {
+    ['<Space>'] = { name = 'Dynamo Trigger' },
+    ['<Space>b'] = { name = 'Buffer' },
+    ['<Space>d'] = { name = 'Debug / Quick fix / Test' },
 
-    -- Leader key
+    -- E key
+    ['<Space>e'] = { name = 'Diagnostic / Error' },
+    ['<Space>en'] = { '<cmd>lua vim.diagnostic.goto_next()<CR>', 'Next diagnostic' },
+    ['<Space>ep'] = { '<cmd>lua vim.diagnostic.goto_prev()<CR>', 'Previous diagnostic' },
+
+    ['<Space>f'] = { name = 'File' },
+    ['<Space>p'] = { name = 'Project' },
+    ['<Space>s'] = { name = 'Search' },
+    ['<Space>l'] = { name = 'Language tool' },
+    ['<Space>t'] = { name = 'Tab' },
+    ['<Space>x'] = { name = 'Text manipulation' },
+    ------------ }
+
+    -- Leader key {
     ['<leader>'] = { name = 'Secondary Trigger' },
+    ------------- }
 }

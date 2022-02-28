@@ -35,4 +35,15 @@ M.setup_autopairs = function(rule, cond)
     return result
 end
 
+M.setup_ls = function()
+    local result = {}
+    for language, _ in pairs(languages) do
+        local ok, lsp = pcall(require, 'languages.' .. language .. '.lsp')
+        if ok and type(lsp) then
+            result[lsp.ls] = lsp.config
+        end
+    end
+    return result
+end
+
 return M

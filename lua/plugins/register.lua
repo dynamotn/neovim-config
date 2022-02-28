@@ -21,7 +21,7 @@ M.register_options = function(name, config_function)
 end
 
 -- Load per-plugin keymaps by `whichkey` plugin
-M.register_keymaps = function(name)
+M.register_keymaps = function(name, bufnr)
     local present, whichkey = pcall(require, 'which-key')
     if not present then
         return
@@ -33,7 +33,9 @@ M.register_keymaps = function(name)
     end
 
     if type(keymaps) == 'table' then
-        whichkey.register(keymaps)
+        whichkey.register(keymaps, { bufnr = bufnr })
+    elseif type(keymaps) == 'function' then
+        keymaps(whichkey, bufnr)
     end
 end
 
