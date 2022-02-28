@@ -67,7 +67,8 @@ return {
     { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
     ------------------- }
     -- Typing {
-    { 'windwp/nvim-autopairs', config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
+    { 'windwp/nvim-autopairs', event = 'BufRead', config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
+    { 'windwp/nvim-ts-autotag', event = 'BufRead' }, -- Automatically close and rename HTML tag
     --------- }
     ----------------------------- }
 
