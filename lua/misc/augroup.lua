@@ -18,9 +18,9 @@ end
 
 create_augroups({
     reload_nvim_config = {
-        { 'BufWritePost', '$NVIMHOME/**/{*.vim,*.lua}', 'lua dynamo_reload_nvim_config()' },
+        { 'BufWritePost', [[$NVIMHOME/**/{*.vim,*.lua}]], 'lua dynamo_reload_nvim_config()' },
     },
     sync_plugin_list = {
-        { 'BufWritePost', '$NVIMHOME/lua/plugins/list.lua', 'lua dynamo_reload_nvim_config(true)' },
+        { 'BufWritePost', [[$NVIMHOME/lua/plugins/list.lua]], 'lua dynamo_reload_nvim_config(true)' },
     },
 })
