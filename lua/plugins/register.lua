@@ -7,7 +7,7 @@ local M = {}
 -- Register plugin config
 M.register_config = function(name, config_function)
     M.register_keymaps(name)
-    return M.register_options(name)
+    return M.register_options(name, config_function)
 end
 
 -- Load per-plugin options to setup plugin

@@ -18,7 +18,7 @@ local filetype_by_language = function(language)
     end
 end
 
-M.autopairs = function(rule, cond)
+M.setup_autopairs = function(rule, cond)
     local result = {}
     for language, _ in pairs(languages) do
         local ok, autopairs = pcall(require, 'languages.' .. language .. '.autopairs')
