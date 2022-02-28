@@ -25,8 +25,8 @@ return {
 
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
-    { 'glepnir/indent-guides.nvim', event = 'BufRead', config = register_config('indent') }, -- Indent guide
-    { 'norcalli/nvim-colorizer.lua', event = 'BufRead', config = register_config('colorizer') }, -- Color highlight
+    { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
+    { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
     --------------- }
     ----------------------------- }
 
@@ -55,10 +55,10 @@ return {
     { 'neovim/nvim-lspconfig' }, -- LSP
     -- }
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
-    { 'gpanders/editorconfig.nvim', event = 'BufRead', config = register_config('editorconfig') }, -- Convention
+    { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
     { -- TreeSitter
         'nvim-treesitter/nvim-treesitter',
-        event = 'BufRead',
+        event = { 'BufRead', 'BufNewFile' },
         run = ':TSUpdate',
         config = register_config('treesitter'),
     },
@@ -67,8 +67,8 @@ return {
     { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
     ------------------- }
     -- Typing {
-    { 'windwp/nvim-autopairs', event = 'BufRead', config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
-    { 'windwp/nvim-ts-autotag', event = 'BufRead' }, -- Automatically close and rename HTML tag
+    { 'windwp/nvim-autopairs', event = { 'BufRead', 'BufNewFile' }, config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
+    { 'windwp/nvim-ts-autotag', event = { 'BufRead', 'BufNewFile' } }, -- Automatically close and rename HTML tag
     --------- }
     ----------------------------- }
 
