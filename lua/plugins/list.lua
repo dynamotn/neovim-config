@@ -9,8 +9,8 @@ return {
     { 'wbthomason/packer.nvim', event = 'VimEnter' }, -- Plugin manager
     { 'nvim-lua/plenary.nvim' }, -- Base Lua functions
     { 'nathom/filetype.nvim' }, -- Detect filetype
-    -- {'dstein64/vim-startuptime'}, -- View startup timing
-    { 'lewis6991/impatient.nvim' }, -- Improve startup time
+    { 'dstein64/vim-startuptime' }, -- View startup timing
+    { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
     ----------------------------- }
 
     -------- Eyecandy ----------- {

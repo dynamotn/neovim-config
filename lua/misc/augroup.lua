@@ -16,11 +16,19 @@ local function create_augroups(definitions)
     end
 end
 
+local present, path = pcall(require, 'plenary.path')
+
+if not present then
+    return
+end
+
+local config_path = path:new():absolute()
+
 create_augroups({
-    reload_nvim_config = {
-        { 'BufWritePost', [[$NVIMHOME/**/{*.vim,*.lua}]], 'lua dynamo_reload_nvim_config()' },
-    },
     sync_plugin_list = {
-        { 'BufWritePost', [[$NVIMHOME/lua/plugins/list.lua]], 'lua dynamo_reload_nvim_config(true)' },
+        { 'BufWritePost', config_path .. 'lua/plugins/list.lua', 'lua dynamo_reload_nvim_config(true)' },
+    },
+    reload_nvim_config = {
+        { 'BufWritePost', config_path .. '**/{*.vim,*.lua}', 'lua dynamo_reload_nvim_config()' },
     },
 })

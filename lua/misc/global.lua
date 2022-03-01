@@ -3,19 +3,28 @@
 --      Useful global functions      --
 ---------------------------------------
 
--- Reload neovim configuration {
-_G.dynamo_reload_nvim_config = function(has_changed_plugins)
+-- Unload neovim module {
+_G.dynamo_unload_module = function(module_name, reload)
+    reload = reload or false
+
     for name, _ in pairs(package.loaded) do
-        if
-            name:match('^core')
-            or name:match('^lsp')
-            or name:match('^plugins')
-            or name:match('^misc')
-            or name:match('^languages')
-        then
+        if name:match('^' .. module_name) then
             package.loaded[name] = nil
         end
     end
+
+    if reload then
+        require(module_name)
+    end
+end
+-- }
+
+-- Reload neovim configuration {
+_G.dynamo_reload_nvim_config = function(has_changed_plugins)
+    dynamo_unload_module('core', true)
+    dynamo_unload_module('plugins', true)
+    dynamo_unload_module('misc', true)
+    dynamo_unload_module('languages', true)
 
     dofile(vim.env.MYVIMRC)
     vim.notify('Nvim configuration reloaded!', vim.log.levels.WARNING)
