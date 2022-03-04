@@ -6,6 +6,10 @@ local languages = {
         'javascriptreact',
         'typescriptreact',
     },
+    bash = {
+        'sh',
+        'bats',
+    },
 }
 
 local M = {}
@@ -40,7 +44,7 @@ M.setup_ls = function()
     for language, _ in pairs(languages) do
         local ok, lsp = pcall(require, 'languages.' .. language .. '.lsp')
         if ok and type(lsp) == 'table' then
-            result[lsp.ls] = lsp.config
+            result[lsp.ls] = lsp.config or function() end
         end
     end
     return result
