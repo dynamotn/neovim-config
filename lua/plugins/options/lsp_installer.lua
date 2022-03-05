@@ -27,7 +27,8 @@ if present then
         }
 
         if ls[server.name] then
-            ls[server.name](opts)
+            ls[server.name].config(opts)
+            opts.filetypes = ls[server.name].filetypes
         end
 
         server:setup(opts)
