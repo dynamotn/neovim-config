@@ -4,6 +4,8 @@ if not present then
     return
 end
 
+local gps = require('nvim-gps')
+
 lualine.setup({
     options = {
         theme = 'onedark',
@@ -18,6 +20,10 @@ lualine.setup({
             {
                 'filename',
                 path = 1, -- Relative path
+            },
+            {
+                gps.get_location,
+                cond = gps.is_available,
             },
         },
         lualine_x = { 'filetype' },

@@ -19,7 +19,13 @@ return {
     --------------- }
 
     -- Status and tab/buffer line {
-    { 'nvim-lualine/lualine.nvim', config = register_config('lualine') }, -- Status line
+    { -- Status line
+        'nvim-lualine/lualine.nvim',
+        config = register_config('lualine'),
+        requires = {
+            { 'SmiteshP/nvim-gps', config = register_config('gps') }, -- Component to show context of current position
+        },
+    },
     { 'akinsho/bufferline.nvim', config = register_config('bufferline') }, -- Buffer and tab line
     ----------------------------- }
 
