@@ -73,4 +73,20 @@ M.setup_treesitter = function(parser_config)
     return parsers, gps_configs
 end
 
+M.setup_linter = function()
+    local result = {}
+
+    for language, filetypes in pairs(languages) do
+        local ok, linter = pcall(require, 'languages.' .. language .. '.linter')
+
+        if ok then
+            for _, ft in pairs(filetypes) do
+                result[ft] = linter
+            end
+        end
+    end
+
+    return result
+end
+
 return M

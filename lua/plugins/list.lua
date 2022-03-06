@@ -76,6 +76,9 @@ return {
     { 'windwp/nvim-autopairs', event = { 'BufRead', 'BufNewFile' }, config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
     { 'windwp/nvim-ts-autotag', event = { 'BufRead', 'BufNewFile' } }, -- Automatically close and rename HTML tag
     --------- }
+    -- Linter {
+    { 'mfussenegger/nvim-lint', config = register_config('linter') },
+    -- }
     ----------------------------- }
 
     -------- Integration -------- {

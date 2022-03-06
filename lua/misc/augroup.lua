@@ -31,4 +31,7 @@ create_augroups({
     -- reload_nvim_config = {
     --     { 'BufWritePost', config_path .. '**/{*.vim,*.lua}', 'lua dynamo_reload_nvim_config()' },
     -- },
+    linter = {
+        { 'BufWritePost,BufRead,BufNewFile', '<buffer>', [[lua require('lint').try_lint()]] },
+    },
 })
