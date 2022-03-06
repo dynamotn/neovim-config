@@ -56,6 +56,7 @@ return {
 
     ---------- Editing ---------- {
     { 'ethanholz/nvim-lastplace', config = register_config('lastplace') }, -- Save the last edit position
+    { 'mcauley-penney/tidy.nvim', event = 'BufWritePre' }, -- Remove trailing whitespace and empty line before EOF
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     -- Complete source {
     { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
