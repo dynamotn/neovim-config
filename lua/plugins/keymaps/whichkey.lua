@@ -14,6 +14,7 @@ return {
     ['<Space>s'] = { name = 'Search' },
     ['<Space>l'] = { name = 'Language tool' },
     ['<Space>t'] = { name = 'Tab' },
+    ['<Space>w'] = { name = 'Window' },
     ['<Space>x'] = { name = 'Text manipulation' },
     ------------ }
 

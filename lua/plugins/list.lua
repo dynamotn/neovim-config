@@ -45,6 +45,7 @@ return {
         cmd = { 'CHADopen' },
         config = register_config('chadtree'),
     }, -- File explorer
+    { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
     ----------------------------- }
 
     ------------- VCS ----------- {
