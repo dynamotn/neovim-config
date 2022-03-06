@@ -10,6 +10,10 @@ local languages = {
         'sh',
         'bats',
     },
+    terraform = {
+        'terraform',
+        'hcl',
+    },
 }
 
 local M = {}
@@ -56,7 +60,7 @@ M.setup_treesitter = function(parser_config)
             parser = language
         else
             parser = treesitter.parser
-            gps_config = treesitter.gps_config
+            gps_config = treesitter.gps_config or {}
         end
 
         table.insert(parsers, parser)
