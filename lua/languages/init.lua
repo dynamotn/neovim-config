@@ -46,21 +46,27 @@ M.setup_ls = function()
 end
 
 M.setup_treesitter = function(parser_config)
-    local result = {}
+    local parsers, gps_configs = {}, {}
 
     for language, filetypes in pairs(languages) do
-        local ok, parser = pcall(require, 'languages.' .. language .. '.treesitter')
-        if not ok or type(parser) ~= 'string' then
+        local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
+        local parser, gps_config
+
+        if not ok or type(treesitter) ~= 'table' then
             parser = language
+        else
+            parser = treesitter.parser
+            gps_config = treesitter.gps_config
         end
+
+        table.insert(parsers, parser)
+        table.insert(gps_configs, gps_config)
 
         for _, ft in pairs(filetypes) do
             parser_config[ft] = parser
         end
-
-        table.insert(result, parser)
     end
-    return result
+    return parsers, gps_configs
 end
 
 return M
