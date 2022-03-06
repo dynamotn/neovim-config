@@ -24,14 +24,20 @@ end
 
 local config_path = path:new():absolute()
 
-create_augroups({
+local augroup_list = {
     sync_plugin_list = {
         { 'BufWritePost', config_path .. 'lua/plugins/list.lua', 'lua dynamo_reload_nvim_config(true)' },
     },
     -- reload_nvim_config = {
     --     { 'BufWritePost', config_path .. '**/{*.vim,*.lua}', 'lua dynamo_reload_nvim_config()' },
     -- },
-    linter = {
+}
+
+local present, _ = pcall(require, 'lint')
+if present then
+    augroup_list['linter'] = {
         { 'BufWritePost,BufRead,BufNewFile', '<buffer>', [[lua require('lint').try_lint()]] },
-    },
-})
+    }
+end
+
+create_augroups(augroup_list)
