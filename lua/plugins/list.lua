@@ -95,5 +95,12 @@ return {
     { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
     { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
     { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
+    { -- Fuzzy finder
+        'nvim-telescope/telescope.nvim',
+        config = register_config('telescope'),
+        requires = {
+            { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }, -- Increase performance with fzf (native port from Go to C)
+        },
+    },
     ----------------------------- }
 }
