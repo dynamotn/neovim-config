@@ -103,4 +103,8 @@ return {
         },
     },
     ----------------------------- }
+
+    ---------- Utility ---------- {
+    { 'nvim-orgmode/orgmode', config = register_config('orgmode') }, -- Note taking
+    ----------------------------- }
 }
