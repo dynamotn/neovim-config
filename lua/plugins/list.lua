@@ -37,21 +37,21 @@ return {
     ----------------------------- }
 
     --------- Navigation -------- {
-    {
+    { -- File explorer
         'ms-jpq/chadtree',
         branch = 'chad',
         opt = true,
         run = ':CHADdeps',
         cmd = { 'CHADopen' },
         config = register_config('chadtree'),
-    }, -- File explorer
+    },
     { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
     ----------------------------- }
 
     ------------- VCS ----------- {
     { 'TimUntersberger/neogit', config = register_config('neogit'), cmd = { 'Neogit' } }, -- Git TUI
     { 'sindrets/diffview.nvim', cmd = { 'DiffviewOpen', 'DiffviewFileHistory' } }, -- Diff view
-    { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git dcoration
+    { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git decoration
     ----------------------------- }
 
     ---------- Editing ---------- {
@@ -79,8 +79,8 @@ return {
     { 'windwp/nvim-ts-autotag', event = { 'BufRead', 'BufNewFile' } }, -- Automatically close and rename HTML tag
     --------- }
     -- Linter and Fixer {
-    { 'dense-analysis/ale', config = register_config('ale') },
-    { 'mfussenegger/nvim-lint', config = register_config('linter') },
+    { 'mfussenegger/nvim-lint', config = register_config('linter') }, -- Linter for most common languages
+    { 'dense-analysis/ale', config = register_config('ale') }, -- Linter for other languages and tools, combine fixer
     ------------------- }
     ----------------------------- }
 
