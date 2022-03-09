@@ -56,10 +56,12 @@ end
 _G.dynamo_mapping_backspace = function()
     local present, autopairs = pcall(require, 'nvim-autopairs')
 
+    local bufnr = vim.api.nvim_get_current_buf()
+
     if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
-        return present and autopairs.esc('<C-e>') .. autopairs.autopairs_bs() or '<C-e><BS>'
+        return present and autopairs.esc('<C-e>') .. autopairs.autopairs_bs(bufnr) or '<C-e><BS>'
     else
-        return present and autopairs.autopairs_bs() or '<BS>'
+        return present and autopairs.autopairs_bs(bufnr) or '<BS>'
     end
 end
 ----------------------------------------- }
