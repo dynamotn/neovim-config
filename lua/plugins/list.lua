@@ -46,6 +46,7 @@ return {
         config = register_config('chadtree'),
     },
     { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
+    { 'chentau/marks.nvim', config = register_config('marks') }, -- Show mark and switch to mark
     ----------------------------- }
 
     ------------- VCS ----------- {
