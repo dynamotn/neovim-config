@@ -31,7 +31,12 @@ if present then
             opts.filetypes = ls[server.name].filetypes
         end
 
-        server:setup(opts)
+        local present, coq = pcall(require, 'coq')
+        if present then
+            server:setup(coq.lsp_ensure_capabilities(opts))
+        else
+            server:setup(opts)
+        end
     end)
 end
 
