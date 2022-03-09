@@ -38,26 +38,28 @@ end
 
 -- Mapping for Enter key in edit mode {
 _G.dynamo_mapping_enter = function()
-    local autopairs = require('nvim-autopairs')
+    local present, autopairs = pcall(require, 'nvim-autopairs')
+
     if vim.fn.pumvisible() ~= 0 then
         if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
-            return autopairs.esc('<C-y>')
+            return present and autopairs.esc('<C-y>') or '<C-y>'
         else
-            return autopairs.esc('<C-e>') .. autopairs.autopairs_cr()
+            return present and autopairs.esc('<C-e>') .. autopairs.autopairs_cr() or '<C-e><CR>'
         end
     else
-        return autopairs.autopairs_cr()
+        return present and autopairs.autopairs_cr() or '<CR>'
     end
 end
 ------------------------------------- }
 
 -- Mapping for Backspace key in edit mode {
 _G.dynamo_mapping_backspace = function()
-    local autopairs = require('nvim-autopairs')
+    local present, autopairs = pcall(require, 'nvim-autopairs')
+
     if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
-        return autopairs.esc('<C-e>') .. autopairs.autopairs_bs()
+        return present and autopairs.esc('<C-e>') .. autopairs.autopairs_bs() or '<C-e><BS>'
     else
-        return autopairs.autopairs_bs()
+        return present and autopairs.autopairs_bs() or '<BS>'
     end
 end
 ----------------------------------------- }
