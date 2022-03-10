@@ -51,13 +51,6 @@ M.load_default_augroups = function()
             { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
         },
     })
-
-    M.create_augroups({
-        basic_lsp = {
-            { 'CursorHold', '<buffer>', 'lua vim.lsp.buf.hover()' },
-            { 'CursorMoved', '<buffer>', 'lua vim.lsp.buf.clear_references()' },
-        },
-    }, true)
 end
 
 M.enable_linter = function()
@@ -77,6 +70,7 @@ M.enable_highlight_document = function(client_id)
     M.create_augroups({
         highlight_lsp = {
             { 'CursorHold', '<buffer>', string.format('lua dynamo_lsp_document_highlight(%d)', client_id) },
+            { 'CursorMoved', '<buffer>', 'lua vim.lsp.buf.clear_references()' },
         },
     }, true)
 end
@@ -95,6 +89,18 @@ end
 
 M.disable_codelens = function()
     M.delete_augroups('codelens_lsp')
+end
+
+M.enable_hover = function(client_id)
+    M.create_augroups({
+        hover_lsp = {
+            { 'CursorHold', '<buffer>', string.format('lua dynamo_lsp_hover(%d)', client_id) },
+        },
+    }, true)
+end
+
+M.disable_hover = function()
+    M.delete_augroups('hover_lsp')
 end
 
 return M
