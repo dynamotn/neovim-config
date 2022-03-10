@@ -1,3 +1,3 @@
 return {
-    ['<Space>ws'] = { [[<cmd>lua require('nvim-window').pick()<CR>]], 'Select window' },
+    ['<Space>wj'] = { [[<cmd>lua require('nvim-window').pick()<CR>]], 'Jump to window' },
 }
