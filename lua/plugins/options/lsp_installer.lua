@@ -19,10 +19,18 @@ if present then
 
     lsp_installer.on_server_ready(function(server)
         local register_keymaps = require('plugins.register').register_keymaps
+        local augroup = require('misc.augroup')
+
         local opts = {
             autostart = true,
-            on_attach = function(_, buffer)
+            on_attach = function(client, buffer)
                 register_keymaps('lsp', buffer)
+                augroup.enable_highlight_document(client.id)
+                augroup.enable_codelens(client.id)
+            end,
+            on_exit = function(_, _)
+                augroup.disable_highlight_document()
+                augroup.disable_codelens()
             end,
         }
 

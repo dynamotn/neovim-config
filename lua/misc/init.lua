@@ -9,3 +9,5 @@ for _, module in ipairs(modules) do
         error('Error loading misc.' .. module .. '\n\n' .. err)
     end
 end
+
+require('misc.augroup').load_default_augroups()
