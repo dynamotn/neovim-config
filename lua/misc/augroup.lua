@@ -31,6 +31,9 @@ local augroup_list = {
     -- reload_nvim_config = {
     --     { 'BufWritePost', config_path .. '**/{*.vim,*.lua}', 'lua dynamo_reload_nvim_config()' },
     -- },
+    quick_quit_manual = {
+        { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
+    },
 }
 
 local present, _ = pcall(require, 'lint')
