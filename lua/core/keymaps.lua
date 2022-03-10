@@ -6,7 +6,7 @@ local opt = vim.opt -- Set options (global/buffer/windowS-scoped)
 local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
-    cmd = 'cnoreabbrev %s %s'
+    local cmd = 'cnoreabbrev %s %s'
     vim.cmd(cmd:format(input, replace))
 end
 
@@ -67,6 +67,12 @@ map('n', '<C-c>', '"+yy')
 
 -- Replace selected text without copying it
 map('v', 'p', '"_dP')
+
+-- Move line to after next line or before previous line
+map('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
+map('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
+map('n', '<A-j>', ':m .+1<CR>==')
+map('n', '<A-k>', ':m .-2<CR>==')
 --------------------------- }
 
 -------- Completion ------- {
