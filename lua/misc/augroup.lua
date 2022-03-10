@@ -34,6 +34,11 @@ local augroup_list = {
     quick_quit_manual = {
         { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
     },
+    highlight_lsp = {
+        { 'CursorHold', '<buffer>', 'lua vim.lsp.buf.document_highlight()' },
+        { 'CursorHold', '<buffer>', 'lua vim.lsp.buf.hover()' },
+        { 'CursorMoved', '<buffer>', 'lua vim.lsp.buf.clear_references()' },
+    },
 }
 
 local present, _ = pcall(require, 'lint')

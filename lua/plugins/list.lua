@@ -11,6 +11,7 @@ return {
     { 'nathom/filetype.nvim' }, -- Detect filetype
     { 'dstein64/vim-startuptime' }, -- View startup timing
     { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
+    { 'antoinemadec/FixCursorHold.nvim' },
     ----------------------------- }
 
     -------- Eyecandy ----------- {
