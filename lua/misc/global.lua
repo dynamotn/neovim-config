@@ -86,8 +86,8 @@ _G.dynamo_lsp_codelens = function(id)
     if not client_ok or not method_supported then
         return
     end
-    vim.lsp.buf.codelens.refresh()
-    vim.lsp.buf.codelens.display()
+    vim.lsp.codelens.refresh()
+    vim.lsp.codelens.display()
 end
 ------------------------------------------------------ }
 
