@@ -73,6 +73,10 @@ map('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
 map('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
 map('n', '<A-j>', ':m .+1<CR>==')
 map('n', '<A-k>', ':m .-2<CR>==')
+
+-- Insert empty lines
+map('n', '[<Space>', ':<C-u>put! =repeat(nr2char(10), v:count1)<CR>')
+map('n', ']<Space>', ':<C-u>put =repeat(nr2char(10), v:count1)<CR>')
 --------------------------- }
 
 -------- Completion ------- {
