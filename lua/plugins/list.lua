@@ -20,13 +20,7 @@ return {
     --------------- }
 
     -- Status and tab/buffer line {
-    { -- Status line
-        'nvim-lualine/lualine.nvim',
-        config = register_config('lualine'),
-        requires = {
-            { 'SmiteshP/nvim-gps', config = register_config('gps') }, -- Component to show context of current position
-        },
-    },
+    { 'nvim-lualine/lualine.nvim', config = register_config('lualine'), after = 'nvim-gps' }, -- Status line
     { 'akinsho/bufferline.nvim', config = register_config('bufferline') }, -- Buffer and tab line
     ----------------------------- }
 
@@ -35,6 +29,7 @@ return {
     { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
     { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
     { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
+    { 'SmiteshP/nvim-gps', config = register_config('gps'), after = 'nvim-treesitter' }, -- Component to show context of current position
     --------------- }
     ----------------------------- }
 
@@ -109,6 +104,6 @@ return {
     ----------------------------- }
 
     ---------- Utility ---------- {
-    { 'nvim-orgmode/orgmode', config = register_config('orgmode') }, -- Note taking
+    { 'nvim-orgmode/orgmode', config = register_config('orgmode'), after = 'nvim-treesitter' }, -- Note taking
     ----------------------------- }
 }

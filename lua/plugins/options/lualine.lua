@@ -4,7 +4,14 @@ if not present then
     return
 end
 
-local gps = require('nvim-gps')
+local present, gps = pcall(require, 'nvim-gps')
+local gps_component = nil
+if present then
+    gps_component = {
+        gps.get_location,
+        cond = gps.is_available,
+    }
+end
 
 lualine.setup({
     options = {
@@ -28,10 +35,7 @@ lualine.setup({
                 'filename',
                 path = 1, -- Relative path
             },
-            {
-                gps.get_location,
-                cond = gps.is_available,
-            },
+            gps_component,
         },
         lualine_x = {
             {
