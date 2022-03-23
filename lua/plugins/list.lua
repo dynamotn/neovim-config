@@ -30,6 +30,7 @@ return {
     { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
     { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
     { 'SmiteshP/nvim-gps', config = register_config('gps'), after = 'nvim-treesitter' }, -- Component to show context of current position
+    { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
     --------------- }
     ----------------------------- }
 
