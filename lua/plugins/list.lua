@@ -81,6 +81,12 @@ return {
         config = register_config('autotag'),
         after = 'nvim-treesitter',
     },
+    { -- Automatically insert end keyword
+        'RRethy/nvim-treesitter-endwise',
+        event = { 'BufRead', 'BufNewFile' },
+        config = register_config('endwise'),
+        after = 'nvim-treesitter',
+    },
     --------- }
     -- Linter and Fixer {
     { 'mfussenegger/nvim-lint', config = register_config('linter') }, -- Linter for most common languages
