@@ -9,7 +9,7 @@ return {
     { 'wbthomason/packer.nvim', event = 'VimEnter' }, -- Plugin manager
     { 'nvim-lua/plenary.nvim' }, -- Base Lua functions
     { 'nathom/filetype.nvim' }, -- Detect filetype
-    { 'dstein64/vim-startuptime' }, -- View startup timing
+    DEBUG and { 'dstein64/vim-startuptime' } or nil, -- View startup timing
     { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
     { 'antoinemadec/FixCursorHold.nvim' },
     ----------------------------- }
@@ -125,5 +125,6 @@ return {
     ---------- Utility ---------- {
     { 'nvim-orgmode/orgmode', config = register_config('orgmode'), after = 'nvim-treesitter' }, -- Note taking
     { 'rmagatti/auto-session', config = register_config('auto_session') }, -- Automatic session management
+    DEBUG and { 'nvim-treesitter/playground' } or nil,
     ----------------------------- }
 }

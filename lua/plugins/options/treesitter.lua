@@ -10,7 +10,7 @@ vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 
 local present, languages = pcall(require, 'languages')
-local parsers = {}
+local parsers = DEBUG and { 'query' } or {}
 
 if present then
     parsers, _ = languages.setup_treesitter(parser_config)
@@ -29,7 +29,7 @@ treesitter.setup({
     indent = {
         enable = true,
     },
-    autotag = {
+    playground = {
         enable = true,
     },
     ensure_installed = parsers,
