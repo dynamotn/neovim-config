@@ -16,7 +16,7 @@ return {
     ['<Space>gc'] = { '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict' },
 
     ['<Space>p'] = { name = 'Project' },
-    ['<Space>s'] = { name = 'Search' },
+    ['<Space>s'] = { name = 'Session' },
     ['<Space>l'] = { name = 'Language tool' },
 
     -- T key

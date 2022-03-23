@@ -94,16 +94,25 @@ return {
     { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
     { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
     { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
-    { -- Fuzzy finder
+    -- Fuzzy finder {
+    { -- Engine
         'nvim-telescope/telescope.nvim',
         config = register_config('telescope'),
         requires = {
             { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }, -- Increase performance with fzf (native port from Go to C)
         },
     },
+    { -- Session search
+        'rmagatti/session-lens',
+        requires = { 'rmagatti/auto-session', 'nvim-telescope/telescope.nvim' },
+        config = register_config('session_lens'),
+        after = { 'telescope.nvim', 'auto-session' },
+    },
+    --------------- }
     ----------------------------- }
 
     ---------- Utility ---------- {
     { 'nvim-orgmode/orgmode', config = register_config('orgmode'), after = 'nvim-treesitter' }, -- Note taking
+    { 'rmagatti/auto-session', config = register_config('auto_session') }, -- Automatic session management
     ----------------------------- }
 }
