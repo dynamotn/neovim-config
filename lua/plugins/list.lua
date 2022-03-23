@@ -88,6 +88,7 @@ return {
         config = register_config('endwise'),
         after = 'nvim-treesitter',
     },
+    { 'monaqa/dial.nvim', config = register_config('dial') }, -- Increment/decrement number, date...
     --------- }
     -- Linter and Fixer {
     { 'mfussenegger/nvim-lint', config = register_config('linter') }, -- Linter for most common languages
