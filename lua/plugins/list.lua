@@ -28,6 +28,10 @@ return {
     { 'folke/trouble.nvim', config = register_config('trouble') },
     --------------------------- }
 
+    -- Sign column {
+    { 'kosayoda/nvim-lightbulb' }, -- Show lightbulb when have code action
+    -------------- }
+
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
     { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide

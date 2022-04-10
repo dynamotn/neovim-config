@@ -94,13 +94,17 @@ end
 M.enable_hover = function(client_id)
     M.create_augroups({
         hover_lsp = {
-            { 'CursorHold', '<buffer>', string.format('lua dynamo_lsp_hover(%d)', client_id) },
+            -- { 'CursorHold', '<buffer>', string.format('lua dynamo_lsp_hover(%d)', client_id) },
+        },
+        codeaction_lsp = {
+            { 'CursorHold,CursorHoldI', '<buffer>', string.format('lua dynamo_lsp_codeaction(%d)', client_id) },
         },
     }, true)
 end
 
 M.disable_hover = function()
     M.delete_augroups('hover_lsp')
+    M.delete_augroups('codeaction_lsp')
 end
 
 return M

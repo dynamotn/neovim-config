@@ -102,3 +102,19 @@ _G.dynamo_lsp_hover = function(id)
     vim.lsp.buf.hover()
 end
 --------------------------------------------------- }
+
+-- Check LSP method textDocument/codeAction
+-- is supported and show lightbulb          {
+_G.dynamo_lsp_codeaction = function(id)
+    local client_ok, method_supported = pcall(function()
+        return vim.lsp.get_client_by_id(id).resolved_capabilities.code_action
+    end)
+    if not client_ok or not method_supported then
+        return
+    end
+    local present, lightbulb = pcall(require, 'nvim-lightbulb')
+    if present then
+        lightbulb.update_lightbulb()
+    end
+end
+------------------------------------------- }
