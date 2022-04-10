@@ -24,6 +24,10 @@ return {
     { 'akinsho/bufferline.nvim', config = register_config('bufferline') }, -- Buffer and tab line
     ----------------------------- }
 
+    -- Quickfix and diagnostics {
+    { 'folke/trouble.nvim', config = register_config('trouble') },
+    --------------------------- }
+
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
     { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
