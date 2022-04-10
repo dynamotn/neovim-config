@@ -20,7 +20,7 @@ if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
     })
 
     vim.cmd([[packadd packer.nvim]])
-    present, packer = pcall(require, 'packer')
+    local present, packer = pcall(require, 'packer')
 
     if present then
         print('Packer cloned successfully.')
