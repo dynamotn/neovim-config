@@ -11,7 +11,7 @@ return {
     { 'nathom/filetype.nvim' }, -- Detect filetype
     DEBUG and { 'dstein64/vim-startuptime' } or nil, -- View startup timing
     { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
-    { 'antoinemadec/FixCursorHold.nvim' },
+    { 'antoinemadec/FixCursorHold.nvim', config = register_config('cursor_hold') }, -- Fix CursorHold performance
     ----------------------------- }
 
     -------- Eyecandy ----------- {
