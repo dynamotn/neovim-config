@@ -69,10 +69,14 @@ return {
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     -- Complete source {
     { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
-    { 'neovim/nvim-lspconfig' }, -- LSP
     -- }
     { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
     { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
+    -- LSP {
+    { 'neovim/nvim-lspconfig' }, -- Config for LSP server
+    { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
+    { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources
+    ------ }
     { -- TreeSitter
         'nvim-treesitter/nvim-treesitter',
         event = { 'BufRead', 'BufNewFile' },
@@ -99,10 +103,6 @@ return {
     },
     { 'monaqa/dial.nvim', config = register_config('dial') }, -- Increment/decrement number, date...
     --------- }
-    -- Linter and Fixer {
-    { 'mfussenegger/nvim-lint', config = register_config('linter') }, -- Linter for most common languages
-    { 'dense-analysis/ale', config = register_config('ale') }, -- Linter for other languages and tools, combine fixer
-    ------------------- }
     ----------------------------- }
 
     -------- Integration -------- {
@@ -115,7 +115,6 @@ return {
     },
     { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
     { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
-    { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
     -- Fuzzy finder {
     { -- Engine
         'nvim-telescope/telescope.nvim',

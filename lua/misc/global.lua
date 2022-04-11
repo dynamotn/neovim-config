@@ -118,3 +118,15 @@ _G.dynamo_lsp_codeaction = function(id)
     end
 end
 ------------------------------------------- }
+
+-- Check LSP method textDocument/formatting is supported {
+_G.dynamo_lsp_formatting = function(id)
+    local client_ok, method_supported = pcall(function()
+        return vim.lsp.get_client_by_id(id).resolved_capabilities.document_formatting
+    end)
+    if not client_ok or not method_supported then
+        return
+    end
+    vim.lsp.buf.formatting_sync()
+end
+--------------------------------------------------------------- }

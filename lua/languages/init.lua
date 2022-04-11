@@ -73,15 +73,15 @@ M.setup_treesitter = function(parser_config)
     return parsers, gps_configs
 end
 
-M.setup_linter = function()
+M.setup_null_ls = function(null_ls)
     local result = {}
 
     for language, filetypes in pairs(languages) do
-        local ok, linter = pcall(require, 'languages.' .. language .. '.linter')
+        local ok, null_ls_callback = pcall(require, 'languages.' .. language .. '.null_ls')
 
         if ok then
-            for _, ft in pairs(filetypes) do
-                result[ft] = linter
+            for _, tool in ipairs(null_ls_callback(null_ls, filetypes)) do
+                table.insert(result, tool)
             end
         end
     end

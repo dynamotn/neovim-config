@@ -27,12 +27,14 @@ if present then
                 register_keymaps('lsp', buffer)
                 augroup.enable_highlight_document(client.id)
                 augroup.enable_codelens(client.id)
-                augroup.enable_hover(client.id)
+                augroup.enable_codeaction(client.id)
+                augroup.enable_formatting(client.id)
             end,
             on_exit = function(_, _)
                 augroup.disable_highlight_document()
+                augroup.disable_codeaction()
                 augroup.disable_codelens()
-                augroup.disable_hover()
+                augroup.disable_formatting()
             end,
         }
 
