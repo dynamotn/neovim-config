@@ -69,6 +69,20 @@ lualine.setup({
                 end,
                 color = { fg = '#008080', gui = 'bold' },
             },
+            {
+                function()
+                    msg = ' '
+                    for _, tool in pairs(require('languages').get_tools_by_filetype(vim.bo.filetype)) do
+                        if vim.fn.executable(tool) == 1 then
+                            msg = msg .. tool .. ' '
+                        else
+                            msg = msg .. tool .. '! '
+                        end
+                    end
+                    return msg
+                end,
+                color = { fg = '#8080f0', gui = 'bold' },
+            },
             'filetype',
         },
         lualine_y = {
