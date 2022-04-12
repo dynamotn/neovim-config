@@ -11,4 +11,8 @@ return function(whichkey, bufnr)
         ['<Space>la'] = { '<cmd>lua vim.lsp.buf.code_action()<CR>', 'Code Action' },
         ['<Space>ff'] = { '<cmd>lua vim.lsp.buf.formatting()<CR>', 'File formatting' },
     }, { buffer = bufnr })
+
+    whichkey.register({
+        ['<Space>ff'] = { '<cmd>lua vim.lsp.buf.range_formatting()<CR>', 'File formatting with range' },
+    }, { buffer = bufnr, mode = 'v' })
 end
