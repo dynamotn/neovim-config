@@ -127,6 +127,19 @@ _G.dynamo_lsp_formatting = function(id)
     if not client_ok or not method_supported then
         return
     end
-    vim.lsp.buf.formatting_sync()
+
+    local bufnr = vim.api.nvim_get_current_buf()
+    local client = vim.lsp.get_client_by_id(id)
+    local result, err = client.request_sync(
+        'textDocument/formatting',
+        vim.lsp.util.make_formatting_params(),
+        nil,
+        bufnr
+    )
+    if result and result.result then
+        vim.lsp.util.apply_text_edits(result.result, bufnr, client.offset_encoding)
+    elseif err then
+        vim.notify('vim.lsp.buf.formatting_sync: ' .. err, vim.log.levels.WARN)
+    end
 end
 --------------------------------------------------------------- }

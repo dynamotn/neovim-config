@@ -64,7 +64,6 @@ return {
 
     ---------- Editing ---------- {
     { 'ethanholz/nvim-lastplace', config = register_config('lastplace') }, -- Save the last edit position
-    { 'mcauley-penney/tidy.nvim', event = 'BufWritePre' }, -- Remove trailing whitespace and empty line before EOF
     { 'numToStr/Comment.nvim', config = register_config('comment') }, -- Commenting
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     -- Complete source {
@@ -103,6 +102,7 @@ return {
     },
     { 'monaqa/dial.nvim', config = register_config('dial') }, -- Increment/decrement number, date...
     --------- }
+    { 'ThePrimeagen/refactoring.nvim', config = register_config('refactoring'), after = 'nvim-treesitter' }, -- Refactoring library
     ----------------------------- }
 
     -------- Integration -------- {
