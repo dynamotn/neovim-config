@@ -30,6 +30,12 @@ My customize configuration for vim/neovim
 - Efficiency editing with a ton of tools
 - Support fuzzy finder, terminal, key mapping board, browser...
 
+## Languages, Frameworks or Tools support
+
+- Lua (of course)
+- Bash
+- Terraform
+
 ## Installation
 
 - Clone this repository to ~/.config/nvim.
