@@ -80,7 +80,7 @@ M.setup_null_ls = function()
         local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
 
         if ok then
-            for _, source in ipairs(null_ls_config.sources) do
+            for _, source in ipairs(null_ls_config) do
                 if #source >= 2 then
                     source.with_config = source.with_config or {}
                     table.insert(source.with_config, { filetypes = filetypes })
@@ -98,6 +98,8 @@ M.setup_null_ls = function()
 end
 
 M.get_tools_by_filetype = function(filetype)
+    local result = {}
+
     for language, filetypes in pairs(languages) do
         for _, ft in pairs(filetypes) do
             if ft == filetype then
@@ -107,7 +109,13 @@ M.get_tools_by_filetype = function(filetype)
                     return
                 end
 
-                return null_ls_config.tools
+                for _, source in ipairs(null_ls_config) do
+                    if source.is_external_tool == true or source.is_external_tool == nil then
+                        table.insert(result, source[1])
+                    end
+                end
+
+                return result
             end
         end
     end
