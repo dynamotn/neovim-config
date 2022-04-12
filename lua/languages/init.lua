@@ -73,15 +73,23 @@ M.setup_treesitter = function(parser_config)
     return parsers, gps_configs
 end
 
-M.setup_null_ls = function(null_ls)
+M.setup_null_ls = function()
     local result = {}
 
     for language, filetypes in pairs(languages) do
         local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
 
         if ok then
-            for _, sources in ipairs(null_ls_config.sources(null_ls, filetypes)) do
-                table.insert(result, sources)
+            for _, source in ipairs(null_ls_config.sources) do
+                if #source >= 2 then
+                    source.with_config = source.with_config or {}
+                    table.insert(source.with_config, { filetypes = filetypes })
+
+                    local tool = dynamo_nullls_tool(source[1], source[2], source.is_external_tool, source.with_config)
+                    if tool then
+                        table.insert(result, tool)
+                    end
+                end
             end
         end
     end

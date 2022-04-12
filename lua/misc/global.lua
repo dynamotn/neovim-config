@@ -143,3 +143,18 @@ _G.dynamo_lsp_formatting = function(id)
     end
 end
 --------------------------------------------------------------- }
+
+-- Activate tool with null_ls {
+_G.dynamo_nullls_tool = function(name, method, is_external_tool, with_config)
+    with_config = with_config or {}
+    is_external_tool = is_external_tool == nil and true or is_external_tool
+    local source = require('null-ls').builtins[method][name].with(with_config)
+
+    if is_external_tool then
+        return vim.fn.executable(name) == 1 and source
+    else
+        return source
+    end
+end
+------------------------------ }
+-- }

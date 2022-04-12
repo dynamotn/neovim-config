@@ -8,7 +8,7 @@ local present, languages = pcall(require, 'languages')
 
 if present then
     local augroup = require('misc.augroup')
-    local sources = languages.setup_null_ls(null_ls)
+    local sources = languages.setup_null_ls()
 
     table.insert(sources, null_ls.builtins.diagnostics.trail_space)
     table.insert(sources, null_ls.builtins.formatting.trim_whitespace)
