@@ -47,11 +47,11 @@ cabbrev('Qa', 'qa')
 ----------------------------- }
 
 ---------- Window ----------- {
--- Navigate splited window easier
-map('n', '<C-j>', '<C-w>j')
-map('n', '<C-k>', '<C-w>k')
-map('n', '<C-h>', '<C-w>h')
-map('n', '<C-l>', '<C-w>l')
+-- Resize window
+map('n', '<C-j>', ':resize +5<CR>')
+map('n', '<C-k>', ':resize -5<CR>')
+map('n', '<C-h>', ':vert resize +5<CR>')
+map('n', '<C-l>', ':vert resize -5<CR>')
 ----------------------------- }
 
 ---------- Editing ---------- {

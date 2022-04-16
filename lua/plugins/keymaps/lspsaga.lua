@@ -11,7 +11,7 @@ return function(whichkey, bufnr)
             "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>",
             'Scroll down in preview window',
         },
-        ['<C-k>'] = { '<cmd>Lspsaga signature_help<CR>', 'Signature help' },
+        ['<leader>k'] = { '<cmd>Lspsaga signature_help<CR>', 'Signature help' },
         ['<Space>lr'] = { '<cmd>Lspsaga rename<CR>', 'Rename' },
         ['<Space>la'] = { '<cmd>Lspsaga code_action<CR>', 'Code Action' },
     }, { buffer = bufnr })
