@@ -18,6 +18,8 @@ return packer.startup({
         -- Automatically reload config when update plugin
         vim.cmd([[autocmd User PackerComplete source $MYVIMRC | redraw]])
 
+        packer.reset()
+
         for _, v in pairs(list) do
             use(v)
         end

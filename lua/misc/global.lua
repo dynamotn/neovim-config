@@ -27,7 +27,7 @@ _G.dynamo_reload_nvim_config = function(has_changed_plugins)
     dynamo_unload_module('languages', true)
 
     dofile(vim.env.MYVIMRC)
-    vim.notify('Nvim configuration reloaded!', vim.log.levels.WARNING)
+    vim.notify('Nvim configuration reloaded!', vim.log.levels.INFO, { title = 'Reload' })
 
     if has_changed_plugins then
         require('packer').sync()

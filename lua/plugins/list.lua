@@ -38,6 +38,7 @@ return {
     { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
     { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
     { 'anuvyklack/pretty-fold.nvim', config = register_config('pretty_fold') }, -- Foldtext customization
+    { 'rcarriga/nvim-notify', config = register_config('notify') }, -- Notification
     --------------- }
     ----------------------------- }
 
