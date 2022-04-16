@@ -1,4 +1,8 @@
 DEBUG = false
-require('core')
-require('plugins')
-require('misc')
+if vim.version().minor > 6 then
+    require('core')
+    require('plugins')
+    require('misc')
+else
+    vim.notify('Requires vim version 0.7+')
+end
