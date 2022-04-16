@@ -127,6 +127,11 @@ opt.undolevels = 50
 opt.foldenable = true
 opt.foldmethod = 'marker'
 opt.foldmarker = '{,}'
+opt.fillchars = 'fold:\\'
+opt.fillchars:append({ eob = ' ' }) -- disable eob marker for dashboard asthetics
+opt.fillchars:append('fold:•')
+opt.fillchars:append('foldopen:-')
+opt.fillchars:append('foldclose:+')
 -- What movements open folds
 opt.foldopen = 'block,hor,mark,percent,quickfix,tag,jump,search,undo'
 ---------- }
