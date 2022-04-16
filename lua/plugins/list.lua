@@ -28,10 +28,6 @@ return {
     { 'folke/trouble.nvim', config = register_config('trouble') },
     --------------------------- }
 
-    -- Sign column {
-    { 'kosayoda/nvim-lightbulb' }, -- Show lightbulb when have code action
-    -------------- }
-
     -- Miscellaneous {
     { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
     { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
@@ -75,6 +71,7 @@ return {
     { 'neovim/nvim-lspconfig' }, -- Config for LSP server
     { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
     { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources
+    { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
     ------ }
     { -- TreeSitter
         'nvim-treesitter/nvim-treesitter',
