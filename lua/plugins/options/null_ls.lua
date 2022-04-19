@@ -18,7 +18,7 @@ if present then
         sources = sources,
         on_attach = function(client)
             augroup.enable_codeaction(client.id)
-            augroup.enable_formatting(client.id)
+            -- augroup.enable_formatting(client.id)
         end,
         on_exit = function(_)
             augroup.disable_codeaction()
