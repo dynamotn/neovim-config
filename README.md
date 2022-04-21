@@ -43,6 +43,7 @@ My customize configuration for vim/neovim
 rm -rf ~/.config/nvim
 git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
 ```
+- Make sure to have `virtualenv` installed, otherwise you must install it via your distro's package manager
 - After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
 
 ## Key bindings
