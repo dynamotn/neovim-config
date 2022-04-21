@@ -4,15 +4,6 @@ if not present then
     return
 end
 
-local present, gps = pcall(require, 'nvim-gps')
-local gps_component = nil
-if present then
-    gps_component = {
-        gps.get_location,
-        cond = gps.is_available,
-    }
-end
-
 lualine.setup({
     options = {
         theme = 'onedark',
@@ -35,7 +26,16 @@ lualine.setup({
                 'filename',
                 path = 1, -- Relative path
             },
-            gps_component,
+            {
+                function()
+                    local present, gps = pcall(require, 'nvim-gps')
+                    if not present or not gps.is_available() then
+                        return ''
+                    end
+                    return gps.get_location()
+                end,
+                color = { fg = '#6cbdc2' },
+            },
         },
         lualine_x = {
             {

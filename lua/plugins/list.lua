@@ -21,7 +21,7 @@ return {
     --------------- }
 
     -- Status and tab/buffer line {
-    { 'nvim-lualine/lualine.nvim', config = register_config('lualine'), after = 'nvim-gps' }, -- Status line
+    { 'nvim-lualine/lualine.nvim', config = register_config('lualine'), after = 'onedark.nvim' }, -- Status line
     { 'akinsho/bufferline.nvim', config = register_config('bufferline') }, -- Buffer and tab line
     ----------------------------- }
 
