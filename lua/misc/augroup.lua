@@ -62,6 +62,9 @@ M.load_default_augroups = function()
             },
             { 'WinLeave,BufLeave,BufWinLeave,FocusLost', '*', [[lua require('scrollbar').clear()]] },
         },
+        chadtree = {
+            { 'BufEnter', '*', "if &ft ==# 'CHADTree' | set winhighlight=Normal:NvimTreeNormal | endif" },
+        },
     })
 end
 
