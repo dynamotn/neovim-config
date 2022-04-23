@@ -11,8 +11,7 @@ local languages = {
         'bats',
     },
     terraform = {
-        'terraform',
-        'hcl',
+        'tf',
     },
 }
 
