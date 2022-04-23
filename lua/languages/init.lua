@@ -10,6 +10,9 @@ local languages = {
         'sh',
         'bats',
     },
+    fish = {
+        'fish',
+    },
     terraform = {
         'tf',
     },

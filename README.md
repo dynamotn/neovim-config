@@ -34,6 +34,7 @@ My customize configuration for vim/neovim
 
 - Lua (of course)
 - Bash
+- Fish
 - Terraform
 
 ## Installation
