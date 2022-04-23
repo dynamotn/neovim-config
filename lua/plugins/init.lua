@@ -15,9 +15,6 @@ local list = require('plugins.list')
 
 return packer.startup({
     function(use)
-        -- Automatically reload config when update plugin
-        vim.cmd([[autocmd User PackerComplete lua require('plugins')]])
-
         packer.reset()
 
         for _, v in pairs(list) do
@@ -27,6 +24,8 @@ return packer.startup({
         -- Automatically fire sync package when first time Packer is installed
         if g.dynamo_bootstrap_packer then
             packer.sync()
+            g.dynamo_bootstrap_packer = false
+            vim.cmd('autocmd User PackerComplete quitall')
         end
     end,
     config = {

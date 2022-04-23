@@ -48,9 +48,9 @@ M.load_default_augroups = function()
         sync_plugin_list = {
             { 'BufWritePost', config_path .. 'lua/plugins/list.lua', 'lua dynamo_reload_nvim_config(true)' },
         },
-        -- reload_nvim_config = {
-        --     { 'BufWritePost', config_path .. '**/{*.vim,*.lua}', 'lua dynamo_reload_nvim_config()' },
-        -- },
+        reload_nvim_config = {
+            { 'User', 'PackerComplete', [[lua require('plugins')]] },
+        },
         quick_quit_manual = {
             { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
         },
