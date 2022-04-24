@@ -5,6 +5,7 @@ local languages = {
         'typescript',
         'javascriptreact',
         'typescriptreact',
+        'vue',
     },
     bash = {
         'sh',
@@ -112,8 +113,8 @@ M.get_tools_by_filetype = function(filetype)
                 end
 
                 for _, source in ipairs(null_ls_config) do
-                    if source.is_external_tool == true or source.is_external_tool == nil then
-                        table.insert(result, source[1])
+                    if (source.is_external_tool == true or source.is_external_tool == nil) then
+                        result[source[1]] = true
                     end
                 end
 

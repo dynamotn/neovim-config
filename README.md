@@ -32,6 +32,7 @@ My customize configuration for vim/neovim
 
 ## Languages, Frameworks or Tools support
 
+- Javascript
 - Lua (of course)
 - Bash
 - Fish
