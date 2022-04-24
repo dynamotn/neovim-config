@@ -12,12 +12,17 @@ end
 
 -- Read the list plugins file
 local list = require('plugins.list')
+local per_language_list = require('languages').get_plugins()
 
 return packer.startup({
     function(use)
         packer.reset()
 
         for _, v in pairs(list) do
+            use(v)
+        end
+
+        for _, v in pairs(per_language_list) do
             use(v)
         end
 

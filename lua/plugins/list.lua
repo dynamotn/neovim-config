@@ -1,7 +1,7 @@
 -- vim:foldmethod=marker:foldmarker={,}
----------------------------------------
---       List of all plugins         --
----------------------------------------
+----------------------------------------------
+--       List of all common plugins         --
+----------------------------------------------
 local register_config = require('plugins.register').register_config
 
 return {

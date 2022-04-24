@@ -124,4 +124,22 @@ M.get_tools_by_filetype = function(filetype)
     end
 end
 
+M.get_plugins = function()
+    local result = {}
+    local register_config = require('plugins.register').register_config
+
+    for language, filetypes in pairs(languages) do
+        local ok, plugins = pcall(require, 'languages.' .. language .. '.plugins')
+
+        if ok then
+            for _, plugin in ipairs(plugins(register_config)) do
+                plugin['ft'] = filetypes
+                table.insert(result, plugin)
+            end
+        end
+    end
+
+    return result
+end
+
 return M
