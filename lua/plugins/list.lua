@@ -40,6 +40,7 @@ return {
     { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
     { 'anuvyklack/pretty-fold.nvim', config = register_config('pretty_fold') }, -- Foldtext customization
     { 'rcarriga/nvim-notify', config = register_config('notify') }, -- Notification
+    { 'sunjon/Shade.nvim', config = register_config('shade') }, -- Dim inactive windows
     --------------- }
     ----------------------------- }
 
