@@ -8,7 +8,7 @@ return {
     ----------- Base ------------ {
     { 'wbthomason/packer.nvim', event = 'VimEnter' }, -- Plugin manager
     { 'nvim-lua/plenary.nvim' }, -- Base Lua functions
-    { 'nathom/filetype.nvim' }, -- Detect filetype
+    { 'nathom/filetype.nvim', config = register_config('filetype') }, -- Detect filetype
     DEBUG and { 'dstein64/vim-startuptime' } or nil, -- View startup timing
     { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
     { 'antoinemadec/FixCursorHold.nvim', config = register_config('cursor_hold') }, -- Fix CursorHold performance
