@@ -38,6 +38,7 @@ My customize configuration for vim/neovim
 *   Bash
 *   Fish
 *   Markdown
+*   Dockerfile
 *   Terraform
 
 ## Installation

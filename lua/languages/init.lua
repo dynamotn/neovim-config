@@ -20,6 +20,9 @@ local languages = {
     markdown = {
         'markdown',
     },
+    dockerfile = {
+        'dockerfile',
+    },
 }
 
 local M = {}
