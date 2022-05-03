@@ -126,18 +126,12 @@ return {
             { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }, -- Increase performance with fzf (native port from Go to C)
         },
     },
-    { -- Session search
-        'rmagatti/session-lens',
-        requires = { 'rmagatti/auto-session', 'nvim-telescope/telescope.nvim' },
-        config = register_config('session_lens'),
-        after = { 'telescope.nvim', 'auto-session' },
-    },
     --------------- }
     ----------------------------- }
 
     ---------- Utility ---------- {
     { 'nvim-orgmode/orgmode', config = register_config('orgmode'), after = 'nvim-treesitter' }, -- Note taking
-    { 'rmagatti/auto-session', config = register_config('auto_session') }, -- Automatic session management
+    { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
     DEBUG and { 'nvim-treesitter/playground' } or nil,
     ----------------------------- }
 }
