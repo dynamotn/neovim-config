@@ -54,14 +54,6 @@ M.load_default_augroups = function()
         quick_quit_manual = {
             { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
         },
-        scrollbar = {
-            {
-                'WinEnter,FocusGained,WinScrolled,VimResized,QuitPre',
-                '*',
-                [[lua require('scrollbar').show()]],
-            },
-            { 'WinLeave,BufLeave,BufWinLeave,FocusLost', '*', [[lua require('scrollbar').clear()]] },
-        },
         chadtree = {
             { 'BufEnter', '*', "if &ft ==# 'CHADTree' | set winhighlight=Normal:NvimTreeNormal | endif" },
         },
@@ -127,6 +119,19 @@ end
 
 M.disable_formatting = function()
     M.delete_augroups('formatting_lsp')
+end
+
+M.enable_scrollbar = function()
+    M.create_augroups({
+        scrollbar = {
+            {
+                'WinEnter,FocusGained,WinScrolled,VimResized,QuitPre',
+                '*',
+                [[lua require('scrollbar').show()]],
+            },
+            { 'WinLeave,BufLeave,BufWinLeave,FocusLost', '*', [[lua require('scrollbar').clear()]] },
+        },
+    })
 end
 
 return M
