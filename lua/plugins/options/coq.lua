@@ -12,3 +12,7 @@ vim.g.coq_settings = {
 }
 
 coq.Now(unpack({ '--shut-up' }))
+
+local augroup = require('misc.augroup')
+
+augroup.enable_snippet_compiling()

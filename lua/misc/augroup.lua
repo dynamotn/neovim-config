@@ -134,4 +134,12 @@ M.enable_scrollbar = function()
     })
 end
 
+M.enable_snippet_compiling = function()
+    M.create_augroups({
+        coq = {
+            { 'BufWritePost', '*.snip', 'COQsnips compile' },
+        },
+    })
+end
+
 return M
