@@ -8,6 +8,7 @@ vim.g.coq_settings = {
     keymap = { recommended = false },
     clients = {
         tabnine = { enabled = true },
+        snippets = { user_path = vim.fn.expand('$HOME/.config/nvim/snippets') },
     },
 }
 
