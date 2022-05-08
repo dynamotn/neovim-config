@@ -1,6 +1,6 @@
 # vim-config
 
-My customize configuration for vim/neovim
+My customization configuration for vim/neovim
 
 [![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.7-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
@@ -31,7 +31,7 @@ My customize configuration for vim/neovim
 *   Efficiency editing with a ton of tools
 *   Support fuzzy finder, terminal, key mapping board, browser...
 
-## Languages, Frameworks or Tools support
+## Languages, Frameworks, or Tools support
 
 *   Javascript
 *   Lua (of course)
@@ -50,7 +50,7 @@ My customize configuration for vim/neovim
     rm -rf ~/.config/nvim
     git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
 
-*   Make sure to have `virtualenv` installed, otherwise you must install it via your distro's package manager
+*   Make sure to have `virtualenv` installed otherwise you must install it via your distro's package manager
 *   After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
 
 ## Key bindings
