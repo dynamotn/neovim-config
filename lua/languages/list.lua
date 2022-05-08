@@ -23,4 +23,7 @@ return {
     dockerfile = {
         'dockerfile',
     },
+    yaml = {
+        'yaml',
+    },
 }

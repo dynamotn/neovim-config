@@ -40,6 +40,7 @@ My customization configuration for vim/neovim
 *   Markdown
 *   Dockerfile
 *   Terraform
+*   YAML
 
 ## Installation
 
