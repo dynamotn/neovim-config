@@ -12,7 +12,7 @@ return {
     DEBUG and { 'dstein64/vim-startuptime' } or nil, -- View startup timing
     { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
     { 'antoinemadec/FixCursorHold.nvim', config = register_config('cursor_hold') }, -- Fix CursorHold performance
-    { 'gelguy/wilder.nvim', config = register_config('wilder') }, -- Improve wildmenu's capabilities
+    { 'gelguy/wilder.nvim', config = register_config('wilder'), event = 'CmdlineEnter' }, -- Improve wildmenu's capabilities
     ----------------------------- }
 
     -------- Eyecandy ----------- {

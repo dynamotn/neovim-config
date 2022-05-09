@@ -45,6 +45,7 @@ wilder.set_option(
 )
 
 wilder.set_option('pipeline', {
+    wilder.debounce(10),
     wilder.branch(
         wilder.python_file_finder_pipeline({
             file_command = vim.fn.executable('fd') == 1 and { 'fd', '-tf' } or {
