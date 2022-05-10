@@ -26,4 +26,7 @@ return {
     yaml = {
         'yaml',
     },
+    gitcommit = {
+        'gitcommit',
+    },
 }
