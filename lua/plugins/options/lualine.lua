@@ -4,6 +4,17 @@ if not present then
     return
 end
 
+local outline = {
+    filetypes = { 'Outline' },
+    sections = {
+        lualine_a = {
+            function()
+                return 'Outline'
+            end,
+        },
+    },
+}
+
 lualine.setup({
     options = {
         theme = 'onedark',
@@ -94,5 +105,5 @@ lualine.setup({
         },
         lualine_z = { 'progress', 'location' },
     },
-    extensions = { 'quickfix', 'chadtree' },
+    extensions = { 'quickfix', 'chadtree', outline },
 })

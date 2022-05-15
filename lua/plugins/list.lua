@@ -87,6 +87,7 @@ return {
     { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
     { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources
     { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
+    { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') },
     ------ }
     { -- TreeSitter
         'nvim-treesitter/nvim-treesitter',
