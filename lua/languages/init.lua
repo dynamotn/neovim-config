@@ -69,7 +69,13 @@ M.setup_null_ls = function()
                     source.with_config = source.with_config or {}
                     table.insert(source.with_config, { filetypes = filetypes })
 
-                    local tool = dynamo_nullls_tool(source[1], source[2], source.is_external_tool, source.with_config)
+                    local tool = dynamo_nullls_tool(
+                        source[1],
+                        source[2],
+                        source.is_external_tool,
+                        source.is_custom_tool,
+                        source.with_config
+                    )
                     if tool then
                         table.insert(result, tool)
                     end
