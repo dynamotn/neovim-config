@@ -31,7 +31,8 @@ return {
     ----------------------------- }
 
     -- Quickfix and diagnostics {
-    { 'folke/trouble.nvim', config = register_config('trouble') },
+    { 'folke/trouble.nvim', config = register_config('trouble') }, -- Highlight quickfix and diagnostics
+    { 'folke/todo-comments.nvim', config = register_config('todo') }, -- Highlight TODO comments
     --------------------------- }
 
     -- Miscellaneous {
