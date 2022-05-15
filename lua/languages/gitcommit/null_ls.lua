@@ -14,4 +14,5 @@ return {
             end,
         },
     },
+    { 'jira', 'completion', is_custom_tool = true },
 }

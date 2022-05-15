@@ -10,6 +10,12 @@ vim.g.coq_settings = {
         tabnine = { enabled = true },
         snippets = { user_path = vim.fn.expand('$HOME/.config/nvim/snippets') },
     },
+    display = {
+        preview = {
+            positions = { south = 1, north = 2, west = 3, east = 4 },
+            x_max_len = 200,
+        },
+    },
 }
 
 coq.Snips('compile')
