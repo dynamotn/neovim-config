@@ -7,6 +7,9 @@ end
 lspsaga.setup({
     debug = DEBUG,
     code_action_icon = '💡',
+    code_action_prompt = {
+        sign = false,
+    },
     finder_action_keys = {
         open = 'o',
         vsplit = 's',
