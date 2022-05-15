@@ -38,7 +38,11 @@ return {
     { 'SmiteshP/nvim-gps', config = register_config('gps'), after = 'nvim-treesitter' }, -- Component to show context of current position
     { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
     { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
-    { 'anuvyklack/pretty-fold.nvim', config = register_config('pretty_fold'), requires = { 'anuvyklack/nvim-keymap-amend' } }, -- Foldtext customization
+    { -- Foldtext customization
+        'anuvyklack/pretty-fold.nvim',
+        config = register_config('pretty_fold'),
+        requires = { 'anuvyklack/nvim-keymap-amend' },
+    },
     { 'rcarriga/nvim-notify', config = register_config('notify') }, -- Notification
     { 'sunjon/Shade.nvim', config = register_config('shade') }, -- Dim inactive windows
     --------------- }

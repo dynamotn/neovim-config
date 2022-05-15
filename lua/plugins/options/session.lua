@@ -11,11 +11,11 @@ session.setup({
     telescope = {
         before_source = function()
             -- Close all open buffers
-            pcall(vim.cmd, "bufdo bwipeout")
+            pcall(vim.cmd, 'bufdo bwipeout')
         end,
         after_source = function(_)
             -- Change the git branch
-            pcall(vim.cmd, "git checkout " .. session.branch)
+            pcall(vim.cmd, 'git checkout ' .. session.branch)
         end,
     },
 })
@@ -26,4 +26,4 @@ if not present then
     return
 end
 
-telescope.load_extension("persisted")
+telescope.load_extension('persisted')
