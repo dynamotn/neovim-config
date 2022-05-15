@@ -114,6 +114,7 @@ return {
         after = 'nvim-treesitter',
     },
     { 'monaqa/dial.nvim', config = register_config('dial') }, -- Increment/decrement number, date...
+    { 'ur4ltz/surround.nvim', config = register_config('surround') }, -- Change surround character
     --------- }
     { 'ThePrimeagen/refactoring.nvim', config = register_config('refactoring'), after = 'nvim-treesitter' }, -- Refactoring library
     ----------------------------- }
