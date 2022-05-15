@@ -57,6 +57,25 @@ M.setup_treesitter = function(parser_config)
     return parsers, gps_configs
 end
 
+M.setup_dap = function()
+    local adapters_result, debugees_result = {}, {}
+
+    for language, filetypes in pairs(languages) do
+        local ok, dap_config = pcall(require, 'languages.' .. language .. '.dap')
+
+        if ok then
+            for _, ft in pairs(filetypes) do
+                for name, adapter in pairs(dap_config.adapters) do
+                    adapters_result[name] = adapter
+                end
+                debugees_result[ft] = dap_config.debugees
+            end
+        end
+    end
+
+    return adapters_result, debugees_result
+end
+
 M.setup_null_ls = function()
     local result = {}
 

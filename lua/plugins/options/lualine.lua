@@ -4,16 +4,27 @@ if not present then
     return
 end
 
-local outline = {
-    filetypes = { 'Outline' },
-    sections = {
-        lualine_a = {
-            function()
-                return 'Outline'
-            end,
-        },
-    },
+local special_filetypes = {
+    Outline = 'Outline',
+    dapui_scopes = 'Scopes',
+    dapui_breakpoints = 'Breakpoints',
+    dapui_stacks = 'Stacks',
+    dapui_watches = 'Watches',
+    ['dap-repl'] = 'REPL',
 }
+
+local extensions = function(filetype)
+    return {
+        filetypes = { filetype },
+        sections = {
+            lualine_a = {
+                function()
+                    return special_filetypes[filetype] or 'N/A'
+                end,
+            },
+        },
+    }
+end
 
 lualine.setup({
     options = {
@@ -105,5 +116,14 @@ lualine.setup({
         },
         lualine_z = { 'progress', 'location' },
     },
-    extensions = { 'quickfix', 'chadtree', outline },
+    extensions = {
+        'quickfix',
+        'chadtree',
+        extensions('outline'),
+        extensions('dapui_scopes'),
+        extensions('dapui_breakpoints'),
+        extensions('dapui_stacks'),
+        extensions('dapui_watches'),
+        extensions('dap-repl'),
+    },
 })

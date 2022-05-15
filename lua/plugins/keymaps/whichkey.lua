@@ -2,7 +2,6 @@ return {
     -- Space key {
     ['<Space>'] = { name = 'Dynamo Trigger' },
     ['<Space>b'] = { name = 'Buffer' },
-    ['<Space>d'] = { name = 'Debug / Quick fix / Test' },
 
     -- E key
     ['<Space>e'] = { name = 'Diagnostic / Error' },
@@ -18,6 +17,7 @@ return {
     ['<Space>p'] = { name = 'Project' },
     ['<Space>s'] = { name = 'Session' },
     ['<Space>l'] = { name = 'Language tool' },
+    ['<Space>q'] = { name = 'Debug / Quick fix / Test' },
 
     -- T key
     ['<Space>t'] = { name = 'Tab' },

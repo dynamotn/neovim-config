@@ -10,4 +10,5 @@ coq_3rd({
     { src = 'bc', short_name = 'MATH' },
     { src = 'copilot', short_name = 'COP', accept_key = '<c-f>' },
     { src = 'orgmode', short_name = 'ORG' },
+    { src = 'dap', short_name = 'DEBUG' },
 })

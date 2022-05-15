@@ -119,6 +119,11 @@ return {
     { 'ThePrimeagen/refactoring.nvim', config = register_config('refactoring'), after = 'nvim-treesitter' }, -- Refactoring library
     ----------------------------- }
 
+    ---- Debug / Test / Run ----- {
+    { 'mfussenegger/nvim-dap', config = register_config('dap') }, -- Debug Adapter implementation
+    { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
+    ----------------------------- }
+
     -------- Integration -------- {
     { -- Browser
         'glacambre/firenvim',
