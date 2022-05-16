@@ -75,7 +75,14 @@ return {
 
     ---------- Editing ---------- {
     { 'ethanholz/nvim-lastplace', config = register_config('lastplace') }, -- Save the last edit position
+    -- Comment {
     { 'numToStr/Comment.nvim', config = register_config('comment') }, -- Commenting
+    {
+        'JoosepAlviste/nvim-ts-context-commentstring',
+        after = { 'nvim-treesitter', 'Comment.nvim' },
+        config = register_config('context_comment'),
+    }, -- Comment based on cursor location
+    ---------- }
     { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
     -- Complete source {
     { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
@@ -149,6 +156,6 @@ return {
     ---------- Utility ---------- {
     { 'nvim-orgmode/orgmode', config = register_config('orgmode'), after = 'nvim-treesitter' }, -- Note taking
     { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
-    DEBUG and { 'nvim-treesitter/playground' } or nil,
+    DEBUG and { 'nvim-treesitter/playground', config = register_config('playground') } or nil,
     ----------------------------- }
 }

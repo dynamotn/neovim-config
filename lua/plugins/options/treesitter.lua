@@ -29,9 +29,6 @@ treesitter.setup({
     indent = {
         enable = true,
     },
-    playground = {
-        enable = true,
-    },
     ensure_installed = parsers,
 })
 
