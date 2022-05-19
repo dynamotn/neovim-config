@@ -29,4 +29,7 @@ return {
     gitcommit = {
         'gitcommit',
     },
+    terragrunt = {
+        'terragrunt',
+    },
 }

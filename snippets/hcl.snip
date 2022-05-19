@@ -1,0 +1,55 @@
+snippet terraform
+  terraform {
+    source = "${1:source}"
+  }
+
+snippet remote_state
+  remote_state {
+    backend = "${1:backend}"
+
+    config = {
+      ${2}
+    }
+
+    generate = {
+      path = "${3:path}"
+      if_exists = "${4:overwrite_terragrunt}"
+    }
+  }
+
+snippet include
+  include "${1:name}" {
+    path = "${2:path}"
+  }
+
+snippet locals
+  locals {
+    ${1}
+  }
+
+snippet dependency
+  dependency "${1:name}" {
+    config_path = "${2:path}"
+    ${3}
+  }
+
+snippet dependencies
+  dependencies {
+    paths = [
+      ${1}
+    ]
+  }
+
+snippet generate
+  generate "${1:name}" {
+    path = "${2:path}"
+    if_exists = "${3:overwrite_terragrunt}"
+    contents = <<EOF
+  ${4}
+  EOF
+  }
+
+snippet inputs
+  inputs = {
+    ${1}
+  }

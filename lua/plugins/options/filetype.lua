@@ -11,6 +11,8 @@ filetype.setup({
         },
         complex = {
             ['.git/ignore'] = 'gitignore',
+            ['terragrunt.hcl'] = 'terragrunt',
+            ['terraform/*.hcl'] = 'terragrunt',
         },
     },
 })

@@ -120,7 +120,9 @@ M.get_tools_by_filetype = function(filetype)
 
                 for _, source in ipairs(null_ls_config) do
                     if source.is_external_tool == true or source.is_external_tool == nil then
-                        result[source[1]] = true
+                        local tool = source.tool and source.tool or source[1]
+
+                        result[tool] = true
                     end
                 end
 
