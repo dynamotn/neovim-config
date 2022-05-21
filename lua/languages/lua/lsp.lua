@@ -4,10 +4,17 @@ return {
     opts.settings = {
       Lua = {
         diagnostics = {
-          globals = { 'vim' },
+          globals = { 'vim', 'awesome' },
         },
         telemetry = {
           enable = false,
+        },
+        format = {
+          enable = true,
+          defaultConfig = {
+            indent_style = 'space',
+            indent_size = '2',
+          },
         },
       },
     }
