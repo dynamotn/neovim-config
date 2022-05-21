@@ -1,7 +1,7 @@
 local present, gps = pcall(require, 'nvim-gps')
 
 if not present then
-    return
+  return
 end
 
 gps.setup({})

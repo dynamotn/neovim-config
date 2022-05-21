@@ -1,3 +1,3 @@
 return {
-    ls = 'dockerls',
+  ls = 'dockerls',
 }

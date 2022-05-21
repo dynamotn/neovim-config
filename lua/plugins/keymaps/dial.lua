@@ -1,7 +1,7 @@
 local present, dial = pcall(require, 'dial')
 
 if not present then
-    return
+  return
 end
 
 vim.api.nvim_set_keymap('n', '<C-a>', require('dial.map').inc_normal(), { noremap = true })

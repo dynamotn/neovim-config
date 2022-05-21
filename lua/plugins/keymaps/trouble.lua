@@ -1,3 +1,3 @@
 return {
-    ['<Space>ex'] = { '<cmd>Trouble<CR>', 'Show diagnostic' },
+  ['<Space>ex'] = { '<cmd>Trouble<CR>', 'Show diagnostic' },
 }

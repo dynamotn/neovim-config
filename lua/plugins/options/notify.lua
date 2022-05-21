@@ -1,7 +1,7 @@
 local present, notify = pcall(require, 'notify')
 
 if not present then
-    return
+  return
 end
 
 vim.notify = notify

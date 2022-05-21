@@ -1,3 +1,3 @@
 return {
-    { 'yamllint', 'diagnostics' },
+  { 'yamllint', 'diagnostics' },
 }

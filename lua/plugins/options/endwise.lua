@@ -1,11 +1,11 @@
 local present, endwise = pcall(require, 'nvim-treesitter-endwise')
 
 if not present then
-    return
+  return
 end
 
 require('nvim-treesitter.configs').setup({
-    endwise = {
-        enable = true,
-    },
+  endwise = {
+    enable = true,
+  },
 })

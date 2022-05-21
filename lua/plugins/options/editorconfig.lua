@@ -1,5 +1,5 @@
 local present, editorconfig = pcall(require, 'editorconfig')
 
 if not present then
-    return
+  return
 end

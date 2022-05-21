@@ -1,9 +1,9 @@
 local present, neoscroll = pcall(require, 'neoscroll')
 
 if not present then
-    return
+  return
 end
 
 neoscroll.setup({
-    easing_function = 'quadratic',
+  easing_function = 'quadratic',
 })

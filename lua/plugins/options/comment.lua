@@ -1,9 +1,9 @@
 local present, comment = pcall(require, 'Comment')
 
 if not present then
-    return
+  return
 end
 
 comment.setup({
-    ignore = '^$', -- Ignore empty lines
+  ignore = '^$', -- Ignore empty lines
 })

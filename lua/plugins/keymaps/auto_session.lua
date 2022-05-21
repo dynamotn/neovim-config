@@ -1,3 +1,3 @@
 return {
-    ['<Space>ss'] = { '<cmd>SaveSession<CR>', 'Save session' },
+  ['<Space>ss'] = { '<cmd>SaveSession<CR>', 'Save session' },
 }

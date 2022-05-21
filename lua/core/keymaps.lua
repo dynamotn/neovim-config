@@ -6,16 +6,16 @@ local opt = vim.opt -- Set options (global/buffer/windowS-scoped)
 local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
-    local cmd = 'cnoreabbrev %s %s'
-    vim.cmd(cmd:format(input, replace))
+  local cmd = 'cnoreabbrev %s %s'
+  vim.cmd(cmd:format(input, replace))
 end
 
 local function map(mode, input, replace, opts)
-    local options = { noremap = true, silent = true }
-    if opts then
-        options = vim.tbl_extend('force', options, opts)
-    end
-    vim.api.nvim_set_keymap(mode, input, replace, options)
+  local options = { noremap = true, silent = true }
+  if opts then
+    options = vim.tbl_extend('force', options, opts)
+  end
+  vim.api.nvim_set_keymap(mode, input, replace, options)
 end
 
 ----------- Base ------------ {

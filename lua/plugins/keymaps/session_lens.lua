@@ -1,3 +1,3 @@
 return {
-    ['<Space>sq'] = { '<cmd>SearchSession<CR>', 'Search and restore session' },
+  ['<Space>sq'] = { '<cmd>SearchSession<CR>', 'Search and restore session' },
 }

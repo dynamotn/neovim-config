@@ -1,3 +1,3 @@
 return {
-    { 'terraform_fmt', 'formatting', tool = 'terraform' },
+  { 'terraform_fmt', 'formatting', tool = 'terraform' },
 }

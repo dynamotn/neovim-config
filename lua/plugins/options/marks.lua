@@ -1,9 +1,9 @@
 local present, marks = pcall(require, 'marks')
 
 if not present then
-    return
+  return
 end
 
 marks.setup({
-    default_mappings = true,
+  default_mappings = true,
 })

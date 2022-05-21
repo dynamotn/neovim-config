@@ -1,11 +1,11 @@
 local present, neogit = pcall(require, 'neogit')
 
 if not present then
-    return
+  return
 end
 
 neogit.setup({
-    integrations = {
-        diffview = true,
-    },
+  integrations = {
+    diffview = true,
+  },
 })

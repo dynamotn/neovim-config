@@ -1,9 +1,9 @@
 local present, surround = pcall(require, 'surround')
 
 if not present then
-    return
+  return
 end
 
 surround.setup({
-    mappings_style = 'surround',
+  mappings_style = 'surround',
 })

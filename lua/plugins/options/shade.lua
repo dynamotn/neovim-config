@@ -1,10 +1,10 @@
 local present, shade = pcall(require, 'shade')
 
 if not present then
-    return
+  return
 end
 
 shade.setup({
-    overlay_opacity = 50,
-    opacity_step = 1,
+  overlay_opacity = 50,
+  opacity_step = 1,
 })

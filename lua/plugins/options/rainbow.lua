@@ -1,12 +1,12 @@
 local present, rainbow = pcall(require, 'rainbow')
 
 if not present then
-    return
+  return
 end
 
 require('nvim-treesitter.configs').setup({
-    rainbow = {
-        enable = true,
-        extended_mode = true,
-    },
+  rainbow = {
+    enable = true,
+    extended_mode = true,
+  },
 })
