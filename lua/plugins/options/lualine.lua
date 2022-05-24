@@ -85,7 +85,9 @@ lualine.setup({
 
           -- add client
           for _, client in pairs(buf_clients) do
-            table.insert(buf_client_names, client.name)
+            if client.name ~= 'null-ls' then
+              table.insert(buf_client_names, client.name)
+            end
           end
           return '  ' .. table.concat(buf_client_names, ', ')
         end,
