@@ -32,4 +32,7 @@ return {
   terragrunt = {
     'terragrunt',
   },
+  ansible = {
+    'ansible',
+  },
 }

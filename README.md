@@ -33,19 +33,28 @@ My customization configuration for vim/neovim
   * [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) to show
     hunks of Git
 * Efficiency editing with a ton of tools
-* Support fuzzy finder, terminal, key mapping board, browser...
+* Support fuzzy finder, terminal, key mapping board, browser, ...
 
 ## Languages, Frameworks, or Tools support
 
+See list of supported things in `lua/languages/list.lua`. You can comment lines that you don't want to use.
+
+#### Languages
+* Bash
+* Dockerfile
+* Fish
+* HCL
 * Javascript
 * Lua (of course)
-* Bash
-* Fish
 * Markdown
-* Dockerfile
+* YAML
+
+#### Frameworks
+
+#### Tools
+* Ansible
 * Terraform
 * Terragrunt
-* YAML
 
 ## Installation
 

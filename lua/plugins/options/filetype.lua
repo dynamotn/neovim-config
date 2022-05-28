@@ -13,7 +13,11 @@ filetype.setup({
       ['.git/ignore'] = 'gitignore',
       ['terragrunt.hcl'] = 'terragrunt',
       ['terraform/*.hcl'] = 'terragrunt',
-      ['ansible/.*.yml'] = 'ansible',
+      ['ansible/.*.ya?ml'] = 'ansible',
+      ['tasks/.*.ya?ml'] = 'ansible',
+      ['roles/.*.ya?ml'] = 'ansible',
+      ['handlers/.*.ya?ml'] = 'ansible',
+      ['inventory/.*.ya?ml'] = 'ansible',
     },
   },
 })
