@@ -121,7 +121,7 @@ lualine.setup({
   extensions = {
     'quickfix',
     'chadtree',
-    extensions('outline'),
+    extensions('Outline'),
     extensions('dapui_scopes'),
     extensions('dapui_breakpoints'),
     extensions('dapui_stacks'),
