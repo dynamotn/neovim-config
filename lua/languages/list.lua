@@ -1,6 +1,7 @@
 return {
   -- Programming language {
   arduino = { 'arduino' },
+  awk = { 'awk' },
   bash = {
     'sh',
     'bats',
