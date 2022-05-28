@@ -44,6 +44,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * AWK
 * Bash
 * C/C++
+* C#
 * Fish
 * Javascript
 * Lua (of course)
