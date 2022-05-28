@@ -40,6 +40,7 @@ My customization configuration for vim/neovim
 See list of supported things in `lua/languages/list.lua`. You can comment lines that you don't want to use.
 
 #### Languages
+* Arduino
 * Bash
 * Fish
 * Javascript

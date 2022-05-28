@@ -8,6 +8,8 @@ filetype.setup({
   overrides = {
     extensions = {
       envrc = 'sh',
+      ino = 'arduino',
+      pde = 'arduino',
     },
     complex = {
       ['.git/ignore'] = 'gitignore',
