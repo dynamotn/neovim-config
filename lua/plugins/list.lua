@@ -104,7 +104,6 @@ return {
     config = register_config('treesitter'),
   },
   -- Syntax highlight {
-  { 'sheerun/vim-polyglot' }, -- For all basic filetypes
   { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
   ------------------- }
   -- Typing {
