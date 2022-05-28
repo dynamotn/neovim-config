@@ -36,7 +36,7 @@ return {
   --------------------------- }
 
   -- Miscellaneous {
-  { 'kyazdani42/nvim-web-devicons' }, -- Programming icons
+  { 'kyazdani42/nvim-web-devicons', config = register_config('icon') }, -- Programming icons
   { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
   { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
   { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
