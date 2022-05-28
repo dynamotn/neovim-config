@@ -41,9 +41,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 
 #### Languages
 * Bash
-* Dockerfile
 * Fish
-* HCL
 * Javascript
 * Lua (of course)
 * Markdown
@@ -53,6 +51,8 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 
 #### Tools
 * Ansible
+* Dockerfile
+* Git (rebase, commit)
 * Terraform
 * Terragrunt
 

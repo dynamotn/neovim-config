@@ -1,5 +1,10 @@
 return {
-  lua = { 'lua' },
+  -- Programming language {
+  bash = {
+    'sh',
+    'bats',
+  },
+  fish = { 'fish' },
   javascript = {
     'javascript',
     'typescript',
@@ -7,32 +12,15 @@ return {
     'typescriptreact',
     'vue',
   },
-  bash = {
-    'sh',
-    'bats',
-  },
-  fish = {
-    'fish',
-  },
-  terraform = {
-    'tf',
-  },
-  markdown = {
-    'markdown',
-  },
-  dockerfile = {
-    'dockerfile',
-  },
-  yaml = {
-    'yaml',
-  },
-  gitcommit = {
-    'gitcommit',
-  },
-  terragrunt = {
-    'terragrunt',
-  },
-  ansible = {
-    'ansible',
-  },
+  lua = { 'lua' },
+  markdown = { 'markdown' },
+  yaml = { 'yaml' },
+  ----------------------- }
+
+  -- Tools {
+  ansible = { 'ansible' },
+  terraform = { 'tf' },
+  terragrunt = { 'terragrunt' },
+  gitcommit = { 'gitcommit' },
+  -------- }
 }
