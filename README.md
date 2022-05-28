@@ -43,6 +43,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Arduino
 * AWK
 * Bash
+* C/C++
 * Fish
 * Javascript
 * Lua (of course)

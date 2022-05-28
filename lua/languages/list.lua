@@ -6,6 +6,8 @@ return {
     'sh',
     'bats',
   },
+  c = { 'c' },
+  cpp = { 'cpp' },
   fish = { 'fish' },
   javascript = {
     'javascript',
