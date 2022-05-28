@@ -1,3 +1,3 @@
 return {
-  ls = 'bashls',
+  'bashls',
 }

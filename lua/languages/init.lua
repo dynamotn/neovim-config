@@ -1,4 +1,5 @@
 local languages = require('languages.list')
+local lspconfig = require('languages.lspconfig')
 
 local M = {}
 
@@ -22,12 +23,16 @@ end
 M.setup_ls = function()
   local result = {}
   for language, filetypes in pairs(languages) do
-    local ok, lsp = pcall(require, 'languages.' .. language .. '.lsp')
-    if ok and type(lsp) == 'table' then
-      result[lsp.ls] = {
-        config = lsp.config or function() end,
-        filetypes = filetypes,
-      }
+    local ok, server_names = pcall(require, 'languages.' .. language .. '.lsp')
+    if ok and type(server_names) == 'table' then
+      for _, server_name in ipairs(server_names) do
+        result[server_name] = {
+          setup = lspconfig[server_name] or function(opts)
+            return opts
+          end,
+          filetypes = filetypes,
+        }
+      end
     end
   end
   return result
