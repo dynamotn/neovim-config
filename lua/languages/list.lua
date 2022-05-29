@@ -31,6 +31,7 @@ return {
     'scss',
     'sass',
   },
+  solidity = { 'solidity' },
   yaml = { 'yaml' },
   ----------------------- }
 
