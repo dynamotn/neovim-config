@@ -36,8 +36,10 @@ return {
 
   -- Tools {
   ansible = { 'ansible' },
+  dockerfile = { 'dockerfile' },
+  gitcommit = { 'gitcommit' },
+  nix = { 'nix' },
   terraform = { 'tf' },
   terragrunt = { 'terragrunt' },
-  gitcommit = { 'gitcommit' },
   -------- }
 }
