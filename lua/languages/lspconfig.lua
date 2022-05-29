@@ -1,6 +1,7 @@
 local M = {}
 
-M.sumneko_lua = function(opts)
+M.sumneko_lua = function(default_opts)
+  local opts = default_opts
   opts.settings = {
     Lua = {
       diagnostics = {
@@ -21,7 +22,8 @@ M.sumneko_lua = function(opts)
   return opts
 end
 
-M.yamlls = function(opts)
+M.yamlls = function(default_opts)
+  local opts = default_opts
   opts.settings = {
     redhat = { telemetry = { enabled = false } },
     yaml = {

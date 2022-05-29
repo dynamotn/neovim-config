@@ -26,12 +26,16 @@ M.setup_ls = function()
     local ok, server_names = pcall(require, 'languages.' .. language .. '.lsp')
     if ok and type(server_names) == 'table' then
       for _, server_name in ipairs(server_names) do
-        result[server_name] = {
-          setup = lspconfig[server_name] or function(opts)
-            return opts
-          end,
-          filetypes = filetypes,
-        }
+        if not result[server_name] then
+          result[server_name] = {
+            setup = lspconfig[server_name] or function(opts)
+              return opts
+            end,
+            filetypes = vim.deepcopy(filetypes),
+          }
+        else
+          vim.list_extend(result[server_name].filetypes, filetypes)
+        end
       end
     end
   end
