@@ -11,6 +11,7 @@ return {
   css = { 'css' },
   cucumber = { 'cucumber' },
   fish = { 'fish' },
+  html = { 'html' },
   javascript = {
     'javascript',
     'typescript',

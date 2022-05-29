@@ -48,6 +48,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * CSS
 * Cucumber
 * Fish
+* HTML
 * Javascript
 * LESS
 * Lua (of course)
