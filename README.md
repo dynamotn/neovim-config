@@ -51,6 +51,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Go
 * HTML
 * Javascript
+* JSON
 * LESS
 * Lua (of course)
 * Markdown

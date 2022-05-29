@@ -20,6 +20,7 @@ return {
     'typescriptreact',
     'vue',
   },
+  json = { 'json' },
   less = { 'less' },
   lua = { 'lua' },
   markdown = { 'markdown' },
