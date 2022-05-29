@@ -54,6 +54,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * LESS
 * Lua (of course)
 * Markdown
+* PHP
 * SASS/SCSS
 * YAML
 

@@ -23,6 +23,7 @@ return {
   less = { 'less' },
   lua = { 'lua' },
   markdown = { 'markdown' },
+  php = { 'php' },
   sass = {
     'scss',
     'sass',
