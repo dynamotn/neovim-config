@@ -45,10 +45,13 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Bash
 * C/C++
 * C#
+* CSS
 * Fish
 * Javascript
+* LESS
 * Lua (of course)
 * Markdown
+* SASS/SCSS
 * YAML
 
 #### Frameworks

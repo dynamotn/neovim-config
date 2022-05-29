@@ -8,6 +8,7 @@ return {
   },
   c = { 'c' },
   cpp = { 'cpp' },
+  css = { 'css' },
   fish = { 'fish' },
   javascript = {
     'javascript',
@@ -16,8 +17,13 @@ return {
     'typescriptreact',
     'vue',
   },
+  less = { 'less' },
   lua = { 'lua' },
   markdown = { 'markdown' },
+  sass = {
+    'scss',
+    'sass',
+  },
   yaml = { 'yaml' },
   ----------------------- }
 
