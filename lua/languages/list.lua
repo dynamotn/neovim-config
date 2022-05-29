@@ -24,6 +24,7 @@ return {
   lua = { 'lua' },
   markdown = { 'markdown' },
   php = { 'php' },
+  python = { 'python' },
   sass = {
     'scss',
     'sass',

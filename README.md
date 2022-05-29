@@ -55,6 +55,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Lua (of course)
 * Markdown
 * PHP
+* Python
 * SASS/SCSS
 * YAML
 
