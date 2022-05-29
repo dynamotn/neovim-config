@@ -26,5 +26,10 @@ icon.setup({
       color = '#202324',
       name = 'HCL',
     },
+    feature = {
+      icon = ' ',
+      color = '#3bdf7d',
+      name = 'Cucumber',
+    },
   },
 })

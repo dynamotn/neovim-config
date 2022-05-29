@@ -46,6 +46,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * C/C++
 * C#
 * CSS
+* Cucumber
 * Fish
 * Javascript
 * LESS

@@ -9,6 +9,7 @@ return {
   c = { 'c' },
   cpp = { 'cpp' },
   css = { 'css' },
+  cucumber = { 'cucumber' },
   fish = { 'fish' },
   javascript = {
     'javascript',
