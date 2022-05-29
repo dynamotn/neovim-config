@@ -25,6 +25,7 @@ return {
   markdown = { 'markdown' },
   php = { 'php' },
   python = { 'python' },
+  ruby = { 'ruby' },
   sass = {
     'scss',
     'sass',
