@@ -69,6 +69,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Dockerfile
 * Git (rebase, commit)
 * Nix
+* Orgmode
 * Terraform
 * Terragrunt
 

@@ -153,7 +153,6 @@ return {
   ----------------------------- }
 
   ---------- Utility ---------- {
-  { 'nvim-orgmode/orgmode', config = register_config('orgmode'), after = 'nvim-treesitter' }, -- Note taking
   { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
   DEBUG and { 'nvim-treesitter/playground', config = register_config('playground') } or nil,
   ----------------------------- }

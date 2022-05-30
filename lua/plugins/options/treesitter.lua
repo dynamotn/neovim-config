@@ -16,8 +16,6 @@ if present then
   parsers, _ = languages.setup_treesitter(parser_config)
 end
 
-table.insert(parsers, 'org')
-
 treesitter.setup({
   highlight = {
     enable = true,

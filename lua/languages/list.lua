@@ -40,6 +40,7 @@ return {
   dockerfile = { 'dockerfile' },
   gitcommit = { 'gitcommit' },
   nix = { 'nix' },
+  org = { 'org' },
   terraform = { 'tf' },
   terragrunt = { 'terragrunt' },
   -------- }
