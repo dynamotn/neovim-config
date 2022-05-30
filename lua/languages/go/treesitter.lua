@@ -1,3 +1,0 @@
-return {
-  parser = 'go',
-}
