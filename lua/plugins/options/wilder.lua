@@ -48,7 +48,7 @@ wilder.set_option('pipeline', {
   wilder.debounce(10),
   wilder.branch(
     wilder.python_file_finder_pipeline({
-      file_command = vim.fn.executable('fd') == 1 and { 'fd', '-tf' } or {
+      file_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-tf' } or {
         'find',
         '.',
         '-type',
@@ -56,7 +56,7 @@ wilder.set_option('pipeline', {
         '-printf',
         '%P\n',
       },
-      dir_command = vim.fn.executable('fd') == 1 and { 'fd', '-td' } or {
+      dir_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-td' } or {
         'find',
         '.',
         '-type',
