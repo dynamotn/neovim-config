@@ -47,7 +47,10 @@ return {
   { -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
     config = register_config('pretty_fold'),
-    requires = { 'anuvyklack/nvim-keymap-amend' },
+    requires = {
+      'anuvyklack/keymap-amend.nvim',
+      'anuvyklack/fold-preview.nvim',
+    },
   },
   { 'rcarriga/nvim-notify', config = register_config('notify') }, -- Notification
   { 'sunjon/Shade.nvim', config = register_config('shade') }, -- Dim inactive windows

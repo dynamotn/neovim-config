@@ -24,6 +24,6 @@ pretty_fold.setup({
     },
   },
 })
-require('pretty-fold.preview').setup({
+require('fold-preview').setup({
   border = 'rounded',
 })

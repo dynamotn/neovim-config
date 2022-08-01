@@ -4,11 +4,7 @@ if not present then
   return
 end
 
-dap_ui.setup({
-  sidebar = {
-    position = 'right',
-  },
-})
+dap_ui.setup({})
 
 local dap = require('dap')
 dap.listeners.after.event_initialized['dapui_config'] = function()
