@@ -1,4 +1,4 @@
 return {
-  { 'fish_indent', 'formatting' },
+  --[[ { 'fish_indent', 'formatting' }, ]]
   { 'fish', 'diagnostics' },
 }
