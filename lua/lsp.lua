@@ -1,13 +1,3 @@
-local present, lsp_installer = pcall(require, 'nvim-lsp-installer')
-
-if not present then
-  return
-end
-
-lsp_installer.setup({
-  automatic_installation = true,
-})
-
 local lspconfig = require('lspconfig')
 local languages = require('languages')
 local register_keymaps = require('plugins.register').register_keymaps

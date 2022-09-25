@@ -94,7 +94,6 @@ return {
   { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
   -- LSP {
   { 'neovim/nvim-lspconfig' }, -- Config for LSP server
-  { 'williamboman/nvim-lsp-installer', config = register_config('lsp_installer') }, -- Automatically ínstall language server
   { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources
   { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
   { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') },
@@ -157,5 +156,10 @@ return {
   ---------- Utility ---------- {
   { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
   DEBUG and { 'nvim-treesitter/playground', config = register_config('playground') } or nil,
+  {
+    'williamboman/mason-lspconfig.nvim', -- Automatically ínstall language server, linter, dap server
+    requires = { 'williamboman/mason.nvim' },
+    config = register_config('mason'),
+  },
   ----------------------------- }
 }
