@@ -11,6 +11,10 @@ local default_opts = {
     augroup.enable_codelens(client.id)
     augroup.enable_codeaction(client.id)
     augroup.enable_formatting(client.id)
+    local present, navic = pcall(require, 'nvim-navic')
+    if present then
+      navic.attach(client, buffer)
+    end
   end,
   on_exit = function(_, _)
     augroup.disable_highlight_document()

@@ -50,11 +50,11 @@ lualine.setup({
       },
       {
         function()
-          local present, gps = pcall(require, 'nvim-gps')
-          if not present or not gps.is_available() then
+          local present, navic = pcall(require, 'nvim-navic')
+          if not present or not navic.is_available() then
             return ''
           end
-          return gps.get_location()
+          return navic.get_location()
         end,
         color = { fg = '#6cbdc2' },
       },
