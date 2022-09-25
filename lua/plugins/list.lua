@@ -89,7 +89,6 @@ return {
   { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
   -- Complete source {
   { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
-  { 'github/copilot.vim' }, -- Github Copilot
   -- }
   { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
   { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
