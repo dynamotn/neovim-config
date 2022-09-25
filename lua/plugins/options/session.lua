@@ -6,7 +6,6 @@ end
 
 session.setup({
   autosave = true,
-  autoload = true,
   use_git_branch = true,
   telescope = {
     before_source = function()
