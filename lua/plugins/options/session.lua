@@ -12,10 +12,6 @@ session.setup({
       -- Close all open buffers
       pcall(vim.cmd, 'bufdo bwipeout')
     end,
-    after_source = function(_)
-      -- Change the git branch
-      pcall(vim.cmd, 'git checkout ' .. session.branch)
-    end,
   },
 })
 
