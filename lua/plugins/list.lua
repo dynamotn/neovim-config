@@ -53,7 +53,6 @@ return {
     },
   },
   { 'rcarriga/nvim-notify', config = register_config('notify') }, -- Notification
-  { 'sunjon/Shade.nvim', config = register_config('shade') }, -- Dim inactive windows
   --------------- }
   ----------------------------- }
 
