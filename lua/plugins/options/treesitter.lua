@@ -13,7 +13,7 @@ local present, languages = pcall(require, 'languages')
 local parsers = DEBUG and { 'query' } or {}
 
 if present then
-  parsers, _ = languages.setup_treesitter(parser_config)
+  parsers = languages.setup_treesitter(parser_config)
 end
 
 treesitter.setup({

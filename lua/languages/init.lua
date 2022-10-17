@@ -43,27 +43,25 @@ M.setup_ls = function()
 end
 
 M.setup_treesitter = function(parser_config)
-  local parsers, gps_configs = {}, {}
+  local parsers = {}, {}
 
   for language, filetypes in pairs(languages) do
     local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
-    local parser, gps_config
+    local parser
 
     if not ok or type(treesitter) ~= 'table' then
       parser = language
     else
       parser = treesitter.parser
-      gps_config = treesitter.gps_config or {}
     end
 
     table.insert(parsers, parser)
-    table.insert(gps_configs, gps_config)
 
     for _, ft in pairs(filetypes) do
       parser_config[ft] = parser
     end
   end
-  return parsers, gps_configs
+  return parsers
 end
 
 M.setup_dap = function()
@@ -97,13 +95,8 @@ M.setup_null_ls = function()
           source.with_config = source.with_config or {}
           table.insert(source.with_config, { filetypes = filetypes })
 
-          local tool = dynamo_nullls_tool(
-            source[1],
-            source[2],
-            source.is_external_tool,
-            source.is_custom_tool,
-            source.with_config
-          )
+          local tool =
+            dynamo_nullls_tool(source[1], source[2], source.is_external_tool, source.is_custom_tool, source.with_config)
           if tool then
             table.insert(result, tool)
           end
