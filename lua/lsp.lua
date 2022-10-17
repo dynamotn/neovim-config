@@ -25,8 +25,10 @@ local default_opts = {
 }
 
 local configs = languages.setup_ls()
+local lsp_servers = {}
 for server_name, config in pairs(configs) do
   if lspconfig[server_name] then
+    table.insert(lsp_servers, server_name)
     local opts = config.setup(default_opts)
     opts.filetypes = config.filetypes
 
@@ -37,4 +39,12 @@ for server_name, config in pairs(configs) do
       lspconfig[server_name].setup(opts)
     end
   end
+end
+
+local present, mason_lsp_config = pcall(require, 'mason-lspconfig')
+
+if present then
+  mason_lsp_config.setup({
+    ensure_installed = lsp_servers,
+  })
 end
