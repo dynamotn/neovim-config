@@ -93,7 +93,9 @@ return {
   { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
   -- LSP {
   { 'neovim/nvim-lspconfig' }, -- Config for LSP server
-  { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources
+  { 'williamboman/mason-lspconfig.nvim', config = register_config('mason_lsp'), after = 'mason.nvim' }, -- LSP server manager
+  { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources (linter and formatter)
+  { 'jayp0521/mason-null-ls.nvim', config = register_config('mason_null_ls'), after = 'mason.nvim' }, -- Linter and Formatter manager
   { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
   { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') },
   ------ }
@@ -156,8 +158,7 @@ return {
   { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
   DEBUG and { 'nvim-treesitter/playground', config = register_config('playground') } or nil,
   {
-    'williamboman/mason-lspconfig.nvim', -- Automatically ínstall language server, linter, dap server
-    requires = { 'williamboman/mason.nvim' },
+    'williamboman/mason.nvim', -- Automatically ínstall language server, linter, dap server
     config = register_config('mason'),
   },
   ----------------------------- }
