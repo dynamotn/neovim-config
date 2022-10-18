@@ -42,7 +42,7 @@ M.setup_ls = function()
   return result
 end
 
-M.setup_treesitter = function(parser_config)
+M.setup_treesitter = function(ft_to_parser, parser_config)
   local parsers = {}, {}
 
   for language, filetypes in pairs(languages) do
@@ -53,12 +53,18 @@ M.setup_treesitter = function(parser_config)
       parser = language
     else
       parser = treesitter.parser
+
+      if type(treesitter.install_info) == 'table' then
+        parser_config[parser] = {
+          install_info = treesitter.install_info,
+        }
+      end
     end
 
     table.insert(parsers, parser)
 
     for _, ft in pairs(filetypes) do
-      parser_config[ft] = parser
+      ft_to_parser[ft] = parser
     end
   end
   return parsers

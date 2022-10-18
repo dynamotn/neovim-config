@@ -4,7 +4,8 @@ if not present then
   return
 end
 
-local parser_config = require('nvim-treesitter.parsers').filetype_to_parsername
+local ft_to_parser = require('nvim-treesitter.parsers').filetype_to_parsername
+local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
 
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
@@ -13,7 +14,7 @@ local present, languages = pcall(require, 'languages')
 local parsers = DEBUG and { 'query' } or {}
 
 if present then
-  parsers = languages.setup_treesitter(parser_config)
+  parsers = languages.setup_treesitter(ft_to_parser, parser_config)
 end
 
 treesitter.setup({
