@@ -17,6 +17,8 @@ if present then
   parsers = languages.setup_treesitter(ft_to_parser, parser_config)
 end
 
+table.insert(parsers, 'diff')
+
 treesitter.setup({
   highlight = {
     enable = true,
