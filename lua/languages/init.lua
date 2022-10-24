@@ -43,7 +43,7 @@ M.setup_ls = function()
 end
 
 M.setup_treesitter = function(ft_to_parser, parser_config)
-  local parsers = {}, {}
+  local parsers = {}
 
   for language, filetypes in pairs(languages) do
     local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
