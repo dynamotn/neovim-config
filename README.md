@@ -1,6 +1,6 @@
-# vim-config
+# neovim-config
 
-My customization configuration for vim/neovim
+My customization configuration for neovim
 
 [![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.7-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
