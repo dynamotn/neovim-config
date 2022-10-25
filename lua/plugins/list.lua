@@ -124,6 +124,7 @@ return {
   },
   { 'monaqa/dial.nvim', config = register_config('dial') }, -- Increment/decrement number, date...
   { 'ur4ltz/surround.nvim', config = register_config('surround') }, -- Change surround character
+  { 'johmsalas/text-case.nvim', config = register_config('textcase') }, -- Convert text case
   --------- }
   { 'ThePrimeagen/refactoring.nvim', config = register_config('refactoring'), after = 'nvim-treesitter' }, -- Refactoring library
   ----------------------------- }
