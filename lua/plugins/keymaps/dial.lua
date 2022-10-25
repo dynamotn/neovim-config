@@ -1,4 +1,4 @@
-local present, dial = pcall(require, 'dial')
+local present, dial = pcall(require, 'dial.config')
 
 if not present then
   return
