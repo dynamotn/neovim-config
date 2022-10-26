@@ -30,5 +30,9 @@ vim.g.firenvim_config = {
       prioirty = 9,
       takeover = 'never',
     },
+    [ [[.*web\.telegram\.org.*]] ] = {
+      prioirty = 9,
+      takeover = 'never',
+    },
   },
 }
