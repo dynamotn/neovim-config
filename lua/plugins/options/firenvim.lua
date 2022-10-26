@@ -23,15 +23,19 @@ vim.g.firenvim_config = {
       takeover = 'never',
     },
     [ [[.*docs\.google\.com.*]] ] = {
-      prioirty = 9,
+      priority = 9,
       takeover = 'never',
     },
     [ [[.*mail\.google\.com.*]] ] = {
-      prioirty = 9,
+      priority = 9,
       takeover = 'never',
     },
     [ [[.*web\.telegram\.org.*]] ] = {
-      prioirty = 9,
+      priority = 9,
+      takeover = 'never',
+    },
+    [ [[.*jira\..*]] ] = {
+      priority = 9,
       takeover = 'never',
     },
   },

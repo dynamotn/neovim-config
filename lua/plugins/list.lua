@@ -140,7 +140,7 @@ return {
     run = function()
       vim.fn['firenvim#install'](0)
     end,
-    config = register_config('firefox'),
+    config = register_config('firenvim'),
   },
   { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
   { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
