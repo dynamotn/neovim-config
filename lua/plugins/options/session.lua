@@ -13,6 +13,7 @@ session.setup({
       pcall(vim.cmd, 'bufdo bwipeout')
     end,
   },
+  branch_separator = '@@',
 })
 
 local present, telescope = pcall(require, 'telescope')
