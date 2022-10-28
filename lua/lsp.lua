@@ -12,7 +12,7 @@ local default_opts = {
     augroup.enable_codeaction(client.id)
     augroup.enable_formatting(client.id)
     local present, navic = pcall(require, 'nvim-navic')
-    if present and client.server_capabilities.documentSymbolsProvider then
+    if present and client.server_capabilities.documentSymbolProvider then
       navic.attach(client, buffer)
     end
   end,
