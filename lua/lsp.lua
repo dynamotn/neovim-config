@@ -5,6 +5,11 @@ local augroup = require('misc.augroup')
 
 local default_opts = {
   autostart = true,
+  capabilities = function()
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
+    return capabilities
+  end,
   on_attach = function(client, buffer)
     register_keymaps('lsp', buffer)
     augroup.enable_highlight_document(client.id)

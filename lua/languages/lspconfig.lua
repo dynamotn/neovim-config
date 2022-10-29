@@ -46,28 +46,4 @@ M.yamlls = function(default_opts)
   return opts
 end
 
-M.emmet_ls = function(default_opts)
-  local opts = default_opts
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  opts.capabilities = capabilities
-  return opts
-end
-
-M.html = function(default_opts)
-  local opts = default_opts
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  opts.capabilities = capabilities
-  return opts
-end
-
-M.jsonls = function(default_opts)
-  local opts = default_opts
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  opts.capabilities = capabilities
-  return opts
-end
-
 return M
