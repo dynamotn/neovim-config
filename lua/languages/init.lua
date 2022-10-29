@@ -20,6 +20,17 @@ M.setup_autopairs = function(rule, cond)
   return result
 end
 
+M.setup_dial = function(augend)
+  local result = {}
+  for language, _ in pairs(languages) do
+    local ok, dial = pcall(require, 'languages.' .. language .. '.dial')
+    if ok and type(dial) == 'function' then
+      result[language] = dial(augend)
+    end
+  end
+  return result
+end
+
 M.setup_ls = function()
   local result = {}
   for language, filetypes in pairs(languages) do
@@ -156,6 +167,16 @@ M.get_plugins = function()
   end
 
   return result
+end
+
+M.get_language_from_filetype = function(filetype)
+  for language, filetypes in pairs(languages) do
+    for _, ft in ipairs(filetypes) do
+      if filetype == ft then
+        return language
+      end
+    end
+  end
 end
 
 return M

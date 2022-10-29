@@ -163,4 +163,24 @@ _G.dynamo_nullls_tool = function(name, method, is_external_tool, is_custom_tool,
   end
 end
 ------------------------------ }
--- }
+
+-- Get dial group from buffer filetype {
+_G.dynamo_dial_group = function()
+  local present, dial = pcall(require, 'dial.config')
+  if not present then
+    return 'default'
+  end
+  local language = require('languages').get_language_from_filetype(vim.bo.filetype)
+
+  if dial.augends:get(language) then
+    return language
+  end
+  return 'default'
+end
+------------------------------- }
+
+-- Global command sequence when mapping key {
+_G.dynamo_cmdcr = function(body)
+  return '<cmd>' .. body .. '<CR>'
+end
+------------------------------------------- }
