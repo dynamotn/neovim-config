@@ -1,3 +1,3 @@
 return {
-  ['<Space>pt'] = { '<cmd>TodoTrouble<CR>', 'Show TODO' },
+  ['<Space>pt'] = { dynamo_cmdcr('TodoTrouble'), 'Show TODO' },
 }

@@ -1,3 +1,3 @@
 return {
-  ['<Space>gs'] = { '<cmd>Neogit<CR>', 'Show Neogit' },
+  ['<Space>gs'] = { dynamo_cmdcr('Neogit'), 'Show Neogit' },
 }

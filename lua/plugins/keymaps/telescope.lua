@@ -1,6 +1,6 @@
 return {
-  ['<Space>fg'] = { '<cmd>Telescope live_grep<CR>', 'Grep file' },
-  ['<Space>fq'] = { '<cmd>Telescope find_files<CR>', 'Find file' },
+  ['<Space>fg'] = { dynamo_cmdcr('Telescope live_grep'), 'Grep file' },
+  ['<Space>fq'] = { dynamo_cmdcr('Telescope find_files'), 'Find file' },
 
-  ['<Space>bq'] = { '<cmd>Telescope buffers<CR>', 'Find buffers' },
+  ['<Space>bq'] = { dynamo_cmdcr('Telescope buffers'), 'Find buffers' },
 }

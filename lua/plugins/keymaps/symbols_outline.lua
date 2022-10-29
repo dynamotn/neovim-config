@@ -1,4 +1,4 @@
 return {
-  ['<F2>'] = { '<cmd>SymbolsOutline<CR>', 'Show outline' },
-  ['<Space>ls'] = { '<cmd>SymbolsOutline<CR>', 'Show outline' },
+  ['<F2>'] = { dynamo_cmdcr('SymbolsOutline'), 'Show outline' },
+  ['<Space>ls'] = { dynamo_cmdcr('SymbolsOutline'), 'Show outline' },
 }

@@ -5,8 +5,8 @@ return {
 
   -- E key
   ['<Space>e'] = { name = 'Diagnostic / Error' },
-  ['<Space>en'] = { '<cmd>lua vim.diagnostic.goto_next()<CR>', 'Next diagnostic' },
-  ['<Space>ep'] = { '<cmd>lua vim.diagnostic.goto_prev()<CR>', 'Previous diagnostic' },
+  ['<Space>en'] = { dynamo_cmdcr('lua vim.diagnostic.goto_next()'), 'Next diagnostic' },
+  ['<Space>ep'] = { dynamo_cmdcr('lua vim.diagnostic.goto_prev()'), 'Previous diagnostic' },
 
   ['<Space>f'] = { name = 'File' },
 
@@ -21,24 +21,24 @@ return {
 
   -- T key
   ['<Space>t'] = { name = 'Tab' },
-  ['<Space>tn'] = { '<cmd>tabnew<CR>', 'Create new tab' },
-  ['<Space>to'] = { '<cmd>tabonly<CR>', 'Close other tabs' },
-  ['<Space>tc'] = { '<cmd>tabclose<CR>', 'Close tab' },
-  ['<Space>th'] = { '<cmd>tabprevious<CR>', 'Previous tab' },
-  ['<Space>tl'] = { '<cmd>tabnext<CR>', 'Next tab' },
+  ['<Space>tn'] = { dynamo_cmdcr('tabnew'), 'Create new tab' },
+  ['<Space>to'] = { dynamo_cmdcr('tabonly'), 'Close other tabs' },
+  ['<Space>tc'] = { dynamo_cmdcr('tabclose'), 'Close tab' },
+  ['<Space>th'] = { dynamo_cmdcr('tabprevious'), 'Previous tab' },
+  ['<Space>tl'] = { dynamo_cmdcr('tabnext'), 'Next tab' },
   ['<Space>te'] = { [[:tabedit <C-r>=expand('%:p:h')<CR>/<CR>]], 'Create new tab in directory of current file' },
 
   -- W key
   ['<Space>w'] = { name = 'Window' },
-  ['<Space>w2'] = { '<cmd>silent only | vs | wincmd w<CR>', 'Layout 2 columns' },
-  ['<Space>w3'] = { '<cmd>silent only | vs | vs | wincmd H<CR>', 'Layout 3 columns' },
-  ['<Space>w='] = { '<cmd>wincmd =<CR>', 'Balance windows' },
+  ['<Space>w2'] = { dynamo_cmdcr('silent only | vs | wincmd w'), 'Layout 2 columns' },
+  ['<Space>w3'] = { dynamo_cmdcr('silent only | vs | vs | wincmd H'), 'Layout 3 columns' },
+  ['<Space>w='] = { dynamo_cmdcr('wincmd ='), 'Balance windows' },
 
   -- X key
   ['<Space>x'] = { name = 'Text manipulation' },
   ['<Space>xs'] = { name = 'Spacing' },
-  ['<Space>xsj'] = { '<cmd>put =repeat(nr2char(10), v:count1)<CR>', 'Insert empty line after one line' },
-  ['<Space>xsk'] = { '<cmd>put! =repeat(nr2char(10), v:count1)<CR>', 'Insert empty line before one line' },
+  ['<Space>xsj'] = { dynamo_cmdcr('put =repeat(nr2char(10), v:count1)'), 'Insert empty line after one line' },
+  ['<Space>xsk'] = { dynamo_cmdcr('put! =repeat(nr2char(10), v:count1)'), 'Insert empty line before one line' },
   ['<Space>xf'] = { name = 'Manipulation with file' },
   ['<Space>xfn'] = { [[i<C-r>=expand('%:t:n')<CR>]], 'Insert name of file' },
   ['<Space>xfb'] = { [[i<C-r>=expand('%:t:r')<CR>]], 'Insert basename of file' },

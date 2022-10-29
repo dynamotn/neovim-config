@@ -1,3 +1,3 @@
 return {
-  ['<Space>bj'] = { [[<cmd>BufferLinePick<CR>]], 'Pick to jump' },
+  ['<Space>bj'] = { dynamo_cmdcr('BufferLinePick'), 'Pick to jump' },
 }
