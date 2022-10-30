@@ -20,6 +20,11 @@ local default_opts = {
     if present and client.server_capabilities.documentSymbolProvider then
       navic.attach(client, buffer)
     end
+
+    local present, colorizer = pcall(require, 'colorizer')
+    if present then
+      colorizer.attach_to_buffer(buffer)
+    end
   end,
   on_exit = function(_, _)
     augroup.disable_highlight_document()
