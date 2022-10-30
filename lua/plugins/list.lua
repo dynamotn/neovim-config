@@ -43,6 +43,7 @@ return {
   { 'SmiteshP/nvim-navic', config = register_config('navic') }, -- Component to show context of current position
   { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
   { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
+  { 'j-hui/fidget.nvim', config = register_config('fidget') }, -- Show LSP progress
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
   { -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
