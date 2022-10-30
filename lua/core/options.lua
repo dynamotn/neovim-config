@@ -50,7 +50,7 @@ opt.fileformat = 'unix'
 
 -- Accept modeline of each file
 opt.modeline = true
-opt.modelines = 1
+opt.modelines = 2
 
 -- Not save backup
 opt.backup = false
