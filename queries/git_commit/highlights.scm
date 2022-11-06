@@ -3,10 +3,10 @@
 (item) @constant
 (header) @attribute
 (comment) @comment
-(change kind: "new file") @keyword
+(change kind: "new file") @text.diff.add
 (change kind: "modified") @keyword
-(change kind: "deleted") @keyword
-(change kind: "renamed") @keyword
+(change kind: "deleted") @text.diff.delete
+(change kind: "renamed") @attribute
 (path) @function
 [
   (branch)

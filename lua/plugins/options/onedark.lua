@@ -37,10 +37,10 @@ onedark.setup({
     dark_red = '#e31a1c',
     dark_yellow = '#dca060',
     dark_purple = '#897fc5',
-    diff_add = '#303d27',
-    diff_delete = '#3c2729',
-    diff_change = '#18344c',
-    diff_text = '#265478',
+  },
+  highlights = {
+    ['@text.diff.add'] = { fg = '$green' },
+    ['@text.diff.delete'] = { fg = '$dark_red' },
   },
 })
 
