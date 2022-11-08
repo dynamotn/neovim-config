@@ -93,7 +93,7 @@ return {
   { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
   { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
   -- LSP {
-  { 'neovim/nvim-lspconfig' }, -- Config for LSP server
+  { 'neovim/nvim-lspconfig', config = register_config('lsp') }, -- Config for LSP server
   { 'williamboman/mason-lspconfig.nvim', config = register_config('mason_lsp'), after = 'mason.nvim' }, -- LSP server manager
   { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources (linter and formatter)
   { 'jayp0521/mason-null-ls.nvim', config = register_config('mason_null_ls'), after = 'mason.nvim' }, -- Linter and Formatter manager
