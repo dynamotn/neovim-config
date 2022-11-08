@@ -1,5 +1,6 @@
 local languages = require('languages.list')
 local lspconfig = require('languages.lspconfig')
+local dapconfig = require('languages.dapconfig')
 
 local M = {}
 
@@ -82,22 +83,36 @@ M.setup_treesitter = function(ft_to_parser, parser_config)
 end
 
 M.setup_dap = function()
-  local adapters_result, debugees_result = {}, {}
+  local result = {}
 
   for language, filetypes in pairs(languages) do
-    local ok, dap_config = pcall(require, 'languages.' .. language .. '.dap')
+    local ok, server_names = pcall(require, 'languages.' .. language .. '.dap')
 
-    if ok then
-      for _, ft in pairs(filetypes) do
-        for name, adapter in pairs(dap_config.adapters) do
-          adapters_result[name] = adapter
+    if ok and type(server_names) == 'table' then
+      for _, server_name in ipairs(server_names) do
+        if not result[server_name] then
+          local adapter, configurations, mason_install = {}, {}, false
+
+          if dapconfig[server_name] then
+            adapter = dapconfig[server_name].adapter or {}
+            configurations = dapconfig[server_name].configurations or {}
+            mason_install = dapconfig[server_name].mason_install or false
+          end
+
+          result[server_name] = {
+            adapter = adapter,
+            configurations = configurations,
+            mason_install = mason_install,
+            filetypes = vim.deepcopy(filetypes),
+          }
+        else
+          vim.list_extend(result[server_name].filetypes, filetypes)
         end
-        debugees_result[ft] = dap_config.debugees
       end
     end
   end
 
-  return adapters_result, debugees_result
+  return result
 end
 
 M.setup_null_ls = function()

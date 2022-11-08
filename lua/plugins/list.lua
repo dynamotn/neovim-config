@@ -132,6 +132,7 @@ return {
 
   ---- Debug / Test / Run ----- {
   { 'mfussenegger/nvim-dap', config = register_config('dap') }, -- Debug Adapter implementation
+  { 'jayp0521/mason-nvim-dap.nvim', config = register_config('mason_dap'), after = { 'mason.nvim', 'nvim-dap' } }, -- DAP manager
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   ----------------------------- }
 

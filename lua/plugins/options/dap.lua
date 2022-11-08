@@ -4,11 +4,12 @@ if not present then
   return
 end
 
-local present, languages = pcall(require, 'languages')
+local configs = require('languages').setup_dap()
 
-if present then
-  local adapters, debugees = languages.setup_dap()
+for server_name, config in pairs(configs) do
+  dap.adapters[server_name] = config.adapter
 
-  dap.adapters = adapters
-  dap.configurations = debugees
+  for filetype in pairs(configs.filetypes) do
+    dap.configurations[filetype] = config.configurations
+  end
 end
