@@ -73,6 +73,9 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Terraform
 * Terragrunt
 
+#### Other
+* CSV
+
 ## Installation
 
 * Clone this repository to ~/.config/nvim.
