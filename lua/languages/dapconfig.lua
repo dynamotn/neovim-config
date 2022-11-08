@@ -40,4 +40,30 @@ M.bash = {
     },
   },
 }
+
+M.lldb = {
+  mason_install = true,
+  adapter = {
+    type = 'server',
+    host = '127.0.0.1',
+    port = '${port}',
+    executable = {
+      command = 'codelldb',
+      args = { '--port', '${port}' },
+    },
+  },
+  configurations = {
+    {
+      name = 'Launch file',
+      type = 'lldb',
+      request = 'launch',
+      program = function()
+        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+      end,
+      cwd = '${workspaceFolder}',
+      stopOnEntry = true,
+    },
+  },
+}
+
 return M
