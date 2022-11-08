@@ -191,4 +191,57 @@ M.delve = {
   },
 }
 
+M.python = {
+  mason_install = true,
+  adapter = function(callback, config)
+    if config.request == 'attach' then
+      local port = (config.connect or config).port
+      callback({
+        type = 'server',
+        port = assert(port, '`connect.port` is required for a python `attach` configuration'),
+        host = (config.connect or config).host or '127.0.0.1',
+      })
+    else
+      callback({
+        type = 'executable',
+        command = 'python',
+        args = { '-m', 'debugpy.adapter' },
+      })
+    end
+  end,
+  configurations = {
+    {
+      type = 'python',
+      request = 'launch',
+      name = 'Launch file',
+      program = '${file}',
+      args = function()
+        local args_string = vim.fn.input('Arguments: ')
+        return vim.split(args_string, ' +')
+      end,
+    },
+    {
+      type = 'python',
+      request = 'attach',
+      name = 'Attach remote',
+      connect = function()
+        local host = vim.fn.input('Host [127.0.0.1]: ')
+        host = host ~= '' and host or '127.0.0.1'
+        local port = tonumber(vim.fn.input('Port [5678]: ')) or 5678
+        return { host = host, port = port }
+      end,
+    },
+    {
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Run doctests in file',
+        module = 'doctest',
+        args = { '${file}' },
+        noDebug = true,
+      },
+    },
+  },
+}
+
 return M
