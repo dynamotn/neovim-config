@@ -38,5 +38,13 @@ vim.g.firenvim_config = {
       priority = 9,
       takeover = 'never',
     },
+    [ [[.*chat\..*]] ] = {
+      priority = 9,
+      takeover = 'never',
+    },
+    [ [[.*cloudflare\..*]] ] = {
+      priority = 9,
+      takeover = 'never',
+    },
   },
 }
