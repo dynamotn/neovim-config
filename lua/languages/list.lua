@@ -37,6 +37,7 @@ return {
 
   -- Tools {
   ansible = { 'ansible' },
+  csv = { 'csv' },
   dockerfile = { 'dockerfile' },
   gitcommit = { 'gitcommit' },
   nix = { 'nix' },
