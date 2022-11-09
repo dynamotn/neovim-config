@@ -44,6 +44,7 @@ return {
   { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
   { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
   { 'j-hui/fidget.nvim', config = register_config('fidget') }, -- Show LSP progress
+  { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
   { -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
@@ -133,7 +134,6 @@ return {
   ---- Debug / Test / Run ----- {
   { 'mfussenegger/nvim-dap', config = register_config('dap') }, -- Debug Adapter implementation
   { 'jayp0521/mason-nvim-dap.nvim', config = register_config('mason_dap'), after = { 'mason.nvim', 'nvim-dap' } }, -- DAP manager
-  { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   ----------------------------- }
 
   -------- Integration -------- {
