@@ -1,5 +1,24 @@
 local M = {}
 
+local input_args = function()
+  local co = coroutine.running()
+  if co then
+    return coroutine.create(function()
+      local args = {}
+      vim.ui.input({ prompt = 'Args: ' }, function(input)
+        args = vim.split(input or '', ' ')
+      end)
+      coroutine.resume(co, args)
+    end)
+  else
+    local args = {}
+    vim.ui.input({ prompt = 'Args: ' }, function(input)
+      args = vim.split(input or '', ' ')
+    end)
+    return args
+  end
+end
+
 M.neovim = {
   mason_install = false,
   adapter = function(callback, config)
@@ -26,7 +45,7 @@ M.bash = {
     {
       type = 'bash',
       request = 'launch',
-      name = 'Bash: Launch file',
+      name = 'Launch file',
       program = '${file}',
       cwd = '${fileDirname}',
       pathBashdb = BASHDB_DIR .. '/bashdb',
@@ -36,7 +55,7 @@ M.bash = {
       pathMkfifo = 'mkfifo',
       pathPkill = 'pkill',
       env = {},
-      args = {},
+      args = input_args,
     },
   },
 }
@@ -136,24 +155,7 @@ M.delve = {
       name = 'Debug (Arguments)',
       request = 'launch',
       program = '${file}',
-      args = function()
-        local co = coroutine.running()
-        if co then
-          return coroutine.create(function()
-            local args = {}
-            vim.ui.input({ prompt = 'Args: ' }, function(input)
-              args = vim.split(input or '', ' ')
-            end)
-            coroutine.resume(co, args)
-          end)
-        else
-          local args = {}
-          vim.ui.input({ prompt = 'Args: ' }, function(input)
-            args = vim.split(input or '', ' ')
-          end)
-          return args
-        end
-      end,
+      args = input_args,
     },
     {
       type = 'lldb',
