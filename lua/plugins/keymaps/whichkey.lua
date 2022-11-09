@@ -1,10 +1,18 @@
 return {
   -- Space key {
   ['<Space>'] = { name = 'Dynamo Trigger' },
-  ['<Space>b'] = { name = 'Buffer' },
+
+  -- B key
+  ['<Space>b'] = { name = 'Buffer & Tab' },
+  ['<Space>bn'] = { dynamo_cmdcr('tabnew'), 'Create new tab' },
+  ['<Space>bo'] = { dynamo_cmdcr('tabonly'), 'Close other tabs' },
+  ['<Space>bc'] = { dynamo_cmdcr('tabclose'), 'Close tab' },
+  ['<Space>bh'] = { dynamo_cmdcr('tabprevious'), 'Previous tab' },
+  ['<Space>bl'] = { dynamo_cmdcr('tabnext'), 'Next tab' },
+  ['<Space>be'] = { [[:tabedit <C-r>=expand('%:p:h')<CR>/<CR>]], 'Create new tab in directory of current file' },
 
   -- E key
-  ['<Space>e'] = { name = 'Diagnostic / Error' },
+  ['<Space>e'] = { name = 'Error / Diagnostic / Quickfix' },
   ['<Space>en'] = { dynamo_cmdcr('lua vim.diagnostic.goto_next()'), 'Next diagnostic' },
   ['<Space>ep'] = { dynamo_cmdcr('lua vim.diagnostic.goto_prev()'), 'Previous diagnostic' },
 
@@ -14,19 +22,9 @@ return {
   ['<Space>g'] = { name = 'Git' },
   ['<Space>gc'] = { '/\v^[<|=>]{7}( .*|$ )<CR>', 'Show conflict' },
 
+  ['<Space>l'] = { name = 'Language tool' },
   ['<Space>p'] = { name = 'Project' },
   ['<Space>s'] = { name = 'Session' },
-  ['<Space>l'] = { name = 'Language tool' },
-  ['<Space>q'] = { name = 'Debug / Quick fix / Test' },
-
-  -- T key
-  ['<Space>t'] = { name = 'Tab' },
-  ['<Space>tn'] = { dynamo_cmdcr('tabnew'), 'Create new tab' },
-  ['<Space>to'] = { dynamo_cmdcr('tabonly'), 'Close other tabs' },
-  ['<Space>tc'] = { dynamo_cmdcr('tabclose'), 'Close tab' },
-  ['<Space>th'] = { dynamo_cmdcr('tabprevious'), 'Previous tab' },
-  ['<Space>tl'] = { dynamo_cmdcr('tabnext'), 'Next tab' },
-  ['<Space>te'] = { [[:tabedit <C-r>=expand('%:p:h')<CR>/<CR>]], 'Create new tab in directory of current file' },
 
   -- W key
   ['<Space>w'] = { name = 'Window' },
@@ -50,5 +48,11 @@ return {
 
   -- Leader key {
   ['<leader>'] = { name = 'Secondary Trigger' },
+
+  -- D key
+  ['<leader>d'] = { name = 'Debug' },
+
+  -- T key
+  ['<leader>t'] = { name = 'Test' },
   ------------- }
 }
