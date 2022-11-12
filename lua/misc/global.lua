@@ -184,3 +184,7 @@ _G.dynamo_cmdcr = function(body)
   return '<cmd>' .. body .. '<CR>'
 end
 ------------------------------------------- }
+
+-- Whichkey mapping for filetypes {
+_G.dynamo_whichkey = {}
+-- }

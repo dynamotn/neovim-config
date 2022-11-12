@@ -174,7 +174,7 @@ M.get_plugins = function()
     local ok, plugins = pcall(require, 'languages.' .. language .. '.plugins')
 
     if ok then
-      for _, plugin in ipairs(plugins(register_config)) do
+      for _, plugin in ipairs(plugins(register_config, filetypes)) do
         plugin['ft'] = filetypes
         table.insert(result, plugin)
       end
