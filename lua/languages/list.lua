@@ -13,6 +13,7 @@ return {
   fish = { 'fish' },
   go = { 'go' },
   html = { 'html' },
+  http = { 'http' },
   javascript = {
     'javascript',
     'typescript',

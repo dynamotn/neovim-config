@@ -50,6 +50,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * Fish
 * Go
 * HTML
+* HTTP
 * Javascript
 * JSON
 * LESS
