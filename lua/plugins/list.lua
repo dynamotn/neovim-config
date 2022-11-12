@@ -157,6 +157,7 @@ return {
     },
   },
   { 'potamides/pantran.nvim', config = register_config('pantran') }, -- Translate
+  { 'ofirgall/open.nvim', config = register_config('open') }, -- Open current word by other tools
   --------------- }
   ----------------------------- }
 
