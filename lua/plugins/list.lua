@@ -42,6 +42,8 @@ return {
   { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
   { 'SmiteshP/nvim-navic', config = register_config('navic') }, -- Component to show context of current position
   { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
+  { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
+  { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') }, -- UI view for Symbols
   { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
   { 'j-hui/fidget.nvim', config = register_config('fidget') }, -- Show LSP progress
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
@@ -98,8 +100,6 @@ return {
   { 'williamboman/mason-lspconfig.nvim', config = register_config('mason_lsp'), after = 'mason.nvim' }, -- LSP server manager
   { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources (linter and formatter)
   { 'jayp0521/mason-null-ls.nvim', config = register_config('mason_null_ls'), after = 'mason.nvim' }, -- Linter and Formatter manager
-  { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
-  { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') },
   ------ }
   { -- TreeSitter
     'nvim-treesitter/nvim-treesitter',
