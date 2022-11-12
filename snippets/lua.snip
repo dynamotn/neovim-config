@@ -2,11 +2,11 @@ snippet plugin
   local present, ${2:name} = pcall(require, '${1:plugin}')
 
   if not present then
-      return
+    return
   end
 
   ${2:name}.setup({
-      ${3:config...}
+    ${3:config...}
   })
 
 snippet vdebug
