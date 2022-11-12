@@ -156,6 +156,7 @@ return {
       { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }, -- Increase performance with fzf (native port from Go to C)
     },
   },
+  { 'potamides/pantran.nvim', config = register_config('pantran') }, -- Translate
   --------------- }
   ----------------------------- }
 
