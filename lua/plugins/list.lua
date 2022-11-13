@@ -36,6 +36,7 @@ return {
   --------------------------- }
 
   -- Miscellaneous {
+  { 'stevearc/dressing.nvim', config = register_config('dressing') }, -- Improve vim.ui.select and vim.ui.input
   { 'kyazdani42/nvim-web-devicons', config = register_config('icon') }, -- Programming icons
   { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
   { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
