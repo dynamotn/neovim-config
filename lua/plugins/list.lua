@@ -85,11 +85,16 @@ return {
   { 'ethanholz/nvim-lastplace', config = register_config('lastplace') }, -- Save the last edit position
   -- Comment {
   { 'numToStr/Comment.nvim', config = register_config('comment') }, -- Commenting
-  {
+  { -- Comment based on cursor location
     'JoosepAlviste/nvim-ts-context-commentstring',
     after = { 'nvim-treesitter', 'Comment.nvim' },
     config = register_config('context_comment'),
-  }, -- Comment based on cursor location
+  },
+  { -- Generate annotation
+    'danymat/neogen',
+    after = { 'nvim-treesitter' },
+    config = register_config('neogen'),
+  },
   ---------- }
   { -- Code complete engine
     'hrsh7th/nvim-cmp',
