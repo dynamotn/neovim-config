@@ -49,7 +49,7 @@ return {
   { 'j-hui/fidget.nvim', config = register_config('fidget') }, -- Show LSP progress
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
-  { 'kristijanhusak/vim-dadbod-ui' }, -- UI for dadbod
+  { 'kristijanhusak/vim-dadbod-ui', config = register_config('dadbod_ui') }, -- UI for dadbod
   { -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
     config = register_config('pretty_fold'),

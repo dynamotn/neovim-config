@@ -11,6 +11,8 @@ local special_filetypes = {
   dapui_stacks = 'Stacks',
   dapui_watches = 'Watches',
   ['dap-repl'] = 'REPL',
+  dbui = 'Database',
+  dbout = 'Query Result',
 }
 
 local extensions = function(filetype)
@@ -117,5 +119,7 @@ lualine.setup({
     extensions('dapui_stacks'),
     extensions('dapui_watches'),
     extensions('dap-repl'),
+    extensions('dbui'),
+    extensions('dbout'),
   },
 })
