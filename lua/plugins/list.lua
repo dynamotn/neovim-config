@@ -108,7 +108,14 @@ return {
       { 'uga-rosa/cmp-dynamic', config = register_config('cmp_dynamic') }, -- Dynamic completion source
     },
   },
-  { 'L3MON4D3/LuaSnip', config = register_config('luasnip') }, -- Snippet engine
+  { -- Snippet engine
+    'L3MON4D3/LuaSnip',
+    config = register_config('luasnip'),
+    requires = {
+      { 'rafamadriz/friendly-snippets' }, -- VSCode snippets
+      { 'honza/vim-snippets' }, -- Snipmate snippets
+    },
+  },
   { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
   -- LSP {
   { 'neovim/nvim-lspconfig', config = register_config('lsp') }, -- Config for LSP server
