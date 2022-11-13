@@ -96,6 +96,7 @@ cmp.setup({
 
             nvim_lua = '「NLUA」',
             neorg = '「ORG」',
+            fish = '「FISH」',
           },
           symbol_map = {
             File = ' ',
