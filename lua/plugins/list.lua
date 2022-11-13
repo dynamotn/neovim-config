@@ -49,6 +49,7 @@ return {
   { 'j-hui/fidget.nvim', config = register_config('fidget') }, -- Show LSP progress
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
+  { 'kristijanhusak/vim-dadbod-ui' }, -- UI for dadbod
   { -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
     config = register_config('pretty_fold'),
@@ -180,6 +181,7 @@ return {
   },
   { 'potamides/pantran.nvim', config = register_config('pantran') }, -- Translate
   { 'ofirgall/open.nvim', config = register_config('open') }, -- Open current word by other tools
+  { 'tpope/vim-dadbod' }, -- Interact with database
   --------------- }
   ----------------------------- }
 
