@@ -93,7 +93,7 @@ cmp.setup({
             treesitter = '「TS」',
 
             nvim_lua = '「NLUA」',
-            orgmode = '「ORG」',
+            neorg = '「ORG」',
           },
           symbol_map = {
             File = ' ',
