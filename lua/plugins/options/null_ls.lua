@@ -24,6 +24,9 @@ if present then
   if vim.fn.executable('ec') then
     table.insert(sources, null_ls.builtins.diagnostics.editorconfig_checker)
   end
+  if vim.fn.executable('vale') then
+    table.insert(sources, null_ls.builtins.diagnostics.vale)
+  end
 
   null_ls.setup({
     sources = sources,
