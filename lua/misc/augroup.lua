@@ -122,12 +122,4 @@ M.disable_formatting = function()
   M.delete_augroups('formatting_lsp')
 end
 
-M.enable_snippet_compiling = function()
-  M.create_augroups({
-    coq = {
-      { 'BufWritePost', '*.snip', 'COQsnips compile' },
-    },
-  })
-end
-
 return M
