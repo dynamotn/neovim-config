@@ -24,6 +24,7 @@ local cmp_default_sources = {
   { name = 'tmux', option = { all_panes = true } },
   { name = 'cmp_tabnine' },
   { name = 'treesitter' },
+  { name = 'dynamic' },
 }
 
 cmp.setup({
@@ -91,6 +92,7 @@ cmp.setup({
             cmp_tabnine = '「T9」',
             dap = '「DAP」',
             treesitter = '「TS」',
+            dynamic = '「ULT」',
 
             nvim_lua = '「NLUA」',
             neorg = '「ORG」',

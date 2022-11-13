@@ -104,6 +104,7 @@ return {
       { 'tzachar/cmp-tabnine', run = './install.sh' }, -- Tabnine completion source
       { 'rcarriga/cmp-dap' }, -- DAP completion source
       { 'ray-x/cmp-treesitter' }, -- Treesitter completion source
+      { 'uga-rosa/cmp-dynamic', config = register_config('cmp_dynamic') }, -- Dynamic completion source
     },
   },
   { 'L3MON4D3/LuaSnip', config = register_config('luasnip') }, -- Snippet engine
