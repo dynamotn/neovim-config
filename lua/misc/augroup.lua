@@ -47,6 +47,7 @@ M.load_default_augroups = function()
   M.create_augroups({
     sync_plugin_list = {
       { 'BufWritePost', config_path .. 'lua/plugins/list.lua', 'lua dynamo_reload_nvim_config(true)' },
+      { 'BufWritePost', config_path .. 'lua/languages/*/plugins.lua', 'lua dynamo_reload_nvim_config(true)' },
     },
     reload_nvim_config = {
       { 'User', 'PackerComplete', [[lua require('plugins')]] },
