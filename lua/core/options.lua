@@ -148,7 +148,7 @@ opt.wildignorecase = true
 --------------- }
 
 -- Edit mode {
-opt.completeopt = 'menu,menuone,preview'
+opt.completeopt = 'menu,menuone,noselect'
 -- Limit completion menu height
 opt.pumheight = 15
 ------------ }
