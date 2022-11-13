@@ -141,7 +141,10 @@ M.setup_null_ls = function()
 end
 
 M.get_tools_by_filetype = function(filetype)
-  local result = {}
+  local result = {
+    ec = true,
+    vale = true,
+  }
 
   for language, filetypes in pairs(languages) do
     for _, ft in pairs(filetypes) do
