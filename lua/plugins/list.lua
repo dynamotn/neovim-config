@@ -40,7 +40,7 @@ return {
   { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
   { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
   { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
-  { 'SmiteshP/nvim-navic', config = register_config('navic') }, -- Component to show context of current position
+  { 'utilyre/barbecue.nvim', config = register_config('barbecue'), requires = { 'SmiteshP/nvim-navic' } }, -- Winbar to show context of current position
   { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
   { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
   { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') }, -- UI view for Symbols

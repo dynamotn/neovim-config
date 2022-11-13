@@ -48,16 +48,6 @@ lualine.setup({
         'filename',
         path = 1, -- Relative path
       },
-      {
-        function()
-          local present, navic = pcall(require, 'nvim-navic')
-          if not present or not navic.is_available() then
-            return ''
-          end
-          return navic.get_location()
-        end,
-        color = { fg = '#6cbdc2' },
-      },
     },
     lualine_x = {
       {
