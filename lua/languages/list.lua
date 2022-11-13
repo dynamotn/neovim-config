@@ -33,6 +33,7 @@ return {
     'sass',
   },
   solidity = { 'solidity' },
+  sql = { 'sql', 'mysql', 'plsql' },
   yaml = { 'yaml' },
   ----------------------- }
 

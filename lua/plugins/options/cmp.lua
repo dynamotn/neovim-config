@@ -97,6 +97,7 @@ cmp.setup({
             nvim_lua = '「NLUA」',
             neorg = '「ORG」',
             fish = '「FISH」',
+            ['vim-dadbod-completion'] = '「DB」',
           },
           symbol_map = {
             File = ' ',
