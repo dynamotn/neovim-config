@@ -5,7 +5,7 @@ return function(register_config, filetypes)
       run = function()
         vim.fn['mkdp#util#install']()
       end,
-      config = register_config('markdown_preview', nil, filetypes),
+      config = register_config('markdown_preview', filetypes),
     },
   }
 end

@@ -6,19 +6,14 @@ local augroup = require('misc.augroup')
 local M = {}
 
 -- Register plugin config
-M.register_config = function(name, config_function, filetypes)
+M.register_config = function(name, filetypes)
   M.register_keymaps(name, nil, filetypes)
-  return M.register_options(name, config_function)
+  return M.register_options(name)
 end
 
 -- Load per-plugin options to setup plugin
-M.register_options = function(name, config_function)
-  local result = "pcall(require, 'plugins.options." .. name .. "')"
-  if type(config_function) == 'string' and config_function ~= '' then
-    result = result .. '.' .. config_function .. '()'
-  end
-
-  return result
+M.register_options = function(name)
+  return "pcall(require, 'plugins.options." .. name .. "')"
 end
 
 -- Load per-plugin keymaps by `whichkey` plugin

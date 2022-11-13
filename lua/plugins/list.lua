@@ -89,11 +89,24 @@ return {
     config = register_config('context_comment'),
   }, -- Comment based on cursor location
   ---------- }
-  { 'ms-jpq/coq_nvim', branch = 'coq', run = ':COQdeps', config = register_config('coq') }, -- Code complete engine
-  -- Complete source {
-  { 'ms-jpq/coq.thirdparty', branch = '3p', config = register_config('coq_3rd') }, -- Shell REPL, Mathematic, Nvim LUA
-  -- }
-  { 'ms-jpq/coq.artifacts', branch = 'artifacts' }, -- Snippet
+  { -- Code complete engine
+    'hrsh7th/nvim-cmp',
+    config = register_config('cmp'),
+    requires = {
+      { 'hrsh7th/cmp-nvim-lsp' }, -- LSP completion source
+      { 'onsails/lspkind.nvim' }, -- LSP completion pictograms
+      { 'saadparwaiz1/cmp_luasnip' }, -- Snippet completion source
+      { 'hrsh7th/cmp-buffer' }, -- Buffer completion source
+      { 'amarakon/nvim-cmp-buffer-lines' }, -- Buffer lines completion source
+      { 'hrsh7th/cmp-calc' }, -- Math calculation
+      { 'hrsh7th/cmp-path' }, -- Path completion source
+      { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
+      { 'tzachar/cmp-tabnine', run = './install.sh' }, -- Tabnine completion source
+      { 'rcarriga/cmp-dap' }, -- DAP completion source
+      { 'ray-x/cmp-treesitter' }, -- Treesitter completion source
+    },
+  },
+  { 'L3MON4D3/LuaSnip', config = register_config('luasnip') }, -- Snippet engine
   { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
   -- LSP {
   { 'neovim/nvim-lspconfig', config = register_config('lsp') }, -- Config for LSP server

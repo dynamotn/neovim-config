@@ -1,6 +1,5 @@
 local languages = require('languages.list')
 local lspconfig = require('languages.lspconfig')
-local dapconfig = require('languages.dapconfig')
 
 local M = {}
 
@@ -83,6 +82,7 @@ M.setup_treesitter = function(ft_to_parser, parser_config)
 end
 
 M.setup_dap = function()
+  local dapconfig = require('languages.dapconfig')
   local result = {}
 
   for language, filetypes in pairs(languages) do
@@ -164,6 +164,22 @@ M.get_tools_by_filetype = function(filetype)
       end
     end
   end
+end
+
+M.get_cmp_sources = function()
+  local result = {}
+
+  for language, filetypes in pairs(languages) do
+    local ok, cmp = pcall(require, 'languages.' .. language .. '.cmp')
+
+    if ok then
+      table.insert(result, {
+        sources = cmp,
+        filetypes = filetypes,
+      })
+    end
+  end
+  return result
 end
 
 M.get_plugins = function()

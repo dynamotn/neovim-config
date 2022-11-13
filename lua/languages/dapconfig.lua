@@ -33,8 +33,6 @@ M.neovim = {
   },
 }
 
-local BASHDB_DIR = require('mason-registry').get_package('bash-debug-adapter'):get_install_path()
-  .. '/extension/bashdb_dir'
 M.bash = {
   mason_install = true,
   adapter = {
@@ -48,8 +46,8 @@ M.bash = {
       name = 'Launch file',
       program = '${file}',
       cwd = '${fileDirname}',
-      pathBashdb = BASHDB_DIR .. '/bashdb',
-      pathBashdbLib = BASHDB_DIR,
+      pathBashdb = vim.fn.stdpath('data') .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
+      pathBashdbLib = vim.fn.stdpath('data') .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
       pathBash = 'bash',
       pathCat = 'cat',
       pathMkfifo = 'mkfifo',

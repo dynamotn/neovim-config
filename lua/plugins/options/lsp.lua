@@ -5,11 +5,6 @@ local augroup = require('misc.augroup')
 
 local default_opts = {
   autostart = true,
-  capabilities = function()
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument.completion.completionItem.snippetSupport = true
-    return capabilities
-  end,
   on_attach = function(client, buffer)
     register_keymaps('lsp', buffer)
     augroup.enable_highlight_document(client.id)
@@ -42,9 +37,14 @@ for server_name, config in pairs(configs) do
 
     local present, coq = pcall(require, 'coq')
     if present then
-      lspconfig[server_name].setup(coq.lsp_ensure_capabilities(opts))
-    else
-      lspconfig[server_name].setup(opts)
+      opts = coq.lsp_ensure_capabilities(opts)
     end
+
+    local present, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
+    if present then
+      opts.capabilities = cmp_nvim_lsp.default_capabilities(opts.capabilities)
+    end
+
+    lspconfig[server_name].setup(opts)
   end
 end
