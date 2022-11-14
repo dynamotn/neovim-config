@@ -65,7 +65,6 @@ return {
   --------- Navigation -------- {
   { -- File explorer
     'nvim-neo-tree/neo-tree.nvim',
-    opt = true,
     cmd = { 'Neotree' },
     config = register_config('neotree'),
     requires = {
