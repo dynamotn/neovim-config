@@ -76,10 +76,11 @@ return {
   { 'chentoast/marks.nvim', config = register_config('marks') }, -- Show mark and switch to mark
   ----------------------------- }
 
-  ------------- VCS ----------- {
+  ------ VCS and Project ------ {
   { 'TimUntersberger/neogit', config = register_config('neogit'), cmd = { 'Neogit' } }, -- Git TUI
   { 'sindrets/diffview.nvim', cmd = { 'DiffviewOpen', 'DiffviewFileHistory' } }, -- Diff view
   { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git decoration
+  { 'tpope/vim-projectionist' }, -- Granular project configuration
   ----------------------------- }
 
   ---------- Editing ---------- {

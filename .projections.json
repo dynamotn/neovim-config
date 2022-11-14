@@ -1,0 +1,46 @@
+{
+  "lua/plugins/list.lua": {
+    "type": "plugin"
+  },
+  "lua/plugins/options/*.lua": {
+    "type": "option",
+    "alternate": "lua/plugins/keymaps/{}.lua"
+  },
+  "lua/plugins/keymaps/*.lua": {
+    "type": "keymap",
+    "alternate": "lua/plugins/options/{}.lua"
+  },
+  "lua/languages/list.lua": {
+    "type": "lang"
+  },
+  "lua/languages/lspconfig.lua": {
+    "type": "lspconfig"
+  },
+  "lua/languages/dapconfig.lua": {
+    "type": "dapconfig"
+  },
+  "lua/languages/*/treesitter.lua": {
+    "type": "treesitter"
+  },
+  "lua/languages/*/lsp.lua": {
+    "type": "lsp"
+  },
+  "lua/languages/*/null_ls.lua": {
+    "type": "null_ls"
+  },
+  "lua/languages/*/dap.lua": {
+    "type": "dap"
+  },
+  "lua/languages/*/cmp.lua": {
+    "type": "cmp"
+  },
+  "lua/languages/*/autopairs.lua": {
+    "type": "autopairs"
+  },
+  "lua/languages/*/dial.lua": {
+    "type": "dial"
+  },
+  "lua/languages/*/plugins.lua": {
+    "type": "plugin_lang"
+  }
+}
