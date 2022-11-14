@@ -51,6 +51,7 @@ M.load_default_augroups = function()
     },
     reload_nvim_config = {
       { 'User', 'PackerComplete', [[lua require('plugins')]] },
+      { 'User', 'PackerComplete', 'UpdateRemotePlugins' },
     },
     quick_quit_manual = {
       { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
