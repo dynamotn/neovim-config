@@ -13,6 +13,7 @@ local special_filetypes = {
   ['dap-repl'] = 'REPL',
   dbui = 'Database',
   dbout = 'Query Result',
+  ['neo-tree'] = 'File Explorer',
 }
 
 local extensions = function(filetype)
@@ -112,7 +113,6 @@ lualine.setup({
   },
   extensions = {
     'quickfix',
-    'chadtree',
     extensions('Outline'),
     extensions('dapui_scopes'),
     extensions('dapui_breakpoints'),
@@ -121,5 +121,6 @@ lualine.setup({
     extensions('dap-repl'),
     extensions('dbui'),
     extensions('dbout'),
+    extensions('neo-tree'),
   },
 })

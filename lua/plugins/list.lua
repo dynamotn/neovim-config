@@ -64,12 +64,13 @@ return {
 
   --------- Navigation -------- {
   { -- File explorer
-    'ms-jpq/chadtree',
-    branch = 'chad',
+    'nvim-neo-tree/neo-tree.nvim',
     opt = true,
-    run = ':CHADdeps',
-    cmd = { 'CHADopen' },
-    config = register_config('chadtree'),
+    cmd = { 'Neotree' },
+    config = register_config('neotree'),
+    requires = {
+      { 'MunifTanjim/nui.nvim' },
+    },
   },
   { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
   { 'chentoast/marks.nvim', config = register_config('marks') }, -- Show mark and switch to mark

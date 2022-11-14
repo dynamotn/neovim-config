@@ -54,9 +54,17 @@ M.load_default_augroups = function()
     },
     quick_quit_manual = {
       { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
-    },
-    chadtree = {
-      { 'BufEnter', '*', "if &ft ==# 'CHADTree' | set winhighlight=Normal:NvimTreeNormal | endif" },
+      { 'StdinReadPre', '*', 'let s:std_in=1' },
+      {
+        'VimEnter',
+        '*',
+        [[if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'Neotree' | wincmd p | ene | exe 'cd '.argv()[0] | endif]],
+      },
+      {
+        'VimEnter',
+        '*',
+        [[if argc() == 0 && !exists('s:std_in') | exe 'Neotree' | endif]],
+      },
     },
   })
 end
