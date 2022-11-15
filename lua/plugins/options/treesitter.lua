@@ -18,6 +18,8 @@ if present then
 end
 
 table.insert(parsers, 'diff')
+table.insert(parsers, 'regex')
+table.insert(parsers, 'comment')
 
 treesitter.setup({
   highlight = {

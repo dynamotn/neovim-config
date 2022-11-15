@@ -42,5 +42,8 @@
   },
   "lua/languages/*/plugins.lua": {
     "type": "plugin_lang"
+  },
+  "after/queries/*.scm": {
+    "type": "tsquery"
   }
 }
