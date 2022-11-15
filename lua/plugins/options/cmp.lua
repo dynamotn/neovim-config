@@ -24,6 +24,7 @@ local cmp_default_sources = {
   { name = 'cmp_tabnine' },
   { name = 'treesitter' },
   { name = 'dynamic' },
+  { name = 'browser' },
 }
 
 cmp.setup({
@@ -92,7 +93,8 @@ cmp.setup({
             cmp_tabnine = '「T9」',
             dap = '「DAP」',
             treesitter = '「TS」',
-            dynamic = '「ULT」',
+            dynamic = '「DYNAMIC」',
+            browser = '「BROWSER」',
 
             nvim_lua = '「NLUA」',
             neorg = '「ORG」',

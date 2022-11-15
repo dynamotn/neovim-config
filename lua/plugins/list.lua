@@ -112,6 +112,7 @@ return {
       { 'rcarriga/cmp-dap' }, -- DAP completion source
       { 'ray-x/cmp-treesitter' }, -- Treesitter completion source
       { 'uga-rosa/cmp-dynamic', config = register_config('cmp_dynamic') }, -- Dynamic completion source
+      { 'wxxxcxx/cmp-browser-source', config = register_config('cmp_browser') }, -- Vivaldi completion source
     },
   },
   { -- Snippet engine
