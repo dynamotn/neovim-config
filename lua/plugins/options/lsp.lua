@@ -8,6 +8,7 @@ local default_opts = {
   on_attach = function(client, buffer)
     register_keymaps('lsp', buffer)
     augroup.enable_highlight_document(client.id)
+    augroup.enable_hover(client.id)
     augroup.enable_codelens(client.id)
     augroup.enable_codeaction(client.id)
     augroup.enable_formatting(client.id)
