@@ -9,6 +9,6 @@ return function(whichkey, bufnr)
   }, { buffer = bufnr })
 
   whichkey.register({
-    ['<Space>la'] = { dynamo_cmdcr('<C-u>Lspsaga range_code_action'), 'Code Action' },
+    ['<Space>la'] = { dynamo_cmdcr('Lspsaga range_code_action'), 'Code Action' },
   }, { buffer = bufnr, mode = 'v' })
 end
