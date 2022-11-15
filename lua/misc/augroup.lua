@@ -1,4 +1,3 @@
--- vim:foldmethod=marker:foldmarker={,}
 ---------------------------------------
 --      Automatic Group setting      --
 ---------------------------------------

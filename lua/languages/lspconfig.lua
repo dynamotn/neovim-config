@@ -46,4 +46,19 @@ M.yamlls = function(default_opts)
   return opts
 end
 
+M.sqls = function(default_opts)
+  local opts = vim.deepcopy(default_opts)
+
+  opts.on_attach = function(client, buffer)
+    default_opts.on_attach(client, buffer)
+
+    local present, sqls = pcall(require, 'sqls')
+    if present then
+      sqls.on_attach(client, buffer)
+    end
+  end
+
+  return opts
+end
+
 return M
