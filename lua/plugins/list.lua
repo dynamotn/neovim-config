@@ -193,7 +193,7 @@ return {
 
   ---------- Utility ---------- {
   { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
-  DEBUG and { 'nvim-treesitter/playground', config = register_config('playground') } or nil,
+  DEBUG and { 'nvim-treesitter/playground', config = register_config('playground'), after = 'nvim-treesitter' } or nil,
   {
     'williamboman/mason.nvim', -- Automatically ínstall language server, linter, dap server
     config = register_config('mason'),
