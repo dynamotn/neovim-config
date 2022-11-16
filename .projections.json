@@ -45,5 +45,8 @@
   },
   "after/queries/*.scm": {
     "type": "tsquery"
+  },
+  "snippets/*.snippets": {
+    "type": "snippet"
   }
 }

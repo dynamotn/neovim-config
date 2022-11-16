@@ -1,0 +1,36 @@
+snippet project "project definition"
+  Project $1 {
+    $2
+  }
+
+snippet table "table definition"
+  Table $1 {
+    $2
+  }
+
+snippet group "table group definition"
+  TableGroup $1 {
+    $2
+  }
+
+snippet note "note of table and project"
+  Note: '$1'
+
+snippet note "inline note of column"
+  note: '$1'
+
+snippet ref "long relationship"
+  Ref $1 {
+    $2
+  }
+
+snippet ref "short relationship"
+  Ref $1: $2
+
+snippet ref "inline relationship of column"
+  ref: $2
+
+snippet enum "enum definition"
+  enum $1 {
+    $2
+  }

@@ -10,6 +10,7 @@ return {
   cpp = { 'cpp' },
   css = { 'css' },
   cucumber = { 'cucumber' },
+  dbml = { 'dbml' },
   fish = { 'fish' },
   go = { 'go' },
   html = { 'html' },
