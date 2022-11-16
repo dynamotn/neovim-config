@@ -46,5 +46,6 @@ return {
   org = { 'norg' },
   terraform = { 'tf' },
   terragrunt = { 'terragrunt' },
+  treesitter = { 'scheme' },
   -------- }
 }
