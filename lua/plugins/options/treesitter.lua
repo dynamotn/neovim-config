@@ -11,15 +11,11 @@ vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 
 local present, languages = pcall(require, 'languages')
-local parsers = DEBUG and { 'query' } or {}
+local parsers = { 'diff', 'regex', 'comment', 'query' }
 
 if present then
   parsers = languages.setup_treesitter(ft_to_parser, parser_config)
 end
-
-table.insert(parsers, 'diff')
-table.insert(parsers, 'regex')
-table.insert(parsers, 'comment')
 
 treesitter.setup({
   highlight = {
