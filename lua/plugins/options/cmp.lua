@@ -96,7 +96,6 @@ cmp.setup({
             dynamic = '「DYNAMIC」',
             browser = '「BROWSER」',
 
-            nvim_lua = '「NLUA」',
             neorg = '「ORG」',
             fish = '「FISH」',
             ['vim-dadbod-completion'] = '「DB」',
