@@ -14,6 +14,8 @@ local special_filetypes = {
   dbui = 'Database',
   dbout = 'Query Result',
   ['neo-tree'] = 'File Explorer',
+  GoogleKeepMenu = 'Google Keep Menu',
+  GoogleKeepList = 'Google Keep Notes',
 }
 
 local extensions = function(filetype)
@@ -122,5 +124,7 @@ lualine.setup({
     extensions('dbui'),
     extensions('dbout'),
     extensions('neo-tree'),
+    extensions('GoogleKeepMenu'),
+    extensions('GoogleKeepList'),
   },
 })

@@ -11,9 +11,14 @@ M.register_config = function(name, filetypes)
   return M.register_options(name)
 end
 
--- Load per-plugin options to setup plugin
+-- Load per-plugin options to setup plugin after plugin load
 M.register_options = function(name)
   return "pcall(require, 'plugins.options." .. name .. "')"
+end
+
+-- Load per-plugin options to setup plugin before plugin log
+M.register_setup = function(name)
+  return "pcall(require, 'plugins.setup." .. name .. "')"
 end
 
 -- Load per-plugin keymaps by `whichkey` plugin

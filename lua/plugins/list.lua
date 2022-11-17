@@ -3,6 +3,7 @@
 --       List of all common plugins         --
 ----------------------------------------------
 local register_config = require('plugins.register').register_config
+local register_setup = require('plugins.register').register_setup
 
 return {
   ----------- Base ------------ {
@@ -188,6 +189,12 @@ return {
   { 'potamides/pantran.nvim', config = register_config('pantran') }, -- Translate
   { 'ofirgall/open.nvim', config = register_config('open') }, -- Open current word by other tools
   { 'tpope/vim-dadbod' }, -- Interact with database
+  { -- Google Keep integration
+    'stevearc/gkeep.nvim',
+    run = 'UpdateRemotePlugins',
+    config = register_config('gkeep'),
+    setup = register_setup('gkeep'),
+  },
   --------------- }
   ----------------------------- }
 

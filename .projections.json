@@ -10,6 +10,9 @@
     "type": "keymap",
     "alternate": "lua/plugins/options/{}.lua"
   },
+  "lua/plugins/setup/*.lua": {
+    "type": "setup"
+  },
   "lua/languages/list.lua": {
     "type": "lang"
   },

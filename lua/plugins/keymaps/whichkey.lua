@@ -26,6 +26,7 @@ return {
   ['<Space>p'] = { name = 'Project' },
   ['<Space>r'] = { name = 'Run' },
   ['<Space>s'] = { name = 'Session' },
+  ['<Space>u'] = { name = 'Utilities' },
 
   -- W key
   ['<Space>w'] = { name = 'Window' },
