@@ -12,6 +12,7 @@ autopairs.setup({
 
 local rule = require('nvim-autopairs.rule')
 local cond = require('nvim-autopairs.conds')
+local ts_cond = require('nvim-autopairs.ts-conds')
 
 -- See rules API: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
 autopairs.add_rules({
@@ -97,7 +98,7 @@ autopairs.add_rules({
 local present, languages = pcall(require, 'languages')
 
 if present then
-  autopairs.add_rules(languages.setup_autopairs(rule, cond))
+  autopairs.add_rules(languages.setup_autopairs(rule, cond, ts_cond))
 end
 
 return autopairs

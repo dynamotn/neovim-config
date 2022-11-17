@@ -3,12 +3,12 @@ local lspconfig = require('languages.lspconfig')
 
 local M = {}
 
-M.setup_autopairs = function(rule, cond)
+M.setup_autopairs = function(rule, cond, ts_cond)
   local result = {}
   for language, filetypes in pairs(languages) do
     local ok, autopairs = pcall(require, 'languages.' .. language .. '.autopairs')
     if ok and type(autopairs) == 'function' then
-      local list = autopairs(filetypes, rule, cond)
+      local list = autopairs(filetypes, rule, cond, ts_cond)
 
       if type(list) == 'table' then
         for _, autopair in ipairs(list) do
