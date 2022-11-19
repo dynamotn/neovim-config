@@ -55,6 +55,7 @@ M.sqls = function(default_opts)
     local present, sqls = pcall(require, 'sqls')
     if present then
       sqls.on_attach(client, buffer)
+      vim.api.nvim_buf_create_user_command(buffer, 'SqlsEditConnections', 'split ~/.config/sqls/config.yml', {})
     end
   end
 

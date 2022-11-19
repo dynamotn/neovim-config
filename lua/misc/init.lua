@@ -1,7 +1,6 @@
 local modules = {
   'global',
   'augroup',
-  'command',
 }
 
 for _, module in ipairs(modules) do
@@ -12,4 +11,3 @@ for _, module in ipairs(modules) do
 end
 
 require('misc.augroup').load_default_augroups()
-require('misc.command').start()
