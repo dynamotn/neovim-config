@@ -111,7 +111,7 @@ cmp.setup({
             Enum = '練',
             Interface = ' ',
             Function = ' ',
-            Variable = '',
+            Variable = ' ',
             Constant = ' ',
             Text = ' ', -- String in barbecue
             Keyword = ' ', -- Key in barbecue

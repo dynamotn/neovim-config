@@ -21,7 +21,7 @@ barbecue.setup({
     Enum = '練',
     Interface = ' ',
     Function = ' ',
-    Variable = '',
+    Variable = ' ',
     Constant = ' ',
     String = ' ',
     Number = ' ',
