@@ -187,7 +187,7 @@ end
 
 -- Whichkey mapping for filetypes {
 _G.dynamo_whichkey = {}
--- }
+--------------------------------- }
 
 -- Make directory when saving {
 _G.dynamo_mkdir_saving = function()
@@ -201,4 +201,12 @@ _G.dynamo_mkdir_saving = function()
     vim.fn.mkdir(dir, 'p')
   end
 end
--- }
+----------------------------- }
+
+-- Set filetype for terminal {
+_G.dynamo_setft_terminal = function()
+  if vim.bo.buftype == 'terminal' then
+    vim.bo.filetype = 'terminal'
+  end
+end
+---------------------------- }

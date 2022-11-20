@@ -17,6 +17,8 @@ local special_filetypes = {
   ['neo-tree'] = 'File Explorer',
   GoogleKeepMenu = 'Google Keep Menu',
   GoogleKeepList = 'Google Keep Notes',
+  OverseerList = 'List tasks',
+  terminal = 'Terminal',
 }
 
 local extensions = function(filetype)
@@ -119,6 +121,8 @@ lualine.setup({
   },
   extensions = {
     'quickfix',
+    'toggleterm',
+    'man',
     extensions('help'),
     extensions('Outline'),
     extensions('dapui_scopes'),
@@ -131,5 +135,6 @@ lualine.setup({
     extensions('neo-tree'),
     extensions('GoogleKeepMenu'),
     extensions('GoogleKeepList'),
+    extensions('terminal'),
   },
 })

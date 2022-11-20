@@ -55,6 +55,9 @@ M.load_default_augroups = function()
     mkdir_saving = {
       { 'BufWritePre', '*', 'lua dynamo_mkdir_saving()' },
     },
+    terminal = {
+      { 'BufEnter', '*', 'lua dynamo_setft_terminal()' },
+    },
     quick_quit_manual = {
       { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
       { 'StdinReadPre', '*', 'let s:std_in=1' },
