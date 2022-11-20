@@ -5,6 +5,7 @@ if not present then
 end
 
 local special_filetypes = {
+  help = 'Help Guide',
   Outline = 'Outline',
   dapui_scopes = 'Scopes',
   dapui_breakpoints = 'Breakpoints',
@@ -118,6 +119,7 @@ lualine.setup({
   },
   extensions = {
     'quickfix',
+    extensions('help'),
     extensions('Outline'),
     extensions('dapui_scopes'),
     extensions('dapui_breakpoints'),
