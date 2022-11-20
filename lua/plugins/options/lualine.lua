@@ -20,6 +20,7 @@ local special_filetypes = {
   OverseerList = 'List tasks',
   terminal = 'Terminal',
   Regexplainer = 'Regex',
+  tsplayground = 'TSPlayground',
 }
 
 local extensions = function(filetype)
@@ -138,5 +139,6 @@ lualine.setup({
     extensions('GoogleKeepList'),
     extensions('terminal'),
     extensions('Regexplainer'),
+    extensions('tsplayground'),
   },
 })
