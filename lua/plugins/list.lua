@@ -82,6 +82,7 @@ return {
   { 'sindrets/diffview.nvim', cmd = { 'DiffviewOpen', 'DiffviewFileHistory' } }, -- Diff view
   { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git decoration
   { 'tpope/vim-projectionist' }, -- Granular project configuration
+  { 'klen/nvim-config-local', config = register_config('local_config') }, -- Load local config file
   ----------------------------- }
 
   ---------- Editing ---------- {
