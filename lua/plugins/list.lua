@@ -37,6 +37,7 @@ return {
   --------------------------- }
 
   -- Miscellaneous {
+  { 'MunifTanjim/nui.nvim' }, -- UI component library
   { 'stevearc/dressing.nvim', config = register_config('dressing') }, -- Improve vim.ui.select and vim.ui.input
   { 'kyazdani42/nvim-web-devicons', config = register_config('icon') }, -- Programming icons
   { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
@@ -68,9 +69,6 @@ return {
     'nvim-neo-tree/neo-tree.nvim',
     cmd = { 'Neotree' },
     config = register_config('neotree'),
-    requires = {
-      { 'MunifTanjim/nui.nvim' },
-    },
   },
   { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
   { 'chentoast/marks.nvim', config = register_config('marks') }, -- Show mark and switch to mark
@@ -159,6 +157,7 @@ return {
   { 'johmsalas/text-case.nvim', config = register_config('textcase') }, -- Convert text case
   --------- }
   { 'ThePrimeagen/refactoring.nvim', config = register_config('refactoring'), after = 'nvim-treesitter' }, -- Refactoring library
+  { 'bennypowers/nvim-regexplainer', config = register_config('regexplainer') }, -- Explain Regex when hover
   ----------------------------- }
 
   ---- Debug / Test / Run ----- {
