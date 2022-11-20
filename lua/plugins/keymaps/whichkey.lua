@@ -51,10 +51,8 @@ return {
   -- Leader key {
   ['<leader>'] = { name = 'Secondary Trigger' },
 
-  -- D key
   ['<leader>d'] = { name = 'Debug' },
-
-  -- T key
   ['<leader>t'] = { name = 'Test' },
+  ['<leader>s'] = { name = 'Swap' },
   ------------- }
 }

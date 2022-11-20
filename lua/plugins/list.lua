@@ -137,6 +137,7 @@ return {
     run = ':TSUpdate',
     config = register_config('treesitter'),
   },
+  { 'nvim-treesitter/nvim-treesitter-textobjects' },
   -- Syntax highlight {
   { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
   ------------------- }
