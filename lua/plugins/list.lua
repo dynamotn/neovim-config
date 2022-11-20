@@ -73,6 +73,7 @@ return {
   },
   { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
   { 'chentoast/marks.nvim', config = register_config('marks') }, -- Show mark and switch to mark
+  { 'phaazon/hop.nvim', config = register_config('hop') }, -- Easymotion
   ----------------------------- }
 
   ------ VCS and Project ------ {
