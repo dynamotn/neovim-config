@@ -8,6 +8,7 @@ autopairs.setup({
   map_bs = false, -- Not map Backspace key
   map_cr = false, -- Not map Enter key
   check_ts = true, -- Check grammar by TreeSitter
+  disable_filetype = { 'TelescopePrompt', 'neo-tree' },
 })
 
 local rule = require('nvim-autopairs.rule')
