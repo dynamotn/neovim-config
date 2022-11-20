@@ -18,6 +18,7 @@ return {
   -------- Eyecandy ----------- {
   -- Color scheme {
   { 'navarasu/onedark.nvim', config = register_config('onedark') }, -- OneDark for both Dark and Light colorscheme
+  { 'xiyaowong/nvim-transparent', config = register_config('transparent') }, -- Transparent neovim window
   --------------- }
 
   -- Status and tab/buffer line {

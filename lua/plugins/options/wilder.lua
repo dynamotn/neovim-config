@@ -17,7 +17,8 @@ local popupmenu_renderer = wilder.popupmenu_renderer(wilder.popupmenu_palette_th
   highlights = {
     accent = wilder.make_hl('WilderAccent', 'Pmenu', { { a = 1 }, { a = 1 }, { foreground = '#f4468f' } }),
   },
-  pumblend = 20,
+  pumblend = 0,
+  winblend = 0,
   border = 'rounded',
   prompt_position = 'bottom',
   empty_message = wilder.popupmenu_empty_message_with_spinner(),
