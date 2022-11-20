@@ -19,6 +19,7 @@ local special_filetypes = {
   GoogleKeepList = 'Google Keep Notes',
   OverseerList = 'List tasks',
   terminal = 'Terminal',
+  Regexplainer = 'Regex',
 }
 
 local extensions = function(filetype)
@@ -136,5 +137,6 @@ lualine.setup({
     extensions('GoogleKeepMenu'),
     extensions('GoogleKeepList'),
     extensions('terminal'),
+    extensions('Regexplainer'),
   },
 })
