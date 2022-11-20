@@ -62,9 +62,6 @@ opt.swapfile = false
 -- Highlight matching parenthesis
 opt.showmatch = true
 
--- Don't redraw when using macro
-opt.lazyredraw = true
-
 -- Wrap
 opt.textwidth = 0
 opt.wrapmargin = 0

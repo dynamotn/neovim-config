@@ -13,12 +13,6 @@ return {
   DEBUG and { 'dstein64/vim-startuptime' } or nil, -- View startup timing
   { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
   { 'antoinemadec/FixCursorHold.nvim', config = register_config('cursor_hold') }, -- Fix CursorHold performance
-  { -- Improve wildmenu's capabilities
-    'gelguy/wilder.nvim',
-    config = register_config('wilder'),
-    run = ':UpdateRemotePlugins',
-    event = 'CmdlineEnter',
-  },
   ----------------------------- }
 
   -------- Eyecandy ----------- {
@@ -39,6 +33,13 @@ return {
   -- Miscellaneous {
   { 'MunifTanjim/nui.nvim' }, -- UI component library
   { 'stevearc/dressing.nvim', config = register_config('dressing') }, -- Improve vim.ui.select and vim.ui.input
+  { -- Improve wildmenu's capabilities
+    'gelguy/wilder.nvim',
+    config = register_config('wilder'),
+    run = ':UpdateRemotePlugins',
+    event = 'CmdlineEnter',
+  },
+  { 'folke/noice.nvim', config = register_config('noice') }, -- Improve messages, cmdline and popups
   { 'kyazdani42/nvim-web-devicons', config = register_config('icon') }, -- Programming icons
   { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
   { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight

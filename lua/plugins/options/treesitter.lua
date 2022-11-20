@@ -11,7 +11,7 @@ vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 
 local present, languages = pcall(require, 'languages')
-local parsers = { 'diff', 'regex', 'comment', 'query' }
+local parsers = { 'diff', 'regex', 'comment', 'query', 'vim', 'markdown_inline' }
 
 if present then
   parsers = languages.setup_treesitter(ft_to_parser, parser_config)
