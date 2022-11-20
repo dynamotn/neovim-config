@@ -166,6 +166,7 @@ return {
   { 'jayp0521/mason-nvim-dap.nvim', config = register_config('mason_dap'), after = { 'mason.nvim', 'nvim-dap' } }, -- DAP manager
   { 'nvim-neotest/neotest', config = register_config('neotest') }, -- Test integration
   { 'nvim-neotest/neotest-vim-test', before = 'neotest' }, -- Test runner compatibility that support vim-test
+  { 'stevearc/overseer.nvim', config = register_config('overseer') }, -- Task runner
   ----------------------------- }
 
   -------- Integration -------- {
