@@ -188,3 +188,17 @@ end
 -- Whichkey mapping for filetypes {
 _G.dynamo_whichkey = {}
 -- }
+
+-- Make directory when saving {
+_G.dynamo_mkdir_saving = function()
+  local dir = vim.fn.expand('<afile>:p:h')
+
+  if dir:find('%l+://') == 1 then
+    return
+  end
+
+  if vim.fn.isdirectory(dir) == 0 then
+    vim.fn.mkdir(dir, 'p')
+  end
+end
+-- }
