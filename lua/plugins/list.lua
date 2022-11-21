@@ -40,7 +40,7 @@ return {
     run = ':UpdateRemotePlugins',
     event = 'CmdlineEnter',
   },
-  { 'folke/noice.nvim', config = register_config('noice') }, -- Improve messages, cmdline and popups
+  { 'folke/noice.nvim', config = register_config('noice') }, -- Improve messages, cmdline, popups & LSP
   { 'kyazdani42/nvim-web-devicons', config = register_config('icon') }, -- Programming icons
   { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
   { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
@@ -50,6 +50,7 @@ return {
   { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') }, -- UI view for Symbols
   { 'rmagatti/goto-preview', config = register_config('goto_preview') }, -- UI view for preview LSP definition, implementation, reference
   { 'kosayoda/nvim-lightbulb', config = register_config('lightbulb') }, -- UI view for LSP code action lightbulb
+  { 'lvimuser/lsp-inlayhints.nvim', config = register_config('lsp_inlay') }, -- Inlayhints for LSP
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
   { 'kristijanhusak/vim-dadbod-ui', config = register_config('dadbod_ui') }, -- UI for dadbod

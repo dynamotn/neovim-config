@@ -17,6 +17,9 @@ M.sumneko_lua = function(default_opts)
           indent_size = '2',
         },
       },
+      hint = {
+        enable = true,
+      },
     },
   }
   return opts
@@ -58,6 +61,25 @@ M.sqls = function(default_opts)
       vim.api.nvim_buf_create_user_command(buffer, 'SqlsEditConnections', 'split ~/.config/sqls/config.yml', {})
     end
   end
+
+  return opts
+end
+
+M.gopls = function(default_opts)
+  local opts = default_opts
+
+  opts.settings = {
+    gopls = {
+      hints = {
+        assignVariableTypes = true,
+        compositeLiteralFields = true,
+        constantValues = true,
+        functionTypeParameters = true,
+        parameterNames = true,
+        rangeVariableTypes = true,
+      },
+    },
+  }
 
   return opts
 end

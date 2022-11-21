@@ -20,6 +20,11 @@ local default_opts = {
     if present then
       colorizer.attach_to_buffer(buffer)
     end
+
+    local present, lsp_inlay = pcall(require, 'lsp-inlayhints')
+    if present then
+      lsp_inlay.on_attach(client, buffer)
+    end
   end,
   on_exit = function(_, _)
     augroup.disable_highlight_document()
