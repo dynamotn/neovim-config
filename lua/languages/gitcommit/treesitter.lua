@@ -1,8 +1,8 @@
 return {
-  parser = 'git_commit',
+  parser = 'gitcommit',
   install_info = {
-    url = 'https://github.com/dynamotn/tree-sitter-git-commit',
+    url = 'https://github.com/gbprod/tree-sitter-gitcommit',
     branch = 'main',
-    files = { 'src/parser.c' },
+    files = { 'src/parser.c', 'src/scanner.c' },
   },
 }
