@@ -89,9 +89,10 @@ M.disable_highlight_document = function()
 end
 
 M.enable_codelens = function(client_id)
+  dynamo_lsp_codelens(client_id)
   M.create_augroups({
     codelens_lsp = {
-      { 'InsertLeave', '<buffer>', string.format('lua dynamo_lsp_codelens(%d)', client_id) },
+      { 'TextChanged,InsertLeave', '<buffer>', string.format('lua dynamo_lsp_codelens(%d)', client_id) },
     },
   }, true, client_id)
 end

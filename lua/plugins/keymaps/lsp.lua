@@ -8,6 +8,7 @@ return function(whichkey, bufnr)
     ['<leader>k'] = { dynamo_cmdcr('lua vim.lsp.buf.signature_help()'), 'Signature help' },
     ['<Space>la'] = { dynamo_cmdcr('lua vim.lsp.buf.code_action()'), 'Code Action' },
     ['<Space>li'] = { dynamo_cmdcr('lua vim.lsp.buf.incoming_calls()'), 'Show incoming calls' },
+    ['<Space>ll'] = { dynamo_cmdcr('lua vim.lsp.codelens.run()'), 'Code Lense' },
     ['<Space>lo'] = { dynamo_cmdcr('lua vim.lsp.buf.outgoing_calls()'), 'Show outgoing calls' },
     ['<Space>lr'] = { dynamo_cmdcr('lua vim.lsp.buf.rename()'), 'Rename' },
     ['<Space>ff'] = { dynamo_cmdcr('lua vim.lsp.buf.formatting()'), 'File formatting' },

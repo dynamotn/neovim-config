@@ -12,7 +12,10 @@ return {
   cucumber = { 'cucumber' },
   dbml = { 'dbml' },
   fish = { 'fish' },
-  go = { 'go' },
+  go = {
+    'go',
+    'gomod',
+  },
   html = { 'html' },
   http = { 'http' },
   javascript = {
