@@ -49,8 +49,6 @@ return {
   { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
   { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
   { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') }, -- UI view for Symbols
-  { 'ray-x/lsp_signature.nvim', config = register_config('lsp_signature') }, -- Show LSP function signature
-  { 'j-hui/fidget.nvim', config = register_config('fidget') }, -- Show LSP progress
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
   { 'kristijanhusak/vim-dadbod-ui', config = register_config('dadbod_ui') }, -- UI for dadbod
