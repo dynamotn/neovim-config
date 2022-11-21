@@ -10,7 +10,6 @@ local default_opts = {
     augroup.enable_highlight_document(client.id)
     augroup.enable_hover(client.id)
     augroup.enable_codelens(client.id)
-    augroup.enable_codeaction(client.id)
     augroup.enable_formatting(client.id)
     local present, navic = pcall(require, 'nvim-navic')
     if present and client.server_capabilities.documentSymbolProvider then
@@ -24,7 +23,6 @@ local default_opts = {
   end,
   on_exit = function(_, _)
     augroup.disable_highlight_document()
-    augroup.disable_codeaction()
     augroup.disable_codelens()
     augroup.disable_formatting()
   end,

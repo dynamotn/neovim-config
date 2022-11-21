@@ -47,8 +47,9 @@ return {
   { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
   { 'utilyre/barbecue.nvim', config = register_config('barbecue'), requires = { 'SmiteshP/nvim-navic' } }, -- Winbar to show context of current position
   { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
-  { 'tami5/lspsaga.nvim', config = register_config('lspsaga') }, -- UI for LSP
   { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') }, -- UI view for Symbols
+  { 'rmagatti/goto-preview', config = register_config('goto_preview') }, -- UI view for preview LSP definition, implementation, reference
+  { 'kosayoda/nvim-lightbulb', config = register_config('lightbulb') }, -- UI view for LSP code action lightbulb
   { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
   { 'kristijanhusak/vim-dadbod-ui', config = register_config('dadbod_ui') }, -- UI for dadbod

@@ -31,11 +31,9 @@ if present then
   null_ls.setup({
     sources = sources,
     on_attach = function(client)
-      augroup.enable_codeaction(client.id)
       augroup.enable_formatting(client.id)
     end,
     on_exit = function(_)
-      augroup.disable_codeaction()
       augroup.disable_formatting()
     end,
   })
