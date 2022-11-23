@@ -22,4 +22,6 @@ whichkey.setup({
   layout = {
     align = 'center',
   },
+  show_help = false,
+  show_keys = false,
 })
