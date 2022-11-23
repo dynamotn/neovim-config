@@ -58,6 +58,21 @@ lualine.setup({
         'filename',
         path = 1, -- Relative path
       },
+      {
+        function()
+          local present, noice = pcall(require, 'noice')
+          if present then
+            return noice.api.statusline.mode.get()
+          end
+        end,
+        cond = function()
+          local present, noice = pcall(require, 'noice')
+          if present then
+            return noice.api.statusline.mode.has()
+          end
+        end,
+        color = { fg = '#ff9e64' },
+      },
     },
     lualine_x = {
       {
