@@ -1,4 +1,5 @@
 return {
   'grammarly',
   'ltex',
+  'marksman',
 }

@@ -11,8 +11,8 @@ neorg.setup({
       config = {
         workspaces = {
           personal = '~/Notes/personal',
-          work = '~/Notes/work',
-          idea = '~/Notes/idea',
+          enterprise = '~/Notes/enterprise',
+          freelance = '~/Notes/freelance',
         },
         autochdir = true,
         index = 'dynamo.norg',
@@ -23,13 +23,15 @@ neorg.setup({
         engine = 'nvim-cmp',
       },
     },
+    ['core.integrations.nvim-cmp'] = {},
     ['core.norg.concealer'] = {},
     ['core.gtd.base'] = {
       config = {
-        workspace = 'idea',
+        workspace = 'personal',
       },
     },
     ['core.integrations.telescope'] = {},
     ['external.kanban'] = {},
+    ['external.zettelkasten'] = {},
   },
 })
