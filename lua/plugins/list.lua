@@ -114,9 +114,9 @@ return {
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
       { 'tzachar/cmp-tabnine', run = './install.sh' }, -- Tabnine completion source
       { 'rcarriga/cmp-dap' }, -- DAP completion source
-      { 'ray-x/cmp-treesitter' }, -- Treesitter completion source
       { 'uga-rosa/cmp-dynamic', config = register_config('cmp_dynamic') }, -- Dynamic completion source
       { 'wxxxcxx/cmp-browser-source', config = register_config('cmp_browser') }, -- Vivaldi completion source
+      { 'hrsh7th/cmp-copilot', requires = 'github/copilot.vim' }, -- Copilot completion source
     },
   },
   { -- Snippet engine

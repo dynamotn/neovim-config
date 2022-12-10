@@ -22,9 +22,9 @@ local cmp_default_sources = {
   { name = 'path' },
   { name = 'tmux', option = { all_panes = true } },
   { name = 'cmp_tabnine' },
-  { name = 'treesitter' },
   { name = 'dynamic' },
   { name = 'browser' },
+  { name = 'copilot' },
 }
 
 cmp.setup({
@@ -92,9 +92,9 @@ cmp.setup({
             tmux = '「TMUX」',
             cmp_tabnine = '「T9」',
             dap = '「DAP」',
-            treesitter = '「TS」',
-            dynamic = '「DYNAMIC」',
-            browser = '「BROWSER」',
+            dynamic = '「CUS」',
+            browser = '「WWW」',
+            copilot = '「COP」',
 
             neorg = '「ORG」',
             fish = '「FISH」',
