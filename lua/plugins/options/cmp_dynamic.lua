@@ -4,7 +4,7 @@ if not present then
   return
 end
 
-cmp_dynamic.setup({
+cmp_dynamic.register({
   {
     label = 'today',
     insertText = 1,
