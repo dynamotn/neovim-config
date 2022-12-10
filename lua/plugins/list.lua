@@ -28,6 +28,7 @@ return {
 
   -- Quickfix and diagnostics {
   { 'folke/trouble.nvim', config = register_config('trouble') }, -- Highlight quickfix and diagnostics
+  { 'https://git.sr.ht/~whynothugo/lsp_lines.nvim', config = register_config('lsp_lines') }, -- Show virtual lines for LSP diagnostics
   { 'folke/todo-comments.nvim', config = register_config('todo') }, -- Highlight TODO comments
   --------------------------- }
 
