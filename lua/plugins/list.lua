@@ -116,7 +116,7 @@ return {
       { 'rcarriga/cmp-dap' }, -- DAP completion source
       { 'uga-rosa/cmp-dynamic', config = register_config('cmp_dynamic') }, -- Dynamic completion source
       { 'wxxxcxx/cmp-browser-source', config = register_config('cmp_browser') }, -- Vivaldi completion source
-      { 'hrsh7th/cmp-copilot', requires = 'github/copilot.vim' }, -- Copilot completion source
+      { 'hrsh7th/cmp-copilot', requires = 'zbirenbaum/copilot.vim' }, -- Copilot completion source
     },
   },
   { -- Snippet engine
