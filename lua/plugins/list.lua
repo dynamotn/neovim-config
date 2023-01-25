@@ -7,63 +7,71 @@ local register_setup = require('plugins.register').register_setup
 
 return {
   ----------- Base ------------ {
-  { 'wbthomason/packer.nvim', event = 'VimEnter' }, -- Plugin manager
-  { 'nvim-lua/plenary.nvim' }, -- Base Lua functions
-  { 'nathom/filetype.nvim', config = register_config('filetype') }, -- Detect filetype
-  DEBUG and { 'dstein64/vim-startuptime' } or nil, -- View startup timing
-  { 'lewis6991/impatient.nvim', config = register_config('impatient') }, -- Improve startup time
-  { 'antoinemadec/FixCursorHold.nvim', config = register_config('cursor_hold') }, -- Fix CursorHold performance
+  { 'nvim-lua/plenary.nvim', name = 'plernary', lazy = false }, -- Base Lua functions
+  { 'dstein64/vim-startuptime', cmd = 'StartupTime', cond = DEBUG }, -- View startup timing
   ----------------------------- }
 
   -------- Eyecandy ----------- {
   -- Color scheme {
-  { 'navarasu/onedark.nvim', config = register_config('onedark') }, -- OneDark for both Dark and Light colorscheme
-  { 'xiyaowong/nvim-transparent', config = register_config('transparent') }, -- Transparent neovim window
+  { 'navarasu/onedark.nvim', name = 'onedark', config = register_config, event = 'UIEnter' }, -- OneDark for both Dark and Light colorscheme
   --------------- }
 
   -- Status and tab/buffer line {
-  { 'nvim-lualine/lualine.nvim', config = register_config('lualine'), after = 'onedark.nvim' }, -- Status line
-  { 'akinsho/bufferline.nvim', config = register_config('bufferline') }, -- Buffer and tab line
+  {
+    'nvim-lualine/lualine.nvim',
+    name = 'lualine',
+    config = register_config,
+    event = 'UIEnter',
+    dependencies = { 'onedark' },
+  }, -- Status line
+  { 'akinsho/bufferline.nvim', name = 'bufferline', config = register_config, event = 'UIEnter' }, -- Buffer and tab line
   ----------------------------- }
 
   -- Quickfix and diagnostics {
-  { 'folke/trouble.nvim', config = register_config('trouble') }, -- Highlight quickfix and diagnostics
-  { 'https://git.sr.ht/~whynothugo/lsp_lines.nvim', config = register_config('lsp_lines') }, -- Show virtual lines for LSP diagnostics
-  { 'folke/todo-comments.nvim', config = register_config('todo') }, -- Highlight TODO comments
+  { 'folke/trouble.nvim', name = 'trouble', config = register_config, cmd = 'TroubleToggle' }, -- Highlight quickfix and diagnostics
+  {
+    url = 'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
+    name = 'lsp_lines',
+    config = register_config,
+    event = 'UIEnter',
+  }, -- Show virtual lines for LSP diagnostics
+  { 'folke/todo-comments.nvim', name = 'todo', config = register_config, dependencies = { 'plernary' } }, -- Highlight TODO comments
   --------------------------- }
 
   -- Miscellaneous {
   { 'MunifTanjim/nui.nvim' }, -- UI component library
-  { 'stevearc/dressing.nvim', config = register_config('dressing') }, -- Improve vim.ui.select and vim.ui.input
+  { 'stevearc/dressing.nvim', name = 'dressing', config = register_config, event = 'VeryLazy' }, -- Improve vim.ui.select and vim.ui.input
   { -- Improve wildmenu's capabilities
     'gelguy/wilder.nvim',
-    config = register_config('wilder'),
-    run = ':UpdateRemotePlugins',
+    name = 'wilder',
+    config = register_config,
+    build = ':UpdateRemotePlugins',
     event = 'CmdlineEnter',
   },
-  { 'folke/noice.nvim', config = register_config('noice') }, -- Improve messages, cmdline, popups & LSP
-  { 'kyazdani42/nvim-web-devicons', config = register_config('icon') }, -- Programming icons
-  { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('indent') }, -- Indent guide
-  { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, config = register_config('colorizer') }, -- Color highlight
-  { 'karb94/neoscroll.nvim', config = register_config('neoscroll') }, -- Smooth scrolling
-  { 'utilyre/barbecue.nvim', config = register_config('barbecue'), requires = { 'SmiteshP/nvim-navic' } }, -- Winbar to show context of current position
-  { 'p00f/nvim-ts-rainbow', config = register_config('rainbow'), after = 'nvim-treesitter' }, -- Rainbow parentheses
-  { 'simrat39/symbols-outline.nvim', config = register_config('symbols_outline') }, -- UI view for Symbols
-  { 'rmagatti/goto-preview', config = register_config('goto_preview') }, -- UI view for preview LSP definition, implementation, reference
-  { 'kosayoda/nvim-lightbulb', config = register_config('lightbulb') }, -- UI view for LSP code action lightbulb
-  { 'lvimuser/lsp-inlayhints.nvim', config = register_config('lsp_inlay') }, -- Inlayhints for LSP
-  { 'rcarriga/nvim-dap-ui', after = 'nvim-dap', config = register_config('dap_ui') }, -- Debugger UI
-  { 'theHamsta/nvim-dap-virtual-text', after = 'nvim-dap', config = register_config('dap_virtual_text') }, -- Virtual text for DAP
-  { 'kristijanhusak/vim-dadbod-ui', config = register_config('dadbod_ui') }, -- UI for dadbod
+  { 'folke/noice.nvim', name = 'noice', config = register_config }, -- Improve messages, cmdline, popups & LSP
+  { 'kyazdani42/nvim-web-devicons', name = 'icon', config = register_config }, -- Programming icons
+  { 'glepnir/indent-guides.nvim', event = { 'BufRead', 'BufNewFile' }, name = 'indent', config = register_config }, -- Indent guide
+  { 'norcalli/nvim-colorizer.lua', event = { 'BufRead', 'BufNewFile' }, name = 'colorizer', config = register_config }, -- Color highlight
+  { 'karb94/neoscroll.nvim', name = 'neoscroll', config = register_config }, -- Smooth scrolling
+  { 'utilyre/barbecue.nvim', name = 'barbecue', config = register_config, dependencies = { 'SmiteshP/nvim-navic' } }, -- Winbar to show context of current position
+  { 'p00f/nvim-ts-rainbow', name = 'rainbow', config = register_config, dependencies = { 'treesitter' } }, -- Rainbow parentheses
+  { 'simrat39/symbols-outline.nvim', name = 'symbols_outline', config = register_config }, -- UI view for Symbols
+  { 'rmagatti/goto-preview', name = 'goto_preview', config = register_config }, -- UI view for preview LSP definition, implementation, reference
+  { 'kosayoda/nvim-lightbulb', name = 'lightbulb', config = register_config }, -- UI view for LSP code action lightbulb
+  { 'lvimuser/lsp-inlayhints.nvim', name = 'lsp_inlay', config = register_config }, -- Inlayhints for LSP
+  { 'rcarriga/nvim-dap-ui', dependencies = { 'dap' }, name = 'dap_ui', config = register_config }, -- Debugger UI
+  { 'theHamsta/nvim-dap-virtual-text', dependencies = { 'dap' }, name = 'dap_virtual_text', config = register_config }, -- Virtual text for DAP
+  { 'kristijanhusak/vim-dadbod-ui', name = 'dadbod_ui', config = register_config }, -- UI for dadbod
   { -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
-    config = register_config('pretty_fold'),
-    requires = {
+    name = 'pretty_fold',
+    config = register_config,
+    dependencies = {
       'anuvyklack/keymap-amend.nvim',
       'anuvyklack/fold-preview.nvim',
     },
   },
-  { 'rcarriga/nvim-notify', config = register_config('notify') }, -- Notification
+  { 'rcarriga/nvim-notify', name = 'notify', config = register_config }, -- Notification
   --------------- }
   ----------------------------- }
 
@@ -71,145 +79,168 @@ return {
   { -- File explorer
     'nvim-neo-tree/neo-tree.nvim',
     cmd = { 'Neotree' },
-    config = register_config('neotree'),
+    name = 'neotree',
+    config = register_config,
   },
-  { 'https://gitlab.com/yorickpeterse/nvim-window', config = register_config('window') }, -- Window switcher
-  { 'chentoast/marks.nvim', config = register_config('marks') }, -- Show mark and switch to mark
-  { 'phaazon/hop.nvim', config = register_config('hop') }, -- Easymotion
+  { url = 'https://gitlab.com/yorickpeterse/nvim-window', name = 'window', config = register_config }, -- Window switcher
+  { 'chentoast/marks.nvim', name = 'marks', config = register_config }, -- Show mark and switch to mark
+  { 'phaazon/hop.nvim', name = 'hop', config = register_config }, -- Easymotion
   ----------------------------- }
 
   ------ VCS and Project ------ {
-  { 'TimUntersberger/neogit', config = register_config('neogit'), cmd = { 'Neogit' } }, -- Git TUI
+  { 'TimUntersberger/neogit', name = 'neogit', config = register_config, cmd = { 'Neogit' } }, -- Git TUI
   { 'sindrets/diffview.nvim', cmd = { 'DiffviewOpen', 'DiffviewFileHistory' } }, -- Diff view
-  { 'lewis6991/gitsigns.nvim', config = register_config('gitsigns') }, -- Git decoration
-  { 'tpope/vim-projectionist' }, -- Granular project configuration
-  { 'klen/nvim-config-local', config = register_config('local_config') }, -- Load local config file
+  { 'lewis6991/gitsigns.nvim', name = 'gitsigns', config = register_config }, -- Git decoration
+  { 'tpope/vim-projectionist', lazy = false }, -- Granular project configuration
+  { 'klen/nvim-config-local', name = 'local_config', config = register_config }, -- Load local config file
   ----------------------------- }
 
   ---------- Editing ---------- {
-  { 'ethanholz/nvim-lastplace', config = register_config('lastplace') }, -- Save the last edit position
+  { 'ethanholz/nvim-lastplace', name = 'lastplace', config = register_config }, -- Save the last edit position
   -- Comment {
-  { 'numToStr/Comment.nvim', config = register_config('comment') }, -- Commenting
+  { 'numToStr/Comment.nvim', name = 'comment', config = register_config, event = 'VeryLazy' }, -- Commenting
   { -- Comment based on cursor location
     'JoosepAlviste/nvim-ts-context-commentstring',
-    after = { 'nvim-treesitter', 'Comment.nvim' },
-    config = register_config('context_comment'),
+    dependencies = { 'treesitter', 'comment' },
+    name = 'context_comment',
+    config = register_config,
   },
   { -- Generate annotation
     'danymat/neogen',
-    after = { 'nvim-treesitter' },
-    config = register_config('neogen'),
+    dependencies = { 'treesitter' },
+    name = 'neogen',
+    config = register_config,
   },
   ---------- }
   { -- Code complete engine
     'hrsh7th/nvim-cmp',
-    config = register_config('cmp'),
-    requires = {
+    name = 'cmp',
+    event = 'InsertEnter',
+    config = register_config,
+    dependencies = {
       { 'hrsh7th/cmp-nvim-lsp' }, -- LSP completion source
       { 'onsails/lspkind.nvim' }, -- LSP completion pictograms
-      { 'saadparwaiz1/cmp_luasnip' }, -- Snippet completion source
+      { 'saadparwaiz1/cmp_luasnip', dependencies = 'luasnip' }, -- Snippet completion source
       { 'hrsh7th/cmp-buffer' }, -- Buffer completion source
       { 'hrsh7th/cmp-calc' }, -- Math calculation
       { 'hrsh7th/cmp-path' }, -- Path completion source
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
-      { 'tzachar/cmp-tabnine', run = './install.sh' }, -- Tabnine completion source
-      { 'rcarriga/cmp-dap' }, -- DAP completion source
-      { 'uga-rosa/cmp-dynamic', config = register_config('cmp_dynamic') }, -- Dynamic completion source
-      { 'wxxxcxx/cmp-browser-source', config = register_config('cmp_browser') }, -- Vivaldi completion source
-      { 'hrsh7th/cmp-copilot', requires = 'zbirenbaum/copilot.vim' }, -- Copilot completion source
+      { 'rcarriga/cmp-dap', dependencies = { 'dap' } }, -- DAP completion source
+      { 'uga-rosa/cmp-dynamic', name = 'cmp_dynamic', config = register_config }, -- Dynamic completion source
+      { 'wxxxcxx/cmp-browser-source', name = 'cmp_browser', config = register_config }, -- Vivaldi completion source
+      { 'hrsh7th/cmp-copilot', dependencies = { 'zbirenbaum/copilot.vim' } }, -- Copilot completion source
     },
   },
   { -- Snippet engine
     'L3MON4D3/LuaSnip',
-    config = register_config('luasnip'),
-    requires = {
+    name = 'luasnip',
+    config = register_config,
+    dependencies = {
       { 'rafamadriz/friendly-snippets' }, -- VSCode snippets
       { 'honza/vim-snippets' }, -- Snipmate snippets
     },
   },
-  { 'gpanders/editorconfig.nvim', event = { 'BufRead', 'BufNewFile' }, config = register_config('editorconfig') }, -- Convention
+  {
+    'gpanders/editorconfig.nvim',
+    event = { 'BufRead', 'BufNewFile' },
+    name = 'editorconfig',
+    config = register_config,
+  }, -- Convention
   -- LSP {
-  { 'neovim/nvim-lspconfig', config = register_config('lsp') }, -- Config for LSP server
-  { 'williamboman/mason-lspconfig.nvim', config = register_config('mason_lsp'), after = 'mason.nvim' }, -- LSP server manager
-  { 'jose-elias-alvarez/null-ls.nvim', config = register_config('null_ls') }, -- Config for non-LSP sources (linter and formatter)
-  { 'jayp0521/mason-null-ls.nvim', config = register_config('mason_null_ls'), after = 'mason.nvim' }, -- Linter and Formatter manager
+  { 'neovim/nvim-lspconfig', name = 'lsp', config = register_config }, -- Config for LSP server
+  { 'williamboman/mason-lspconfig.nvim', name = 'mason_lsp', config = register_config, dependencies = { 'mason' } }, -- LSP server manager
+  { 'jose-elias-alvarez/null-ls.nvim', name = 'null_ls', config = register_config }, -- Config for non-LSP sources (linter and formatter)
+  { 'jayp0521/mason-null-ls.nvim', name = 'mason_null_ls', config = register_config, dependencies = { 'mason' } }, -- Linter and Formatter manager
   ------ }
   { -- TreeSitter
     'nvim-treesitter/nvim-treesitter',
     event = { 'BufRead', 'BufNewFile' },
-    run = ':TSUpdate',
-    config = register_config('treesitter'),
+    build = ':TSUpdate',
+    name = 'treesitter',
+    config = register_config,
   },
   { 'nvim-treesitter/nvim-treesitter-textobjects' },
   -- Syntax highlight {
   { 'gentoo/gentoo-syntax' }, -- For gentoo filetypes
   ------------------- }
   -- Typing {
-  { 'windwp/nvim-autopairs', event = { 'BufRead', 'BufNewFile' }, config = register_config('autopairs') }, -- Automatically insert/delete brackets, parentheses, quotes...
+  { 'windwp/nvim-autopairs', event = { 'BufRead', 'BufNewFile' }, name = 'autopairs', config = register_config }, -- Automatically insert/delete brackets, parentheses, quotes...
   { -- Automatically close and rename HTML tag
     'windwp/nvim-ts-autotag',
     event = { 'BufRead', 'BufNewFile' },
-    config = register_config('autotag'),
-    after = 'nvim-treesitter',
+    name = 'autotag',
+    config = register_config,
+    dependencies = { 'treesitter' },
   },
   { -- Automatically insert end keyword
     'RRethy/nvim-treesitter-endwise',
     event = { 'BufRead', 'BufNewFile' },
-    config = register_config('endwise'),
-    after = 'nvim-treesitter',
+    name = 'endwise',
+    config = register_config,
+    dependencies = { 'treesitter' },
   },
-  { 'monaqa/dial.nvim', config = register_config('dial') }, -- Increment/decrement number, date...
-  { 'ur4ltz/surround.nvim', config = register_config('surround') }, -- Change surround character
-  { 'johmsalas/text-case.nvim', config = register_config('textcase') }, -- Convert text case
+  { 'monaqa/dial.nvim', name = 'dial', config = register_config }, -- Increment/decrement number, date...
+  { 'ur4ltz/surround.nvim', name = 'surround', config = register_config }, -- Change surround character
+  { 'johmsalas/text-case.nvim', name = 'textcase', config = register_config }, -- Convert text case
   --------- }
-  { 'ThePrimeagen/refactoring.nvim', config = register_config('refactoring'), after = 'nvim-treesitter' }, -- Refactoring library
-  { 'bennypowers/nvim-regexplainer', config = register_config('regexplainer') }, -- Explain Regex when hover
+  { 'ThePrimeagen/refactoring.nvim', name = 'refactoring', config = register_config, dependencies = { 'treesitter' } }, -- Refactoring library
+  { 'bennypowers/nvim-regexplainer', name = 'regexplainer', config = register_config }, -- Explain Regex when hover
   ----------------------------- }
 
   ---- Debug / Test / Run ----- {
-  { 'mfussenegger/nvim-dap', config = register_config('dap') }, -- Debug Adapter implementation
-  { 'jayp0521/mason-nvim-dap.nvim', config = register_config('mason_dap'), after = { 'mason.nvim', 'nvim-dap' } }, -- DAP manager
-  { 'nvim-neotest/neotest', config = register_config('neotest') }, -- Test integration
+  { 'mfussenegger/nvim-dap', name = 'dap', config = register_config }, -- Debug Adapter implementation
+  { 'jayp0521/mason-nvim-dap.nvim', name = 'mason_dap', config = register_config, dependencies = { 'mason', 'dap' } }, -- DAP manager
+  { 'nvim-neotest/neotest', name = 'neotest', config = register_config }, -- Test integration
   { 'nvim-neotest/neotest-vim-test', before = 'neotest' }, -- Test runner compatibility that support vim-test
-  { 'stevearc/overseer.nvim', config = register_config('overseer') }, -- Task runner
+  { 'stevearc/overseer.nvim', name = 'overseer', config = register_config }, -- Task runner
   ----------------------------- }
 
   -------- Integration -------- {
   { -- Browser
     'glacambre/firenvim',
-    run = function()
+    build = function()
       vim.fn['firenvim#install'](0)
     end,
-    config = register_config('firenvim'),
+    name = 'firenvim',
+    config = register_config,
   },
-  { 'folke/which-key.nvim', config = register_config('whichkey') }, -- Show guide of keymaps
-  { 'akinsho/nvim-toggleterm.lua', config = register_config('toggleterm') }, -- Terminal
+  { 'folke/which-key.nvim', name = 'whichkey', config = register_config, event = 'VeryLazy' }, -- Show guide of keymaps
+  { 'akinsho/nvim-toggleterm.lua', name = 'toggleterm', config = register_config }, -- Terminal
   -- Fuzzy finder {
   { -- Engine
     'nvim-telescope/telescope.nvim',
-    config = register_config('telescope'),
-    requires = {
-      { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }, -- Increase performance with fzf (native port from Go to C)
+    name = 'telescope',
+    config = register_config,
+    dependencies = {
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }, -- Increase performance with fzf (native port from Go to C)
     },
   },
-  { 'potamides/pantran.nvim', config = register_config('pantran') }, -- Translate
-  { 'ofirgall/open.nvim', config = register_config('open') }, -- Open current word by other tools
+  { 'potamides/pantran.nvim', name = 'pantran', config = register_config }, -- Translate
+  { 'ofirgall/open.nvim', name = 'open', config = register_config }, -- Open current word by other tools
   { 'tpope/vim-dadbod' }, -- Interact with database
   { -- Google Keep integration
     'stevearc/gkeep.nvim',
-    run = 'UpdateRemotePlugins',
-    config = register_config('gkeep'),
+    build = ':UpdateRemotePlugins',
+    name = 'gkeep',
+    config = register_config,
     setup = register_setup('gkeep'),
   },
   --------------- }
   ----------------------------- }
 
   ---------- Utility ---------- {
-  { 'olimorris/persisted.nvim', config = register_config('session') }, -- Automatic session management
-  DEBUG and { 'nvim-treesitter/playground', config = register_config('playground'), after = 'nvim-treesitter' } or nil,
+  { 'olimorris/persisted.nvim', name = 'session', config = register_config }, -- Automatic session management
+  {
+    'nvim-treesitter/playground',
+    name = 'playground',
+    config = register_config,
+    dependencies = { 'treesitter' },
+    cond = DEBUG,
+  },
   {
     'williamboman/mason.nvim', -- Automatically ínstall language server, linter, dap server
-    config = register_config('mason'),
+    name = 'mason',
+    config = register_config,
   },
   ----------------------------- }
 }

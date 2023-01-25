@@ -2,10 +2,11 @@ return function(register_config, filetypes)
   return {
     { -- Preview markdown
       'iamcco/markdown-preview.nvim',
-      run = function()
+      build = function()
         vim.fn['mkdp#util#install']()
       end,
-      config = register_config('markdown_preview', filetypes),
+      name = 'markdown_preview',
+      config = register_config,
     },
   }
 end

@@ -8,13 +8,7 @@ My customization configuration for neovim
 
 ## Feature
 
-* Manage plugin and lazy-load plugin with [packer](https://github.com/wbthomason/packer.nvim)
-* Improve startup time by:
-  * Use [filetype.nvim](https://github.com/nathom/filetype.nvim), a replacement for
-    the included filetype.vim that is sourced on startup
-  * Use [vim-startuptime](https://github.com/dstein64/vim-startuptime) for viewing
-    startup event timing information
-  * Speed up loading Lua modules with [impatient.nvim](https://github.com/lewis6991/impatient.nvim)
+* Manage plugin and lazy-load plugin with [lazy](https://github.com/folke/lazy.nvim)
 * Elegant and beautiful UI:
   * Beautiful theme [onedark](https://github.com/navarasu/onedark.nvim)
   * Managing tabs, buffers with [bufferline.nvim](https://github.com/akinsho/bufferline.nvim)

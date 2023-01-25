@@ -2,6 +2,7 @@ local modules = {
   'bootstrap',
   'options',
   'keymaps',
+  'filetype',
 }
 
 for _, module in ipairs(modules) do

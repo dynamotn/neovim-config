@@ -30,7 +30,7 @@ _G.dynamo_reload_nvim_config = function(has_changed_plugins)
   vim.notify('Nvim configuration reloaded!', vim.log.levels.INFO, { title = 'Reload' })
 
   if has_changed_plugins then
-    require('packer').sync()
+    require('lazy').sync()
     vim.api.nvim_command('redraw')
   end
 end

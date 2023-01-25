@@ -1,5 +1,5 @@
-return function(require_config, filetypes)
+return function(register_config, filetypes)
   return {
-    { 'someone-stole-my-name/yaml-companion.nvim', config = require_config('yaml_companion', filetypes) }, -- Autodetect YAML schema
+    { 'someone-stole-my-name/yaml-companion.nvim', name = 'yaml_companion', config = register_config }, -- Autodetect YAML schema
   }
 end

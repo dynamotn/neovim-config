@@ -49,8 +49,8 @@ M.load_default_augroups = function()
       { 'BufWritePost', config_path .. 'lua/languages/*/plugins.lua', 'lua dynamo_reload_nvim_config(true)' },
     },
     reload_nvim_config = {
-      { 'User', 'PackerComplete', [[lua require('plugins')]] },
-      { 'User', 'PackerComplete', 'UpdateRemotePlugins' },
+      { 'User', 'LazyComplete', [[lua require('plugins')]] },
+      { 'User', 'LazyComplete', 'UpdateRemotePlugins' },
     },
     mkdir_saving = {
       { 'BufWritePre', '*', 'lua dynamo_mkdir_saving()' },

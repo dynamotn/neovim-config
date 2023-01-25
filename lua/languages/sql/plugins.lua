@@ -1,6 +1,6 @@
-return function(require_config, filetypes)
+return function(register_config, filetypes)
   return {
-    { 'kristijanhusak/vim-dadbod-completion', config = require_config('cmp_dadbod', filetypes) }, -- SQL completion source
-    { 'nanotee/sqls.nvim', config = require_config('sqls', filetypes) }, -- SQL LSP
+    { 'kristijanhusak/vim-dadbod-completion', name = 'cmp_dadbod', config = register_config }, -- SQL completion source
+    { 'nanotee/sqls.nvim', name = 'sqls', config = register_config }, -- SQL LSP
   }
 end

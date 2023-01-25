@@ -1,5 +1,5 @@
 return function(register_config, filetypes)
   return {
-    { 'rest-nvim/rest.nvim', config = register_config('rest', filetypes) }, -- HTTP client
+    { 'rest-nvim/rest.nvim', name = 'rest', config = register_config }, -- HTTP client
   }
 end

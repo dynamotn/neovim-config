@@ -4,30 +4,33 @@
 ---------------------------------------
 local g = vim.g -- Global variables
 
----------- Packer ----------- {
-local packer_path = vim.fn.stdpath('data') .. '/site/pack/packer/opt/packer.nvim'
-if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
-  print('Cloning packer..')
+---------- Lazy ----------- {
+local lazy_path = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+if not vim.loop.fs_stat(lazy_path) then
+  print('Cloning lazy..')
   -- Remove the dir before cloning
-  vim.fn.delete(packer_path, 'rf')
+  vim.fn.delete(lazy_path, 'rf')
   vim.fn.system({
     'git',
     'clone',
-    'https://github.com/wbthomason/packer.nvim',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim',
     '--depth',
     '1',
-    packer_path,
+    lazy_path,
   })
 
-  vim.cmd([[packadd packer.nvim]])
-  local present, packer = pcall(require, 'packer')
+  vim.opt.rtp:prepend(lazy_path)
+  local present, lazy = pcall(require, 'lazy')
 
   if present then
-    print('Packer cloned successfully.')
-    g.dynamo_bootstrap_packer = true
+    print('Lazy cloned successfully.')
+    g.dynamo_bootstrap_lazy = true
   else
-    error("Couldn't clone packer !\nPacker path: " .. packer_path .. '\n' .. packer)
+    error("Couldn't clone lazy !\nLazy path: " .. lazy_path .. '\n' .. lazy)
   end
+else
+  vim.opt.rtp:prepend(lazy_path)
 end
 ----------------------------- }
 

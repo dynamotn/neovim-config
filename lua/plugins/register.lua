@@ -6,29 +6,36 @@ local augroup = require('misc.augroup')
 local M = {}
 
 -- Register plugin config
-M.register_config = function(name, filetypes)
-  M.register_keymaps(name, nil, filetypes)
-  return M.register_options(name)
+M.register_config = function(plugin)
+  M.register_keymaps(plugin, nil)
+  return M.register_options(plugin)
 end
 
 -- Load per-plugin options to setup plugin after plugin load
-M.register_options = function(name)
-  return "pcall(require, 'plugins.options." .. name .. "')"
+M.register_options = function(plugin)
+  if plugin.dir then
+    vim.opt.rtp:append(plugin.dir)
+  end
+  if plugin.name then
+    pcall(require, 'plugins.options.' .. plugin.name)
+  end
 end
 
 -- Load per-plugin options to setup plugin before plugin log
-M.register_setup = function(name)
-  return "pcall(require, 'plugins.setup." .. name .. "')"
+M.register_setup = function(plugin)
+  if plugin.name then
+    pcall(require, 'plugins.setup.' .. plugin.name)
+  end
 end
 
 -- Load per-plugin keymaps by `whichkey` plugin
-M.register_keymaps = function(name, buffer_number, filetypes)
+M.register_keymaps = function(plugin, buffer_number)
   local present, whichkey = pcall(require, 'which-key')
   if not present then
     return
   end
 
-  local present, keymaps = pcall(require, 'plugins.keymaps.' .. name)
+  local present, keymaps = pcall(require, 'plugins.keymaps.' .. plugin.name)
   if not present then
     return
   end
@@ -41,16 +48,16 @@ M.register_keymaps = function(name, buffer_number, filetypes)
     end
   end
 
-  if filetypes ~= nil then
-    _G.dynamo_whichkey[table.concat(filetypes, '_')] = function()
+  if plugin.ft ~= nil then
+    _G.dynamo_whichkey[table.concat(plugin.ft, '_')] = function()
       define_keymaps(0)
     end
     augroup.create_augroups({
-      ['whichkey_' .. table.concat(filetypes, '_')] = {
+      ['whichkey_' .. table.concat(plugin.ft, '_')] = {
         {
           'FileType',
-          table.concat(filetypes, ','),
-          'lua dynamo_whichkey["' .. table.concat(filetypes, '_') .. '"]()',
+          table.concat(plugin.ft, ','),
+          'lua dynamo_whichkey["' .. table.concat(plugin.ft, '_') .. '"]()',
         },
       },
     })
