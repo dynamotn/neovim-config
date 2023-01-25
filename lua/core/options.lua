@@ -45,6 +45,9 @@ opt.cursorline = true
 ----------------------------- }
 
 ---- File manipulation ------ {
+-- Encoding
+opt.fileencoding = 'utf-8'
+
 -- End of file setting
 opt.fileformat = 'unix'
 
