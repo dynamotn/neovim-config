@@ -45,38 +45,42 @@ wilder.set_option(
   })
 )
 
+local has_python = vim.fn.has('python') == 1
+
 wilder.set_option('pipeline', {
   wilder.debounce(10),
   wilder.branch(
-    wilder.python_file_finder_pipeline({
-      file_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-tf' } or {
-        'find',
-        '.',
-        '-type',
-        'f',
-        '-printf',
-        '%P\n',
-      },
-      dir_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-td' } or {
-        'find',
-        '.',
-        '-type',
-        'd',
-        '-printf',
-        '%P\n',
-      },
-      filters = { 'fuzzy_filter', 'difflib_sorter' },
-    }),
+    has_python
+        and wilder.python_file_finder_pipeline({
+          file_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-tf' } or {
+            'find',
+            '.',
+            '-type',
+            'f',
+            '-printf',
+            '%P\n',
+          },
+          dir_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-td' } or {
+            'find',
+            '.',
+            '-type',
+            'd',
+            '-printf',
+            '%P\n',
+          },
+          filters = { 'fuzzy_filter', 'difflib_sorter' },
+        })
+      or wilder.vim_file_finder_pipeline(),
     wilder.substitute_pipeline({
-      pipeline = wilder.python_search_pipeline({
+      pipeline = has_python and wilder.python_search_pipeline({
         skip_cmdtype_check = 1,
         pattern = wilder.python_fuzzy_pattern({
           start_at_boundary = 0,
         }),
-      }),
+      }) or wilder.vim_search_pipeline(),
     }),
     wilder.cmdline_pipeline({
-      language = 'python',
+      language = has_python and 'python' or 'vim',
       fuzzy = 1,
     }),
     {
@@ -85,13 +89,15 @@ wilder.set_option('pipeline', {
       end),
       wilder.history(),
     },
-    wilder.python_search_pipeline({
-      skip_cmdtype_check = 1,
-      pattern = wilder.python_fuzzy_pattern({
-        start_at_boundary = 0,
-      }),
-      sorter = wilder.python_difflib_sorter(),
-      engine = 're',
-    })
+    has_python
+        and wilder.python_search_pipeline({
+          skip_cmdtype_check = 1,
+          pattern = wilder.python_fuzzy_pattern({
+            start_at_boundary = 0,
+          }),
+          sorter = wilder.python_difflib_sorter(),
+          engine = 're',
+        })
+      or wilder.vim_search_pipeline()
   ),
 })
