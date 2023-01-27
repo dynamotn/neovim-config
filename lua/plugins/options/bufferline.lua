@@ -22,7 +22,7 @@ local special_filetypes = {
 
 local offsets = {}
 for filetype, text in pairs(special_filetypes) do
-  table.insert(offset, {
+  table.insert(offsets, {
     filetype = filetype,
     text = text,
     highlight = 'Directory',
@@ -31,6 +31,7 @@ for filetype, text in pairs(special_filetypes) do
 end
 
 bufferline.setup({
+  highlights = require('catppuccin.groups.integrations.bufferline').get(),
   options = {
     mode = 'tabs',
     numbers = function(opts)

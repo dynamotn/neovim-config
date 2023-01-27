@@ -1,6 +1,7 @@
 local barbecue = require('barbecue')
 
 barbecue.setup({
+  theme = 'catppuccin',
   symbols = {
     separator = '>',
   },

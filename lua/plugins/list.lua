@@ -11,7 +11,11 @@ return {
 
   -------- Eyecandy ----------- {
   -- Color scheme {
-  { 'navarasu/onedark.nvim', name = 'onedark', event = 'UIEnter' }, -- OneDark for both Dark and Light colorscheme
+  { -- Catppuccin for both Dark (Macchiato) and Light (Latte) colorscheme
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    event = 'UIEnter',
+  },
   --------------- }
 
   -- Status and tab/buffer line {
@@ -19,9 +23,14 @@ return {
     'nvim-lualine/lualine.nvim',
     name = 'lualine',
     event = 'UIEnter',
-    dependencies = { 'onedark' },
+    dependencies = { 'catppuccin' },
   },
-  { 'akinsho/bufferline.nvim', name = 'bufferline', event = 'UIEnter' }, -- Buffer and tab line
+  { -- Buffer and tab line
+    'akinsho/bufferline.nvim',
+    name = 'bufferline',
+    event = 'UIEnter',
+    dependencies = { 'catppuccin' },
+  },
   ----------------------------- }
 
   -- Quickfix and diagnostics {
@@ -71,7 +80,7 @@ return {
     'utilyre/barbecue.nvim',
     name = 'barbecue',
     event = 'UIEnter',
-    dependencies = { 'SmiteshP/nvim-navic' },
+    dependencies = { 'SmiteshP/nvim-navic', 'catppuccin' },
   },
   { -- Rainbow parentheses
     'p00f/nvim-ts-rainbow',

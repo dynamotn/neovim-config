@@ -35,7 +35,7 @@ end
 
 lualine.setup({
   options = {
-    theme = 'onedark',
+    theme = 'catppuccin',
   },
   sections = {
     lualine_a = { 'mode' },
