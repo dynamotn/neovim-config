@@ -1,23 +1,6 @@
-local indent = require('indent_guides')
-
-local dark_gui_colors = { '#3D4148', '#50545A' }
-local light_gui_colors = { '#E1E1E1', '#CACACA' }
+local indent = require('indent_blankline')
 
 indent.setup({
-  indent_guide_size = 8,
-  exclude_filetypes = { 'help', 'neo-tree' },
-  even_colors = vim.go.background == 'dark' and {
-    fg = dark_gui_colors[1],
-    bg = dark_gui_colors[2],
-  } or {
-    fg = light_gui_colors[1],
-    bg = light_gui_colors[2],
-  },
-  odd_colors = vim.go.background == 'dark' and {
-    fg = dark_gui_colors[2],
-    bg = dark_gui_colors[1],
-  } or {
-    fg = light_gui_colors[2],
-    bg = light_gui_colors[1],
-  },
+  char = '▏',
+  show_current_context = true,
 })

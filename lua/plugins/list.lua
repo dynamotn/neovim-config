@@ -67,9 +67,9 @@ return {
   },
   { 'nvim-tree/nvim-web-devicons', name = 'icon', event = 'UIEnter' }, -- Programming icons
   { -- Indent guide
-    'glepnir/indent-guides.nvim',
+    'lukas-reineke/indent-blankline.nvim',
     name = 'indent',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost' },
   },
   { -- Color highlight
     'NvChad/nvim-colorizer.lua',

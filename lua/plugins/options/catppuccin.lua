@@ -21,6 +21,10 @@ catppuccin.setup({
     dap = true,
     gitsigns = true,
     hop = true,
+    indent_blankline = {
+      enabled = true,
+      colored_indent_levels = true,
+    },
     mini = true,
     lsp_trouble = true,
     native_lsp = {

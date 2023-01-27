@@ -41,7 +41,7 @@
   "goto_preview": { "branch": "main", "commit": "54a5e18f6a42b39021b7aef62aae4dda8680d666" },
   "hop": { "branch": "master", "commit": "90db1b2c61b820e230599a04fedcd2679e64bd07" },
   "icon": { "branch": "master", "commit": "3548363849878ef895ce54edda02421279b419d8" },
-  "indent": { "branch": "main", "commit": "e261e5a43b5a05557a66b760a4132a6c502cc0e4" },
+  "indent": { "branch": "master", "commit": "8299fe7703dfff4b1752aeed271c3b95281a952d" },
   "keymap-amend.nvim": { "branch": "master", "commit": "b8bf9d820878d5497fdd11d6de55dea82872d98e" },
   "lazy.nvim": { "branch": "main", "commit": "15fe46a728b7473d4cae368838bbc1c79c3a3f48" },
   "lightbulb": { "branch": "master", "commit": "56b9ce31ec9d09d560fe8787c0920f76bc208297" },
