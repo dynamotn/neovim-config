@@ -1,13 +1,16 @@
-snippet plugin
-  local present, ${2:name} = pcall(require, '${1:plugin}')
-
-  if not present then
-    return
-  end
+snippet plugin_option
+  local ${2:name} = require('${1:plugin}')
 
   ${2:name}.setup({
     ${3:config...}
   })
+
+snippet plugin_keymap
+  local ${2:name} = require('${1:plugin}')
+
+  return {
+    ${3:config...}
+  }
 
 snippet vdebug
   print(vim.inspect.inspect(${1}))

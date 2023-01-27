@@ -1,8 +1,4 @@
-local present, toggleterm = pcall(require, 'toggleterm')
-
-if not present then
-  return
-end
+local toggleterm = require('toggleterm')
 
 toggleterm.setup({
   open_mapping = '<F3>',

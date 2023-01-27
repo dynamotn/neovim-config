@@ -1,3 +1,7 @@
 return {
-  ['<Space>lm'] = { dynamo_cmdcr('MarkdownPreview'), 'Preview Markdown file' },
+  {
+    '<Space>lm',
+    dynamo_cmdcr('MarkdownPreview'),
+    desc = 'Preview Markdown file',
+  },
 }

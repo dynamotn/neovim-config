@@ -1,8 +1,4 @@
-local present, icon = pcall(require, 'nvim-web-devicons')
-
-if not present then
-  return
-end
+local icon = require('nvim-web-devicons')
 
 icon.setup({
   override = {

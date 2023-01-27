@@ -1,3 +1,11 @@
+local trouble = require('trouble')
+
 return {
-  ['<Space>pt'] = { dynamo_cmdcr('TodoTrouble'), 'Show TODO' },
+  {
+    '<Space>pt',
+    function()
+      trouble.toggle({ mode = 'todo' })
+    end,
+    desc = 'Show TODO',
+  },
 }

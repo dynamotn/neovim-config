@@ -1,8 +1,4 @@
-local present, wilder = pcall(require, 'wilder')
-
-if not present then
-  return
-end
+local wilder = require('wilder')
 
 wilder.setup({
   modes = { ':', '/', '?' },
@@ -12,29 +8,34 @@ local highlighters = {
   wilder.basic_highlighter(),
 }
 
-local popupmenu_renderer = wilder.popupmenu_renderer(wilder.popupmenu_palette_theme({
-  highlighter = highlighters,
-  highlights = {
-    accent = wilder.make_hl('WilderAccent', 'Pmenu', { { a = 1 }, { a = 1 }, { foreground = '#f4468f' } }),
-  },
-  pumblend = 0,
-  winblend = 0,
-  border = 'rounded',
-  prompt_position = 'bottom',
-  empty_message = wilder.popupmenu_empty_message_with_spinner(),
-  left = {
-    ' ',
-    wilder.popupmenu_devicons(),
-    wilder.popupmenu_buffer_flags({
-      flags = ' a + ',
-      icons = { ['+'] = '', a = '', h = '' },
-    }),
-  },
-  right = {
-    ' ',
-    wilder.popupmenu_scrollbar(),
-  },
-}))
+local popupmenu_renderer =
+  wilder.popupmenu_renderer(wilder.popupmenu_palette_theme({
+    highlighter = highlighters,
+    highlights = {
+      accent = wilder.make_hl(
+        'WilderAccent',
+        'Pmenu',
+        { { a = 1 }, { a = 1 }, { foreground = '#f4468f' } }
+      ),
+    },
+    pumblend = 0,
+    winblend = 0,
+    border = 'rounded',
+    prompt_position = 'bottom',
+    empty_message = wilder.popupmenu_empty_message_with_spinner(),
+    left = {
+      ' ',
+      wilder.popupmenu_devicons(),
+      wilder.popupmenu_buffer_flags({
+        flags = ' a + ',
+        icons = { ['+'] = '', a = '', h = '' },
+      }),
+    },
+    right = {
+      ' ',
+      wilder.popupmenu_scrollbar(),
+    },
+  }))
 
 wilder.set_option(
   'renderer',
@@ -52,22 +53,24 @@ wilder.set_option('pipeline', {
   wilder.branch(
     has_python
         and wilder.python_file_finder_pipeline({
-          file_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-tf' } or {
-            'find',
-            '.',
-            '-type',
-            'f',
-            '-printf',
-            '%P\n',
-          },
-          dir_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-td' } or {
-            'find',
-            '.',
-            '-type',
-            'd',
-            '-printf',
-            '%P\n',
-          },
+          file_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-tf' }
+            or {
+              'find',
+              '.',
+              '-type',
+              'f',
+              '-printf',
+              '%P\n',
+            },
+          dir_command = vim.fn.executable('fd') == 1 and { 'fd', '-H', '-td' }
+            or {
+              'find',
+              '.',
+              '-type',
+              'd',
+              '-printf',
+              '%P\n',
+            },
           filters = { 'fuzzy_filter', 'difflib_sorter' },
         })
       or wilder.vim_file_finder_pipeline(),

@@ -35,23 +35,7 @@ M.delete_augroups = function(name)
 end
 
 M.load_default_augroups = function()
-  local present, path = pcall(require, 'plenary.path')
-
-  if not present then
-    return
-  end
-
-  local config_path = path:new():absolute()
-
   M.create_augroups({
-    sync_plugin_list = {
-      { 'BufWritePost', config_path .. 'lua/plugins/list.lua', 'lua dynamo_reload_nvim_config(true)' },
-      { 'BufWritePost', config_path .. 'lua/languages/*/plugins.lua', 'lua dynamo_reload_nvim_config(true)' },
-    },
-    reload_nvim_config = {
-      { 'User', 'LazyComplete', [[lua require('plugins')]] },
-      { 'User', 'LazyComplete', 'UpdateRemotePlugins' },
-    },
     mkdir_saving = {
       { 'BufWritePre', '*', 'lua dynamo_mkdir_saving()' },
     },
@@ -59,17 +43,17 @@ M.load_default_augroups = function()
       { 'BufEnter', '*', 'lua dynamo_setft_terminal()' },
     },
     quick_quit_manual = {
-      { 'FileType', 'qf,help,man,lspinfo,lsp-installer', 'nnoremap <silent> <buffer> q :close<CR>' },
-      { 'StdinReadPre', '*', 'let s:std_in=1' },
       {
-        'VimEnter',
-        '*',
-        [[if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'Neotree' | wincmd p | ene | exe 'cd '.argv()[0] | endif]],
+        'FileType',
+        'qf,help,man,lspinfo,lsp-installer',
+        'nnoremap <silent> <buffer> q :close<CR>',
       },
+    },
+    lastplace = {
       {
-        'VimEnter',
+        'BufReadPost',
         '*',
-        [[if argc() == 0 && !exists('s:std_in') | exe 'Neotree' | endif]],
+        [[if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif]],
       },
     },
   })
@@ -78,7 +62,11 @@ end
 M.enable_highlight_document = function(client_id)
   M.create_augroups({
     highlight_lsp = {
-      { 'CursorHold', '<buffer>', string.format('lua dynamo_lsp_document_highlight(%d)', client_id) },
+      {
+        'CursorHold',
+        '<buffer>',
+        string.format('lua dynamo_lsp_document_highlight(%d)', client_id),
+      },
       { 'CursorMoved', '<buffer>', 'lua vim.lsp.buf.clear_references()' },
     },
   }, true, client_id)
@@ -92,7 +80,11 @@ M.enable_codelens = function(client_id)
   dynamo_lsp_codelens(client_id)
   M.create_augroups({
     codelens_lsp = {
-      { 'TextChanged,InsertLeave', '<buffer>', string.format('lua dynamo_lsp_codelens(%d)', client_id) },
+      {
+        'TextChanged,InsertLeave',
+        '<buffer>',
+        string.format('lua dynamo_lsp_codelens(%d)', client_id),
+      },
     },
   }, true, client_id)
 end
@@ -104,7 +96,11 @@ end
 M.enable_hover = function(client_id)
   M.create_augroups({
     hover_lsp = {
-      { 'CursorHold', '<buffer>', string.format('lua dynamo_lsp_hover(%d)', client_id) },
+      {
+        'CursorHold',
+        '<buffer>',
+        string.format('lua dynamo_lsp_hover(%d)', client_id),
+      },
     },
   }, true, client_id)
 end
@@ -116,7 +112,11 @@ end
 M.enable_codeaction = function(client_id)
   M.create_augroups({
     codeaction_lsp = {
-      { 'CursorHold,CursorHoldI', '<buffer>', string.format('lua dynamo_lsp_codeaction(%d)', client_id) },
+      {
+        'CursorHold,CursorHoldI',
+        '<buffer>',
+        string.format('lua dynamo_lsp_codeaction(%d)', client_id),
+      },
     },
   }, true, client_id)
 end
@@ -128,7 +128,11 @@ end
 M.enable_formatting = function(client_id)
   M.create_augroups({
     formatting_lsp = {
-      { 'BufWritePre', '<buffer>', string.format('lua dynamo_lsp_formatting(%d)', client_id) },
+      {
+        'BufWritePre',
+        '<buffer>',
+        string.format('lua dynamo_lsp_formatting(%d)', client_id),
+      },
     },
   }, true, client_id)
 end

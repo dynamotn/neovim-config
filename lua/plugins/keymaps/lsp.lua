@@ -1,21 +1,102 @@
-return function(whichkey, bufnr)
-  whichkey.register({
-    ['gd'] = { dynamo_cmdcr('lua vim.lsp.buf.definition()'), 'Go to definition' },
-    ['gi'] = { dynamo_cmdcr('lua vim.lsp.buf.implementation()'), 'Go to implementation' },
-    ['gt'] = { dynamo_cmdcr('lua vim.lsp.buf.type_definition()'), 'Go to type definition' },
-    ['gr'] = { dynamo_cmdcr('lua vim.lsp.buf.references()'), 'Go to references' },
-    ['K'] = { dynamo_cmdcr('lua vim.lsp.buf.hover()'), 'Hover document' },
-    ['<leader>k'] = { dynamo_cmdcr('lua vim.lsp.buf.signature_help()'), 'Signature help' },
-    ['<Space>la'] = { dynamo_cmdcr('lua vim.lsp.buf.code_action()'), 'Code Action' },
-    ['<Space>li'] = { dynamo_cmdcr('lua vim.lsp.buf.incoming_calls()'), 'Show incoming calls' },
-    ['<Space>ll'] = { dynamo_cmdcr('lua vim.lsp.codelens.run()'), 'Code Lense' },
-    ['<Space>lo'] = { dynamo_cmdcr('lua vim.lsp.buf.outgoing_calls()'), 'Show outgoing calls' },
-    ['<Space>lr'] = { dynamo_cmdcr('lua vim.lsp.buf.rename()'), 'Rename' },
-    ['<Space>ff'] = { dynamo_cmdcr('lua vim.lsp.buf.formatting()'), 'File formatting' },
-  }, { buffer = bufnr })
-
-  whichkey.register({
-    ['<Space>la'] = { dynamo_cmdcr('lua vim.lsp.buf.range_code_action()'), 'Code Action' },
-    ['<Space>ff'] = { dynamo_cmdcr('lua vim.lsp.buf.range_formatting()'), 'File formatting with range' },
-  }, { buffer = bufnr, mode = 'v' })
-end
+return {
+  {
+    'gd',
+    function()
+      vim.lsp.buf.definition()
+    end,
+    desc = 'Go to definition',
+  },
+  {
+    'gi',
+    function()
+      vim.lsp.buf.implementation()
+    end,
+    desc = 'Go to implementation',
+  },
+  {
+    'gt',
+    function()
+      vim.lsp.buf.type_definition()
+    end,
+    desc = 'Go to type definition',
+  },
+  {
+    'gr',
+    function()
+      vim.lsp.buf.references()
+    end,
+    desc = 'Go to references',
+  },
+  {
+    'K',
+    function()
+      vim.lsp.buf.hover()
+    end,
+    desc = 'Hover document',
+  },
+  {
+    '<leader>k',
+    function()
+      vim.lsp.buf.signature_help()
+    end,
+    desc = 'Signature help',
+  },
+  {
+    '<Space>la',
+    function()
+      vim.lsp.buf.code_action()
+    end,
+    desc = 'Code Action',
+  },
+  {
+    '<Space>li',
+    function()
+      vim.lsp.buf.incoming_calls()
+    end,
+    desc = 'Show incoming calls',
+  },
+  {
+    '<Space>ll',
+    function()
+      vim.lsp.codelens.run()
+    end,
+    desc = 'Code Lense',
+  },
+  {
+    '<Space>lo',
+    function()
+      vim.lsp.buf.outgoing_calls()
+    end,
+    desc = 'Show outgoing calls',
+  },
+  {
+    '<Space>lr',
+    function()
+      vim.lsp.buf.rename()
+    end,
+    desc = 'Rename',
+  },
+  {
+    '<Space>ff',
+    function()
+      vim.lsp.buf.formatting()
+    end,
+    desc = 'File formatting',
+  },
+  {
+    '<Space>la',
+    function()
+      vim.lsp.buf.range_code_action()
+    end,
+    desc = 'Code Action',
+    mode = 'v',
+  },
+  {
+    '<Space>ff',
+    function()
+      vim.lsp.buf.range_formatting()
+    end,
+    desc = 'File formatting with range',
+    mode = 'v',
+  },
+}

@@ -1,15 +1,19 @@
-return function(whichkey, bufnr)
-  whichkey.register({
-    ['<Space>lt'] = {
-      function()
-        return require('pantran').motion_translate() .. 'aw'
-      end,
-      'Translate',
-      expr = true,
-    },
-  }, { buffer = bufnr })
+local pantran = require('pantran')
 
-  whichkey.register({
-    ['<Space>lt'] = { require('pantran').motion_translate, 'Translate', expr = true },
-  }, { buffer = bufnr, mode = 'v' })
-end
+return {
+  {
+    '<Space>lt',
+    function()
+      return pantran.motion_translate() .. 'aw'
+    end,
+    desc = 'Translate',
+    expr = true,
+  },
+  {
+    '<Space>lt',
+    pantran.motion_translate,
+    desc = 'Translate',
+    mode = 'v',
+    expr = true,
+  },
+}

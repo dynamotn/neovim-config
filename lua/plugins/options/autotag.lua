@@ -1,8 +1,4 @@
-local present, autotag = pcall(require, 'nvim-ts-autotag')
-
-if not present then
-  return
-end
+local autotag = require('nvim-ts-autotag')
 
 require('nvim-treesitter.configs').setup({
   autotag = {

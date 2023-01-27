@@ -1,11 +1,8 @@
-local present, session = pcall(require, 'persisted')
-
-if not present then
-  return
-end
+local session = require('persisted')
 
 session.setup({
   autosave = true,
+  autoload = true,
   use_git_branch = true,
   telescope = {
     before_source = function()
@@ -14,6 +11,7 @@ session.setup({
     end,
   },
   branch_separator = '@@',
+  allowed_dirs = nil,
 })
 
 local present, telescope = pcall(require, 'telescope')

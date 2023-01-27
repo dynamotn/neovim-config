@@ -1,8 +1,4 @@
-local present, local_config = pcall(require, 'config-local')
-
-if not present then
-  return
-end
+local local_config = require('config-local')
 
 local_config.setup({
   config_files = { '.nvimrc.lua', '.nvimrc' },

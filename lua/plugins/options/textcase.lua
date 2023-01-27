@@ -1,5 +1,3 @@
-local present, textcase = pcall(require, 'textcase')
+local textcase = require('textcase')
 
-if not present then
-  return
-end
+textcase.setup({})

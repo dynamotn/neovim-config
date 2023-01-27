@@ -1,3 +1,9 @@
 return {
-  ['<Space>wj'] = { dynamo_cmdcr('lua require("nvim-window").pick()'), 'Jump to window' },
+  {
+    '<Space>wj',
+    function()
+      require('nvim-window').pick()
+    end,
+    desc = 'Jump to window',
+  },
 }

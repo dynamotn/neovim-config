@@ -1,7 +1,3 @@
-local present, todo = pcall(require, 'todo-comments')
-
-if not present then
-  return
-end
+local todo = require('todo-comments')
 
 todo.setup({})

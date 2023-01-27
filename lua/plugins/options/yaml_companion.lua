@@ -1,8 +1,4 @@
-local present, yaml_companion = pcall(require, 'yaml-companion')
-
-if not present then
-  return
-end
+local yaml_companion = require('yaml-companion')
 
 yaml_companion.setup({})
 

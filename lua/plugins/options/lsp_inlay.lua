@@ -1,7 +1,3 @@
-local present, lsp_inlay = pcall(require, 'lsp-inlayhints')
-
-if not present then
-  return
-end
+local lsp_inlay = require('lsp-inlayhints')
 
 lsp_inlay.setup({})

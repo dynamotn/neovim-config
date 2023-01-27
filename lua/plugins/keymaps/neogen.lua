@@ -1,3 +1,11 @@
+local neogen = require('neogen')
+
 return {
-  ['<Space>ld'] = { dynamo_cmdcr('Neogen'), 'Generate documentation' },
+  {
+    '<Space>ld',
+    function()
+      neogen.generate()
+    end,
+    desc = 'Generate documentation',
+  },
 }

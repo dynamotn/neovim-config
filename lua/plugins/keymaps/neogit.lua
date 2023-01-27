@@ -1,4 +1,18 @@
+local neogit = require('neogit')
+
 return {
-  ['<F7>'] = { dynamo_cmdcr('Neogit'), 'Show Neogit' },
-  ['<Space>gs'] = { dynamo_cmdcr('Neogit'), 'Show Neogit' },
+  {
+    '<F7>',
+    function()
+      neogit.open()
+    end,
+    desc = 'Show Neogit',
+  },
+  {
+    '<Space>gs',
+    function()
+      neogit.open()
+    end,
+    desc = 'Show Neogit',
+  },
 }

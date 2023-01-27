@@ -1,8 +1,4 @@
-local present, neorg = pcall(require, 'neorg')
-
-if not present then
-  return
-end
+local neorg = require('neorg')
 
 neorg.setup({
   load = {

@@ -1,9 +1,3 @@
-local present, surround = pcall(require, 'surround')
+local surround = require('mini.surround')
 
-if not present then
-  return
-end
-
-surround.setup({
-  mappings_style = 'surround',
-})
+surround.setup({})

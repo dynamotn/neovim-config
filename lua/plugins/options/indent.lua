@@ -1,8 +1,4 @@
-local present, indent = pcall(require, 'indent_guides')
-
-if not present then
-  return
-end
+local indent = require('indent_guides')
 
 local dark_gui_colors = { '#3D4148', '#50545A' }
 local light_gui_colors = { '#E1E1E1', '#CACACA' }

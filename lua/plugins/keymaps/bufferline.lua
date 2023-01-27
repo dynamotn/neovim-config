@@ -1,3 +1,11 @@
+local bufferline = require('bufferline')
+
 return {
-  ['<Space>bj'] = { dynamo_cmdcr('BufferLinePick'), 'Pick to jump' },
+  {
+    '<Space>bj',
+    function()
+      bufferline.pick_buffer()
+    end,
+    desc = 'Pick to jump',
+  },
 }

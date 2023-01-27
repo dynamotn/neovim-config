@@ -1,8 +1,4 @@
-local present, endwise = pcall(require, 'nvim-treesitter-endwise')
-
-if not present then
-  return
-end
+local endwise = require('nvim-treesitter-endwise')
 
 require('nvim-treesitter.configs').setup({
   endwise = {

@@ -1,8 +1,4 @@
-local present, pretty_fold = pcall(require, 'pretty-fold')
-
-if not present then
-  return
-end
+local pretty_fold = require('pretty-fold')
 
 pretty_fold.setup({
   keep_indentation = false,

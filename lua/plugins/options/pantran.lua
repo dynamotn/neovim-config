@@ -1,8 +1,4 @@
-local present, pantran = pcall(require, 'pantran')
-
-if not present then
-  return
-end
+local pantran = require('pantran')
 
 pantran.setup({
   default_engine = 'google',

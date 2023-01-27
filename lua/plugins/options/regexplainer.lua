@@ -1,8 +1,4 @@
-local present, regexplainer = pcall(require, 'regexplainer')
-
-if not present then
-  return
-end
+local regexplainer = require('regexplainer')
 
 regexplainer.setup({
   auto = true,

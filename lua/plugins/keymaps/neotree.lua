@@ -1,5 +1,23 @@
 return {
-  ['<F1>'] = { dynamo_cmdcr('Neotree toggle'), 'File explorer' },
-  ['<Space>ft'] = { dynamo_cmdcr('Neotree'), 'File explorer' },
-  ['<Space>gt'] = { dynamo_cmdcr('Neotree source=git_status'), 'Status explorer' },
+  {
+    '<F1>',
+    function()
+      require('neo-tree').float(nil, true)
+    end,
+    desc = 'File explorer',
+  },
+  {
+    '<Space>ft',
+    function()
+      require('neo-tree').float(nil, true)
+    end,
+    desc = 'File explorer',
+  },
+  {
+    '<Space>gt',
+    function()
+      require('neo-tree').float('git_status', true)
+    end,
+    desc = 'Status explorer',
+  },
 }

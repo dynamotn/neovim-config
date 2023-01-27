@@ -1,8 +1,4 @@
-local present, lightbulb = pcall(require, 'nvim-lightbulb')
-
-if not present then
-  return
-end
+local lightbulb = require('nvim-lightbulb')
 
 lightbulb.setup({
   autocmd = {

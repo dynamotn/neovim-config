@@ -1,3 +1,3 @@
 return {
-  ['<Space>rd'] = { dynamo_cmdcr('DBUI'), 'Open database window' },
+  { '<Space>rd', dynamo_cmdcr('DBUI'), desc = 'Open database window' },
 }

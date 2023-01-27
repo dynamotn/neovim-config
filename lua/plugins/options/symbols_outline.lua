@@ -1,8 +1,4 @@
-local present, symbols_outline = pcall(require, 'symbols-outline')
-
-if not present then
-  return
-end
+local symbols_outline = require('symbols-outline')
 
 symbols_outline.setup({
   auto_preview = true,

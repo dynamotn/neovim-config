@@ -1,5 +1,3 @@
-return function(_, _)
-  return {
-    { 'mtoohey31/cmp-fish' }, -- Fish completion source
-  }
-end
+return {
+  { 'mtoohey31/cmp-fish', event = 'InsertEnter' }, -- Fish completion source
+}

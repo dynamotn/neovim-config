@@ -1,8 +1,4 @@
-local present, lsp_lines = pcall(require, 'lsp_lines')
-
-if not present then
-  return
-end
+local lsp_lines = require('lsp_lines')
 
 vim.diagnostic.config({
   virtual_text = false,

@@ -1,13 +1,8 @@
-local present, neotest = pcall(require, 'neotest')
-
-if not present then
-  return
-end
+local neotest = require('neotest')
 
 local adapters = {}
 
 local present, neotest_vim = pcall(require, 'neotest-vim-test')
-
 if present then
   table.insert(
     adapters,

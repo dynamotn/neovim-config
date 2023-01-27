@@ -1,9 +1,3 @@
-local present, comment = pcall(require, 'Comment')
+local comment = require('mini.comment')
 
-if not present then
-  return
-end
-
-comment.setup({
-  ignore = '^$', -- Ignore empty lines
-})
+comment.setup({})

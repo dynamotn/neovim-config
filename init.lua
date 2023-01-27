@@ -1,4 +1,4 @@
-DEBUG = true
+DEBUG = false
 if vim.version().minor > 6 then
   require('core')
   require('misc')

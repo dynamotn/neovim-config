@@ -1,7 +1,3 @@
-local present, neotree = pcall(require, 'neo-tree')
-
-if not present then
-  return
-end
+local neotree = require('neo-tree')
 
 neotree.setup({})

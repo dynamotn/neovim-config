@@ -1,8 +1,4 @@
-local present, neogen = pcall(require, 'neogen')
-
-if not present then
-  return
-end
+local neogen = require('neogen')
 
 neogen.setup({
   snippet_engine = 'luasnip',

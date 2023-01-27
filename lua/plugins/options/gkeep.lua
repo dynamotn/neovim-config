@@ -1,4 +1,4 @@
-local present, telescope = pcall(require, 'telescope')
+local telescope = require('telescope')
 
 if not present then
   return

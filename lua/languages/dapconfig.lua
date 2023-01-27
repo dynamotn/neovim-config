@@ -22,7 +22,11 @@ end
 M.neovim = {
   mason_install = false,
   adapter = function(callback, config)
-    callback({ type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 })
+    callback({
+      type = 'server',
+      host = config.host or '127.0.0.1',
+      port = config.port or 8086,
+    })
   end,
   configurations = {
     {
@@ -46,8 +50,10 @@ M.bash = {
       name = 'Launch file',
       program = '${file}',
       cwd = '${fileDirname}',
-      pathBashdb = vim.fn.stdpath('data') .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
-      pathBashdbLib = vim.fn.stdpath('data') .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
+      pathBashdb = vim.fn.stdpath('data')
+        .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
+      pathBashdbLib = vim.fn.stdpath('data')
+        .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
       pathBash = 'bash',
       pathCat = 'cat',
       pathMkfifo = 'mkfifo',
@@ -75,7 +81,11 @@ M.lldb = {
       type = 'lldb',
       request = 'launch',
       program = function()
-        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        return vim.fn.input(
+          'Path to executable: ',
+          vim.fn.getcwd() .. '/',
+          'file'
+        )
       end,
       cwd = '${workspaceFolder}',
       stopOnEntry = true,
@@ -198,7 +208,10 @@ M.python = {
       local port = (config.connect or config).port
       callback({
         type = 'server',
-        port = assert(port, '`connect.port` is required for a python `attach` configuration'),
+        port = assert(
+          port,
+          '`connect.port` is required for a python `attach` configuration'
+        ),
         host = (config.connect or config).host or '127.0.0.1',
       })
     else
@@ -262,9 +275,21 @@ M.ruby = {
     end
 
     if config.bundle == 'bundle' then
-      args = { '-n', '--open', '--port', config.port, '-c', '--', 'bundle', 'exec', config.command, script }
+      args = {
+        '-n',
+        '--open',
+        '--port',
+        config.port,
+        '-c',
+        '--',
+        'bundle',
+        'exec',
+        config.command,
+        script,
+      }
     else
-      args = { '--open', '--port', config.port, '-c', '--', config.command, script }
+      args =
+        { '--open', '--port', config.port, '-c', '--', config.command, script }
     end
 
     local opts = {

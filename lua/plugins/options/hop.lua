@@ -1,7 +1,3 @@
-local present, hop = pcall(require, 'hop')
-
-if not present then
-  return
-end
+local hop = require('hop')
 
 hop.setup({})

@@ -80,5 +80,5 @@ plugin.register_keybindings(prefix, api.to_path_case, {
 })
 
 return {
-  [prefix] = 'Convert text case',
+  { prefix, nil },
 }

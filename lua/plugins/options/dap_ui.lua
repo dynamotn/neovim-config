@@ -1,8 +1,4 @@
-local present, dap_ui = pcall(require, 'dapui')
-
-if not present then
-  return
-end
+local dap_ui = require('dapui')
 
 dap_ui.setup({})
 

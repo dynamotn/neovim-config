@@ -40,10 +40,17 @@ M.generate_candidates = function(kind, candidates, entries, callback)
       on_exit = function(self, exit_code)
         exited_view_jobs_count = exited_view_jobs_count + 1
         if exit_code == 0 then
-          candidates[candidate_index].documentation.value =
-            table.concat(require('vim.lsp.util').convert_input_to_markdown_lines(self:result()), '\n')
+          candidates[candidate_index].documentation.value = table.concat(
+            require('vim.lsp.util').convert_input_to_markdown_lines(
+              self:result()
+            ),
+            '\n'
+          )
         end
-        if exited_view_jobs_count == #entries and type(callback) == 'function' then
+        if
+          exited_view_jobs_count == #entries
+          and type(callback) == 'function'
+        then
           callback()
         end
       end,
@@ -72,39 +79,43 @@ M.setup = function(params, done)
     search_jobs_count = search_jobs_count + 1
   end
   for kind, query in pairs(jira_queries) do
-    j:new({
-      command = 'jira',
-      args = {
-        'issue',
-        'list',
-        '--plain',
-        '--columns',
-        'KEY,SUMMARY,ASSIGNEE',
-        '--paginate',
-        10,
-        '--no-headers',
-        '--jql',
-        query,
-      },
-      on_exit = function(self, exit_code)
-        exited_search_jobs_count = exited_search_jobs_count + 1
-        if exit_code == 0 then
-          M.generate_candidates(
-            kind,
-            candidates,
-            self:result(),
-            exited_search_jobs_count == search_jobs_count
-                and function()
-                  if exited_search_jobs_count == search_jobs_count then
-                    done({ { items = candidates, isIncomplete = #candidates == 0 } })
+    j
+      :new({
+        command = 'jira',
+        args = {
+          'issue',
+          'list',
+          '--plain',
+          '--columns',
+          'KEY,SUMMARY,ASSIGNEE',
+          '--paginate',
+          10,
+          '--no-headers',
+          '--jql',
+          query,
+        },
+        on_exit = function(self, exit_code)
+          exited_search_jobs_count = exited_search_jobs_count + 1
+          if exit_code == 0 then
+            M.generate_candidates(
+              kind,
+              candidates,
+              self:result(),
+              exited_search_jobs_count == search_jobs_count
+                  and function()
+                    if exited_search_jobs_count == search_jobs_count then
+                      done({
+                        { items = candidates, isIncomplete = #candidates == 0 },
+                      })
+                    end
                   end
-                end
-              or nil
-          )
-        end
-      end,
-      detached = true,
-    }):start()
+                or nil
+            )
+          end
+        end,
+        detached = true,
+      })
+      :start()
   end
 end
 

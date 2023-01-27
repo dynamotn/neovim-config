@@ -1,8 +1,4 @@
-local present, dial = pcall(require, 'dial.config')
-
-if not present then
-  return
-end
+local dial = require('dial.config')
 
 local augend = require('dial.augend')
 local configs = require('languages').setup_dial(augend)

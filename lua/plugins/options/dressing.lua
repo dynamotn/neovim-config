@@ -1,7 +1,3 @@
-local present, dressing = pcall(require, 'dressing')
-
-if not present then
-  return
-end
+local dressing = require('dressing')
 
 dressing.setup({})

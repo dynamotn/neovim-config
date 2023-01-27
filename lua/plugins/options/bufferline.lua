@@ -1,7 +1,33 @@
-local present, bufferline = pcall(require, 'bufferline')
+local bufferline = require('bufferline')
 
-if not present then
-  return
+local special_filetypes = {
+  help = 'Help Guide',
+  Outline = 'Outline',
+  dapui_scopes = 'Scopes',
+  dapui_breakpoints = 'Breakpoints',
+  dapui_stacks = 'Stacks',
+  dapui_watches = 'Watches',
+  ['dap-repl'] = 'REPL',
+  dapui_console = 'Console',
+  dbui = 'Database',
+  dbout = 'Query Result',
+  ['neo-tree'] = 'File Explorer',
+  GoogleKeepMenu = 'Google Keep Menu',
+  GoogleKeepList = 'Google Keep Notes',
+  OverseerList = 'List tasks',
+  terminal = 'Terminal',
+  Regexplainer = 'Regex',
+  tsplayground = 'TSPlayground',
+}
+
+local offsets = {}
+for filetype, text in pairs(special_filetypes) do
+  table.insert(offset, {
+    filetype = filetype,
+    text = text,
+    highlight = 'Directory',
+    text_align = 'left',
+  })
 end
 
 bufferline.setup({
@@ -15,5 +41,6 @@ bufferline.setup({
     show_close_icon = false,
     separator_style = 'slant',
     sort_by = 'tabs',
+    offsets = offsets,
   },
 })

@@ -1,8 +1,4 @@
-local present, onedark = pcall(require, 'onedark')
-
-if not present then
-  return
-end
+local onedark = require('onedark')
 
 onedark.setup({
   style = 'cool',

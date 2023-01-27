@@ -1,8 +1,4 @@
-local present, lualine = pcall(require, 'lualine')
-
-if not present then
-  return
-end
+local lualine = require('lualine')
 
 local special_filetypes = {
   help = 'Help Guide',
@@ -40,9 +36,6 @@ end
 lualine.setup({
   options = {
     theme = 'onedark',
-    disabled_filetypes = {
-      'NvimTree',
-    },
   },
   sections = {
     lualine_a = { 'mode' },
@@ -115,7 +108,9 @@ lualine.setup({
       {
         function()
           local msg = ' '
-          for tool, _ in pairs(require('languages').get_tools_by_filetype(vim.bo.filetype)) do
+          for tool, _ in
+            pairs(require('languages').get_tools_by_filetype(vim.bo.filetype))
+          do
             if vim.fn.executable(tool) == 1 then
               msg = msg .. tool .. ' '
             else
@@ -154,6 +149,7 @@ lualine.setup({
     extensions('neo-tree'),
     extensions('GoogleKeepMenu'),
     extensions('GoogleKeepList'),
+    extensions('OverseerList'),
     extensions('terminal'),
     extensions('Regexplainer'),
     extensions('tsplayground'),

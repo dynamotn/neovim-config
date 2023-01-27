@@ -1,8 +1,4 @@
-local present, barbecue = pcall(require, 'barbecue')
-
-if not present then
-  return
-end
+local barbecue = require('barbecue')
 
 barbecue.setup({
   symbols = {

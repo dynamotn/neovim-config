@@ -7,7 +7,6 @@ local M = {}
 
 -- Register plugin config
 M.register_config = function(plugin)
-  M.register_keymaps(plugin, nil)
   return M.register_options(plugin)
 end
 
@@ -21,17 +20,16 @@ M.register_options = function(plugin)
   end
 end
 
--- Load per-plugin options to setup plugin before plugin log
+-- Load per-plugin options to setup plugin before plugin load
 M.register_setup = function(plugin)
   if plugin.name then
     pcall(require, 'plugins.setup.' .. plugin.name)
   end
 end
 
--- Load per-plugin keymaps by `whichkey` plugin
-M.register_keymaps = function(plugin, buffer_number)
-  local present, whichkey = pcall(require, 'which-key')
-  if not present then
+-- Load per-plugin keymaps
+M.register_keymaps = function(plugin)
+  if not plugin.name then
     return
   end
 
@@ -40,29 +38,25 @@ M.register_keymaps = function(plugin, buffer_number)
     return
   end
 
-  local define_keymaps = function(bufnr)
-    if type(keymaps) == 'table' then
-      whichkey.register(keymaps, { buffer = bufnr })
-    elseif type(keymaps) == 'function' then
-      keymaps(whichkey, bufnr)
+  if plugin.name == 'whichkey' then
+    local present, whichkey = pcall(require, 'which-key')
+    if not present then
+      return
     end
-  end
 
-  if plugin.ft ~= nil then
-    _G.dynamo_whichkey[table.concat(plugin.ft, '_')] = function()
-      define_keymaps(0)
+    for _, keymap in ipairs(keymaps) do
+      if keymap[2] then
+        whichkey.register({
+          [keymap[1]] = { keymap[2], keymap['desc'] },
+        })
+      else
+        whichkey.register({
+          [keymap[1]] = { name = keymap['desc'] },
+        })
+      end
     end
-    augroup.create_augroups({
-      ['whichkey_' .. table.concat(plugin.ft, '_')] = {
-        {
-          'FileType',
-          table.concat(plugin.ft, ','),
-          'lua dynamo_whichkey["' .. table.concat(plugin.ft, '_') .. '"]()',
-        },
-      },
-    })
   else
-    define_keymaps(buffer_number)
+    return keymaps
   end
 end
 

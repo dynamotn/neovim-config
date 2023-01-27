@@ -1,6 +1,4 @@
-return function(_, _)
-  return {
-    { 'jbyuki/one-small-step-for-vimkind', cond = DEBUG }, -- Neovim debugger
-    { 'folke/neodev.nvim' },
-  }
-end
+return {
+  DEBUG and { 'jbyuki/one-small-step-for-vimkind' } or nil, -- Neovim debugger
+  { 'folke/neodev.nvim' },
+}
