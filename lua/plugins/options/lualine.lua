@@ -65,7 +65,7 @@ lualine.setup({
             return noice.api.statusline.mode.has()
           end
         end,
-        color = { fg = '#ff9e64' },
+        color = { fg = '#f5a97f' },
       },
     },
     lualine_x = {
@@ -80,7 +80,7 @@ lualine.setup({
           end
           return ''
         end,
-        color = { fg = '#98be65' },
+        color = { fg = '#a6da95' },
       },
       {
         function(msg)
@@ -103,7 +103,7 @@ lualine.setup({
           end
           return '  ' .. table.concat(buf_client_names, ', ')
         end,
-        color = { fg = '#008080', gui = 'bold' },
+        color = { fg = '#8bd5ca', gui = 'bold' },
       },
       {
         function()
@@ -119,7 +119,7 @@ lualine.setup({
           end
           return msg
         end,
-        color = { fg = '#8080f0', gui = 'bold' },
+        color = { fg = '#c6a0f6', gui = 'bold' },
       },
       'filetype',
     },
