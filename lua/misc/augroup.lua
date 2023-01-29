@@ -56,6 +56,13 @@ M.load_default_augroups = function()
         [[if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif]],
       },
     },
+    neotree = {
+      {
+        'VimEnter',
+        '*',
+        [[if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'lua dynamo_file_explorer()' | wincmd p | ene | exe 'cd '.argv()[0] | endif]],
+      },
+    },
   })
 end
 

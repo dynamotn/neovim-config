@@ -227,3 +227,10 @@ _G.dynamo_setft_terminal = function()
   end
 end
 ---------------------------- }
+
+-- Open File explore {
+_G.dynamo_file_explorer = function()
+  require('lazy').load({ plugins = { 'neotree' } })
+  require('neo-tree').show(nil, true, true, true)
+end
+--------------- }

@@ -1,22 +1,24 @@
+local neotree = require('neo-tree')
+
 return {
   {
     '<F1>',
     function()
-      require('neo-tree').float(nil, true)
+      neotree.show(nil, true, true, true)
     end,
     desc = 'File explorer',
   },
   {
     '<Space>ft',
     function()
-      require('neo-tree').float(nil, true)
+      neotree.show(nil, true, true, true)
     end,
     desc = 'File explorer',
   },
   {
     '<Space>gt',
     function()
-      require('neo-tree').float('git_status', true)
+      neotree.show('git_status', true, true, true)
     end,
     desc = 'Status explorer',
   },
