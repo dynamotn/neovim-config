@@ -328,7 +328,6 @@ return {
   {
     'williamboman/mason.nvim', -- Automatically ínstall language server, linter, dap server
     name = 'mason',
-    cmd = { 'Mason', 'MasonInstall' },
   },
   ----------------------------- }
 }
