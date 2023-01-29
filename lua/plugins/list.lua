@@ -133,6 +133,7 @@ return {
     name = 'symbols_outline',
   },
   { 'phaazon/hop.nvim', name = 'hop' }, -- Easymotion
+  { 'numToStr/Navigator.nvim', name = 'neomux', event = 'UIEnter' }, -- Smoothly navigate between neovim and tmux
   ----------------------------- }
 
   ------ VCS and Project ------ {

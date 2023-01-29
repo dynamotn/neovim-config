@@ -59,6 +59,7 @@
   "mason_null_ls": { "branch": "main", "commit": "93946aef86b1409958c97ee5feaf30bdd1053e24" },
   "neogen": { "branch": "main", "commit": "465af9d6c6fb7f360175991dcc23fc10917e3a06" },
   "neogit": { "branch": "master", "commit": "de227f740bb29f90d62f9a6112f926de5f052358" },
+  "neomux": { "branch": "master", "commit": "a2e7d6ebd26e647469135d4096dfa89da4f070e5" },
   "neorg": { "branch": "main", "commit": "4a9a5fe13cd454692fc4db0b27783cd005e6be56" },
   "neorg-kanban": { "branch": "master", "commit": "d480760a70d81ec3858984cdb54d25e9a13b4137" },
   "neorg-telescope": { "branch": "main", "commit": "8d15129818c5dc224be97c9c6350d3386addeac8" },
