@@ -39,6 +39,7 @@ return {
   { '<Space>r', nil, desc = 'Run' },
   { '<Space>s', nil, desc = 'Session' },
   { '<Space>u', nil, desc = 'Utilities' },
+  { '<Space>up', dynamo_cmdcr('Lazy'), desc = 'Package manager' },
 
   -- W key
   { '<Space>w', nil, desc = 'Window' },
