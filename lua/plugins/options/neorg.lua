@@ -3,6 +3,14 @@ local neorg = require('neorg')
 neorg.setup({
   load = {
     ['core.defaults'] = {},
+    ['core.norg.esupports.hop'] = {},
+    ['core.norg.esupports.indent'] = {},
+    ['core.norg.journal'] = {},
+    ['core.norg.news'] = {},
+    ['core.norg.qol.todo_items'] = {},
+    ['core.syntax'] = {},
+    ['core.neorgcmd'] = {},
+    ['core.norg.concealer'] = {},
     ['core.norg.dirman'] = {
       config = {
         workspaces = {
@@ -20,14 +28,7 @@ neorg.setup({
       },
     },
     ['core.integrations.nvim-cmp'] = {},
-    ['core.norg.concealer'] = {},
-    ['core.gtd.base'] = {
-      config = {
-        workspace = 'personal',
-      },
-    },
     ['core.integrations.telescope'] = {},
-    ['external.kanban'] = {},
     ['external.zettelkasten'] = {},
   },
 })
