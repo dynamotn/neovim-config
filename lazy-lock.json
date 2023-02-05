@@ -1,4 +1,5 @@
 {
+  "align": { "branch": "main", "commit": "ad9f4e93deb551cc0d26a7c93a02061412ab21ce" },
   "autopairs": { "branch": "master", "commit": "31042a5823b55c4bfb30efcbba2fc1b5b53f90dc" },
   "autotag": { "branch": "main", "commit": "fdefe46c6807441460f11f11a167a2baf8e4534b" },
   "barbecue": { "branch": "main", "commit": "11e363e33f9952b35e757c528bf6515872ec8650" },

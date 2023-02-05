@@ -160,6 +160,7 @@ return {
     name = 'neogen',
     dependencies = { 'treesitter' },
   },
+  { 'echasnovski/mini.align', name = 'align', event = 'UIEnter' }, -- Align text interactively
   ---------- }
   { -- Code complete engine
     'hrsh7th/nvim-cmp',
@@ -238,7 +239,7 @@ return {
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
-  ------------- {
+  ------------- }
   -- Syntax highlight {
   vim.fn.system('grep -is "Gentoo" /etc/os-release') ~= '' and {
     'gentoo/gentoo-syntax',
