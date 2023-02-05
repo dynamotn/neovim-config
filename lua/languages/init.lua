@@ -156,7 +156,7 @@ end
 
 M.get_tools_by_filetype = function(filetype)
   local result = {
-    ec = true,
+    ["editorconfig-checker"] = true,
     vale = true,
   }
 
@@ -173,8 +173,7 @@ M.get_tools_by_filetype = function(filetype)
         end
 
         for _, source in ipairs(null_ls_config) do
-          if
-            source.is_external_tool == true or source.is_external_tool == nil
+          if source.is_external_tool == true or source.is_external_tool == nil
           then
             local tool = source.tool and source.tool or source[1]
 
