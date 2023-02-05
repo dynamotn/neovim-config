@@ -14,7 +14,14 @@ end
 local cmp_default_sources = {
   { name = 'nvim_lsp' },
   { name = 'luasnip' },
-  { name = 'buffer' },
+  {
+    name = 'buffer',
+    option = {
+      get_bufnrs = function()
+        return vim.api.nvim_list_bufs()
+      end,
+    },
+  },
   { name = 'calc' },
   { name = 'path' },
   { name = 'tmux', option = { all_panes = true } },
