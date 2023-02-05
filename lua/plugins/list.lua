@@ -177,7 +177,6 @@ return {
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
       { 'rcarriga/cmp-dap', dependencies = { 'dap' } }, -- DAP completion source
       { 'uga-rosa/cmp-dynamic', name = 'cmp_dynamic' }, -- Dynamic completion source
-      { 'wxxxcxx/cmp-browser-source', name = 'cmp_browser' }, -- Vivaldi completion source
       { 'hrsh7th/cmp-copilot', dependencies = { 'zbirenbaum/copilot.vim' } }, -- Copilot completion source
     },
   },
@@ -241,9 +240,11 @@ return {
   },
   ------------- }
   -- Syntax highlight {
-  vim.fn.system('grep -is "Gentoo" /etc/os-release') ~= '' and {
-    'gentoo/gentoo-syntax',
-  } or nil, -- For gentoo filetypes
+  vim.fn.system('grep -is "Gentoo" /etc/os-release') ~= ''
+      and {
+        'gentoo/gentoo-syntax',
+      }
+    or nil, -- For gentoo filetypes
   ------------------- }
   -- Typing {
   { -- Automatically insert/delete brackets, parentheses, quotes...
@@ -320,12 +321,14 @@ return {
 
   -- ---------- Utility ---------- {
   { 'olimorris/persisted.nvim', name = 'session', event = 'UIEnter' }, -- Automatic session management
-  DEBUG and { -- Debug Treesitter
-    'nvim-treesitter/playground',
-    name = 'playground',
-    dependencies = { 'treesitter' },
-    cmd = 'TSPlaygroundToggle',
-  } or nil,
+  DEBUG
+      and { -- Debug Treesitter
+        'nvim-treesitter/playground',
+        name = 'playground',
+        dependencies = { 'treesitter' },
+        cmd = 'TSPlaygroundToggle',
+      }
+    or nil,
   {
     'williamboman/mason.nvim', -- Automatically ínstall language server, linter, dap server
     name = 'mason',

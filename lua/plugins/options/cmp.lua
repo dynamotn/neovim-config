@@ -20,7 +20,6 @@ local cmp_default_sources = {
   { name = 'tmux', option = { all_panes = true } },
   { name = 'cmp_tabnine' },
   { name = 'dynamic' },
-  { name = 'browser' },
   { name = 'copilot' },
 }
 
