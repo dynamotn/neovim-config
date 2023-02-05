@@ -6,10 +6,8 @@ local M = {}
 M.setup_autopairs = function(rule, cond, ts_cond)
   local result = {}
   for language, filetypes in pairs(languages) do
-    local ok, autopairs = pcall(
-      require,
-      'languages.' .. language .. '.autopairs'
-    )
+    local ok, autopairs =
+      pcall(require, 'languages.' .. language .. '.autopairs')
     if ok and type(autopairs) == 'function' then
       local list = autopairs(filetypes, rule, cond, ts_cond)
 
@@ -60,10 +58,8 @@ M.setup_treesitter = function(ft_to_parser, parser_config)
   local parsers = {}
 
   for language, filetypes in pairs(languages) do
-    local ok, treesitter = pcall(
-      require,
-      'languages.' .. language .. '.treesitter'
-    )
+    local ok, treesitter =
+      pcall(require, 'languages.' .. language .. '.treesitter')
     local parser
 
     if not ok or type(treesitter) ~= 'table' then
@@ -125,10 +121,8 @@ M.setup_null_ls = function()
   local result = {}
 
   for language, filetypes in pairs(languages) do
-    local ok, null_ls_config = pcall(
-      require,
-      'languages.' .. language .. '.null_ls'
-    )
+    local ok, null_ls_config =
+      pcall(require, 'languages.' .. language .. '.null_ls')
 
     if ok then
       for _, source in ipairs(null_ls_config) do
@@ -156,24 +150,23 @@ end
 
 M.get_tools_by_filetype = function(filetype)
   local result = {
-    ["editorconfig-checker"] = true,
+    ['editorconfig-checker'] = true,
     vale = true,
   }
 
   for language, filetypes in pairs(languages) do
     for _, ft in pairs(filetypes) do
       if ft == filetype then
-        local ok, null_ls_config = pcall(
-          require,
-          'languages.' .. language .. '.null_ls'
-        )
+        local ok, null_ls_config =
+          pcall(require, 'languages.' .. language .. '.null_ls')
 
         if not ok then
           return {}
         end
 
         for _, source in ipairs(null_ls_config) do
-          if source.is_external_tool == true or source.is_external_tool == nil
+          if
+            source.is_external_tool == true or source.is_external_tool == nil
           then
             local tool = source.tool and source.tool or source[1]
 
