@@ -1,8 +1,4 @@
-local present, cmp_dynamic = pcall(require, 'cmp_dynamic')
-
-if not present then
-  return
-end
+local cmp_dynamic = require('cmp_dynamic')
 
 cmp_dynamic.register({
   {
