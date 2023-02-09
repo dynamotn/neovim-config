@@ -160,7 +160,6 @@ return {
     name = 'neogen',
     dependencies = { 'treesitter' },
   },
-  { 'echasnovski/mini.align', name = 'align', event = 'UIEnter' }, -- Align text interactively
   ---------- }
   { -- Code complete engine
     'hrsh7th/nvim-cmp',
@@ -255,6 +254,7 @@ return {
   { 'monaqa/dial.nvim', name = 'dial' }, -- Increment/decrement number, date...
   { 'echasnovski/mini.surround', name = 'surround' }, -- Change surround character
   { 'johmsalas/text-case.nvim', name = 'textcase' }, -- Convert text case
+  { 'echasnovski/mini.align', name = 'align', event = 'UIEnter' }, -- Align text interactively
   --------- }
   { -- Refactoring library
     'ThePrimeagen/refactoring.nvim',
@@ -286,7 +286,7 @@ return {
   { 'stevearc/overseer.nvim', name = 'overseer' }, -- Task runner
   ----------------------------- }
 
-  -- -------- Integration -------- {
+  -------- Integration -------- {
   { -- Browser
     'glacambre/firenvim',
     name = 'firenvim',
@@ -319,7 +319,7 @@ return {
   --------------- }
   ----------------------------- }
 
-  -- ---------- Utility ---------- {
+  ---------- Utility ---------- {
   { 'olimorris/persisted.nvim', name = 'session', event = 'UIEnter' }, -- Automatic session management
   DEBUG
       and { -- Debug Treesitter

@@ -2,7 +2,6 @@
 ----------------------------------------
 -- Plugin registration to load config --
 ----------------------------------------
-local augroup = require('misc.augroup')
 local M = {}
 
 -- Register plugin config
