@@ -176,7 +176,17 @@ return {
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
       { 'rcarriga/cmp-dap', dependencies = { 'dap' } }, -- DAP completion source
       { 'uga-rosa/cmp-dynamic', name = 'cmp_dynamic' }, -- Dynamic completion source
-      { 'hrsh7th/cmp-copilot', dependencies = { 'zbirenbaum/copilot.vim' } }, -- Copilot completion source
+      { -- Copilot completion source
+        'zbirenbaum/copilot-cmp',
+        name = 'cmp_copilot',
+        dependencies = {
+          {
+            'zbirenbaum/copilot.lua',
+            cmd = 'Copilot',
+            name = 'copilot',
+          },
+        },
+      },
     },
   },
   { -- Snippet engine

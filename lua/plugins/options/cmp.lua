@@ -133,6 +133,7 @@ cmp.setup({
             Color = ' ',
             Reference = ' ',
             Folder = ' ',
+            Copilot = ' ',
           },
         })(entry, vim_item)
       end
