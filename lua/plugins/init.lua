@@ -18,34 +18,39 @@ local common_list = require('plugins.list')
 local per_language_list = require('languages').get_plugins()
 local final_list = {}
 
-for _, plugin in pairs(common_list) do
+-- Automatically inject config, setup, keymaps of plugin
+-- when lazy-loading with Lazy. Plugin must have name then trigger that.
+local function inject_lazy(plugin)
+  local result = nil
   if plugin.name then
-    table.insert(
-      final_list,
-      vim.tbl_extend('force', plugin, {
-        config = register_config,
-        init = register_setup,
-        keys = register_keymaps,
-      })
-    )
+    -- Inject to dependencies
+    local dependencies = {}
+    if plugin.dependencies then
+      for _, dependency in pairs(plugin.dependencies) do
+        table.insert(dependencies, inject_lazy(dependency))
+      end
+    end
+
+    result = vim.tbl_extend('force', plugin, {
+      config = register_config,
+      init = register_setup,
+      keys = register_keymaps,
+      dependencies = dependencies,
+    })
   else
-    table.insert(final_list, plugin)
+    result = plugin
   end
+  return result
 end
 
+-- Add plugin from common list to lazy
+for _, plugin in pairs(common_list) do
+  table.insert(final_list, inject_lazy(plugin))
+end
+
+-- Add plugin from specific language's list to lazy
 for _, plugin in pairs(per_language_list) do
-  if plugin.name then
-    table.insert(
-      final_list,
-      vim.tbl_extend('force', plugin, {
-        config = register_config,
-        init = register_setup,
-        keys = register_keymaps,
-      })
-    )
-  else
-    table.insert(final_list, plugin)
-  end
+  table.insert(final_list, inject_lazy(plugin))
 end
 
 return lazy.setup(final_list, {
