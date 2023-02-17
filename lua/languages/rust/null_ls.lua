@@ -1,0 +1,3 @@
+return {
+  { 'rustfmt', 'formatting' },
+}

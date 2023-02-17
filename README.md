@@ -54,6 +54,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * PHP
 * Python
 * Ruby
+* Rust
 * SASS/SCSS
 * Solidity
 * SQL

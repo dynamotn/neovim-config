@@ -32,6 +32,7 @@ return {
   php = { 'php' },
   python = { 'python' },
   ruby = { 'ruby' },
+  rust = { 'rust' },
   sass = {
     'scss',
     'sass',
