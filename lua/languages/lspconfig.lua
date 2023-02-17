@@ -1,6 +1,6 @@
 local M = {}
 
-M.sumneko_lua = function(default_opts)
+M.lua_ls = function(default_opts)
   local opts = default_opts
   opts.settings = {
     Lua = {
