@@ -30,6 +30,7 @@ return {
     name = 'bufferline',
     event = 'UIEnter',
     dependencies = { 'catppuccin' },
+    cond = not vim.g.started_by_firenvim,
   },
   ----------------------------- }
 
@@ -64,6 +65,7 @@ return {
     name = 'noice',
     event = 'VeryLazy',
     dependencies = { 'nui' },
+    cond = not vim.g.started_by_firenvim,
   },
   { 'nvim-tree/nvim-web-devicons', name = 'icon', event = 'UIEnter' }, -- Programming icons
   { -- Indent guide
@@ -300,11 +302,12 @@ return {
   { -- Browser
     'glacambre/firenvim',
     name = 'firenvim',
-    event = 'UIEnter',
     build = function()
+      require('lazy').load({ plugins = 'firenvim', wait = true })
       vim.fn['firenvim#install'](0)
     end,
-    cond = vim.g.started_by_firenvim,
+    cond = not not vim.g.started_by_firenvim,
+    lazy = false,
   },
   { 'folke/which-key.nvim', name = 'whichkey', lazy = false }, -- Show guide of keymaps
   { 'akinsho/nvim-toggleterm.lua', name = 'toggleterm', event = 'VeryLazy' }, -- Terminal
