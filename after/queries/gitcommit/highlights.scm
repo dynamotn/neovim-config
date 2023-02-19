@@ -4,10 +4,6 @@
 (text) @text
 (branch) @text.reference
 (change) @keyword
-;; (change "new file") @text.diff.add
-;; (change "modified") @keyword
-;; (change "deleted") @text.diff.delete
-;; (change "renamed") @attribute
 (filepath) @text.uri
 (arrow) @punctuation.delimiter
 
