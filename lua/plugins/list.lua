@@ -73,6 +73,11 @@ return {
     name = 'indent',
     event = { 'BufReadPost' },
   },
+  { -- Column highlight
+    'm4xshen/smartcolumn.nvim',
+    name = 'smartcolumn',
+    event = { 'BufRead', 'BufNewFile' },
+  },
   { -- Color highlight
     'NvChad/nvim-colorizer.lua',
     name = 'colorizer',

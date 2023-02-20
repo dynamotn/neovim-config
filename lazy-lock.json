@@ -83,6 +83,7 @@
   "regexplainer": { "branch": "main", "commit": "8af9a846644982ab1e11cc99b6e4831e12479207" },
   "rest": { "branch": "main", "commit": "0fdb69f328529b34a2279c14be63b3325dc52740" },
   "session": { "branch": "main", "commit": "325cda4fb406601929fbc2084816dc5e49d5e5aa" },
+  "smartcolumn": { "branch": "main", "commit": "5dc781cd2fd4a5e9645401017b04c22b40438943" },
   "sqls.nvim": { "branch": "main", "commit": "a0048b7018c99b68456f91b4aa42ce288f0c0774" },
   "surround": { "branch": "main", "commit": "6a4f31e2a380439315729f561d7e7898bde1fd52" },
   "symbols_outline": { "branch": "master", "commit": "512791925d57a61c545bc303356e8a8f7869763c" },
