@@ -58,6 +58,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * SASS/SCSS
 * Solidity
 * SQL
+* TOML
 * YAML
 
 #### Frameworks

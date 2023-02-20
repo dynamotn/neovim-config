@@ -39,6 +39,7 @@ return {
   },
   solidity = { 'solidity' },
   sql = { 'sql', 'mysql', 'plsql' },
+  toml = { 'toml' },
   yaml = { 'yaml' },
   ----------------------- }
 
