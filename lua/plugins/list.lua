@@ -90,7 +90,7 @@ return {
     dependencies = { 'SmiteshP/nvim-navic', 'catppuccin' },
   },
   { -- Rainbow parentheses
-    'p00f/nvim-ts-rainbow',
+    'HiPhish/nvim-ts-rainbow2',
     name = 'rainbow',
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'treesitter' },
@@ -128,7 +128,11 @@ return {
       'anuvyklack/fold-preview.nvim',
     },
   },
-  { 'rcarriga/nvim-notify', name = 'notify', event = 'UIEnter' }, -- Notification
+  {
+    'rcarriga/nvim-notify',
+    name = 'notify',
+    event = 'UIEnter',
+  }, -- Notification
   --------------- }
   ----------------------------- }
 
