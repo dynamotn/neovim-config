@@ -238,7 +238,9 @@ return {
     'nvim-treesitter/nvim-treesitter',
     name = 'treesitter',
     event = { 'BufRead', 'BufNewFile' },
-    build = ':TSUpdate',
+    build = function()
+      require('nvim-treesitter.install').update({ with_sync = true })
+    end,
   },
   { -- Text object for Treesitter
     'nvim-treesitter/nvim-treesitter-textobjects',
