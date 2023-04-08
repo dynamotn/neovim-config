@@ -1,7 +1,5 @@
 vim.opt.laststatus = 0
 vim.opt.showtabline = 0
-vim.opt.wrap = 1
-vim.opt.linebreak = 1
 vim.g.firenvim_config = {
   globalSettings = {
     alt = 'all',
