@@ -1,3 +1,3 @@
 return {
-  parser = 'rust',
+  { parser = 'rust' },
 }

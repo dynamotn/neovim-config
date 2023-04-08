@@ -2,7 +2,7 @@
 
 My customization configuration for neovim
 
-[![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.8-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
+[![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.10-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -93,6 +93,6 @@ My habit key is `Space`. You can explore it :)
 
 ## Note
 
-* Not used for neovim < 0.8 or vim (any version)
+* Not used for neovim < 0.10 or vim (any version)
 * Not used for neovim GUI
 * Used for Linux only or Mac (not sure)

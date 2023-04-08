@@ -1,3 +1,3 @@
 return {
-  parser = 'http',
+  { parser = 'http' },
 }

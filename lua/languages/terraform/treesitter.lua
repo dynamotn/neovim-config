@@ -1,3 +1,3 @@
 return {
-  parser = 'hcl',
+  { parser = 'hcl' },
 }

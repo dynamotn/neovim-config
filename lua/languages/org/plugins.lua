@@ -2,7 +2,6 @@ return {
   { -- Org managed plugin
     'nvim-neorg/neorg',
     name = 'neorg',
-    build = ':Neorg sync-parsers',
     dependencies = {
       { 'plenary' },
       { 'nvim-neorg/neorg-telescope' }, -- Telescope for Neorg

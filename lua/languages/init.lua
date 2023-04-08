@@ -54,33 +54,34 @@ M.setup_ls = function()
   return result
 end
 
-M.setup_treesitter = function(ft_to_parser, parser_config)
-  local parsers = {}
+M.setup_treesitter = function(parser_config)
+  local result = {}
 
   for language, filetypes in pairs(languages) do
     local ok, treesitter =
       pcall(require, 'languages.' .. language .. '.treesitter')
-    local parser
 
-    if not ok or type(treesitter) ~= 'table' then
-      parser = language
-    else
-      parser = treesitter.parser
+    if ok and type(treesitter) == 'table' then
+      for index, config in ipairs(treesitter) do
+        if config.parser then
+          table.insert(result, config.parser)
 
-      if type(treesitter.install_info) == 'table' then
-        parser_config[parser] = {
-          install_info = treesitter.install_info,
-        }
+          if index == 1 then
+            for _, ft in pairs(filetypes) do
+              vim.treesitter.language.register(config.parser, ft)
+            end
+          end
+
+          if type(config.install_info) == 'table' then
+            parser_config[config.parser] = {
+              install_info = config.install_info,
+            }
+          end
+        end
       end
     end
-
-    table.insert(parsers, parser)
-
-    for _, ft in pairs(filetypes) do
-      ft_to_parser[ft] = parser
-    end
   end
-  return parsers
+  return result
 end
 
 M.setup_dap = function()

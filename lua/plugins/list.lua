@@ -239,6 +239,7 @@ return {
     name = 'treesitter',
     event = { 'BufRead', 'BufNewFile' },
     build = function()
+      require('lazy').load({ plugins = 'treesitter', wait = true })
       require('nvim-treesitter.install').update({ with_sync = true })
     end,
   },

@@ -1,3 +1,3 @@
 return {
-  parser = 'sql',
+  { parser = 'sql' },
 }

@@ -1,8 +1,8 @@
 DEBUG = false
-if vim.version().minor > 6 then
+if vim.version().minor >= 10 then
   require('core')
   require('misc')
   require('plugins')
 else
-  vim.notify('Requires neovim version 0.8+')
+  vim.notify('Requires neovim version 0.10+')
 end

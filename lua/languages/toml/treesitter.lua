@@ -1,3 +1,3 @@
 return {
-  parser = 'toml',
+  { parser = 'toml' },
 }

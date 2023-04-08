@@ -1,3 +1,3 @@
 return {
-  parser = 'scss',
+  { parser = 'scss' },
 }

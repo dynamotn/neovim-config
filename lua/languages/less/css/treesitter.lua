@@ -1,3 +1,3 @@
 return {
-  parser = 'css',
+  { parser = 'css' },
 }

@@ -1,3 +1,3 @@
 return {
-  parser = 'fish',
+  { parser = 'fish' },
 }
