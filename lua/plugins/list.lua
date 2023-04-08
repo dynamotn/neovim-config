@@ -276,7 +276,7 @@ return {
     event = { 'BufRead', 'BufNewFile' },
   },
   { 'monaqa/dial.nvim', name = 'dial' }, -- Increment/decrement number, date...
-  { 'echasnovski/mini.surround', name = 'surround' }, -- Change surround character
+  { 'echasnovski/mini.surround', name = 'surround', lazy = false }, -- Change surround character
   { 'johmsalas/text-case.nvim', name = 'textcase' }, -- Convert text case
   { 'echasnovski/mini.align', name = 'align', event = 'UIEnter' }, -- Align text interactively
   --------- }
