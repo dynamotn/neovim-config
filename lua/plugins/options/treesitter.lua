@@ -7,7 +7,8 @@ vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 local languages = require('languages')
 local parsers =
   { 'diff', 'regex', 'comment', 'query', 'vim', 'markdown_inline' }
-parsers = languages.setup_treesitter(parser_config)
+parsers =
+  vim.tbl_extend('force', languages.setup_treesitter(parser_config), parsers)
 
 treesitter.setup({
   highlight = {
