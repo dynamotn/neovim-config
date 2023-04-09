@@ -242,6 +242,7 @@ return {
       require('lazy').load({ plugins = 'treesitter', wait = true })
       require('nvim-treesitter.install').update({ with_sync = true })
     end,
+    cmd = 'TSInstall',
   },
   { -- Text object for Treesitter
     'nvim-treesitter/nvim-treesitter-textobjects',

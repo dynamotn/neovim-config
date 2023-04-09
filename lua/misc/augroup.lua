@@ -148,4 +148,16 @@ M.disable_formatting = function()
   M.delete_augroups('formatting_lsp')
 end
 
+M.auto_install_ts_parser = function()
+  M.create_augroups({
+    install_ts_parser = {
+      {
+        'FileType',
+        '*',
+        'lua dynamo_ts_install()',
+      },
+    },
+  })
+end
+
 return M

@@ -11,3 +11,4 @@ for _, module in ipairs(modules) do
 end
 
 require('misc.augroup').load_default_augroups()
+require('misc.augroup').auto_install_ts_parser()

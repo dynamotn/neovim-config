@@ -238,3 +238,22 @@ _G.dynamo_file_explorer = function()
   require('neo-tree').show(nil, true, true, true)
 end
 --------------- }
+
+-- Install TS parsers for window buffer {
+_G.dynamo_ts_install = function(bufnr)
+  require('lazy').load({ plugins = { 'treesitter' } })
+  local languages = require('languages')
+
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local parsers =
+    languages.get_parsers_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
+  for _, parser in ipairs(parsers) do
+    if
+      next(vim.api.nvim_get_runtime_file('parser/' .. parser .. '.so', true))
+      == nil
+    then
+      vim.api.nvim_command('TSInstall ' .. parser)
+    end
+  end
+end
+--------------------------------------- }
