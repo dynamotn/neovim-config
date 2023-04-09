@@ -66,10 +66,8 @@ M.setup_treesitter = function(parser_config)
         if config.parser then
           table.insert(result, config.parser)
 
-          if index == 1 then
-            for _, ft in pairs(filetypes) do
-              vim.treesitter.language.register(config.parser, ft)
-            end
+          for _, ft in pairs(filetypes) do
+            vim.treesitter.language.register(config.parser, ft)
           end
 
           if type(config.install_info) == 'table' then
@@ -81,6 +79,27 @@ M.setup_treesitter = function(parser_config)
       end
     end
   end
+  return result
+end
+
+M.get_parsers_by_filetype = function(filetype)
+  local language = M.get_language_from_filetype(filetype)
+  if not language then
+    return {}
+  end
+
+  local ok, treesitter =
+    pcall(require, 'languages.' .. language .. '.treesitter')
+
+  local result = {}
+  if ok and type(treesitter) == 'table' then
+    for index, config in ipairs(treesitter) do
+      if config.parser then
+        table.insert(result, config.parser)
+      end
+    end
+  end
+
   return result
 end
 

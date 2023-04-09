@@ -237,7 +237,7 @@ return {
   { -- Config for Treesitter
     'nvim-treesitter/nvim-treesitter',
     name = 'treesitter',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufRead', 'BufNewFile', 'FileType' },
     build = function()
       require('lazy').load({ plugins = 'treesitter', wait = true })
       require('nvim-treesitter.install').update({ with_sync = true })
