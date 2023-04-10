@@ -131,4 +131,14 @@ M.auto_install_ts_parser = function()
   })
 end
 
+M.auto_install_mason_tools = function()
+  vim.api.nvim_create_autocmd({ 'FileType' }, {
+    pattern = { '*' },
+    group = vim.api.nvim_create_augroup('mason_tools', {}),
+    callback = function()
+      dynamo_mason_install()
+    end,
+  })
+end
+
 return M

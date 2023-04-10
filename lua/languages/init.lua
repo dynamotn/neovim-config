@@ -54,6 +54,24 @@ M.setup_ls = function()
   return result
 end
 
+M.get_ls_by_filetype = function(filetype)
+  local language = M.get_language_from_filetype(filetype)
+  if not language then
+    return {}
+  end
+
+  local ok, server_names = pcall(require, 'languages.' .. language .. '.lsp')
+
+  local result = {}
+  if ok and type(server_names) == 'table' then
+    for _, server_name in ipairs(server_names) do
+      table.insert(result, server_name)
+    end
+  end
+
+  return result
+end
+
 M.setup_treesitter = function(parser_config)
   local result = {}
 
@@ -62,7 +80,7 @@ M.setup_treesitter = function(parser_config)
       pcall(require, 'languages.' .. language .. '.treesitter')
 
     if ok and type(treesitter) == 'table' then
-      for index, config in ipairs(treesitter) do
+      for _, config in ipairs(treesitter) do
         if config.parser then
           table.insert(result, config.parser)
 
@@ -131,6 +149,24 @@ M.setup_dap = function()
           vim.list_extend(result[server_name].filetypes, filetypes)
         end
       end
+    end
+  end
+
+  return result
+end
+
+M.get_dap_by_filetype = function(filetype)
+  local language = M.get_language_from_filetype(filetype)
+  if not language then
+    return {}
+  end
+
+  local ok, server_names = pcall(require, 'languages.' .. language .. '.dap')
+
+  local result = {}
+  if ok and type(server_names) == 'table' then
+    for _, server_name in ipairs(server_names) do
+      table.insert(result, server_name)
     end
   end
 
