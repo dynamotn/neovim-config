@@ -273,7 +273,7 @@ _G.dynamo_mason_install = function(bufnr)
     languages.get_ls_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
   for _, lsp_server in ipairs(lsp_servers) do
     local server = lsp_mapping.lspconfig_to_package[lsp_server]
-    if not registry.is_installed(server) then
+    if server ~= nil and not registry.is_installed(server) then
       vim.api.nvim_command('MasonInstall ' .. server)
     end
   end
@@ -282,7 +282,7 @@ _G.dynamo_mason_install = function(bufnr)
     languages.get_dap_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
   for _, dap_server in ipairs(dap_servers) do
     local server = dap_mapping.nvim_dap_to_package[dap_server]
-    if not registry.is_installed(server) then
+    if server ~= nil and not registry.is_installed(server) then
       vim.api.nvim_command('MasonInstall ' .. server)
     end
   end
@@ -295,7 +295,7 @@ _G.dynamo_mason_install = function(bufnr)
   for null_ls_tool, is_external_tool in pairs(null_ls_tools) do
     if not is_external_tool then
       local tool = null_ls_mapping.getPackageFromNullLs[null_ls_tool]
-      if not registry.is_installed(tool) then
+      if tool ~= nil and not registry.is_installed(tool) then
         vim.api.nvim_command('MasonInstall ' .. tool)
       end
     end
