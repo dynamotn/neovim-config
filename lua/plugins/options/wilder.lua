@@ -46,7 +46,7 @@ wilder.set_option(
   })
 )
 
-local has_python = vim.fn.has('python') == 1
+local has_python = vim.fn.has('python3') == 1
 
 wilder.set_option('pipeline', {
   wilder.debounce(10),
