@@ -322,7 +322,12 @@ return {
     cond = not not vim.g.started_by_firenvim,
     lazy = false,
   },
-  { 'folke/which-key.nvim', name = 'whichkey', lazy = false }, -- Show guide of keymaps
+  { -- Show guide of keymaps
+    'folke/which-key.nvim',
+    name = 'whichkey',
+    lazy = false,
+    version = 'v1.2.3',
+  },
   { 'akinsho/nvim-toggleterm.lua', name = 'toggleterm', event = 'VeryLazy' }, -- Terminal
   -- Fuzzy finder {
   { -- Engine
