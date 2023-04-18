@@ -208,11 +208,6 @@ return {
       { 'honza/vim-snippets' }, -- Snipmate snippets
     },
   },
-  { -- Convention
-    'gpanders/editorconfig.nvim',
-    name = 'editorconfig',
-    event = { 'BufRead', 'BufNewFile' },
-  },
   -- LSP {
   { 'neovim/nvim-lspconfig', name = 'lsp', event = 'BufReadPre' }, -- Config for LSP server
   { -- LSP server manager
@@ -326,7 +321,6 @@ return {
     'folke/which-key.nvim',
     name = 'whichkey',
     lazy = false,
-    version = 'v1.2.3',
   },
   { 'akinsho/nvim-toggleterm.lua', name = 'toggleterm', event = 'VeryLazy' }, -- Terminal
   -- Fuzzy finder {
