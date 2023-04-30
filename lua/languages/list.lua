@@ -10,14 +10,12 @@ return {
   cpp = { 'cpp' },
   css = { 'css' },
   cucumber = { 'cucumber' },
-  dbml = { 'dbml' },
   fish = { 'fish' },
   go = {
     'go',
     'gomod',
   },
   html = { 'html' },
-  http = { 'http' },
   javascript = {
     'javascript',
     'typescript',
@@ -25,10 +23,8 @@ return {
     'typescriptreact',
     'vue',
   },
-  json = { 'json' },
   less = { 'less' },
   lua = { 'lua' },
-  markdown = { 'markdown' },
   php = { 'php' },
   python = { 'python' },
   ruby = { 'ruby' },
@@ -39,19 +35,24 @@ return {
   },
   solidity = { 'solidity' },
   sql = { 'sql', 'mysql', 'plsql' },
-  toml = { 'toml' },
-  yaml = { 'yaml' },
   ----------------------- }
 
-  -- Tools {
+  -- Tools & Markup {
   ansible = { 'ansible' },
   csv = { 'csv' },
+  dbml = { 'dbml' },
   dockerfile = { 'dockerfile' },
   gitcommit = { 'gitcommit' },
+  gotmpl = { 'gotmpl' },
+  http = { 'http' },
+  json = { 'json' },
+  markdown = { 'markdown' },
   nix = { 'nix' },
   org = { 'norg' },
   terraform = { 'tf' },
   terragrunt = { 'terragrunt' },
+  toml = { 'toml' },
   treesitter = { 'scheme' },
+  yaml = { 'yaml' },
   -------- }
 }

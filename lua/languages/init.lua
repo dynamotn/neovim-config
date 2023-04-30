@@ -90,8 +90,17 @@ M.setup_treesitter = function(parser_config)
 
           if type(config.install_info) == 'table' then
             parser_config[config.parser] = {
-              install_info = config.install_info,
+              filetypes = filetypes,
             }
+            parser_config[config.parser].install_info = config.install_info
+            if type(config.used_by) == 'table' then
+              parser_config[config.parser].used_by =
+                vim.list_extend(config.used_by, filetypes)
+            end
+          end
+          if type(config.used_by) == 'table' then
+            parser_config[config.parser]['used_by'] =
+              vim.list_extend(filetypes, config.used_by)
           end
         end
       end

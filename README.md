@@ -41,16 +41,12 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * C#
 * CSS
 * Cucumber
-* DBML
 * Fish
 * Go
 * HTML
-* HTTP
 * Javascript
-* JSON
 * LESS
 * Lua (of course)
-* Markdown
 * PHP
 * Python
 * Ruby
@@ -58,21 +54,26 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * SASS/SCSS
 * Solidity
 * SQL
-* TOML
-* YAML
 
 #### Frameworks
 
-#### Tools
+#### Tools & Markup
 * Ansible
 * CSV
+* DBML
 * Dockerfile
 * Git (rebase, commit)
+* GoTemplate (Helm template...)
+* HTTP
+* JSON
+* Markdown
 * Nix
 * Orgmode
 * Terraform
 * Terragrunt
+* TOML
 * Treesitter
+* YAML
 
 ## Installation
 
