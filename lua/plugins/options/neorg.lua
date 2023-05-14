@@ -6,7 +6,6 @@ neorg.setup({
     ['core.norg.esupports.hop'] = {},
     ['core.norg.esupports.indent'] = {},
     ['core.norg.journal'] = {},
-    ['core.norg.news'] = {},
     ['core.norg.qol.todo_items'] = {},
     ['core.syntax'] = {},
     ['core.neorgcmd'] = {},
