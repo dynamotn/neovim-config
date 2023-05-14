@@ -107,7 +107,7 @@ lualine.setup({
       },
       {
         function()
-          local msg = ' '
+          local msg = '󰉼 '
           for tool, _ in
             pairs(require('languages').get_tools_by_filetype(vim.bo.filetype))
           do
