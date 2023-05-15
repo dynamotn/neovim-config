@@ -193,7 +193,7 @@ M.setup_null_ls = function()
       for _, source in ipairs(null_ls_config) do
         if #source >= 2 then
           source.with_config = source.with_config or {}
-          table.insert(source.with_config, { filetypes = filetypes })
+          source.with_config['filetypes'] = filetypes
 
           local tool = dynamo_nullls_tool(
             source[1],
