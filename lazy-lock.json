@@ -56,6 +56,7 @@
   "mason_lsp": { "branch": "main", "commit": "5230617372e656d4a2e1e236e03bf7e7b4b97273" },
   "mason_null_ls": { "branch": "main", "commit": "54d702020bf94e4eefd357f0b738317af30217eb" },
   "mkdx": { "branch": "master", "commit": "b2c059e15b4998f98faa1d3c9dc6c2cddb2f8208" },
+  "neodev.nvim": { "branch": "main", "commit": "d69254e1fbdc4a04c56719dde19e5eafb7b04b58" },
   "neogen": { "branch": "main", "commit": "1dd0319ccf41b2498f45a3c7607f2ee325ffc6a0" },
   "neogit": { "branch": "master", "commit": "68a3e90e9d1ed9e362317817851d0f34b19e426b" },
   "neomux": { "branch": "master", "commit": "91d86506ac2a039504d5205d32a1d4bc7aa57072" },

@@ -1,4 +1,4 @@
 return {
-  DEBUG and { 'jbyuki/one-small-step-for-vimkind' } or nil, -- Neovim debugger
+  DEBUG and { 'jbyuki/one-small-step-for-vimkind' } or {}, -- Neovim debugger
   { 'folke/neodev.nvim' },
 }

@@ -269,8 +269,10 @@ M.get_plugins = function()
 
     if ok then
       for _, plugin in ipairs(plugins) do
-        plugin['ft'] = filetypes
-        table.insert(result, plugin)
+        if next(plugin) ~= nil then
+          plugin['ft'] = filetypes
+          table.insert(result, plugin)
+        end
       end
     end
   end
