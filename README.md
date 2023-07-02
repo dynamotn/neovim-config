@@ -74,6 +74,7 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
 * TOML
 * Treesitter
 * YAML
+* Yuck
 
 ## Installation
 

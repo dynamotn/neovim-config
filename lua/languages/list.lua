@@ -54,5 +54,6 @@ return {
   toml = { 'toml' },
   treesitter = { 'scheme' },
   yaml = { 'yaml' },
+  yuck = { 'yuck' },
   -------- }
 }
