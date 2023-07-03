@@ -1,8 +1,4 @@
-local present, whichkey = pcall(require, 'which-key')
-
-if not present then
-  return
-end
+local whichkey = require('which-key')
 
 whichkey.setup({
   key_labels = {

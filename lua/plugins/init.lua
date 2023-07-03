@@ -9,7 +9,7 @@ if not present then
   return
 end
 
-local register_config = require('plugins.register').register_config
+local register_options = require('plugins.register').register_options
 local register_setup = require('plugins.register').register_setup
 local register_keymaps = require('plugins.register').register_keymaps
 
@@ -32,7 +32,7 @@ local function inject_lazy(plugin)
     end
 
     result = vim.tbl_extend('force', plugin, {
-      config = register_config,
+      config = register_options,
       init = register_setup,
       keys = register_keymaps,
       dependencies = dependencies,

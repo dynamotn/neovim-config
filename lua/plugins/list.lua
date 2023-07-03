@@ -11,7 +11,8 @@ return {
 
   -------- Eyecandy ----------- {
   -- Color scheme {
-  { -- Catppuccin for both Dark (Macchiato) and Light (Latte) colorscheme
+  {
+    -- Catppuccin for both Dark (Macchiato) and Light (Latte) colorscheme
     'catppuccin/nvim',
     name = 'catppuccin',
     event = 'UIEnter',
@@ -19,13 +20,15 @@ return {
   --------------- }
 
   -- Status and tab/buffer line {
-  { -- Status line
+  {
+    -- Status line
     'nvim-lualine/lualine.nvim',
     name = 'lualine',
     event = 'UIEnter',
     dependencies = { 'catppuccin' },
   },
-  { -- Buffer and tab line
+  {
+    -- Buffer and tab line
     'akinsho/bufferline.nvim',
     name = 'bufferline',
     event = 'UIEnter',
@@ -36,12 +39,14 @@ return {
 
   -- Quickfix and diagnostics {
   { 'folke/trouble.nvim', name = 'trouble' }, -- Highlight quickfix and diagnostics
-  { -- Show virtual lines for LSP diagnostics
+  {
+    -- Show virtual lines for LSP diagnostics
     url = 'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
     name = 'lsp_lines',
     event = 'UIEnter',
   },
-  { -- Highlight TODO comments
+  {
+    -- Highlight TODO comments
     'folke/todo-comments.nvim',
     name = 'todo',
     event = { 'BufRead', 'BufNewFile' },
@@ -50,17 +55,20 @@ return {
   --------------------------- }
 
   -- Miscellaneous {
-  { -- Improve vim.ui.select and vim.ui.input
+  {
+    -- Improve vim.ui.select and vim.ui.input
     'stevearc/dressing.nvim',
     name = 'dressing',
   },
-  { -- Improve wildmenu's capabilities
+  {
+    -- Improve wildmenu's capabilities
     'gelguy/wilder.nvim',
     name = 'wilder',
     event = 'CmdlineEnter',
     build = ':UpdateRemotePlugins',
   },
-  { -- Improve messages, cmdline, popups & LSP
+  {
+    -- Improve messages, cmdline, popups & LSP
     'folke/noice.nvim',
     name = 'noice',
     event = 'VeryLazy',
@@ -68,58 +76,68 @@ return {
     cond = not vim.g.started_by_firenvim,
   },
   { 'nvim-tree/nvim-web-devicons', name = 'icon', event = 'UIEnter' }, -- Programming icons
-  { -- Indent guide
+  {
+    -- Indent guide
     'lukas-reineke/indent-blankline.nvim',
     name = 'indent',
     event = { 'BufReadPost' },
   },
-  { -- Column highlight
+  {
+    -- Column highlight
     'm4xshen/smartcolumn.nvim',
     name = 'smartcolumn',
     event = { 'BufRead', 'BufNewFile' },
   },
-  { -- Color highlight
+  {
+    -- Color highlight
     'NvChad/nvim-colorizer.lua',
     name = 'colorizer',
     event = { 'BufRead', 'BufNewFile' },
   },
-  { -- Winbar to show context of current position
+  {
+    -- Winbar to show context of current position
     'utilyre/barbecue.nvim',
     name = 'barbecue',
     event = 'UIEnter',
     dependencies = { 'SmiteshP/nvim-navic', 'catppuccin' },
   },
-  { -- Rainbow parentheses
+  {
+    -- Rainbow parentheses
     'HiPhish/nvim-ts-rainbow2',
     name = 'rainbow',
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
   { 'rmagatti/goto-preview', name = 'goto_preview' }, -- UI view for preview LSP definition, implementation, reference
-  { -- UI view for LSP code action lightbulb
+  {
+    -- UI view for LSP code action lightbulb
     'kosayoda/nvim-lightbulb',
     name = 'lightbulb',
     event = { 'BufRead', 'BufNewFile' },
   },
-  { -- Inlayhints for LSP
+  {
+    -- Inlayhints for LSP
     'lvimuser/lsp-inlayhints.nvim',
     name = 'lsp_inlay',
     event = { 'BufRead', 'BufNewFile' },
   },
   { 'rcarriga/nvim-dap-ui', name = 'dap_ui' }, -- Debugger UI
   { 'theHamsta/nvim-dap-virtual-text', name = 'dap_virtual_text' }, -- Virtual text for DAP
-  { -- UI for dadbod
+  {
+    -- UI for dadbod
     'kristijanhusak/vim-dadbod-ui',
     name = 'dadbod_ui',
     dependencies = { 'dadbod' },
   },
-  { -- Explain Regex when hover
+  {
+    -- Explain Regex when hover
     'bennypowers/nvim-regexplainer',
     name = 'regexplainer',
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'nui', 'treesitter' },
   },
-  { -- Foldtext customization
+  {
+    -- Foldtext customization
     'anuvyklack/pretty-fold.nvim',
     name = 'pretty_fold',
     event = 'UIEnter',
@@ -139,7 +157,8 @@ return {
   --------- Navigation -------- {
   { 'nvim-neo-tree/neo-tree.nvim', name = 'neotree' }, -- File explorer
   { url = 'https://gitlab.com/yorickpeterse/nvim-window', name = 'window' }, -- Window switcher
-  { -- UI view for Symbols
+  {
+    -- UI view for Symbols
     'simrat39/symbols-outline.nvim',
     name = 'symbols_outline',
   },
@@ -148,7 +167,8 @@ return {
   ----------------------------- }
 
   ------ VCS and Project ------ {
-  { -- Git TUI
+  {
+    -- Git TUI
     'TimUntersberger/neogit',
     name = 'neogit',
     dependencies = { 'sindrets/diffview.nvim' },
@@ -161,18 +181,21 @@ return {
   ---------- Editing ---------- {
   -- Comment {
   { 'echasnovski/mini.comment', name = 'comment', event = 'VeryLazy' }, -- Commenting
-  { -- Comment based on cursor location
+  {
+    -- Comment based on cursor location
     'JoosepAlviste/nvim-ts-context-commentstring',
     name = 'context_comment',
     dependencies = { 'treesitter', 'comment' },
   },
-  { -- Generate annotation
+  {
+    -- Generate annotation
     'danymat/neogen',
     name = 'neogen',
     dependencies = { 'treesitter' },
   },
   ---------- }
-  { -- Code complete engine
+  {
+    -- Code complete engine
     'hrsh7th/nvim-cmp',
     name = 'cmp',
     event = 'InsertEnter',
@@ -187,7 +210,8 @@ return {
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
       { 'rcarriga/cmp-dap', dependencies = { 'dap' } }, -- DAP completion source
       { 'uga-rosa/cmp-dynamic', name = 'cmp_dynamic' }, -- Dynamic completion source
-      { -- Copilot completion source
+      {
+        -- Copilot completion source
         'zbirenbaum/copilot-cmp',
         name = 'cmp_copilot',
         dependencies = {
@@ -200,7 +224,8 @@ return {
       },
     },
   },
-  { -- Snippet engine
+  {
+    -- Snippet engine
     'L3MON4D3/LuaSnip',
     name = 'luasnip',
     dependencies = {
@@ -210,26 +235,30 @@ return {
   },
   -- LSP {
   { 'neovim/nvim-lspconfig', name = 'lsp', event = 'BufReadPre' }, -- Config for LSP server
-  { -- LSP server manager
+  {
+    -- LSP server manager
     'williamboman/mason-lspconfig.nvim',
     name = 'mason_lsp',
     event = 'BufReadPre',
     dependencies = { 'mason' },
   },
-  { -- Config for non-LSP sources (linter and formatter)
+  {
+    -- Config for non-LSP sources (linter and formatter)
     'jose-elias-alvarez/null-ls.nvim',
     name = 'null_ls',
     event = 'VeryLazy',
     dependencies = { 'refactoring' },
   },
-  { -- Linter and Formatter manager
+  {
+    -- Linter and Formatter manager
     'jayp0521/mason-null-ls.nvim',
     name = 'mason_null_ls',
     dependencies = { 'mason' },
   },
   ------ }
   -- Treesitter {
-  { -- Config for Treesitter
+  {
+    -- Config for Treesitter
     'nvim-treesitter/nvim-treesitter',
     name = 'treesitter',
     event = { 'BufRead', 'BufNewFile', 'FileType' },
@@ -239,19 +268,22 @@ return {
     end,
     cmd = 'TSInstall',
   },
-  { -- Text object for Treesitter
+  {
+    -- Text object for Treesitter
     'nvim-treesitter/nvim-treesitter-textobjects',
     name = 'text_object',
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
-  { -- Automatically close and rename HTML tag
+  {
+    -- Automatically close and rename HTML tag
     'windwp/nvim-ts-autotag',
     name = 'autotag',
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
-  { -- Automatically insert end keyword
+  {
+    -- Automatically insert end keyword
     'RRethy/nvim-treesitter-endwise',
     name = 'endwise',
     event = { 'BufRead', 'BufNewFile' },
@@ -266,7 +298,8 @@ return {
     or nil, -- For gentoo filetypes
   ------------------- }
   -- Typing {
-  { -- Automatically insert/delete brackets, parentheses, quotes...
+  {
+    -- Automatically insert/delete brackets, parentheses, quotes...
     'windwp/nvim-autopairs',
     name = 'autopairs',
     event = { 'BufRead', 'BufNewFile' },
@@ -276,7 +309,8 @@ return {
   { 'johmsalas/text-case.nvim', name = 'textcase' }, -- Convert text case
   { 'echasnovski/mini.align', name = 'align', event = 'UIEnter' }, -- Align text interactively
   --------- }
-  { -- Refactoring library
+  {
+    -- Refactoring library
     'ThePrimeagen/refactoring.nvim',
     name = 'refactoring',
     event = { 'BufRead', 'BufNewFile' },
@@ -285,18 +319,21 @@ return {
   ----------------------------- }
 
   ---- Debug / Test / Run ----- {
-  { -- Debug Adapter implementation
+  {
+    -- Debug Adapter implementation
     'mfussenegger/nvim-dap',
     name = 'dap',
     dependencies = { 'dap_ui', 'dap_virtual_text' },
   },
-  { -- DAP manager
+  {
+    -- DAP manager
     'jayp0521/mason-nvim-dap.nvim',
     name = 'mason_dap',
     event = 'BufReadPre',
     dependencies = { 'mason', 'dap' },
   },
-  { -- Test integration
+  {
+    -- Test integration
     'nvim-neotest/neotest',
     name = 'neotest',
     dependencies = {
@@ -307,7 +344,8 @@ return {
   ----------------------------- }
 
   -------- Integration -------- {
-  { -- Browser
+  {
+    -- Browser
     'glacambre/firenvim',
     name = 'firenvim',
     build = function()
@@ -317,14 +355,16 @@ return {
     cond = not not vim.g.started_by_firenvim,
     lazy = false,
   },
-  { -- Show guide of keymaps
+  {
+    -- Show guide of keymaps
     'folke/which-key.nvim',
     name = 'whichkey',
     lazy = false,
   },
   { 'akinsho/nvim-toggleterm.lua', name = 'toggleterm', event = 'VeryLazy' }, -- Terminal
   -- Fuzzy finder {
-  { -- Engine
+  {
+    -- Engine
     'nvim-telescope/telescope.nvim',
     name = 'telescope',
     dependencies = {
@@ -336,10 +376,23 @@ return {
   { 'potamides/pantran.nvim', name = 'pantran', cmd = 'Pantran' }, -- Translate
   { 'ofirgall/open.nvim', name = 'open' }, -- Open current word by other tools
   { 'tpope/vim-dadbod', name = 'dadbod' }, -- Interact with database
-  { -- Google Keep integration
+  {
+    -- Google Keep integration
     'stevearc/gkeep.nvim',
     name = 'gkeep',
     build = ':UpdateRemotePlugins',
+  },
+  --------------- }
+  -- Prompt AI -- {
+  {
+    'jackMort/ChatGPT.nvim',
+    name = 'chatgpt',
+    event = 'VeryLazy',
+    dependencies = {
+      'nui',
+      'telescope',
+    },
+    lazy = false,
   },
   --------------- }
   ----------------------------- }
@@ -347,7 +400,8 @@ return {
   ---------- Utility ---------- {
   { 'olimorris/persisted.nvim', name = 'session', event = 'UIEnter' }, -- Automatic session management
   DEBUG
-      and { -- Debug Treesitter
+      and {
+        -- Debug Treesitter
         'nvim-treesitter/playground',
         name = 'playground',
         dependencies = { 'treesitter' },
