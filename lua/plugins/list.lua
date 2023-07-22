@@ -96,10 +96,9 @@ return {
   },
   {
     -- Winbar to show context of current position
-    'utilyre/barbecue.nvim',
-    name = 'barbecue',
+    'Bekaboo/dropbar.nvim',
+    name = 'dropbar',
     event = 'UIEnter',
-    dependencies = { 'SmiteshP/nvim-navic', 'catppuccin' },
   },
   {
     -- Rainbow parentheses
