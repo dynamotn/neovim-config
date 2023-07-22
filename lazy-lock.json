@@ -78,7 +78,7 @@
   "pantran": { "branch": "main", "commit": "42c4c1fba7cc86315e1f33eb2d31d99f7e96a9f6" },
   "plenary": { "branch": "master", "commit": "102c02903c74b93c705406bf362049383abc87c8" },
   "pretty_fold": { "branch": "master", "commit": "a7d8b424abe0eedf50116c460fbe6dfd5783b1d5" },
-  "rainbow": { "branch": "master", "commit": "1c7980dadb9d702d063c968cc240e282bb574995" },
+  "rainbow": { "branch": "master", "commit": "7506a7d66b8bebfc6638c86601b7310c6db262a0" },
   "rainbow_csv": { "branch": "master", "commit": "7453a3f9679f0c753ec9d77f9ea8588778f35aeb" },
   "refactoring": { "branch": "master", "commit": "859289acc0fda13bf42834dbeef10b8c1148d444" },
   "regexplainer": { "branch": "main", "commit": "ae651b187bdaa0fc6cbf60e660da5ebf74013d72" },
