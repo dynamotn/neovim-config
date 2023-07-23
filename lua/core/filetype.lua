@@ -13,6 +13,7 @@ vim.filetype.add({
     ['terragrunt.hcl'] = 'terragrunt',
   },
   pattern = {
+    ['.*%.hcl'] = 'terragrunt',
     ['.*terraform/.*%.hcl'] = 'terragrunt',
     ['ansible/.*%.ya?ml'] = 'ansible',
     ['tasks/.*%.ya?ml'] = 'ansible',
