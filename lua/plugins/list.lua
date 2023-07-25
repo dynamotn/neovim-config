@@ -74,7 +74,7 @@ return {
     -- Indent guide
     'lukas-reineke/indent-blankline.nvim',
     name = 'indent',
-    event = { 'BufReadPost' },
+    event = { 'BufReadPost', 'BufNewFile' },
   },
   {
     -- Column highlight
