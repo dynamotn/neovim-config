@@ -18,15 +18,21 @@ catppuccin.setup({
   },
   integrations = {
     cmp = true,
-    dap = true,
+    dap = {
+      enabled = true,
+      enable_ui = true,
+    },
     gitsigns = true,
     hop = true,
     indent_blankline = {
       enabled = true,
       colored_indent_levels = true,
     },
-    mini = true,
+    lsp_saga = true,
     lsp_trouble = true,
+    markdown = true,
+    mason = true,
+    mini = true,
     native_lsp = {
       enabled = true,
       virtual_text = {
@@ -36,10 +42,13 @@ catppuccin.setup({
         information = { 'italic' },
       },
       underlines = {
-        errors = { 'underline' },
-        hints = { 'underline' },
-        warnings = { 'underline' },
-        information = { 'underline' },
+        errors = { 'undercurl' },
+        hints = { 'undercurl' },
+        warnings = { 'undercurl' },
+        information = { 'undercurl' },
+      },
+      inlay_hints = {
+        background = true,
       },
     },
     neogit = true,
@@ -48,11 +57,13 @@ catppuccin.setup({
     noice = true,
     notify = true,
     overseer = true,
-    symbols_outline = true,
-    telescope = true,
+    rainbow_delimiters = true,
+    semantic_tokens = true,
+    telescope = {
+      enabled = true,
+    },
     treesitter = true,
     treesitter_context = true,
-    ts_rainbow = true,
     which_key = true,
   },
 })
