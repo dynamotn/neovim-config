@@ -3,7 +3,7 @@ local icons = require('core.defaults').icons
 
 local special_filetypes = {
   help = 'Help Guide',
-  Outline = 'Outline',
+  sagaoutline = 'Outline',
   dapui_scopes = 'Scopes',
   dapui_breakpoints = 'Breakpoints',
   dapui_stacks = 'Stacks',
@@ -155,7 +155,7 @@ lualine.setup({
     'toggleterm',
     'man',
     extensions('help'),
-    extensions('Outline'),
+    extensions('sagaoutline'),
     extensions('dapui_scopes'),
     extensions('dapui_breakpoints'),
     extensions('dapui_stacks'),

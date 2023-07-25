@@ -2,7 +2,6 @@ local bufferline = require('bufferline')
 
 local special_filetypes = {
   help = 'Help Guide',
-  Outline = 'Outline',
   dapui_scopes = 'Scopes',
   dapui_breakpoints = 'Breakpoints',
   dapui_stacks = 'Stacks',
@@ -11,7 +10,6 @@ local special_filetypes = {
   dapui_console = 'Console',
   dbui = 'Database',
   dbout = 'Query Result',
-  ['neo-tree'] = 'File Explorer',
   GoogleKeepMenu = 'Google Keep Menu',
   GoogleKeepList = 'Google Keep Notes',
   OverseerList = 'List tasks',
