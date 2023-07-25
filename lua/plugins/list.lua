@@ -196,7 +196,7 @@ return {
       { 'saadparwaiz1/cmp_luasnip', dependencies = { 'luasnip' } }, -- Snippet completion source
       { 'hrsh7th/cmp-buffer' }, -- Buffer completion source
       { 'hrsh7th/cmp-calc' }, -- Math calculation
-      { 'hrsh7th/cmp-path' }, -- Path completion source
+      { 'FelipeLema/cmp-async-path' }, -- Path completion source
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
       { 'rcarriga/cmp-dap', dependencies = { 'dap' } }, -- DAP completion source
       { 'uga-rosa/cmp-dynamic', name = 'cmp_dynamic' }, -- Dynamic completion source
