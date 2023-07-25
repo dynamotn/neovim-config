@@ -205,6 +205,7 @@ return {
             'zbirenbaum/copilot.lua',
             cmd = 'Copilot',
             name = 'copilot',
+            build = ':Copilot auth',
           },
         },
       },
