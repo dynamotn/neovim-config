@@ -24,9 +24,6 @@ g.leader = '\\'
 
 -- Need help, but I can type on my own
 map('', '<F1>', '<Esc>')
-
--- Copy paste, stackoverflow =]]
-opt.pastetoggle = '<F3>'
 ----------------------------- }
 
 ------ Save and Exit -------- {
