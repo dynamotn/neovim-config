@@ -136,11 +136,20 @@ return {
     name = 'notify',
     event = 'UIEnter',
   }, -- Notification
+  { -- Window layouts
+    'folke/edgy.nvim',
+    name = 'edgy',
+    event = 'VeryLazy',
+  },
   --------------- }
   ----------------------------- }
 
   --------- Navigation -------- {
-  { 'nvim-neo-tree/neo-tree.nvim', name = 'neotree' }, -- File explorer
+  { -- File explorer
+    'nvim-neo-tree/neo-tree.nvim',
+    name = 'neotree',
+    cmd = 'Neotree',
+  },
   { url = 'https://gitlab.com/yorickpeterse/nvim-window', name = 'window' }, -- Window switcher
   { 'phaazon/hop.nvim', name = 'hop' }, -- Easymotion
   {

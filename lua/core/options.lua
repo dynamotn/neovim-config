@@ -8,11 +8,12 @@ local exec = vim.api.nvim_exec -- Execute Vimscript
 
 ------------ UI ------------- {
 -- Status line look nicer
-opt.laststatus = 2
+opt.laststatus = 3
 
 -- More natural split opening
 opt.splitbelow = true
 opt.splitright = true
+opt.splitkeep = 'screen'
 
 -- Show shorten messages in UI
 opt.shortmess:append('filmnrxoOtT')

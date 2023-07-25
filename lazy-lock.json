@@ -32,6 +32,7 @@
   "dial": { "branch": "master", "commit": "c6657df5453a6cbe4e8356e1675e9652cadc332f" },
   "diffview.nvim": { "branch": "main", "commit": "e91110d2a7f8e2f667666aba6ea089ff823f8748" },
   "dressing": { "branch": "master", "commit": "39611852fd7bbac117e939a26759bb37361f0c90" },
+  "edgy": { "branch": "main", "commit": "4ccc1c67ae2b1a0c55f18c83d03b714e2bb1bae4" },
   "endwise": { "branch": "master", "commit": "9298b3ac8fd6d0d8f9e321194c6d3fd37e417cf9" },
   "fold-preview.nvim": { "branch": "main", "commit": "b7920cb0aba2b48a6b679bff45f98c3ebc0f0b89" },
   "friendly-snippets": { "branch": "main", "commit": "bc38057e513458cb2486b6cd82d365fa294ee398" },
