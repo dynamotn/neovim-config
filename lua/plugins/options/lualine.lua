@@ -1,4 +1,5 @@
 local lualine = require('lualine')
+local icons = require('core.defaults').icons
 
 local special_filetypes = {
   help = 'Help Guide',
@@ -43,29 +44,50 @@ lualine.setup({
       'branch',
       {
         'diff',
-        symbols = { added = ' ', modified = ' ', removed = ' ' },
+        symbols = {
+          added = icons.git.added,
+          modified = icons.git.modified,
+          removed = icons.git.removed,
+        },
       },
-      'diagnostics',
+      {
+        'diagnostics',
+        symbols = {
+          error = icons.diagnostics.Error,
+          warn = icons.diagnostics.Warn,
+          info = icons.diagnostics.Info,
+          hint = icons.diagnostics.Hint,
+        },
+      },
     },
     lualine_c = {
       {
         'filename',
         path = 1, -- Relative path
+        symbols = {
+          modified = icons.file_attributes.draft,
+          readonly = icons.file_attributes.readonly,
+          unnamed = icons.file_attributes.unnamed,
+        },
       },
       {
         function()
-          local present, noice = pcall(require, 'noice')
-          if present then
-            return noice.api.statusline.mode.get()
-          end
+          return require('noice').api.statusline.mode.get()
         end,
         cond = function()
-          local present, noice = pcall(require, 'noice')
-          if present then
-            return noice.api.statusline.mode.has()
-          end
+          return package.loaded['noice']
+            and require('noice').api.statusline.mode.has()
         end,
-        color = { fg = '#f5a97f' },
+        color = { fg = dynamo_fg('Constant') },
+      },
+      {
+        function()
+          return '  ' .. require('dap').status()
+        end,
+        cond = function()
+          return package.loaded['dap'] and require('dap').status() ~= ''
+        end,
+        color = { fg = dynamo_fg('Debug') },
       },
     },
     lualine_x = {
@@ -76,21 +98,17 @@ lualine.setup({
         function()
           local b = vim.api.nvim_get_current_buf()
           if next(vim.treesitter.highlighter.active[b]) then
-            return ' '
+            return icons.treesitter
           end
           return ''
         end,
-        color = { fg = '#a6da95' },
+        color = { fg = dynamo_fg('String') },
       },
       {
         function(msg)
-          msg = msg or '  Inactive'
+          msg = msg or icons.lsp .. 'Inactive'
           local buf_clients = vim.lsp.buf_get_clients()
           if next(buf_clients) == nil then
-            -- TODO: clean up this if statement
-            if type(msg) == 'boolean' or #msg == 0 then
-              return '  Inactive'
-            end
             return msg
           end
           local buf_client_names = {}
@@ -101,13 +119,13 @@ lualine.setup({
               table.insert(buf_client_names, client.name)
             end
           end
-          return '  ' .. table.concat(buf_client_names, ', ')
+          return icons.lsp .. table.concat(buf_client_names, ', ')
         end,
-        color = { fg = '#8bd5ca', gui = 'bold' },
+        color = { fg = dynamo_fg('Label'), gui = 'bold' },
       },
       {
         function()
-          local msg = '󰉼 '
+          local msg = icons.null_ls
           for tool, _ in
             pairs(require('languages').get_tools_by_filetype(vim.bo.filetype))
           do
@@ -117,13 +135,13 @@ lualine.setup({
               msg = msg .. tool .. '! '
             end
           end
-          return msg
+          return vim.trim(msg)
         end,
-        color = { fg = '#c6a0f6', gui = 'bold' },
+        color = { fg = dynamo_fg('Statement'), gui = 'bold' },
       },
-      'filetype',
     },
     lualine_y = {
+      'filetype',
       {
         'encoding',
         separator = { left = '', right = '' }, -- Not use powerline between encoding and file format
