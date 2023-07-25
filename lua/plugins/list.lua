@@ -6,6 +6,7 @@ return {
   ----------- Base ------------ {
   { 'nvim-lua/plenary.nvim', name = 'plenary' }, -- Base Lua functions
   { 'MunifTanjim/nui.nvim', name = 'nui' }, -- UI component library
+  { 'tzachar/fuzzy.nvim', name = 'fuzzy' }, -- Fuzzy
   DEBUG and { 'dstein64/vim-startuptime', cmd = 'StartupTime' } or nil, -- View startup timing
   ----------------------------- }
 
@@ -59,13 +60,6 @@ return {
     -- Improve vim.ui.select and vim.ui.input
     'stevearc/dressing.nvim',
     name = 'dressing',
-  },
-  {
-    -- Improve wildmenu's capabilities
-    'gelguy/wilder.nvim',
-    name = 'wilder',
-    event = 'CmdlineEnter',
-    build = ':UpdateRemotePlugins',
   },
   {
     -- Improve messages, cmdline, popups & LSP
@@ -195,9 +189,10 @@ return {
       { 'hrsh7th/cmp-nvim-lsp' }, -- LSP completion source
       { 'onsails/lspkind.nvim' }, -- LSP completion pictograms
       { 'saadparwaiz1/cmp_luasnip', dependencies = { 'luasnip' } }, -- Snippet completion source
-      { 'hrsh7th/cmp-buffer' }, -- Buffer completion source
+      { 'tzachar/cmp-fuzzy-buffer', dependencies = { 'fuzzy' } }, -- Buffer completion source with fuzzy
       { 'hrsh7th/cmp-calc' }, -- Math calculation
       { 'FelipeLema/cmp-async-path' }, -- Path completion source
+      { 'tzachar/cmp-fuzzy-path', dependencies = { 'fuzzy' } }, -- Path completion source with fuzzy
       { 'andersevenrud/cmp-tmux' }, -- Tmux completion source
       { 'rcarriga/cmp-dap', dependencies = { 'dap' } }, -- DAP completion source
       { 'uga-rosa/cmp-dynamic', name = 'cmp_dynamic' }, -- Dynamic completion source

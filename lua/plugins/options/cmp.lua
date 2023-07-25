@@ -12,15 +12,7 @@ local has_words_before = function()
 end
 
 local cmp_default_sources = {
-  {
-    name = 'buffer',
-    option = {
-      get_bufnrs = function()
-        return vim.api.nvim_list_bufs()
-      end,
-    },
-    group_index = 1,
-  },
+  { name = 'fuzzy_buffer', group_index = 1 },
   { name = 'luasnip', group_index = 2 },
   { name = 'nvim_lsp', group_index = 3 },
   { name = 'calc', group_index = 4 },
@@ -29,6 +21,7 @@ local cmp_default_sources = {
   { name = 'dap', group_index = 7 },
   { name = 'dynamic', group_index = 8 },
   { name = 'copilot', group_index = 9 },
+  { name = 'fuzzy_path', group_index = 10 },
 }
 
 cmp.setup({
@@ -91,11 +84,12 @@ cmp.setup({
         return lspkind.cmp_format({
           mode = 'symbol_text',
           menu = {
-            buffer = '「BUF」',
+            fuzzy_buffer = '「BUF」',
             luasnip = '「SNIP」',
             nvim_lsp = '「LSP」',
             calc = '「CALC」',
             async_path = '「PATH」',
+            fuzzy_path = '「PATH」',
             tmux = '「TMUX」',
             dap = '「DAP」',
             dynamic = '「CUS」',
@@ -150,14 +144,14 @@ cmp.setup.filetype({ 'dap-repl', 'dapui_watches', 'dapui_hover' }, {
 cmp.setup.cmdline({ '/', '?' }, {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
-    { name = 'buffer' },
+    { name = 'fuzzy_buffer' },
   },
 })
 
 cmp.setup.cmdline(':', {
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'path' },
+    { name = 'fuzzy_path' },
   }, {
     { name = 'cmdline' },
   }),
