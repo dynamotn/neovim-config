@@ -21,21 +21,71 @@ M.load_default_augroups = function()
   })
 
   vim.api.nvim_create_autocmd({ 'FileType' }, {
-    pattern = { 'qf,help,man,lspinfo,lsp-installer' },
+    pattern = {
+      'help',
+      'lspinfo',
+      'man',
+      'notify',
+      'qf',
+      'startuptime',
+      'tsplayground',
+      'neotest-output',
+      'checkhealth',
+      'neotest-summary',
+      'neotest-output-panel',
+    },
+    callback = function(event)
+      vim.bo[event.buf].buflisted = false
+      vim.keymap.set(
+        'n',
+        'q',
+        '<cmd>close<cr>',
+        { buffer = event.buf, silent = true }
+      )
+    end,
     group = vim.api.nvim_create_augroup('quick_quit_manual', {}),
-    command = 'nnoremap <silent> <buffer> q :close<CR>',
   })
 
   vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
     pattern = { '*' },
     group = vim.api.nvim_create_augroup('lastplace', {}),
-    command = [[if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif]],
+    callback = function()
+      local exclude = { 'gitcommit' }
+      local buf = vim.api.nvim_get_current_buf()
+      if vim.tbl_contains(exclude, vim.bo[buf].filetype) then
+        return
+      end
+      local mark = vim.api.nvim_buf_get_mark(buf, '"')
+      local lcount = vim.api.nvim_buf_line_count(buf)
+      if mark[1] > 0 and mark[1] <= lcount then
+        pcall(vim.api.nvim_win_set_cursor, 0, mark)
+      end
+    end,
   })
 
   vim.api.nvim_create_autocmd({ 'VimEnter' }, {
     pattern = { '*' },
     group = vim.api.nvim_create_augroup('neotree', {}),
     command = [[if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'lua dynamo_file_explorer()' | wincmd p | ene | exe 'cd '.argv()[0] | endif]],
+  })
+
+  vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
+    group = vim.api.nvim_create_augroup('checktime', {}),
+    command = 'checktime',
+  })
+
+  vim.api.nvim_create_autocmd('TextYankPost', {
+    group = vim.api.nvim_create_augroup('highlight_when_copy', {}),
+    callback = function()
+      vim.highlight.on_yank()
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ 'VimResized' }, {
+    group = vim.api.nvim_create_augroup('resize_windows', {}),
+    callback = function()
+      vim.cmd('tabdo wincmd =')
+    end,
   })
 end
 
