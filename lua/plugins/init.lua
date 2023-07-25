@@ -2,8 +2,6 @@
 ---------------------------------------
 --      Plugin initialization        --
 ---------------------------------------
-local g = vim.g -- Global variables
-
 local present, lazy = pcall(require, 'lazy')
 if not present then
   return

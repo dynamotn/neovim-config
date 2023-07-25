@@ -95,24 +95,16 @@ return {
     event = { 'BufRead', 'BufNewFile' },
   },
   {
-    -- Winbar to show context of current position
-    'Bekaboo/dropbar.nvim',
-    name = 'dropbar',
-    event = 'UIEnter',
-  },
-  {
     -- Rainbow parentheses
     'HiPhish/rainbow-delimiters.nvim',
     name = 'rainbow',
     event = { 'BufRead', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
-  { 'rmagatti/goto-preview', name = 'goto_preview' }, -- UI view for preview LSP definition, implementation, reference
-  {
-    -- UI view for LSP code action lightbulb
-    'kosayoda/nvim-lightbulb',
-    name = 'lightbulb',
-    event = { 'BufRead', 'BufNewFile' },
+  { -- UI view for LSP
+    'nvimdev/lspsaga.nvim',
+    name = 'lspsaga',
+    event = { 'LspAttach' },
   },
   {
     -- Inlayhints for LSP
@@ -156,13 +148,12 @@ return {
   --------- Navigation -------- {
   { 'nvim-neo-tree/neo-tree.nvim', name = 'neotree' }, -- File explorer
   { url = 'https://gitlab.com/yorickpeterse/nvim-window', name = 'window' }, -- Window switcher
-  {
-    -- UI view for Symbols
-    'simrat39/symbols-outline.nvim',
-    name = 'symbols_outline',
-  },
   { 'phaazon/hop.nvim', name = 'hop' }, -- Easymotion
-  { 'numToStr/Navigator.nvim', name = 'neomux', event = 'UIEnter' }, -- Smoothly navigate between neovim and tmux
+  {
+    'numToStr/Navigator.nvim',
+    name = 'neomux',
+    event = 'UIEnter',
+  }, -- Smoothly navigate between neovim and tmux
   ----------------------------- }
 
   ------ VCS and Project ------ {
