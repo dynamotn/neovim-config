@@ -188,9 +188,10 @@ return {
     -- Code complete engine
     'hrsh7th/nvim-cmp',
     name = 'cmp',
-    event = 'InsertEnter',
+    event = { 'InsertEnter', 'CmdlineEnter' },
     dependencies = {
       'luasnip',
+      { 'hrsh7th/cmp-cmdline' }, -- CMD
       { 'hrsh7th/cmp-nvim-lsp' }, -- LSP completion source
       { 'onsails/lspkind.nvim' }, -- LSP completion pictograms
       { 'saadparwaiz1/cmp_luasnip', dependencies = { 'luasnip' } }, -- Snippet completion source
