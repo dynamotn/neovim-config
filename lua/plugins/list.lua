@@ -168,6 +168,16 @@ return {
     name = 'neomux',
     event = 'UIEnter',
   }, -- Smoothly navigate between neovim and tmux
+  {
+    -- Automatically expand window
+    'anuvyklack/windows.nvim',
+    name = 'winex',
+    event = 'WinNew',
+    dependencies = {
+      { 'anuvyklack/middleclass' },
+      { 'anuvyklack/animation.nvim' },
+    },
+  },
   ----------------------------- }
 
   ------ VCS and Project ------ {

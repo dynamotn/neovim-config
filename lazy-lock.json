@@ -1,5 +1,6 @@
 {
   "align": { "branch": "main", "commit": "86c8edae77023a7b71d0fa9e2bf78960c1e46fd8" },
+  "animation.nvim": { "branch": "main", "commit": "fb77091ab72ec9971aee0562e7081182527aaa6a" },
   "autopairs": { "branch": "master", "commit": "ae5b41ce880a6d850055e262d6dfebd362bb276e" },
   "autotag": { "branch": "main", "commit": "6be1192965df35f94b8ea6d323354f7dc7a557e4" },
   "bufferline": { "branch": "main", "commit": "99f0932365b34e22549ff58e1bea388465d15e99" },
@@ -57,6 +58,7 @@
   "mason_dap": { "branch": "main", "commit": "e4d56b400e9757b1dc77d620fd3069396e92d5fc" },
   "mason_lsp": { "branch": "main", "commit": "e86a4c84ff35240639643ffed56ee1c4d55f538e" },
   "mason_null_ls": { "branch": "main", "commit": "ae0c5fa57468ac65617f1bf821ba0c3a1e251f0c" },
+  "middleclass": { "branch": "master", "commit": "9fab4d5bca67262614960960ca35c4740eb2be2c" },
   "mkdx": { "branch": "master", "commit": "518ef7fcbdb3b73b315828622ccd3b026bb3a9c1" },
   "neodev.nvim": { "branch": "main", "commit": "f57e5210d450b47aa02ea6d9e50a37414f570b4c" },
   "neogen": { "branch": "main", "commit": "1dd0319ccf41b2498f45a3c7607f2ee325ffc6a0" },
@@ -100,5 +102,6 @@
   "vim-table-mode": { "branch": "master", "commit": "9555a3e6e5bcf285ec181b7fc983eea90500feb4" },
   "whichkey": { "branch": "main", "commit": "38b990f6eabf62014018b4aae70a97d7a6c2eb88" },
   "window": { "branch": "main", "commit": "dd0a6b230003ef35524853d71e5413f88fd2ba74" },
+  "winex": { "branch": "main", "commit": "c7492552b23d0ab30325e90b56066ec51242adc8" },
   "yaml_companion": { "branch": "main", "commit": "4de1e1546abc461f62dee02fcac6a02debd6eb9e" }
 }
