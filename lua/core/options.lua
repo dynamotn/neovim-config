@@ -4,7 +4,6 @@
 ---------------------------------------
 local opt = vim.opt -- Set options (global/buffer/windows-scoped)
 local cmd = vim.cmd -- Execute Vim commands
-local exec = vim.api.nvim_exec -- Execute Vimscript
 
 ------------ UI ------------- {
 -- Status line look nicer
