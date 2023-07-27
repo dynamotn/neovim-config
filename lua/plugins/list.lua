@@ -29,6 +29,12 @@ return {
     dependencies = { 'catppuccin' },
   },
   {
+    -- Status column
+    'luukvbaal/statuscol.nvim',
+    name = 'statuscol',
+    event = 'UIEnter',
+  },
+  {
     -- Buffer and tab line
     'akinsho/bufferline.nvim',
     name = 'bufferline',
@@ -129,12 +135,11 @@ return {
   },
   {
     -- Foldtext customization
-    'anuvyklack/pretty-fold.nvim',
-    name = 'pretty_fold',
-    event = 'UIEnter',
+    'kevinhwang91/nvim-ufo',
+    name = 'ufo',
+    event = 'BufReadPost',
     dependencies = {
-      'anuvyklack/keymap-amend.nvim',
-      'anuvyklack/fold-preview.nvim',
+      'kevinhwang91/promise-async',
     },
   },
   {

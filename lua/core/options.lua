@@ -126,6 +126,9 @@ opt.undolevels = 50
 -- Set marker
 opt.foldenable = true
 opt.foldmethod = 'marker'
+opt.foldcolumn = '1'
+opt.foldlevel = 99
+opt.foldlevelstart = 99
 opt.foldmarker = '{,}'
 opt.fillchars = {
   foldopen = '',
