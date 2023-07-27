@@ -89,6 +89,12 @@ return {
     event = { 'BufRead', 'BufNewFile' },
   },
   {
+    -- Winbar to show context of current position
+    'Bekaboo/dropbar.nvim',
+    name = 'dropbar',
+    event = 'UIEnter',
+  },
+  {
     -- Rainbow parentheses
     'HiPhish/rainbow-delimiters.nvim',
     name = 'rainbow',
