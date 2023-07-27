@@ -1,5 +1,17 @@
 # neovim-config
 
+<!--toc:start-->
+- [neovim-config](#neovim-config)
+  - [Feature](#feature)
+  - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
+      - [Languages](#languages)
+      - [Frameworks](#frameworks)
+      - [Tools & Markup](#tools-markup)
+  - [Installation](#installation)
+  - [Key bindings](#key-bindings)
+  - [Note](#note)
+<!--toc:end-->
+
 My customization configuration for neovim
 
 [![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.10-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
@@ -30,8 +42,7 @@ My customization configuration for neovim
 * Support fuzzy finder, terminal, key mapping board, browser, ...
 
 ## Languages, Frameworks, or Tools support
-
-See list of supported things in `lua/languages/list.lua`. You can comment lines that you don't want to use.
+See the list of supported things in `lua/languages/list.lua`. You can comment on lines that you don't want to use.
 
 #### Languages
 * Arduino
@@ -85,8 +96,6 @@ See list of supported things in `lua/languages/list.lua`. You can comment lines 
     git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
 ```
 
-* Make sure to have `virtualenv` installed otherwise you must install it via
-  your distro's package manager
 * After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
 
 ## Key bindings

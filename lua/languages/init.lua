@@ -6,8 +6,7 @@ local M = {}
 M.setup_autopairs = function(rule, cond, ts_cond)
   local result = {}
   for language, filetypes in pairs(languages) do
-    local ok, autopairs =
-      pcall(require, 'languages.' .. language .. '.autopairs')
+    local ok, autopairs = pcall(require, 'languages.' .. language .. '.autopairs')
     if ok and type(autopairs) == 'function' then
       local list = autopairs(filetypes, rule, cond, ts_cond)
 
@@ -76,8 +75,7 @@ M.setup_treesitter = function(parser_config)
   local result = {}
 
   for language, filetypes in pairs(languages) do
-    local ok, treesitter =
-      pcall(require, 'languages.' .. language .. '.treesitter')
+    local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
 
     if ok and type(treesitter) == 'table' then
       for _, config in ipairs(treesitter) do
@@ -94,13 +92,11 @@ M.setup_treesitter = function(parser_config)
             }
             parser_config[config.parser].install_info = config.install_info
             if type(config.used_by) == 'table' then
-              parser_config[config.parser].used_by =
-                vim.list_extend(config.used_by, filetypes)
+              parser_config[config.parser].used_by = vim.list_extend(config.used_by, filetypes)
             end
           end
           if type(config.used_by) == 'table' then
-            parser_config[config.parser]['used_by'] =
-              vim.list_extend(filetypes, config.used_by)
+            parser_config[config.parser]['used_by'] = vim.list_extend(filetypes, config.used_by)
           end
         end
       end
@@ -115,8 +111,7 @@ M.get_parsers_by_filetype = function(filetype)
     return {}
   end
 
-  local ok, treesitter =
-    pcall(require, 'languages.' .. language .. '.treesitter')
+  local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
 
   local result = {}
   if ok and type(treesitter) == 'table' then
@@ -186,8 +181,7 @@ M.setup_null_ls = function()
   local result = {}
 
   for language, filetypes in pairs(languages) do
-    local ok, null_ls_config =
-      pcall(require, 'languages.' .. language .. '.null_ls')
+    local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
 
     if ok then
       for _, source in ipairs(null_ls_config) do
@@ -195,13 +189,8 @@ M.setup_null_ls = function()
           source.with_config = source.with_config or {}
           source.with_config['filetypes'] = filetypes
 
-          local tool = dynamo_nullls_tool(
-            source[1],
-            source[2],
-            source.is_external_tool,
-            source.is_custom_tool,
-            source.with_config
-          )
+          local tool =
+            dynamo_nullls_tool(source[1], source[2], source.is_external_tool, source.is_custom_tool, source.with_config)
           if tool then
             result[source[1]] = tool
           end
@@ -222,17 +211,14 @@ M.get_tools_by_filetype = function(filetype)
   for language, filetypes in pairs(languages) do
     for _, ft in pairs(filetypes) do
       if ft == filetype then
-        local ok, null_ls_config =
-          pcall(require, 'languages.' .. language .. '.null_ls')
+        local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
 
         if not ok then
           return {}
         end
 
         for _, source in ipairs(null_ls_config) do
-          if
-            source.is_external_tool == true or source.is_external_tool == nil
-          then
+          if source.is_external_tool == true or source.is_external_tool == nil then
             local tool = source.tool and source.tool or source[1]
 
             result[tool] = true

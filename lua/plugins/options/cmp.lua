@@ -3,12 +3,7 @@ local luasnip = require('luasnip')
 
 local has_words_before = function()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0
-    and vim.api
-        .nvim_buf_get_lines(0, line - 1, line, true)[1]
-        :sub(col, col)
-        :match('%s')
-      == nil
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match('%s') == nil
 end
 
 local cmp_default_sources = {
@@ -32,8 +27,7 @@ cmp.setup({
   },
   sources = cmp.config.sources(cmp_default_sources, { { name = 'buffer' } }),
   enabled = function()
-    return vim.api.nvim_buf_get_option(0, 'buftype') ~= 'prompt'
-      or require('cmp_dap').is_dap_buffer()
+    return vim.api.nvim_buf_get_option(0, 'buftype') ~= 'prompt' or require('cmp_dap').is_dap_buffer()
   end,
   mapping = cmp.mapping.preset.insert({
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -67,9 +61,7 @@ cmp.setup({
   formatting = {
     format = function(entry, vim_item)
       if vim.tbl_contains({ 'path' }, entry.source.name) then
-        local icon, hl_group = require('nvim-web-devicons').get_icon(
-          entry:get_completion_item().label
-        )
+        local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
         if icon then
           vim_item.kind = icon:gsub('^%s+', ''):gsub('%s+$', '') .. ' File'
           vim_item.kind_hl_group = hl_group

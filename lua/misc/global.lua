@@ -27,11 +27,7 @@ _G.dynamo_reload_nvim_config = function(has_changed_plugins)
   dynamo_unload_module('languages', true)
 
   dofile(vim.env.MYVIMRC)
-  vim.notify(
-    'Nvim configuration reloaded!',
-    vim.log.levels.INFO,
-    { title = 'Reload' }
-  )
+  vim.notify('Nvim configuration reloaded!', vim.log.levels.INFO, { title = 'Reload' })
 
   if has_changed_plugins then
     require('lazy').sync()
@@ -48,8 +44,7 @@ _G.dynamo_mapping_enter = function()
     if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
       return present and autopairs.esc('<C-y>') or '<C-y>'
     else
-      return present and autopairs.esc('<C-e>') .. autopairs.autopairs_cr()
-        or '<C-e><CR>'
+      return present and autopairs.esc('<C-e>') .. autopairs.autopairs_cr() or '<C-e><CR>'
     end
   else
     return present and autopairs.autopairs_cr() or '<CR>'
@@ -63,12 +58,8 @@ _G.dynamo_mapping_backspace = function()
 
   local bufnr = vim.api.nvim_get_current_buf()
 
-  if
-    vim.fn.pumvisible() ~= 0
-    and vim.fn.complete_info({ 'mode' }).mode == 'eval'
-  then
-    return present and autopairs.esc('<C-e>') .. autopairs.autopairs_bs(bufnr)
-      or '<C-e><BS>'
+  if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
+    return present and autopairs.esc('<C-e>') .. autopairs.autopairs_bs(bufnr) or '<C-e><BS>'
   else
     return present and autopairs.autopairs_bs(bufnr) or '<BS>'
   end
@@ -138,12 +129,7 @@ _G.dynamo_lsp_formatting = function(id)
 
   local bufnr = vim.api.nvim_get_current_buf()
   local client = vim.lsp.get_client_by_id(id)
-  local result, err = client.request_sync(
-    'textDocument/formatting',
-    vim.lsp.util.make_formatting_params(),
-    nil,
-    bufnr
-  )
+  local result, err = client.request_sync('textDocument/formatting', vim.lsp.util.make_formatting_params(), nil, bufnr)
   if result and result.result then
     vim.lsp.util.apply_text_edits(result.result, bufnr, client.offset_encoding)
   elseif err then
@@ -153,13 +139,7 @@ end
 --------------------------------------------------------------- }
 
 -- Activate tool with null_ls {
-_G.dynamo_nullls_tool = function(
-  name,
-  method,
-  is_external_tool,
-  is_custom_tool,
-  with_config
-)
+_G.dynamo_nullls_tool = function(name, method, is_external_tool, is_custom_tool, with_config)
   with_config = with_config or {}
   is_external_tool = is_external_tool == nil and true or is_external_tool
   is_custom_tool = is_custom_tool == nil and false or is_custom_tool
@@ -189,8 +169,7 @@ _G.dynamo_dial_group = function()
   if not present then
     return 'default'
   end
-  local language =
-    require('languages').get_language_from_filetype(vim.bo.filetype)
+  local language = require('languages').get_language_from_filetype(vim.bo.filetype)
 
   if dial.augends:get(language) then
     return language
@@ -244,13 +223,9 @@ _G.dynamo_ts_install = function(bufnr)
   local languages = require('languages')
 
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local parsers =
-    languages.get_parsers_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
+  local parsers = languages.get_parsers_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
   for _, parser in ipairs(parsers) do
-    if
-      next(vim.api.nvim_get_runtime_file('parser/' .. parser .. '.so', true))
-      == nil
-    then
+    if next(vim.api.nvim_get_runtime_file('parser/' .. parser .. '.so', true)) == nil then
       vim.api.nvim_command('TSInstall ' .. parser)
     end
   end
@@ -268,8 +243,7 @@ _G.dynamo_mason_install = function(bufnr)
 
   bufnr = bufnr or vim.api.nvim_get_current_buf()
 
-  local lsp_servers =
-    languages.get_ls_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
+  local lsp_servers = languages.get_ls_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
   for _, lsp_server in ipairs(lsp_servers) do
     local server = lsp_mapping.lspconfig_to_package[lsp_server]
     if server ~= nil and not registry.is_installed(server) then
@@ -277,8 +251,7 @@ _G.dynamo_mason_install = function(bufnr)
     end
   end
 
-  local dap_servers =
-    languages.get_dap_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
+  local dap_servers = languages.get_dap_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
   for _, dap_server in ipairs(dap_servers) do
     local server = dap_mapping.nvim_dap_to_package[dap_server]
     if server ~= nil and not registry.is_installed(server) then
@@ -286,8 +259,7 @@ _G.dynamo_mason_install = function(bufnr)
     end
   end
 
-  local null_ls_tools =
-    languages.get_tools_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
+  local null_ls_tools = languages.get_tools_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
   if null_ls_tools == nil then
     return
   end
@@ -305,12 +277,7 @@ end
 -- Check filetype is gotemplate {
 _G.dynamo_gotemplate_detection = function(bufnr)
   local content = function()
-    local content = vim.api.nvim_buf_get_lines(
-      bufnr,
-      0,
-      vim.api.nvim_buf_line_count(0),
-      false
-    )
+    local content = vim.api.nvim_buf_get_lines(bufnr, 0, vim.api.nvim_buf_line_count(0), false)
     return table.concat(content, '\n')
   end
   if content():match('{{.+}}') then
@@ -321,8 +288,7 @@ end
 
 -- Get foreground color from highlight group {
 _G.dynamo_fg = function(name)
-  local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name })
-    or vim.api.nvim_get_hl_by_name(name, true)
+  local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name }) or vim.api.nvim_get_hl_by_name(name, true)
   local fg = hl and hl.fg or hl.foreground
   return fg and string.format('#%06x', fg)
 end

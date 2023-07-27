@@ -1,15 +1,7 @@
 local function dial_sequence(direction, mode)
-  local select = dynamo_cmdcr(
-    [[lua require("dial.command").select_augend_]]
-      .. mode
-      .. '(dynamo_dial_group())'
-  )
-  local setopfunc = dynamo_cmdcr(
-    [[let &opfunc="dial#operator#]] .. direction .. '_' .. mode .. [["]]
-  )
-  local textobj = mode == 'normal'
-      and dynamo_cmdcr([[lua require("dial.command").textobj()]])
-    or ''
+  local select = dynamo_cmdcr([[lua require("dial.command").select_augend_]] .. mode .. '(dynamo_dial_group())')
+  local setopfunc = dynamo_cmdcr([[let &opfunc="dial#operator#]] .. direction .. '_' .. mode .. [["]])
+  local textobj = mode == 'normal' and dynamo_cmdcr([[lua require("dial.command").textobj()]]) or ''
   return select .. setopfunc .. 'g@' .. textobj
 end
 

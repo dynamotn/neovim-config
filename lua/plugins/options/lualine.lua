@@ -75,8 +75,7 @@ lualine.setup({
           return require('noice').api.statusline.mode.get()
         end,
         cond = function()
-          return package.loaded['noice']
-            and require('noice').api.statusline.mode.has()
+          return package.loaded['noice'] and require('noice').api.statusline.mode.has()
         end,
         color = { fg = dynamo_fg('Constant') },
       },
@@ -126,9 +125,7 @@ lualine.setup({
       {
         function()
           local msg = icons.null_ls
-          for tool, _ in
-            pairs(require('languages').get_tools_by_filetype(vim.bo.filetype))
-          do
+          for tool, _ in pairs(require('languages').get_tools_by_filetype(vim.bo.filetype)) do
             if vim.fn.executable(tool) == 1 then
               msg = msg .. tool .. ' '
             else

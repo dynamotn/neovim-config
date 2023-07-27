@@ -1,3 +1,5 @@
 local smartcolumn = require('smartcolumn')
 
-smartcolumn.setup()
+smartcolumn.setup({
+  colorcolumn = '120',
+})

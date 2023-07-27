@@ -138,8 +138,7 @@ opt.foldopen = 'block,hor,mark,percent,quickfix,tag,jump,search,undo'
 ---------- }
 
 -- Session
-opt.sessionoptions =
-  'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal'
+opt.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal'
 ----------------------------- }
 
 ------- Autocomplete -------- {
