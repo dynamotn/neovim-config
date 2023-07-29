@@ -25,7 +25,7 @@ cmp.setup({
       luasnip.lsp_expand(args.body)
     end,
   },
-  sources = cmp.config.sources(cmp_default_sources, { { name = 'buffer' } }),
+  sources = cmp.config.sources(cmp_default_sources),
   enabled = function()
     return vim.api.nvim_buf_get_option(0, 'buftype') ~= 'prompt' or require('cmp_dap').is_dap_buffer()
   end,
@@ -129,7 +129,8 @@ cmp.setup({
 
 cmp.setup.filetype({ 'dap-repl', 'dapui_watches', 'dapui_hover' }, {
   sources = {
-    { name = 'dap' },
+    { name = 'dap', group_index = 1 },
+    { name = 'fuzzy_buffer', group_index = 2 },
   },
 })
 
@@ -142,18 +143,18 @@ cmp.setup.cmdline({ '/', '?' }, {
 
 cmp.setup.cmdline(':', {
   mapping = cmp.mapping.preset.cmdline(),
-  sources = cmp.config.sources({
-    { name = 'fuzzy_path' },
-  }, {
-    { name = 'cmdline' },
-  }),
+  sources = {
+    { name = 'cmdline', group_index = 1 },
+    { name = 'fuzzy_path', group_index = 2 },
+  },
 })
 
 local configs = require('languages').get_cmp_sources()
 for _, config in ipairs(configs) do
   local new_sources = vim.deepcopy(cmp_default_sources)
+  vim.list_extend(new_sources, config.sources)
   cmp.setup.filetype(config.filetypes, {
-    sources = vim.list_extend(new_sources, config.sources),
+    sources = new_sources,
   })
 end
 

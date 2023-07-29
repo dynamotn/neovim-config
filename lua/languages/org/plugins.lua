@@ -5,7 +5,10 @@ return {
     dependencies = {
       { 'plenary' },
       { 'nvim-neorg/neorg-telescope' }, -- Telescope for Neorg
-      { 'max397574/neorg-zettelkasten' }, -- Zettelkasten for Neorg
     },
+    cmd = { 'Neorg' },
+    lazy = false,
   },
+  { 'navarasu/onedark.nvim' },
+  { 'lukas-reineke/headlines.nvim', dependencies = { 'treesitter' }, name = 'headlines' }, -- Highlight for headlines, codeblocks
 }

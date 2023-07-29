@@ -3,31 +3,46 @@ local neorg = require('neorg')
 neorg.setup({
   load = {
     ['core.defaults'] = {},
-    ['core.norg.esupports.hop'] = {},
-    ['core.norg.esupports.indent'] = {},
-    ['core.norg.journal'] = {},
-    ['core.norg.qol.todo_items'] = {},
+    ['core.esupports.metagen'] = {
+      config = {
+        type = 'auto',
+        update_date = true,
+      },
+    },
+    ['core.journal'] = {
+      config = {
+        workspace = 'personal',
+        strategy = 'flat',
+      },
+    },
     ['core.syntax'] = {},
     ['core.neorgcmd'] = {},
-    ['core.norg.concealer'] = {},
-    ['core.norg.dirman'] = {
+    ['core.concealer'] = { config = { icon_preset = 'diamond' } },
+    ['core.dirman'] = {
       config = {
         workspaces = {
           personal = '~/Notes/personal',
           enterprise = '~/Notes/enterprise',
           freelance = '~/Notes/freelance',
         },
-        autochdir = true,
-        index = 'dynamo.norg',
+        index = 'index.norg',
       },
     },
-    ['core.norg.completion'] = {
+    ['core.completion'] = {
       config = {
         engine = 'nvim-cmp',
       },
     },
+    ['core.highlights'] = {},
+    ['core.ui.calendar'] = {},
     ['core.integrations.nvim-cmp'] = {},
     ['core.integrations.telescope'] = {},
-    ['external.zettelkasten'] = {},
+    ['core.integrations.treesitter'] = {
+      config = {
+        configure_parsers = true,
+        install_parsers = false,
+      },
+    },
+    ['core.fs'] = {},
   },
 })
