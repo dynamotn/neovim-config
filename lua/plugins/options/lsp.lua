@@ -6,15 +6,11 @@ local augroup = require('misc.augroup')
 local default_opts = {
   autostart = true,
   on_attach = function(client, buffer)
-    register_keymaps('lsp', buffer)
+    register_keymaps('lsp')
     augroup.enable_highlight_document(client.id)
     augroup.enable_hover(client.id)
     augroup.enable_codelens(client.id)
     augroup.enable_formatting(client.id)
-    local present, navic = pcall(require, 'nvim-navic')
-    if present and client.server_capabilities.documentSymbolProvider then
-      navic.attach(client, buffer)
-    end
 
     local present, colorizer = pcall(require, 'colorizer')
     if present then
@@ -38,11 +34,6 @@ for server_name, config in pairs(configs) do
   if lspconfig[server_name] then
     local opts = config.setup(default_opts)
     opts.filetypes = config.filetypes
-
-    local present, coq = pcall(require, 'coq')
-    if present then
-      opts = coq.lsp_ensure_capabilities(opts)
-    end
 
     local present, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
     if present then
