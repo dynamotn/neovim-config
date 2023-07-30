@@ -62,6 +62,8 @@ opt.swapfile = false
 ----------------------------- }
 
 ---------- Tweaks ----------- {
+opt.cp = false
+
 -- Highlight matching parenthesis
 opt.showmatch = true
 

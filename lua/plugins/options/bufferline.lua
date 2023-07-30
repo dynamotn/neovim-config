@@ -29,7 +29,12 @@ for filetype, text in pairs(special_filetypes) do
 end
 
 bufferline.setup({
-  highlights = require('catppuccin.groups.integrations.bufferline').get(),
+  highlights = function()
+    if require('core.defaults').colorscheme == 'catppuccin' and dynamo_has_plugin('catppuccin') then
+      return require('catppuccin.groups.integrations.bufferline').get()
+    end
+    return {}
+  end,
   options = {
     mode = 'tabs',
     numbers = function(opts)

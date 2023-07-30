@@ -40,6 +40,7 @@ local unwanted_plugins = {
   '2html_plugin',
   'gzip',
   'matchit',
+  'netrw',
   'netrwPlugin',
   'tarPlugin',
   'tutor_mode_plugin',

@@ -210,13 +210,6 @@ _G.dynamo_setft_terminal = function()
 end
 ---------------------------- }
 
--- Open File explore {
-_G.dynamo_file_explorer = function()
-  require('lazy').load({ plugins = { 'neotree' } })
-  require('neo-tree').show(nil, true, true, true)
-end
---------------- }
-
 -- Install TS parsers for window buffer {
 _G.dynamo_ts_install = function(bufnr)
   require('lazy').load({ plugins = { 'treesitter' } })
@@ -293,3 +286,10 @@ _G.dynamo_fg = function(name)
   return fg and string.format('#%06x', fg)
 end
 -------------------------------------------- }
+
+-- Check plugin is declared in spec {
+_G.dynamo_list_plugins = {}
+_G.dynamo_has_plugin = function(plugin)
+  return vim.list_contains(_G.dynamo_list_plugins, plugin)
+end
+----------------------------------- }

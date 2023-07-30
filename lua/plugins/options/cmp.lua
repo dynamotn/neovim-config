@@ -18,6 +18,7 @@ local cmp_default_sources = {
   { name = 'copilot', group_index = 9 },
   { name = 'fuzzy_path', group_index = 10 },
 }
+vim.api.nvim_set_hl(0, 'CmpGhostText', { link = 'Comment', default = true })
 
 cmp.setup({
   snippet = {
@@ -32,6 +33,8 @@ cmp.setup({
   mapping = cmp.mapping.preset.insert({
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+    ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping(function(fallback)
@@ -58,9 +61,14 @@ cmp.setup({
       end
     end, { 'i', 's' }),
   }),
+  experimental = {
+    ghost_text = {
+      hl_group = 'CmpGhostText',
+    },
+  },
   formatting = {
     format = function(entry, vim_item)
-      if vim.tbl_contains({ 'path' }, entry.source.name) then
+      if vim.tbl_contains({ 'fuzzy_path', 'async_path', 'path' }, entry.source.name) then
         local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
         if icon then
           vim_item.kind = icon:gsub('^%s+', ''):gsub('%s+$', '') .. ' File'
@@ -69,6 +77,7 @@ cmp.setup({
       end
 
       local present, lspkind = pcall(require, 'lspkind')
+      local icons = require('core.defaults').icons.kinds
 
       if not present then
         return vim_item
@@ -93,33 +102,33 @@ cmp.setup({
             ['vim-dadbod-completion'] = '「DB」',
           },
           symbol_map = {
-            File = '󰈔 ',
-            Module = '󰏗 ',
-            Class = ' ',
-            Method = '󰆧 ',
-            Property = ' ',
-            Field = ' ',
-            Constructor = ' ',
-            Enum = ' ',
-            Interface = ' ',
-            Function = '󰊕 ',
-            Variable = '󰀫 ',
-            Constant = '󰏿 ',
-            Text = '󰉾 ', -- String in barbecue
-            Keyword = '󰌋 ', -- Key in barbecue
-            EnumMember = ' ',
-            Struct = ' ',
-            Event = ' ',
-            Operator = '󰆕 ',
-            TypeParameter = '󰆩 ',
+            File = icons.File,
+            Module = icons.Module,
+            Class = icons.Class,
+            Method = icons.Method,
+            Property = icons.Property,
+            Field = icons.Field,
+            Constructor = icons.Constructor,
+            Enum = icons.Enum,
+            Interface = icons.Interface,
+            Function = icons.Function,
+            Variable = icons.Variable,
+            Constant = icons.Constant,
+            Text = icons.Text,
+            Keyword = icons.Keyword,
+            EnumMember = icons.EnumMember,
+            Struct = icons.Struct,
+            Event = icons.Event,
+            Operator = icons.Operator,
+            TypeParameter = icons.TypeParameter,
 
-            Snippet = ' ',
-            Unit = ' ',
-            Value = '󰎠 ',
-            Color = '󰏘 ',
-            Reference = '󰦾 ',
-            Folder = '󰉋 ',
-            Copilot = ' ',
+            Snippet = icons.Snippet,
+            Unit = icons.Unit,
+            Value = icons.Value,
+            Color = icons.Color,
+            Reference = icons.Reference,
+            Folder = icons.folder,
+            Copilot = icons.Copilot,
           },
         })(entry, vim_item)
       end

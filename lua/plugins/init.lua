@@ -35,6 +35,7 @@ local function inject_lazy(plugin)
       keys = register_keymaps,
       dependencies = dependencies,
     })
+    table.insert(_G.dynamo_list_plugins, plugin.name)
   else
     result = plugin
   end
@@ -54,5 +55,12 @@ end
 return lazy.setup(final_list, {
   defaults = {
     lazy = true,
+  },
+  install = {
+    colorscheme = { require('core.defaults').colorscheme },
+  },
+  checker = {
+    enabled = true,
+    notify = true,
   },
 })

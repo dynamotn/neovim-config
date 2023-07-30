@@ -1,5 +1,5 @@
-DEBUG = false
-if vim.version().minor >= 10 then
+DEBUG = true
+if vim.fn.has('nvim-0.10.0') == 1 then
   require('core')
   require('misc')
   require('plugins')

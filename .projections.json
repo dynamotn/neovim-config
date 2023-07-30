@@ -1,5 +1,5 @@
 {
-  "lua/plugins/list.lua": {
+  "lua/plugins/list/*.lua": {
     "type": "plugin"
   },
   "lua/plugins/options/*.lua": {

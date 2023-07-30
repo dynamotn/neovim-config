@@ -36,7 +36,7 @@ end
 
 lualine.setup({
   options = {
-    theme = 'catppuccin',
+    theme = require('core.defaults').colorscheme,
   },
   sections = {
     lualine_a = { 'mode' },

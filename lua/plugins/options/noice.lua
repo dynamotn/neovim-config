@@ -1,8 +1,11 @@
 local noice = require('noice')
 
 noice.setup({
-  cmdline = { view = 'cmdline' },
+  cmdline = { view = 'cmdline_popup' },
   messages = { view = 'notify' },
+  popupmenu = {
+    backend = 'cmp',
+  },
   lsp = {
     override = {
       ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
