@@ -6,10 +6,10 @@ return {
     null_ls = '󰉼 ',
     dap = {
       Stopped = { '󰁕 ', 'DiagnosticWarn', 'DapStoppedLine' },
-      Breakpoint = ' ',
-      BreakpointCondition = ' ',
+      Breakpoint = { ' ' },
+      BreakpointCondition = { ' ' },
       BreakpointRejected = { ' ', 'DiagnosticError' },
-      LogPoint = '.>',
+      LogPoint = { '.>' },
     },
     file_attributes = {
       draft = ' ',
