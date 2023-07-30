@@ -16,6 +16,7 @@ return {
     'gomod',
   },
   html = { 'html' },
+  java = { 'java' },
   javascript = {
     'javascript',
     'typescript',
@@ -45,7 +46,10 @@ return {
   gitcommit = { 'gitcommit' },
   gotmpl = { 'gotmpl' },
   http = { 'http' },
-  json = { 'json' },
+  json = {
+    'json',
+    'jsonc',
+  },
   markdown = { 'markdown' },
   nix = { 'nix' },
   org = { 'norg' },

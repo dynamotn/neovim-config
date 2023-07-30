@@ -84,4 +84,19 @@ M.gopls = function(default_opts)
   return opts
 end
 
+M.jsonls = function(default_opts)
+  local opts = default_opts
+
+  opts.settings = {
+    json = {
+      format = {
+        enable = true,
+      },
+      validate = { enable = true },
+    },
+  }
+
+  return opts
+end
+
 return M

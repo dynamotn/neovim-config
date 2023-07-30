@@ -84,6 +84,14 @@ M.lldb = {
       cwd = '${workspaceFolder}',
       stopOnEntry = true,
     },
+    {
+      name = 'Attach to process',
+      type = 'lldb',
+      request = 'attach',
+      processId = require('dap.utils').pick_process,
+      cwd = '${workspaceFolder}',
+      stopOnEntry = true,
+    },
   },
 }
 
