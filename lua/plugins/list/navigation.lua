@@ -11,8 +11,9 @@ return {
   },
   {
     -- Easymotion
-    'phaazon/hop.nvim',
-    name = 'hop',
+    'folke/flash.nvim',
+    name = 'flash',
+    event = 'VeryLazy',
   },
   {
     -- Smoothly navigate between neovim and tmux
