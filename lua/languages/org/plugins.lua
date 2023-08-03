@@ -6,7 +6,6 @@ return {
       { 'plenary' },
       { 'nvim-neorg/neorg-telescope' }, -- Telescope for Neorg
     },
-    tag = 'v5.0.0',
     cmd = { 'Neorg' },
     lazy = false,
   },
