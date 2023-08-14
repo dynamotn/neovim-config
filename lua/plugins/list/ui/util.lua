@@ -20,5 +20,6 @@ return {
     'kristijanhusak/vim-dadbod-ui',
     name = 'dadbod_ui',
     dependencies = { 'dadbod' },
+    cmd = 'DBUI',
   },
 }
