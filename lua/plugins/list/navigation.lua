@@ -3,6 +3,9 @@ return {
     'nvim-neo-tree/neo-tree.nvim',
     name = 'neotree',
     cmd = 'Neotree',
+    deactivate = function()
+      vim.cmd([[Neotree close]])
+    end,
   },
   {
     -- Window switcher

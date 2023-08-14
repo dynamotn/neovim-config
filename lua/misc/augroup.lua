@@ -58,12 +58,6 @@ M.load_default_augroups = function()
     end,
   })
 
-  vim.api.nvim_create_autocmd({ 'VimEnter' }, {
-    pattern = { '*' },
-    group = vim.api.nvim_create_augroup('neotree', {}),
-    command = [[if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'lua dynamo_file_explorer()' | wincmd p | ene | exe 'cd '.argv()[0] | endif]],
-  })
-
   vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
     group = vim.api.nvim_create_augroup('checktime', {}),
     command = 'checktime',
