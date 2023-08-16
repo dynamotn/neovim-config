@@ -20,6 +20,7 @@ vim.filetype.add({
     ['roles/.*%.ya?ml'] = 'ansible',
     ['handlers/.*%.ya?ml'] = 'ansible',
     ['inventory/.*%.ya?ml'] = 'ansible',
+    ['.*%.dbml'] = 'dbml',
     ['.*%.tpl'] = {
       priority = -math.huge,
       function(_, bufnr)
