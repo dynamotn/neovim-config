@@ -40,6 +40,14 @@ for server_name, config in pairs(configs) do
       opts.capabilities = cmp_nvim_lsp.default_capabilities(opts.capabilities)
     end
 
+    local present, ufo = pcall(require, 'ufo')
+    if present then
+      opts.capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
+    end
+
     lspconfig[server_name].setup(opts)
   end
 end
