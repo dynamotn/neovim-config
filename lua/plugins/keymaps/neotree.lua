@@ -1,24 +1,24 @@
-local neotree = require('neo-tree')
+local neotree = require('neo-tree.command')
 
 return {
   {
     '<F1>',
     function()
-      neotree.show(nil, true, true, true)
+      neotree._command('show', nil, true, true, true)
     end,
     desc = 'File explorer',
   },
   {
     '<Space>ft',
     function()
-      neotree.show(nil, true, true, true)
+      neotree._command('show', nil, true, true, true)
     end,
     desc = 'File explorer',
   },
   {
     '<Space>gt',
     function()
-      neotree.show('git_status', true, true, true)
+      neotree._command('show', 'git_status', true, true, true)
     end,
     desc = 'Status explorer',
   },
