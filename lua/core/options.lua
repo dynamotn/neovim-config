@@ -21,9 +21,6 @@ opt.shortmess:append('filmnrxoOtT')
 -- Better Unix / Windows compatibility
 opt.viewoptions = 'folds,options,cursor,unix,slash'
 
--- Enable syntax of file
-cmd([[syntax on]])
-
 -- Highlight unwanted space
 opt.list = true
 opt.listchars = 'tab:→ ,trail:·,extends:↷,precedes:↶'
