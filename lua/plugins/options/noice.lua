@@ -31,6 +31,15 @@ noice.setup({
     },
     {
       filter = {
+        event = 'notify',
+        find = 'split buf',
+      },
+      opts = {
+        skip = true,
+      },
+    },
+    {
+      filter = {
         event = 'msg_show',
         any = {
           { find = '%d+L, %d+B' },
