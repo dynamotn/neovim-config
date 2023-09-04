@@ -47,8 +47,14 @@ return {
           {
             'zbirenbaum/copilot.lua',
             cmd = 'Copilot',
+            event = 'InsertEnter',
             name = 'copilot',
-            build = ':Copilot auth',
+            build = function()
+              require('lazy').load({ plugins = 'copilot', wait = true })
+              vim.defer_fn(function()
+                require('copilot.command').auth()
+              end, 100)
+            end,
           },
         },
       },

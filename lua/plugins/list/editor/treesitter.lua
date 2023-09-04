@@ -6,7 +6,9 @@ return {
     event = { 'BufRead', 'BufNewFile', 'FileType' },
     build = function()
       require('lazy').load({ plugins = 'treesitter', wait = true })
-      require('nvim-treesitter.install').update({ with_sync = true })
+      vim.defer_fn(function()
+        require('nvim-treesitter.install').update({ with_sync = true })
+      end, 100)
     end,
     cmd = 'TSInstall',
   },
