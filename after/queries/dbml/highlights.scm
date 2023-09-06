@@ -1,4 +1,5 @@
-(keyword) @keyword
+(keyword_def) @keyword
+(keyword_ref) @keyword
 (identifier) @constant
 (item (identifier) @function)
 (index (identifier) @function)
