@@ -4,9 +4,9 @@
 - [neovim-config](#neovim-config)
   - [Feature](#feature)
   - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
-      - [Languages](#languages)
-      - [Frameworks](#frameworks)
-      - [Tools & Markup](#tools-markup)
+    - [Languages](#languages)
+    - [Frameworks](#frameworks)
+    - [Tools & Markup](#tools-markup)
   - [Installation](#installation)
   - [Key bindings](#key-bindings)
   - [Note](#note)
@@ -33,11 +33,9 @@ My customization configuration for neovim
   * [nvim-window](https://gitlab.com/yorickpeterse/nvim-window) as window switcher
   * [marks.nvim](chentau/marks.nvim) as mark switcher
 * Fully support Git and Diff with
-  * [neogit](https://github.com/TimUntersberger/neogit) as TUI of Git
-    (although I rarely use it, I would prefer `git` command to it)
+  * [neogit](https://github.com/TimUntersberger/neogit) as TUI of Git (although I rarely use it, I would prefer `git` command to it)
   * [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim) to view diff
-  * [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) to show
-    hunks of Git
+  * [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) to show hunks of Git
 * Efficiency editing with a ton of tools
 * Support fuzzy finder, terminal, key mapping board, browser, ...
 
@@ -92,8 +90,8 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 * Clone this repository to ~/.config/nvim.
 
 ```sh
-    rm -rf ~/.config/nvim
-    git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
+  rm -rf ~/.config/nvim
+  git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
 ```
 
 * After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
