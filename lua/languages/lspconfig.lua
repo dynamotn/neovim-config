@@ -11,7 +11,7 @@ M.lua_ls = function(default_opts)
         enable = false,
       },
       format = {
-        enable = true,
+        enable = false,
         defaultConfig = {
           indent_style = 'space',
           indent_size = '2',
