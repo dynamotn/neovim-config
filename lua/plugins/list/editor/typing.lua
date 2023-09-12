@@ -34,4 +34,10 @@ return {
     dependencies = { 'treesitter' },
     event = 'InsertEnter',
   },
+  {
+    -- Supercharge autopairing
+    'altermo/ultimate-autopair.nvim',
+    name = 'ultimate_autopair',
+    event = { 'InsertEnter', 'CmdlineEnter' },
+  },
 }
