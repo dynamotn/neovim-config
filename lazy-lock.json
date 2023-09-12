@@ -91,6 +91,7 @@
   "smartcolumn": { "branch": "main", "commit": "d01b99355c7fab13233f48d0f28dc097e68a03f7" },
   "statuscol": { "branch": "main", "commit": "0944234914438695050eec6f83b4669864680c1a" },
   "surround": { "branch": "main", "commit": "9d1956b576d7051da3a483b251dfc778121c60db" },
+  "tabout": { "branch": "master", "commit": "0d275c8d25f32457e67b5c66d6ae43f26a61bce5" },
   "telescope": { "branch": "master", "commit": "a19770625aed49ad2a9f591a5e3946707f7359f6" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "6c921ca12321edaa773e324ef64ea301a1d0da62" },
   "text_object": { "branch": "master", "commit": "bd103502252027434ec42f628d2dbf54821d4ce6" },

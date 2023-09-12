@@ -27,4 +27,11 @@ return {
     name = 'align',
     event = 'UIEnter',
   },
+  {
+    -- Tabbing out
+    'abecodes/tabout.nvim',
+    name = 'tabout',
+    dependencies = { 'treesitter' },
+    event = 'InsertEnter',
+  },
 }
