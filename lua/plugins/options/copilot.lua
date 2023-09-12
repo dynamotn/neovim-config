@@ -23,3 +23,8 @@ copilot.setup({
     },
   },
 })
+
+local auth = require('copilot.auth')
+if not auth.get_cred().user then
+  auth.signin()
+end

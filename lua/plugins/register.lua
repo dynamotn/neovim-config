@@ -13,6 +13,7 @@ end
 M.register_options = function(plugin)
   if plugin.dir then
     vim.opt.rtp:append(plugin.dir)
+    require('lazy.core.loader').packadd(plugin.dir)
   end
   if plugin.name then
     pcall(require, 'plugins.options.' .. plugin.name)
@@ -23,6 +24,9 @@ end
 M.register_setup = function(plugin)
   if plugin.name then
     pcall(require, 'plugins.setup.' .. plugin.name)
+  end
+  if plugin.dir then
+    require('lazy.core.loader').ftdetect(plugin.dir)
   end
 end
 
