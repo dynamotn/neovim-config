@@ -37,13 +37,16 @@ cmp.setup({
     ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping(function(fallback)
-      if cmp.get_selected_entry() then
-        cmp.confirm({ select = true })
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
+    ['<CR>'] = cmp.mapping({
+      i = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
+      c = function(fallback)
+        if cmp.get_selected_entry() then
+          cmp.confirm({ select = true })
+        else
+          fallback()
+        end
+      end,
+    }),
     ['<Tab>'] = cmp.mapping(function(fallback)
       if luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()

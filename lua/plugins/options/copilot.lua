@@ -7,9 +7,9 @@ copilot.setup({
     auto_trigger = true,
     debounce = 75,
     keymap = {
-      accept = '<C-CR>',
+      accept = '<M-CR>',
       accept_word = false,
-      accept_line = '<C-Space>',
+      accept_line = '<M-Space>',
       next = '<C-n>',
       prev = '<C-p>',
       dismiss = '<C-c>',
