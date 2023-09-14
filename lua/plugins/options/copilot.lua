@@ -24,7 +24,9 @@ copilot.setup({
   },
 })
 
-local auth = require('copilot.auth')
-if not auth.get_cred().user then
-  auth.signin()
-end
+vim.defer_fn(function()
+  local auth = require('copilot.auth')
+  if not auth.get_cred().user then
+    auth.signin()
+  end
+end, 100)
