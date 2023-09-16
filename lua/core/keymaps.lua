@@ -6,8 +6,7 @@ local opt = vim.opt -- Set options (global/buffer/windowS-scoped)
 local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
-  local cmd = 'cnoreabbrev %s %s'
-  vim.cmd(cmd:format(input, replace))
+  vim.cmd({ cmd = 'cnoreabbrev', args = {input, replace} })
 end
 
 local function map(mode, input, replace, opts)
