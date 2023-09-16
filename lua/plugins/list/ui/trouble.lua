@@ -3,6 +3,7 @@ return {
     -- Highlight quickfix and diagnostics
     'folke/trouble.nvim',
     name = 'trouble',
+    cmd = 'Trouble',
   },
   {
     -- Show virtual lines for LSP diagnostics
@@ -14,7 +15,7 @@ return {
     -- Highlight TODO comments
     'folke/todo-comments.nvim',
     name = 'todo',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile' },
     dependencies = { 'plenary' },
   },
 }

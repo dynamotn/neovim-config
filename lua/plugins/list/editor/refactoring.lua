@@ -3,7 +3,7 @@ return {
     -- Refactoring library
     'ThePrimeagen/refactoring.nvim',
     name = 'refactoring',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
 }

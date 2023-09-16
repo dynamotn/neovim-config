@@ -9,18 +9,18 @@ return {
     -- Column highlight
     'm4xshen/smartcolumn.nvim',
     name = 'smartcolumn',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile' },
   },
   {
     -- Color highlight
     'NvChad/nvim-colorizer.lua',
     name = 'colorizer',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile' },
   },
   {
     -- Rainbow parentheses
     'HiPhish/rainbow-delimiters.nvim',
     name = 'rainbow',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile' },
   },
 }

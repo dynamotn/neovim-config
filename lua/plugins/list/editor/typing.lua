@@ -3,7 +3,7 @@ return {
     -- Automatically insert/delete brackets, parentheses, quotes...
     'windwp/nvim-autopairs',
     name = 'autopairs',
-    event = { 'BufRead', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile' },
   },
   {
     -- Increment/decrement number, date...
