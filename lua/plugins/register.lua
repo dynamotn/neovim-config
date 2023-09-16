@@ -4,11 +4,6 @@
 ----------------------------------------
 local M = {}
 
--- Register plugin config
-M.register_config = function(plugin)
-  return M.register_options(plugin)
-end
-
 -- Load per-plugin options to setup plugin after plugin load
 M.register_options = function(plugin)
   if plugin.dir then

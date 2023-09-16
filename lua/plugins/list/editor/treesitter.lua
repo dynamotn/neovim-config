@@ -4,7 +4,10 @@ return {
     'nvim-treesitter/nvim-treesitter',
     name = 'treesitter',
     event = { 'BufReadPost', 'BufNewFile' },
-    cmd = 'TSInstall',
+    cmd = { 'TSInstall', 'TSUpdateSync' },
+    build = function()
+      require('nvim-treesitter.install').update({ with_sync = true })()
+    end,
   },
   {
     -- Text object for Treesitter
