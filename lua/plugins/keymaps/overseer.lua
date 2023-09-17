@@ -1,4 +1,13 @@
 local restart = function()
+  local open_term_and_watch = function(task)
+    if task then
+      local main_win = vim.api.nvim_get_current_win()
+      require('overseer').run_action(task, 'open hsplit')
+      vim.cmd('resize 8')
+      vim.api.nvim_set_current_win(main_win)
+    end
+  end
+
   local tasks = require('overseer').list_tasks({ recent_first = true })
   if vim.tbl_isempty(tasks) then
     require('overseer').run_template({}, function(task)
