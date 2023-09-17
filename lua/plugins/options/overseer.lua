@@ -1,3 +1,3 @@
-local overseer = require('overseer')
-
-overseer.setup({})
+require('overseer').setup({
+  strategy = 'toggleterm',
+})
