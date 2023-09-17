@@ -1,3 +1,3 @@
 return {
-  { 's', nil },
+  { 'gz', desc = 'Surround' },
 }
