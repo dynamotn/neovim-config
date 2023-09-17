@@ -14,10 +14,12 @@ session.setup({
   allowed_dirs = nil,
 })
 
-local present, telescope = pcall(require, 'telescope')
+vim.defer_fn(function()
+  local present, telescope = pcall(require, 'telescope')
 
-if not present then
-  return
-end
+  if not present then
+    return
+  end
 
-telescope.load_extension('persisted')
+  telescope.load_extension('persisted')
+end, 10)
