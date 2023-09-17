@@ -22,7 +22,7 @@ My customization configuration for neovim
 
 * Manage plugin and lazy-load plugin with [lazy](https://github.com/folke/lazy.nvim)
 * Elegant and beautiful UI:
-  * Beautiful theme [onedark](https://github.com/navarasu/onedark.nvim)
+  * Beautiful theme [catppuccin](https://github.com/catppuccin/nvim)
   * Managing tabs, buffers with [bufferline.nvim](https://github.com/akinsho/bufferline.nvim)
   * Pretty and functional statusline with [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
   * Beautiful icons with [nvim-web-devicons](https://github.com/kyazdani42/nvim-web-devicons)

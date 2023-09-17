@@ -74,7 +74,6 @@
   "notify": { "branch": "master", "commit": "94859430020f5cf32a1b97ddd9e596fed9db7981" },
   "nui": { "branch": "main", "commit": "c8de23342caf8d50b15d6b28368d36a56a69d76f" },
   "null_ls": { "branch": "main", "commit": "0010ea927ab7c09ef0ce9bf28c2b573fc302f5a7" },
-  "onedark.nvim": { "branch": "master", "commit": "dac8c39812dae025255c9069a260e1f69d967927" },
   "open": { "branch": "master", "commit": "1cabf5fc2c0d59d6273c932546d5465104ad278f" },
   "osv": { "branch": "main", "commit": "edbb34ee779049f2071dc7becff0bbf51c865906" },
   "overseer": { "branch": "master", "commit": "2749d8893a069a0020eba3ddbc26f1624a57d7b3" },
