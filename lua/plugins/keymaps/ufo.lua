@@ -1,17 +1,15 @@
-local ufo = require('ufo')
-
 return {
   {
     'zR',
     function()
-      ufo.openAllFolds()
+      require('ufo').openAllFolds()
     end,
     desc = 'Open all folds',
   },
   {
     'zM',
     function()
-      ufo.closeAllFolds()
+      require('ufo').closeAllFolds()
     end,
     desc = 'Close all folds',
   },

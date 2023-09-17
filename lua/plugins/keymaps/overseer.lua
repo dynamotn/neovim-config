@@ -1,14 +1,12 @@
-local overseer = require('overseer')
-
 local restart = function()
-  local tasks = overseer.list_tasks({ recent_first = true })
+  local tasks = require('overseer').list_tasks({ recent_first = true })
   if vim.tbl_isempty(tasks) then
-    overseer.run_template({}, function(task)
+    require('overseer').run_template({}, function(task)
       open_term_and_watch(task)
     end)
   else
-    overseer.run_action(tasks[1], 'restart')
-    open_term_and_watch(overseer.get_by_index(1))
+    require('overseer').run_action(tasks[1], 'restart')
+    open_term_and_watch(require('overseer').get_by_index(1))
   end
 end
 
@@ -20,7 +18,7 @@ return {
   {
     '<Space>rt',
     function()
-      overseer.toggle()
+      require('overseer').toggle()
     end,
     desc = 'Toggle ran tasks and jobs',
   },

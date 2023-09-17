@@ -1,4 +1,5 @@
 local modules = {
+  'debug',
   'bootstrap',
   'options',
   'keymaps',

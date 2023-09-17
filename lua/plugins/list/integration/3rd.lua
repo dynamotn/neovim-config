@@ -47,6 +47,5 @@ return {
       'nui',
       'telescope',
     },
-    lazy = false,
   },
 }

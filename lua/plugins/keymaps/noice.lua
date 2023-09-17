@@ -1,10 +1,8 @@
-local noice_lsp = require('noice.lsp')
-
 return {
   {
     '<C-f>',
     function()
-      if not noice_lsp.scroll(4) then
+      if not require('noice.lsp').scroll(4) then
         return '<C-f>'
       end
     end,
@@ -13,7 +11,7 @@ return {
   {
     '<C-b>',
     function()
-      if not noice_lsp.scroll(-4) then
+      if not require('noice.lsp').scroll(-4) then
         return '<C-b>'
       end
     end,

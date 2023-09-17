@@ -1,10 +1,8 @@
-local neogen = require('neogen')
-
 return {
   {
     '<Space>ld',
     function()
-      neogen.generate()
+      require('neogen').generate()
     end,
     desc = 'Generate documentation',
   },

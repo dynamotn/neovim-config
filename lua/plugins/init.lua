@@ -44,11 +44,19 @@ end
 
 -- Add plugin from common list to lazy
 for _, plugin in pairs(common_list) do
+  if DEBUG and plugin.name and plugin.name == DEBUG_PLUGIN_NAME then
+    print('Loading plugin: ' .. plugin.name)
+    print(vim.inspect.inspect(inject_lazy(plugin)))
+  end
   table.insert(final_list, inject_lazy(plugin))
 end
 
 -- Add plugin from specific language's list to lazy
 for _, plugin in pairs(per_language_list) do
+  if DEBUG and plugin.name and plugin.name == DEBUG_PLUGIN_NAME then
+    print('Loading plugin: ' .. plugin.name)
+    print(vim.inspect.inspect(inject_lazy(plugin)))
+  end
   table.insert(final_list, inject_lazy(plugin))
 end
 

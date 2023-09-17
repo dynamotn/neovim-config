@@ -1,4 +1,7 @@
 {
+  "lua/core/*.lua": {
+    "type": "core"
+  },
   "lua/plugins/list/*.lua": {
     "type": "plugin"
   },

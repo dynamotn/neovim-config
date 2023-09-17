@@ -14,7 +14,6 @@ return {
     -- Change surround character
     'echasnovski/mini.surround',
     name = 'surround',
-    lazy = false,
   },
   {
     -- Convert text case

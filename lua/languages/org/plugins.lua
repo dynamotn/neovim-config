@@ -7,7 +7,7 @@ return {
       { 'nvim-neorg/neorg-telescope' }, -- Telescope for Neorg
     },
     cmd = { 'Neorg' },
-    lazy = false,
+    build = ':Neorg sync-parsers',
   },
   { 'lukas-reineke/headlines.nvim', dependencies = { 'treesitter' }, name = 'headlines' }, -- Highlight for headlines, codeblocks
 }

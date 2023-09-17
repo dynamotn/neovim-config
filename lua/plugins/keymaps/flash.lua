@@ -1,10 +1,8 @@
-local flash = require('flash')
-
 return {
   {
     '<Space>bm',
     function()
-      flash.jump()
+      require('flash').jump()
     end,
     desc = 'Move cursor to anywhere',
   },

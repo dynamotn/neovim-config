@@ -1,10 +1,8 @@
-local neomux = require('Navigator')
-
 return {
   {
     '<S-Left>',
     function()
-      neomux.left()
+      require('Navigator').left()
     end,
     desc = 'Navigate to left window',
     mode = { 'n', 't' },
@@ -12,7 +10,7 @@ return {
   {
     '<S-Down>',
     function()
-      neomux.down()
+      require('Navigator').down()
     end,
     desc = 'Navigate to down window',
     mode = { 'n', 't' },
@@ -21,7 +19,7 @@ return {
   {
     '<S-Up>',
     function()
-      neomux.up()
+      require('Navigator').up()
     end,
     desc = 'Navigate to up window',
     mode = { 'n', 't' },
@@ -30,7 +28,7 @@ return {
   {
     '<S-Right>',
     function()
-      neomux.right()
+      require('Navigator').right()
     end,
     desc = 'Navigate to right window',
     mode = { 'n', 't' },
@@ -39,7 +37,7 @@ return {
   {
     '<C-\\>',
     function()
-      neomux.previous()
+      require('Navigator').previous()
     end,
     desc = 'Navigate to previous window',
     mode = { 'n', 't' },
