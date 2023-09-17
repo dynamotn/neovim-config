@@ -111,7 +111,6 @@ opt.shiftwidth = 2
 opt.softtabstop = 2
 -- Automatically indent
 opt.autoindent = true
-cmd([[filetype plugin indent on]])
 --------- }
 
 -- Size {
