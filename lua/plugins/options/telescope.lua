@@ -5,8 +5,39 @@ telescope.setup({
   defaults = {
     mappings = {
       i = {
-        ['<Esc>'] = actions.close, -- Esc to quit in insert mode
-        ['<C-u>'] = false, -- Clear prompt
+        ['<c-t>'] = function(...)
+          return require('trouble.providers.telescope').open_with_trouble(...)
+        end,
+        ['<a-t>'] = function(...)
+          return require('trouble.providers.telescope').open_selected_with_trouble(...)
+        end,
+        ['<a-i>'] = function()
+          local action_state = require('telescope.actions.state')
+          local line = action_state.get_current_line()
+          dynamo_telescope('find_files', { no_ignore = true, default_text = line })()
+        end,
+        ['<a-h>'] = function()
+          local action_state = require('telescope.actions.state')
+          local line = action_state.get_current_line()
+          dynamo_telescope('find_files', { hidden = true, default_text = line })()
+        end,
+        ['<C-Down>'] = function(...)
+          return require('telescope.actions').cycle_history_next(...)
+        end,
+        ['<C-Up>'] = function(...)
+          return require('telescope.actions').cycle_history_prev(...)
+        end,
+        ['<C-f>'] = function(...)
+          return require('telescope.actions').preview_scrolling_down(...)
+        end,
+        ['<C-b>'] = function(...)
+          return require('telescope.actions').preview_scrolling_up(...)
+        end,
+      },
+      n = {
+        ['q'] = function(...)
+          return require('telescope.actions').close(...)
+        end,
       },
     },
   },
