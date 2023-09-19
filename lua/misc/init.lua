@@ -13,3 +13,4 @@ end
 require('misc.augroup').load_default_augroups()
 require('misc.augroup').auto_install_ts_parser()
 require('misc.augroup').auto_install_mason_tools()
+vim.opt.rtp:append(dynamo_get_root() .. "/.nvim")
