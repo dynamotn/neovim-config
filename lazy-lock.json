@@ -46,7 +46,6 @@
   "icon": { "branch": "master", "commit": "973ab742f143a796a779af4d786ec409116a0d87" },
   "indent": { "branch": "master", "commit": "9637670896b68805430e2f72cf5d16be5b97a22a" },
   "lazy.nvim": { "branch": "main", "commit": "2a9354c7d2368d78cbd5575a51a2af5bd8a6ad01" },
-  "local_config": { "branch": "main", "commit": "83bb6d9881653a5cf8b489ba8a6fe5a06049a10a" },
   "lsp": { "branch": "master", "commit": "f3195835c0447ee2c80152b893ab51ca162b04a9" },
   "lsp_inlay": { "branch": "main", "commit": "d981f65c9ae0b6062176f0accb9c151daeda6f16" },
   "lsp_lines": { "branch": "main", "commit": "f53af96d4789eef39a082dbcce078d2bfc384ece" },

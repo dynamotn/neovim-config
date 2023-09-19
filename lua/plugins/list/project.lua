@@ -16,10 +16,4 @@ return {
     'tpope/vim-projectionist',
     lazy = false,
   },
-  {
-    -- Load local config file
-    'klen/nvim-config-local',
-    name = 'local_config',
-    event = 'VeryLazy',
-  },
 }
