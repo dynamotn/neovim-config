@@ -7,7 +7,22 @@ local has_words_before = function()
 end
 
 local cmp_default_sources = {
-  { name = 'fuzzy_buffer', group_index = 1 },
+  {
+    name = 'fuzzy_buffer',
+    group_index = 1,
+    option = {
+      get_bufnrs = function()
+        local bufs = {}
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
+          if buftype ~= 'nofile' and buftype ~= 'prompt' then
+            bufs[#bufs + 1] = buf
+          end
+        end
+        return bufs
+      end,
+    },
+  },
   { name = 'luasnip', group_index = 2 },
   { name = 'nvim_lsp', group_index = 3 },
   { name = 'calc', group_index = 4 },
@@ -16,7 +31,7 @@ local cmp_default_sources = {
   { name = 'dap', group_index = 7 },
   { name = 'dynamic', group_index = 8 },
   { name = 'copilot', group_index = 9 },
-  { name = 'fuzzy_path', group_index = 10 },
+  { name = 'fuzzy_path', group_index = 10, option = { fd_timeout_msec = 200 } },
 }
 vim.api.nvim_set_hl(0, 'CmpGhostText', { link = 'Comment', default = true })
 
