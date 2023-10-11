@@ -8,6 +8,5 @@ return {
       }
     or {},
   { 'SidOfc/mkdx', name = 'mkdx' }, -- Handle lists, checkboxes, fenced code blocks, shortcuts, headers and links...
-  { 'dhruvasagar/vim-table-mode' }, -- Formatting
   { 'lukas-reineke/headlines.nvim', dependencies = { 'treesitter' }, name = 'headlines' }, -- Highlight for headlines, codeblocks
 }
