@@ -204,7 +204,7 @@ end
 
 M.get_tools_by_filetype = function(filetype)
   local result = {
-    ['editorconfig-checker'] = true,
+    ec = true,
     vale = true,
   }
 
