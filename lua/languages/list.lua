@@ -43,7 +43,7 @@ return {
   csv = { 'csv' },
   dbml = { 'dbml' },
   dockerfile = { 'dockerfile' },
-  gitcommit = { 'gitcommit' },
+  gitcommit = { 'gitcommit', 'NeogitCommitMessage' },
   gotmpl = { 'gotmpl' },
   http = { 'http' },
   json = {
