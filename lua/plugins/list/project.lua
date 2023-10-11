@@ -14,6 +14,6 @@ return {
   {
     -- Granular project configuration
     'tpope/vim-projectionist',
-    lazy = false,
+    event = 'BufReadPre',
   },
 }
