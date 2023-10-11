@@ -5,6 +5,7 @@ autopairs.setup({
   map_cr = false, -- Not map Enter key
   check_ts = true, -- Check grammar by TreeSitter
   disable_filetype = { 'TelescopePrompt', 'neo-tree' },
+  enable_abbr = true, -- Enable abbreviation
 })
 
 local rule = require('nvim-autopairs.rule')
@@ -15,9 +16,13 @@ local ts_cond = require('nvim-autopairs.ts-conds')
 autopairs.add_rules({
   -- Add spaces between parentheses
   rule(' ', ' ')
-    :with_pair(function(opts)
+    :with_pair(cond.done())
+    :replace_endpair(function(opts)
       local pair = opts.line:sub(opts.col - 1, opts.col)
-      return vim.tbl_contains({ '()', '{}', '[]' }, pair)
+      if vim.tbl_contains({ '()', '{}', '[]' }, pair) then
+        return ' ' -- it return space here
+      end
+      return '' -- return empty
     end)
     :with_move(cond.none())
     :with_cr(cond.none())
