@@ -94,4 +94,7 @@ return {
       WhileStatement = '󰑖 ',
     },
   },
+  abbreviations = {
+    gh = "https://github.com/",
+  },
 }

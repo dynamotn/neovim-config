@@ -91,9 +91,6 @@ opt.virtualedit = 'onemore'
 -- Timeout of key sequence
 opt.timeoutlen = 200
 
--- Highlight matching parenthesis
-opt.showmatch = true
-
 -- Search {
 -- Find as you type search
 opt.incsearch = true
