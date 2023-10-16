@@ -1,7 +1,7 @@
 return {
   {
     -- Config for non-LSP sources (linter and formatter)
-    'jose-elias-alvarez/null-ls.nvim',
+    'nvimtools/none-ls.nvim',
     name = 'null_ls',
     event = 'VeryLazy',
     dependencies = { 'refactoring' },
