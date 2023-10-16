@@ -4,7 +4,7 @@ return {
     'bennypowers/nvim-regexplainer',
     name = 'regexplainer',
     event = { 'BufRead', 'BufNewFile' },
-    dependencies = { 'nui', 'treesitter' },
+    dependencies = { 'nui' },
   },
   {
     -- Foldtext customization
