@@ -151,7 +151,7 @@ M.delve = {
     -- Wait for delve to start
     vim.defer_fn(function()
       callback({ type = 'server', host = host, port = port })
-    end, 100)
+    end, 10)
   end,
   configurations = {
     {
@@ -262,7 +262,7 @@ M.ruby = {
     local handle
     local stdout = vim.loop.new_pipe(false)
     local pid_or_err
-    local waiting = config.waiting or 500
+    local waiting = config.waiting or 10
     local args
     local script
     local rdbg

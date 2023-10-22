@@ -29,4 +29,4 @@ vim.defer_fn(function()
   if not auth.get_cred().user then
     auth.signin()
   end
-end, 100)
+end, 10)
