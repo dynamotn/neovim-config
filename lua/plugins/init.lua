@@ -70,6 +70,6 @@ return lazy.setup(final_list, {
   },
   checker = {
     enabled = true,
-    notify = true,
+    notify = false,
   },
 })
