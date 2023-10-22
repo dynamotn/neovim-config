@@ -182,6 +182,7 @@ M.setup_null_ls = function()
 
   for language, filetypes in pairs(languages) do
     local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
+    local nullls_util = require('util.null_ls')
 
     if ok then
       for _, source in ipairs(null_ls_config) do
@@ -189,8 +190,13 @@ M.setup_null_ls = function()
           source.with_config = source.with_config or {}
           source.with_config['filetypes'] = filetypes
 
-          local tool =
-            dynamo_nullls_tool(source[1], source[2], source.is_external_tool, source.is_custom_tool, source.with_config)
+          local tool = nullls_util.active_tool(
+            source[1],
+            source[2],
+            source.is_external_tool,
+            source.is_custom_tool,
+            source.with_config
+          )
           if tool then
             result[source[1]] = tool
           end
