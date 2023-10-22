@@ -36,23 +36,32 @@ M.register_keymaps = function(plugin)
     return
   end
 
-  if plugin.name == 'whichkey' then
-    local present, whichkey = pcall(require, 'which-key')
-    if not present then
-      return
-    end
+  local load_whichkey_keymaps = function(args)
+    local whichkey = require('which-key')
 
     for _, keymap in ipairs(keymaps) do
       if keymap[2] then
         whichkey.register({
           [keymap[1]] = { keymap[2], keymap['desc'] },
-        })
+        }, args)
       else
         whichkey.register({
           [keymap[1]] = { name = keymap['desc'] },
-        })
+        }, args)
       end
     end
+  end
+
+  if plugin.name == 'whichkey' then
+    load_whichkey_keymaps()
+  elseif plugin.ft then
+    vim.api.nvim_create_autocmd({ 'FileType' }, {
+      pattern = plugin.ft,
+      group = vim.api.nvim_create_augroup('whichkey_' .. plugin.name, {}),
+      callback = function()
+        load_whichkey_keymaps({ buffer = 0 })
+      end
+    })
   else
     return keymaps
   end
