@@ -1,8 +1,8 @@
 local autopairs = require('nvim-autopairs')
 
 autopairs.setup({
-  map_bs = false, -- Not map Backspace key
-  map_cr = false, -- Not map Enter key
+  map_bs = true, -- Not map Backspace key
+  map_cr = true, -- Not map Enter key
   check_ts = true, -- Check grammar by TreeSitter
   disable_filetype = { 'TelescopePrompt', 'neo-tree' },
   enable_abbr = true, -- Enable abbreviation

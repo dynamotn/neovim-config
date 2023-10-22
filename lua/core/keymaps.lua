@@ -6,7 +6,7 @@ local opt = vim.opt -- Set options (global/buffer/windowS-scoped)
 local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
-  vim.cmd({ cmd = 'cnoreabbrev', args = {input, replace} })
+  vim.cmd({ cmd = 'cnoreabbrev', args = { input, replace } })
 end
 
 local function map(mode, input, replace, opts)
@@ -80,6 +80,4 @@ map('i', '<Esc>', [[pumvisible() ? "<C-e><Esc>" : "<Esc>"]], { expr = true })
 map('i', '<C-c>', [[pumvisible() ? "<C-e><C-c>" : "<C-c>"]], { expr = true })
 map('i', '<Tab>', [[pumvisible() ? "<C-n>" : "<Tab>"]], { expr = true })
 map('i', '<S-Tab>', [[pumvisible() ? "<C-p>" : "<BS>"]], { expr = true })
-map('i', '<CR>', 'v:lua.dynamo_mapping_enter()', { expr = true })
-map('i', '<BS>', 'v:lua.dynamo_mapping_backspace()', { expr = true })
 --------------------------- }

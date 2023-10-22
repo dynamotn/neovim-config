@@ -35,37 +35,6 @@ _G.dynamo_reload_nvim_config = function(has_changed_plugins)
   end
 end
 ------------------------------ }
-
--- Mapping for Enter key in edit mode {
-_G.dynamo_mapping_enter = function()
-  local present, autopairs = pcall(require, 'nvim-autopairs')
-
-  if vim.fn.pumvisible() ~= 0 then
-    if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
-      return present and autopairs.esc('<C-y>') or '<C-y>'
-    else
-      return present and autopairs.esc('<C-e>') .. autopairs.autopairs_cr() or '<C-e><CR>'
-    end
-  else
-    return present and autopairs.autopairs_cr() or '<CR>'
-  end
-end
-------------------------------------- }
-
--- Mapping for Backspace key in edit mode {
-_G.dynamo_mapping_backspace = function()
-  local present, autopairs = pcall(require, 'nvim-autopairs')
-
-  local bufnr = vim.api.nvim_get_current_buf()
-
-  if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
-    return present and autopairs.esc('<C-e>') .. autopairs.autopairs_bs(bufnr) or '<C-e><BS>'
-  else
-    return present and autopairs.autopairs_bs(bufnr) or '<BS>'
-  end
-end
------------------------------------------ }
-
 -- Check LSP method textDocument/documentHighlight is supported {
 _G.dynamo_lsp_document_highlight = function(id)
   local client_ok, method_supported = pcall(function()
