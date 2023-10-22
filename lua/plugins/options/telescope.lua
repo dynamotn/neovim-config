@@ -1,5 +1,6 @@
 local telescope = require('telescope')
 local actions = require('telescope.actions')
+local telescope_util = require('util.telescope')
 
 telescope.setup({
   defaults = {
@@ -14,12 +15,12 @@ telescope.setup({
         ['<a-i>'] = function()
           local action_state = require('telescope.actions.state')
           local line = action_state.get_current_line()
-          dynamo_telescope('find_files', { no_ignore = true, default_text = line })()
+          telescope_util.improve('find_files', { no_ignore = true, default_text = line })()
         end,
         ['<a-h>'] = function()
           local action_state = require('telescope.actions.state')
           local line = action_state.get_current_line()
-          dynamo_telescope('find_files', { hidden = true, default_text = line })()
+          telescope_util.improve('find_files', { hidden = true, default_text = line })()
         end,
         ['<C-Down>'] = function(...)
           return require('telescope.actions').cycle_history_next(...)
