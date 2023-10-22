@@ -2,77 +2,77 @@ return {
   {
     'gd',
     function()
-      require('lspsaga.definition'):peek_definition(1)
+      require('lspsaga.command').load_command('peek_definition')
     end,
     desc = 'Go to definition',
   },
   {
     'gi',
     function()
-      require('lspsaga.finder'):new('imp')
+      require('lspsaga.command').load_command('finder', 'imp')
     end,
     desc = 'Go to implementation',
   },
   {
     'gt',
     function()
-      require('lspsaga.definition'):peek_definition(2)
+      require('lspsaga.definition').load_command('peek_type_definition')
     end,
     desc = 'Go to type definition',
   },
   {
     'gr',
     function()
-      require('lspsaga.finder'):new('ref')
+      require('lspsaga.command').load_command('finder', 'ref')
     end,
     desc = 'Go to references',
   },
   {
     'K',
     function()
-      require('lspsaga.hover'):render_hover_doc({})
+      require('lspsaga.command').load_command('hover_doc')
     end,
     desc = 'Hover document',
   },
   {
     '<Space>la',
     function()
-      require('lspsaga.codeaction'):code_action()
+      require('lspsaga.command').load_command('code_action')
     end,
     desc = 'Code Action',
   },
   {
     '<Space>li',
     function()
-      require('lspsaga.callhierarchy'):send_method(2, {})
+      require('lspsaga.command').load_command('incoming_calls')
     end,
     desc = 'Show incoming calls',
   },
   {
     '<Space>lo',
     function()
-      require('lspsaga.callhierarchy'):send_method(3, {})
+      require('lspsaga.command').load_command('outgoing_calls')
     end,
     desc = 'Show outgoing calls',
   },
   {
     '<Space>lr',
     function()
-      require('lspsaga.rename'):lsp_rename({})
+      require('lspsaga.command').load_command('rename')
     end,
     desc = 'Rename',
   },
   {
     '<F2>',
     function()
-      require('lspsaga.symbol'):outline()
+      require('lspsaga.command').load_command('outline')
     end,
     desc = 'Show outline',
   },
   {
     '<Space>ls',
     function()
-      require('lspsaga.symbol'):outline()
+      require('lspsaga.command').load_command('outline')
     end,
     desc = 'Show outline',
   },
