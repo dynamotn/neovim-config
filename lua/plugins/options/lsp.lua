@@ -1,7 +1,7 @@
 local lspconfig = require('lspconfig')
 local languages = require('languages')
 local register_keymaps = require('plugins.register').register_keymaps
-local augroup = require('misc.augroup')
+local augroup = require('core.augroup')
 
 local default_opts = {
   autostart = true,

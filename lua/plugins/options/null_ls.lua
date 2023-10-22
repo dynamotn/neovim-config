@@ -1,7 +1,7 @@
 local null_ls = require('null-ls')
 local languages = require('languages')
 
-local augroup = require('misc.augroup')
+local augroup = require('core.augroup')
 local configs = languages.setup_null_ls()
 local sources = {}
 for _, tool in pairs(configs) do

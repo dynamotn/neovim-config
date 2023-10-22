@@ -4,6 +4,7 @@ local modules = {
   'options',
   'keymaps',
   'filetype',
+  'augroup',
   'misc',
 }
 
