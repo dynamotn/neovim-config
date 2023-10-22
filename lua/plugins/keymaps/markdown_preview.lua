@@ -1,7 +1,9 @@
+local extras = require('util.extras')
+
 return {
   {
     '<Space>lm',
-    dynamo_cmdcr('MarkdownPreview'),
+    extras.cmdcr('MarkdownPreview'),
     desc = 'Preview Markdown file',
   },
 }

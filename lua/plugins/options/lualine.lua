@@ -1,5 +1,6 @@
 local lualine = require('lualine')
 local icons = require('core.defaults').icons
+local extras = require('util.extras')
 
 local special_filetypes = {
   help = 'Help Guide',
@@ -77,7 +78,7 @@ lualine.setup({
         cond = function()
           return package.loaded['noice'] and require('noice').api.statusline.mode.has()
         end,
-        color = { fg = dynamo_fg('Constant') },
+        color = { fg = extras.fg('Constant') },
       },
       {
         function()
@@ -86,7 +87,7 @@ lualine.setup({
         cond = function()
           return package.loaded['dap'] and require('dap').status() ~= ''
         end,
-        color = { fg = dynamo_fg('Debug') },
+        color = { fg = extras.fg('Debug') },
       },
     },
     lualine_x = {
@@ -103,7 +104,7 @@ lualine.setup({
           local ok, clients = pcall(vim.lsp.get_active_clients, { name = 'copilot', bufnr = 0 })
           return ok and #clients > 0
         end,
-        color = { fg = dynamo_fg('Function') },
+        color = { fg = extras.fg('Function') },
       },
       {
         function()
@@ -113,7 +114,7 @@ lualine.setup({
           end
           return ''
         end,
-        color = { fg = dynamo_fg('String') },
+        color = { fg = extras.fg('String') },
       },
       {
         function(msg)
@@ -132,7 +133,7 @@ lualine.setup({
           end
           return icons.lsp .. table.concat(buf_client_names, ', ')
         end,
-        color = { fg = dynamo_fg('Label'), gui = 'bold' },
+        color = { fg = extras.fg('Label'), gui = 'bold' },
       },
       {
         function()
@@ -146,7 +147,7 @@ lualine.setup({
           end
           return vim.trim(msg)
         end,
-        color = { fg = dynamo_fg('Statement'), gui = 'bold' },
+        color = { fg = extras.fg('Statement'), gui = 'bold' },
       },
     },
     lualine_y = {

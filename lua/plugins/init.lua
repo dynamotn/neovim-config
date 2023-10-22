@@ -15,6 +15,7 @@ local register_keymaps = require('plugins.register').register_keymaps
 local common_list = require('plugins.list')
 local per_language_list = require('languages').get_plugins()
 local final_list = {}
+_G.dynamo_list_plugins = {}
 
 -- Automatically inject config, setup, keymaps of plugin
 -- when lazy-loading with Lazy. Plugin must have name then trigger that.

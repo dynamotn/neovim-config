@@ -1,4 +1,5 @@
 local bufferline = require('bufferline')
+local extras = require('util.extras')
 
 local special_filetypes = {
   help = 'Help Guide',
@@ -30,7 +31,7 @@ end
 
 bufferline.setup({
   highlights = function()
-    if require('core.defaults').colorscheme == 'catppuccin' and dynamo_has_plugin('catppuccin') then
+    if require('core.defaults').colorscheme == 'catppuccin' and extras.has_plugin('catppuccin') then
       return require('catppuccin.groups.integrations.bufferline').get()
     end
     return {}

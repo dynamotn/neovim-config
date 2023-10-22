@@ -5,7 +5,7 @@ local modules = {
   'keymaps',
   'filetype',
   'augroup',
-  'misc',
+  'extras',
 }
 
 for _, module in ipairs(modules) do

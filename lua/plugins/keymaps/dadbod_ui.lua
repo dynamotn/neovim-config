@@ -1,3 +1,5 @@
+local extras = require('util.extras')
+
 return {
-  { '<Space>rd', dynamo_cmdcr('DBUI'), desc = 'Open database window' },
+  { '<Space>rd', extras.cmdcr('DBUI'), desc = 'Open database window' },
 }

@@ -1,7 +1,9 @@
+local extras = require('util.extras')
+
 return {
   {
     '<Space>sa',
-    dynamo_cmdcr('Telescope persisted'),
+    extras.cmdcr('Telescope persisted'),
     desc = 'List all session',
   },
   {

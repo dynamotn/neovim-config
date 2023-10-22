@@ -24,13 +24,13 @@ vim.filetype.add({
     ['.*%.tpl'] = {
       priority = -math.huge,
       function(_, bufnr)
-        return _G.dynamo_gotemplate_detection(bufnr)
+        return require('util.filetype').detect_gotemplate(bufnr)
       end,
     },
     ['.*%.ya?ml'] = {
       priority = -math.huge,
       function(_, bufnr)
-        return _G.dynamo_gotemplate_detection(bufnr)
+        return require('util.filetype').detect_gotemplate(bufnr)
       end,
     },
   },
