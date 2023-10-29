@@ -43,6 +43,7 @@ return {
         -- Copilot completion source
         'zbirenbaum/copilot-cmp',
         name = 'cmp_copilot',
+        cond = vim.fn.executable('node') == 1,
         dependencies = {
           {
             'zbirenbaum/copilot.lua',

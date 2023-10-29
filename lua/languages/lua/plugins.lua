@@ -1,8 +1,8 @@
 return {
-  DEBUG and {
-      -- Neovim debugger
-      'jbyuki/one-small-step-for-vimkind',
-      name = 'osv',
-    } or {},
+  { -- Neovim debugger
+    'jbyuki/one-small-step-for-vimkind',
+    name = 'osv',
+    cond = DEBUG,
+  },
   { 'folke/neodev.nvim', opts = {} },
 }
