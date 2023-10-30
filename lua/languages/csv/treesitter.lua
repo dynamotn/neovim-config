@@ -1,3 +1,3 @@
 return {
-  { parser = nil },
+  { parser = 'csv' },
 }
