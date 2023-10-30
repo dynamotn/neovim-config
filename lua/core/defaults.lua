@@ -1,10 +1,12 @@
 return {
   colorscheme = 'catppuccin',
   icons = {
+    projekt = '󱉭 ',
     treesitter = ' ',
     lsp = '  ',
     null_ls = '󰉼 ',
     dap = {
+      Status = ' ',
       Stopped = { '󰁕 ', 'DiagnosticWarn', 'DapStoppedLine' },
       Breakpoint = { ' ' },
       BreakpointCondition = { ' ' },
@@ -95,6 +97,6 @@ return {
     },
   },
   abbreviations = {
-    gh = "https://github.com/",
+    gh = 'https://github.com/',
   },
 }

@@ -1,3 +1,9 @@
+-- PERF: we don't need this lualine require madness 🤷
+local lualine_require = require('lualine_require')
+lualine_require.require = require
+
+vim.o.laststatus = vim.g.lualine_laststatus
+
 local lualine = require('lualine')
 local icons = require('core.defaults').icons
 local extras = require('util.extras')
@@ -38,6 +44,7 @@ end
 lualine.setup({
   options = {
     theme = require('core.defaults').colorscheme,
+    globalstatus = true,
   },
   sections = {
     lualine_a = { 'mode' },
@@ -63,6 +70,36 @@ lualine.setup({
     },
     lualine_c = {
       {
+        function()
+          local root = require('util.root').get()
+          local cwd = vim.loop.cwd()
+          local result = ''
+          if root:find(cwd, 1, true) == 1 then
+            result = cwd
+          else
+            result = root
+          end
+          return require('core.defaults').icons.projekt .. result
+        end,
+        color = { fg = extras.fg('Constant') },
+      },
+      {
+        function()
+          local root = require('util.root').get()
+          local cwd = vim.loop.cwd()
+          local result = ''
+
+          if root == cwd then
+            result = ''
+          elseif cwd:find(root, 1, true) == 1 then
+            result = string.gsub(cwd, root .. '/', '')
+          end
+
+          return result
+        end,
+        color = { fg = extras.fg('Constant') },
+      },
+      {
         'filename',
         path = 1, -- Relative path
         symbols = {
@@ -78,11 +115,11 @@ lualine.setup({
         cond = function()
           return package.loaded['noice'] and require('noice').api.statusline.mode.has()
         end,
-        color = { fg = extras.fg('Constant') },
+        color = { fg = extras.fg('Statement') },
       },
       {
         function()
-          return '  ' .. require('dap').status()
+          return require('core.defaults').icons.dap.Status .. require('dap').status()
         end,
         cond = function()
           return package.loaded['dap'] and require('dap').status() ~= ''
@@ -91,9 +128,6 @@ lualine.setup({
       },
     },
     lualine_x = {
-      {
-        'overseer',
-      },
       {
         function()
           local icon = require('core.defaults').icons.kinds.Copilot
@@ -151,14 +185,14 @@ lualine.setup({
       },
     },
     lualine_y = {
-      'filetype',
-      {
-        'encoding',
-        separator = { left = '', right = '' }, -- Not use powerline between encoding and file format
-      },
+      { 'filetype', separator = '', padding = { left = 1, right = 0 } },
+      { 'encoding', separator = '', padding = { left = 1, right = 0 } },
       'fileformat',
     },
-    lualine_z = { 'progress', 'location' },
+    lualine_z = {
+      { 'progress', separator = '', padding = { left = 1, right = 0 } },
+      { 'location', separator = '', padding = { left = 1, right = 0 } },
+    },
   },
   extensions = {
     'quickfix',
