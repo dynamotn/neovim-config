@@ -4,11 +4,12 @@ return {
     'nvim-lua/plenary.nvim',
     name = 'plenary',
   },
-  DEBUG and {
-      -- View startup timing
-      'dstein64/vim-startuptime',
-      cmd = 'StartupTime',
-    } or nil,
+  {
+    -- View startup timing
+    'dstein64/vim-startuptime',
+    cmd = 'StartupTime',
+    cond = DEBUG,
+  },
   {
     -- Show guide of keymaps
     'folke/which-key.nvim',

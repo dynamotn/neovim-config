@@ -5,15 +5,14 @@ return {
     name = 'session',
     event = 'UIEnter',
   },
-  DEBUG
-      and {
-        -- Debug Treesitter
-        'nvim-treesitter/playground',
-        name = 'playground',
-        dependencies = { 'treesitter' },
-        cmd = 'TSPlaygroundToggle',
-      }
-    or nil,
+  {
+    -- Debug Treesitter
+    'nvim-treesitter/playground',
+    name = 'playground',
+    dependencies = { 'treesitter' },
+    cmd = 'TSPlaygroundToggle',
+    cond = DEBUG,
+  },
   {
     -- Automatically ínstall language server, linter, dap server
     'williamboman/mason.nvim',
