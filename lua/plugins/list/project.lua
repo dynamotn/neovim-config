@@ -9,11 +9,11 @@ return {
     -- Git decoration
     'lewis6991/gitsigns.nvim',
     name = 'gitsigns',
-    event = 'BufReadPre',
+    event = { 'BufReadPre', 'BufNewFile' },
   },
   {
     -- Granular project configuration
     'tpope/vim-projectionist',
-    event = 'BufReadPre',
+    event = { 'BufReadPre', 'BufNewFile' },
   },
 }
