@@ -3,6 +3,13 @@ return {
     -- Indent guide
     'lukas-reineke/indent-blankline.nvim',
     name = 'indent',
+    main = 'ibl',
+    event = { 'BufReadPost', 'BufNewFile' },
+  },
+  {
+    -- Indent guide animation
+    'echasnovski/mini.indentscope',
+    name = 'indent_scope',
     event = { 'BufReadPost', 'BufNewFile' },
   },
   {
