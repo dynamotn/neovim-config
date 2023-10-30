@@ -19,18 +19,35 @@ local input_args = function()
   end
 end
 
-M.neovim = {
+M.nlua = {
   mason_install = false,
   adapter = function(callback, config)
-    callback({
+    local dap = require('dap')
+    local adapter = {
       type = 'server',
       host = config.host or '127.0.0.1',
       port = config.port or 8086,
-    })
+    }
+    if config.start_neovim then
+      local dap_run = dap.run
+      dap.run = function(c)
+        adapter.port = c.port
+        adapter.host = c.host
+      end
+      require('osv').run_this()
+      dap.run = dap_run
+    end
+    callback(adapter)
   end,
   configurations = {
     {
-      type = 'neovim',
+      type = 'nlua',
+      request = 'attach',
+      name = 'Run this file',
+      start_neovim = {},
+    },
+    {
+      type = 'nlua',
       request = 'attach',
       name = 'Attach to running Neovim instance',
     },
