@@ -237,6 +237,18 @@ M.get_tools_by_filetype = function(filetype)
   end
 end
 
+M.setup_test = function()
+  local result = {}
+  for language, _ in pairs(languages) do
+    local ok, test = pcall(require, 'languages.' .. language .. '.test')
+
+    if ok then
+      table.insert(result, test)
+    end
+  end
+  return result
+end
+
 M.get_cmp_sources = function()
   local result = {}
 

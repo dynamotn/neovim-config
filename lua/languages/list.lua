@@ -8,6 +8,7 @@ return {
   },
   c = { 'c' },
   cpp = { 'cpp' },
+  c_sharp = { 'cs' },
   css = { 'css' },
   cucumber = { 'cucumber' },
   fish = { 'fish' },

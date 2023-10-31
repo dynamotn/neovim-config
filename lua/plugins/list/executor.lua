@@ -17,8 +17,11 @@ return {
     'nvim-neotest/neotest',
     name = 'neotest',
     dependencies = {
-      { 'nvim-neotest/neotest-vim-test' }, -- Test runner compatibility that support vim-test
-      { 'vim-test/vim-test' }, -- Test runner config
+      {
+        -- Test runner compatibility that support vim-test
+        'nvim-neotest/neotest-vim-test',
+        dependencies = { 'vim-test/vim-test' },
+      },
     },
   },
   {
