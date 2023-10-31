@@ -16,4 +16,11 @@ return {
     'tpope/vim-projectionist',
     event = { 'BufReadPre', 'BufNewFile' },
   },
+  {
+    -- Manage global and project-local settings
+    'folke/neoconf.nvim',
+    name = 'neoconf',
+    cmd = 'Neoconf',
+    event = { 'BufReadPre', 'BufNewFile' },
+  },
 }

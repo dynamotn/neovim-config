@@ -4,5 +4,9 @@ return {
     name = 'osv',
     cond = DEBUG,
   },
-  { 'folke/neodev.nvim', opts = {} },
+  {
+    -- Neovim development
+    'folke/neodev.nvim',
+    name = 'neodev',
+  },
 }

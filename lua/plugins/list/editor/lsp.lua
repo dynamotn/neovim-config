@@ -4,6 +4,7 @@ return {
     'neovim/nvim-lspconfig',
     name = 'lsp',
     event = 'BufReadPre',
+    dependencies = { 'neoconf' },
   },
   {
     -- LSP server manager

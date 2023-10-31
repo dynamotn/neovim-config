@@ -20,6 +20,9 @@ M.lua_ls = function(default_opts)
       hint = {
         enable = true,
       },
+      completion = {
+        callSnippet = 'Replace',
+      },
     },
   }
   return opts
