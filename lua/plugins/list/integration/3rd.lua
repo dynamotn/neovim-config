@@ -28,12 +28,6 @@ return {
     name = 'dadbod',
   },
   {
-    -- Google Keep integration
-    'stevearc/gkeep.nvim',
-    name = 'gkeep',
-    build = ':UpdateRemotePlugins',
-  },
-  {
     -- Open current word by other tools
     'ofirgall/open.nvim',
     name = 'open',
