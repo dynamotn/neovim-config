@@ -21,6 +21,7 @@ vim.filetype.add({
     ['inventory/.*%.ya?ml'] = 'ansible',
     ['.*%.tmpl'] = 'gotmpl',
     ['.*%.dbml'] = 'dbml',
+    ['.*%.d2'] = 'd2',
     ['.*%.tpl'] = {
       priority = -math.huge,
       function(_, bufnr)

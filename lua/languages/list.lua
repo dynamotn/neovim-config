@@ -42,6 +42,7 @@ return {
   -- Tools & Markup {
   ansible = { 'ansible' },
   csv = { 'csv' },
+  d2 = { 'd2' },
   dbml = { 'dbml' },
   dockerfile = { 'dockerfile' },
   gitcommit = { 'gitcommit', 'NeogitCommitMessage' },
