@@ -115,7 +115,6 @@ cmp.setup({
             browser = '「WWW」',
             copilot = '「COP」',
 
-            neorg = '「ORG」',
             fish = '「FISH」',
             ['vim-dadbod-completion'] = '「DB」',
           },

@@ -78,7 +78,6 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 * JSON
 * Markdown
 * Nix
-* Orgmode
 * Terraform
 * Terragrunt
 * TOML

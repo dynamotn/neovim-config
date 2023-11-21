@@ -63,8 +63,6 @@
   "neogen": { "branch": "main", "commit": "70127baaff25611deaf1a29d801fc054ad9d2dc1" },
   "neogit": { "branch": "master", "commit": "987e415247547a372d0356f76444cf402436c727" },
   "neomux": { "branch": "master", "commit": "91d86506ac2a039504d5205d32a1d4bc7aa57072" },
-  "neorg": { "branch": "main", "commit": "3f4b279d7505ac854fcd31d1aad24991542ea5d8" },
-  "neorg-telescope": { "branch": "main", "commit": "6a7a677c40fa3c348924a4e2a06a513e0b34c056" },
   "neotest": { "branch": "master", "commit": "d424d262d01bccc1e0b038c9a7220a755afd2a1f" },
   "neotest-dotnet": { "branch": "main", "commit": "f7bdb60c3d7716f75fb04582f64dae8efb7716f1" },
   "neotest-go": { "branch": "main", "commit": "1a15e1136db43775214a3e7a598f8930c29c94b7" },
