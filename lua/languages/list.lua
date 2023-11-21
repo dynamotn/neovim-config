@@ -55,7 +55,10 @@ return {
   markdown = { 'markdown' },
   nix = { 'nix' },
   org = { 'norg' },
-  terraform = { 'tf' },
+  terraform = {
+    'tf',
+    'terraform',
+  },
   terragrunt = { 'terragrunt' },
   toml = { 'toml' },
   treesitter = { 'scheme' },
