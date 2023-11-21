@@ -6,4 +6,10 @@ return {
     enabled = vim.fn.executable('deno') == 1,
   },
   { 'lukas-reineke/headlines.nvim', dependencies = { 'treesitter' }, name = 'headlines' }, -- Highlight for headlines, codeblocks
+  {
+    -- Obsidian
+    'epwalsh/obsidian.nvim',
+    name = 'obsidian',
+    dependencies = { 'plenary' },
+  },
 }
