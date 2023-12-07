@@ -9,6 +9,6 @@ neotree.setup({
     'edgy',
   },
   filesystem = {
-    hijack_netrw_behavior = 'open_current',
+    hijack_netrw_behavior = 'open_default',
   },
 })
