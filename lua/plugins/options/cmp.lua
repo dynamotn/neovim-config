@@ -1,5 +1,6 @@
 local cmp = require('cmp')
 local luasnip = require('luasnip')
+local compare = require('cmp.config.compare')
 
 local has_words_before = function()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -85,6 +86,7 @@ cmp.setup({
     },
   },
   formatting = {
+    fields = { 'kind', 'menu', 'abbr' },
     format = function(entry, vim_item)
       if vim.tbl_contains({ 'fuzzy_path', 'async_path', 'path' }, entry.source.name) then
         local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
@@ -100,7 +102,7 @@ cmp.setup({
       if not present then
         return vim_item
       else
-        return lspkind.cmp_format({
+        local result = lspkind.cmp_format({
           mode = 'symbol_text',
           menu = {
             fuzzy_buffer = '「BUF」',
@@ -148,8 +150,35 @@ cmp.setup({
             Copilot = icons.Copilot,
           },
         })(entry, vim_item)
+
+        local strings = vim.split(result.kind, '%s', { trimempty = true })
+        result.kind = ' ' .. (strings[1] or '') .. ' '
+
+        return result
       end
     end,
+  },
+  window = {
+    completion = {
+      winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,Search:None',
+      col_offset = -3,
+      side_padding = 0,
+    },
+  },
+  sorting = {
+    priority_weight = 2,
+    comparators = {
+      require('cmp_fuzzy_buffer.compare'),
+      require('cmp_fuzzy_path.compare'),
+      compare.offset,
+      compare.exact,
+      compare.score,
+      compare.recently_used,
+      compare.kind,
+      compare.sort_text,
+      compare.length,
+      compare.order,
+    },
   },
 })
 
