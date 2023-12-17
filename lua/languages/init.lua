@@ -178,30 +178,41 @@ M.get_dap_by_filetype = function(filetype)
 end
 
 M.setup_null_ls = function()
+  local list_tools = {}
   local result = {}
 
   for language, filetypes in pairs(languages) do
     local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
-    local nullls_util = require('util.null_ls')
 
     if ok then
       for _, source in ipairs(null_ls_config) do
-        if #source >= 2 then
-          source.with_config = source.with_config or {}
-          source.with_config['filetypes'] = filetypes
+        source.with_config = source.with_config or {}
+        source.with_config['extra_filetypes'] = {}
+        local tool_kind = source[1] .. '_' .. source[2]
 
-          local tool = nullls_util.active_tool(
-            source[1],
-            source[2],
-            source.is_external_tool,
-            source.is_custom_tool,
-            source.with_config
-          )
-          if tool then
-            result[source[1]] = tool
-          end
+        if list_tools[tool_kind] == nil then
+          source.with_config['extra_filetypes'] = filetypes
+        else
+          vim.list_extend(list_tools[tool_kind].with_config['extra_filetypes'], filetypes)
+          source.with_config['extra_filetypes'] = list_tools[tool_kind].with_config['extra_filetypes']
         end
+        list_tools[tool_kind] = source
       end
+    end
+  end
+
+  local nullls_util = require('util.null_ls')
+  for tool_kind, source in pairs(list_tools) do
+    local tool = nullls_util.active_tool(
+      source[1],
+      source[2],
+      source.is_external_tool,
+      source.is_custom_tool,
+      source.with_config,
+      source.tool
+    )
+    if tool then
+      result[tool_kind] = tool
     end
   end
 

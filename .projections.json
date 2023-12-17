@@ -52,6 +52,9 @@
   "lua/languages/*/test.lua": {
     "type": "test"
   },
+  "lua/tools/*.lua": {
+    "type": "tool"
+  },
   "after/queries/*.scm": {
     "type": "tsquery"
   },

@@ -127,13 +127,20 @@ M.enable_cursorline = function()
 end
 
 M.enable_highlight_document = function(client_id)
+  local client_ok, method_supported = pcall(function()
+    return vim.lsp.get_client_by_id(client_id).server_capabilities.documentHighlightProvider
+  end)
+  if not client_ok or not method_supported then
+    return
+  end
+
   local id = vim.api.nvim_create_augroup('highlight_lsp', {})
 
   vim.api.nvim_create_autocmd({ 'CursorHold' }, {
     buffer = 0,
     group = id,
     callback = function()
-      lsp.document_highlight(client_id)
+      vim.lsp.buf.document_highlight()
     end,
   })
 
@@ -151,13 +158,19 @@ M.disable_highlight_document = function()
 end
 
 M.enable_codelens = function(client_id)
-  lsp.codelens(client_id)
+  local client_ok, method_supported = pcall(function()
+    return vim.lsp.get_client_by_id(client_id).server_capabilities.codeLensProvider
+  end)
+  if not client_ok or not method_supported then
+    return
+  end
 
-  vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave' }, {
+  vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'BufReadPost' }, {
     buffer = 0,
     group = vim.api.nvim_create_augroup('codelens_lsp', {}),
     callback = function()
-      lsp.codelens(client_id)
+      vim.lsp.codelens.refresh()
+      vim.lsp.codelens.display(nil, vim.api.nvim_get_current_buf(), client_id)
     end,
   })
 end
@@ -167,11 +180,22 @@ M.disable_codelens = function()
 end
 
 M.enable_hover = function(client_id)
+  local client_ok, method_supported = pcall(function()
+    return vim.lsp.get_client_by_id(client_id).server_capabilities.hoverProvider
+  end)
+  if not client_ok or not method_supported then
+    return
+  end
+
   vim.api.nvim_create_autocmd({ 'CursorHold' }, {
     buffer = 0,
     group = vim.api.nvim_create_augroup('hover_lsp', {}),
     callback = function()
-      lsp.hover(client_id)
+      if pcall(require, 'lspsaga') then
+        require('lspsaga.hover'):render_hover_doc({})
+      else
+        vim.lsp.buf.hover()
+      end
     end,
   })
 end
@@ -181,11 +205,18 @@ M.disable_hover = function()
 end
 
 M.enable_codeaction = function(client_id)
+  local client_ok, method_supported = pcall(function()
+    return vim.lsp.get_client_by_id(client_id).server_capabilities.codeActionProvider
+  end)
+  if not client_ok or not method_supported then
+    return
+  end
+
   vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
     buffer = 0,
     group = vim.api.nvim_create_augroup('codeaction_lsp', {}),
     callback = function()
-      lsp.codeaction(client_id)
+      vim.lsp.buf.code_action()
     end,
   })
 end
@@ -195,11 +226,18 @@ M.disable_codeaction = function()
 end
 
 M.enable_formatting = function(client_id)
+  local client_ok, method_supported = pcall(function()
+    return vim.lsp.get_client_by_id(client_id).server_capabilities.documentFormattingProvider
+  end)
+  if not client_ok or not method_supported then
+    return
+  end
+
   vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
     buffer = 0,
     group = vim.api.nvim_create_augroup('formatting_lsp', {}),
     callback = function()
-      lsp.formatting(client_id)
+      lsp.formatting()
     end,
   })
 end

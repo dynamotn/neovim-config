@@ -1,7 +1,7 @@
 local M = {}
 
 -- Activate tool
-M.active_tool = function(name, method, is_external_tool, is_custom_tool, with_config)
+M.active_tool = function(name, method, is_external_tool, is_custom_tool, with_config, tool)
   with_config = with_config or {}
   is_external_tool = is_external_tool == nil and true or is_external_tool
   is_custom_tool = is_custom_tool == nil and false or is_custom_tool
@@ -18,7 +18,7 @@ M.active_tool = function(name, method, is_external_tool, is_custom_tool, with_co
   end
 
   if is_external_tool then
-    return vim.fn.executable(name) == 1 and source
+    return vim.fn.executable(tool == nil and name or tool) == 1 and source
   else
     return source
   end

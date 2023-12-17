@@ -54,10 +54,10 @@ return {
   },
   markdown = { 'markdown' },
   nix = { 'nix' },
-  org = { 'norg' },
   terraform = {
     'tf',
     'terraform',
+    'terraform-vars',
   },
   terragrunt = { 'terragrunt' },
   toml = { 'toml' },
