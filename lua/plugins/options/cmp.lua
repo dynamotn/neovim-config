@@ -173,8 +173,6 @@ cmp.setup({
   sorting = {
     priority_weight = 2,
     comparators = {
-      require('cmp_fuzzy_buffer.compare'),
-      require('cmp_fuzzy_path.compare'),
       compare.offset,
       compare.exact,
       compare.score,
@@ -183,6 +181,8 @@ cmp.setup({
       compare.sort_text,
       compare.length,
       compare.order,
+      require('cmp_fuzzy_buffer.compare'),
+      require('cmp_fuzzy_path.compare'),
     },
   },
 })
@@ -199,6 +199,21 @@ cmp.setup.cmdline({ '/', '?' }, {
   sources = {
     { name = 'fuzzy_buffer' },
   },
+  sorting = {
+    comparators = {
+      compare.offset,
+      compare.exact,
+      compare.scopes,
+      compare.score,
+      compare.recently_used,
+      compare.locality,
+      compare.kind,
+      compare.sort_text,
+      compare.length,
+      compare.order,
+      require('cmp_fuzzy_path.compare'),
+    },
+  },
 })
 
 cmp.setup.cmdline(':', {
@@ -206,6 +221,21 @@ cmp.setup.cmdline(':', {
   sources = {
     { name = 'cmdline', group_index = 1 },
     { name = 'fuzzy_path', group_index = 2 },
+  },
+  sorting = {
+    comparators = {
+      compare.offset,
+      compare.exact,
+      compare.scopes,
+      compare.score,
+      compare.recently_used,
+      compare.locality,
+      compare.kind,
+      compare.sort_text,
+      compare.length,
+      compare.order,
+      require('cmp_fuzzy_path.compare'),
+    },
   },
 })
 
