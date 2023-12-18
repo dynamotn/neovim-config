@@ -80,6 +80,7 @@
   "obsidian": { "branch": "main", "commit": "6e3ede15176d3852e87605c22ba58f7f6eb37198" },
   "open": { "branch": "master", "commit": "1cabf5fc2c0d59d6273c932546d5465104ad278f" },
   "osv": { "branch": "main", "commit": "94b06d81209627d0098c4c5a14714e42a792bf0b" },
+  "otter": { "branch": "main", "commit": "9a3db06bf3abadafb93279648317984ca789b888" },
   "overseer": { "branch": "master", "commit": "9e6fe0ec30a241cecffcf2902332980b3bf2e73c" },
   "pantran": { "branch": "main", "commit": "461799624948bfb66f73b20b6fffa7e4c8ca6d08" },
   "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" },

@@ -97,8 +97,8 @@ M.auto_resize_split = function()
     group = vim.api.nvim_create_augroup('resize_windows', {}),
     callback = function()
       local current_tab = vim.fn.tabpagenr()
-      vim.cmd("tabdo wincmd =")
-      vim.cmd("tabnext " .. current_tab)
+      vim.cmd('tabdo wincmd =')
+      vim.cmd('tabnext ' .. current_tab)
     end,
   })
 end
@@ -313,6 +313,38 @@ M.auto_install_mason_tools = function()
   })
 end
 
+-- Add LspOtter for codeblocks
+M.enable_otter = function()
+  function _G.dynamo_otter_extensions(arglead, _, _)
+    local extensions = require('otter.tools.extensions')
+    local out = {}
+    for k, v in pairs(extensions) do
+      if arglead == nil then
+        table.insert(out, '*.otter.' .. v)
+      elseif k:find('^' .. arglead) ~= nil then
+        table.insert(out, k)
+      end
+    end
+    return out
+  end
+  vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+    group = vim.api.nvim_create_augroup('lspconfig', { clear = false }),
+    pattern = dynamo_otter_extensions(),
+    callback = function(ev)
+      local buf = ev.buf
+      local ft = vim.api.nvim_get_option_value('filetype', { buf = ev.buf })
+      local matching_configs = require('lspconfig.util').get_config_by_ft(ft)
+      for _, config in ipairs(matching_configs) do
+        print('Activating ', config.name, ' LspOtter in buffer ', buf, '...')
+        config.launch(buf)
+      end
+    end,
+  })
+  vim.cmd(
+    [[ command! -nargs=* -complete=customlist,v:lua.dynamo_otter_extensions LspOtter lua require'otter'.activate({<f-args>}) ]]
+  )
+end
+
 M.setup = function()
   M.enable_mkdir_when_save()
   M.set_ft_terminal()
@@ -324,6 +356,7 @@ M.setup = function()
   M.enable_cursorline()
   M.auto_install_ts_parser()
   M.auto_install_mason_tools()
+  M.enable_otter()
 
   local root = require('util.root')
   vim.opt.rtp:append(root.get() .. '/.nvim')

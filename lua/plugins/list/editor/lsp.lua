@@ -7,6 +7,12 @@ return {
     dependencies = { 'neoconf' },
   },
   {
+    -- LSP for codeblocks
+    'jmbuhr/otter.nvim',
+    name = 'otter',
+    dependencies = { 'cmp', 'lsp' },
+  },
+  {
     -- LSP server manager
     'williamboman/mason-lspconfig.nvim',
     name = 'mason_lsp',
