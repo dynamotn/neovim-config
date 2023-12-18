@@ -14,7 +14,7 @@ return {
   {
     -- Granular project configuration
     'tpope/vim-projectionist',
-    event = { 'BufReadPre', 'BufNewFile' },
+    event = { 'VimEnter' },
   },
   {
     -- Manage global and project-local settings
