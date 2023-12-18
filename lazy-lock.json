@@ -90,7 +90,7 @@
   "refactoring": { "branch": "master", "commit": "156532476deb10b1b2a32cb38e1078b3f9951c42" },
   "regexplainer": { "branch": "main", "commit": "78fff711edcb986a05a03253c28a90e32c4ce31f" },
   "rest": { "branch": "main", "commit": "84e81a19ab24ccf05c9233d34d4dfce61c233abe" },
-  "session": { "branch": "main", "commit": "fc9f398393cc3bb0e4e81cb9f7c133cd2b21467f" },
+  "session": { "branch": "main", "commit": "38fd5556a5afc2e0a16764c2d2dd14fd6b1f2676" },
   "smartcolumn": { "branch": "main", "commit": "c6abf3917fcec487c7475e208ae37f5788af5b04" },
   "statuscol": { "branch": "main", "commit": "7d593a285d83c1a865219e4e7e1e5aedf4e0dd9c" },
   "surround": { "branch": "main", "commit": "af8129efcabe95fc08a233e9f91569829bed031f" },

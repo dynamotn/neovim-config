@@ -1,9 +1,9 @@
 return {
   {
     -- Automatic session management
-    'olimorris/persisted.nvim',
+    'echasnovski/mini.sessions',
     name = 'session',
-    event = 'UIEnter',
+    lazy = false,
   },
   {
     -- Debug Treesitter
