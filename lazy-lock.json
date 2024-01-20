@@ -22,6 +22,7 @@
   "cmp_luasnip": { "branch": "master", "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843" },
   "colorizer": { "branch": "master", "commit": "85855b38011114929f4058efc97af1059ab3e41d" },
   "comment": { "branch": "main", "commit": "67f00d3ebbeae15e84584d971d0c32aad4f4f3a4" },
+  "context": { "branch": "master", "commit": "85cf977181fb8e816e47ac05df7f756e9cb72caf" },
   "context_comment": { "branch": "main", "commit": "1277b4a1f451b0f18c0790e1a7f12e1e5fdebfee" },
   "copilot": { "branch": "master", "commit": "b03617a6dc4bc88b65ab5deac1631da9a9c2dcaf" },
   "csv.vim": { "branch": "master", "commit": "0a4361efb247fa98065e37fdf5e8dcf39f4219dd" },

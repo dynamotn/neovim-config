@@ -30,4 +30,11 @@ return {
     event = { 'BufReadPost', 'BufNewFile' },
     dependencies = { 'treesitter' },
   },
+  {
+    -- Show code context
+    'nvim-treesitter/nvim-treesitter-context',
+    name = 'context',
+    event = { 'BufReadPost', 'BufNewFile' },
+    dependencies = { 'treesitter' },
+  }
 }
