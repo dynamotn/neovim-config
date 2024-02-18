@@ -2,6 +2,7 @@
 --      Automatic Group setting      --
 ---------------------------------------
 local lsp = require('util.lsp')
+local extras = require('util.extras')
 local M = {}
 
 M.enable_mkdir_when_save = function()
@@ -345,6 +346,21 @@ M.enable_otter = function()
   )
 end
 
+-- Autoread latest session
+M.auto_read_session = function()
+  vim.api.nvim_create_autocmd({ 'VimEnter' }, {
+    group = vim.api.nvim_create_augroup('auto_read_session', {}),
+    callback = function()
+      if not extras.is_something_shown() then
+        local session = require('mini.sessions')
+        if vim.tbl_count(session.detected) > 0 then
+          session.read()
+        end
+      end
+    end,
+  })
+end
+
 M.setup = function()
   M.enable_mkdir_when_save()
   M.set_ft_terminal()
@@ -357,6 +373,7 @@ M.setup = function()
   M.auto_install_ts_parser()
   M.auto_install_mason_tools()
   M.enable_otter()
+  M.auto_read_session()
 
   local root = require('util.root')
   vim.opt.rtp:append(root.get() .. '/.nvim')
