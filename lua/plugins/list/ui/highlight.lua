@@ -29,5 +29,6 @@ return {
     'HiPhish/rainbow-delimiters.nvim',
     name = 'rainbow',
     event = { 'BufReadPost', 'BufNewFile' },
+    submodules = false,
   },
 }
