@@ -16,6 +16,8 @@ return {
     [[:tabedit <C-r>=expand('%:p:h')<CR>/<CR>]],
     desc = 'Create new tab in directory of current file',
   },
+  { '<Space>b[', extras.cmdcr('bprevious'), desc = 'Previous buffer' },
+  { '<Space>b]', extras.cmdcr('bnext'), desc = 'Next buffer' },
 
   -- E key
   { '<Space>e', nil, desc = 'Error / Diagnostic / Quickfix' },
