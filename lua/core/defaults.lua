@@ -98,5 +98,6 @@ return {
   },
   abbreviations = {
     gh = 'https://github.com/',
+    gl = 'https://gitlab.com/',
   },
 }
