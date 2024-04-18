@@ -3,7 +3,6 @@
 --       General Neovim options      --
 ---------------------------------------
 local opt = vim.opt -- Set options (global/buffer/windows-scoped)
-local cmd = vim.cmd -- Execute Vim commands
 
 ------------ UI ------------- {
 -- Status line look nicer
@@ -30,6 +29,15 @@ opt.showmode = false
 
 -- Enable 24 bit RGB colors
 opt.termguicolors = true
+
+-- Lines and columns of context
+opt.scrolloff = 10
+opt.sidescrolloff = 10
+
+-- Smooth scroll
+if vim.fn.has("nvim-0.10") == 1 then
+  opt.smoothscroll = true
+end
 
 -- Show current position {
 -- Show the line number of all lines
@@ -67,7 +75,7 @@ opt.showmatch = true
 -- Wrap
 opt.textwidth = 0
 opt.wrapmargin = 0
-opt.wrap = true
+opt.wrap = false
 opt.linebreak = true
 
 -- Flexible backspace
@@ -75,6 +83,11 @@ opt.backspace = 'indent,eol,start'
 
 -- Not use mouse
 opt.mouse:remove('a')
+
+-- Sync with system clipboard
+if not vim.env.SSH_TTY then
+  opt.clipboard = 'unnamedplus'
+end
 
 -- Allow to change terminal's title
 opt.title = true
@@ -108,6 +121,7 @@ opt.shiftwidth = 2
 opt.softtabstop = 2
 -- Automatically indent
 opt.autoindent = true
+opt.smartindent = true
 --------- }
 
 -- Size {
