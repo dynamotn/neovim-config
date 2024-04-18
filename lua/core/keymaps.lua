@@ -2,7 +2,6 @@
 ---------------------------------------
 --    General Neovim key mappings    --
 ---------------------------------------
-local opt = vim.opt -- Set options (global/buffer/windowS-scoped)
 local g = vim.g -- Global variables
 
 local function cabbrev(input, replace)
@@ -23,11 +22,14 @@ g.leader = '\\'
 
 -- Need help, but I can type on my own
 map('', '<F1>', '<Esc>')
+
+-- Clear search
+map('n', '<Esc>', ':noh<CR><Esc>')
 ----------------------------- }
 
 ------ Save and Exit -------- {
 -- Save with root permission
-map('c', 'w!!', 'w ! sudo tee % > /dev/null')
+map('c', 'w!!', 'w ! sudo tee % > /dev/null', { desc = 'Save with root permission' })
 
 -- No one is really happy until you have this shortcuts
 cabbrev('W!', 'w!')
