@@ -90,12 +90,21 @@ lualine.setup({
       },
       {
         function()
-          return require('noice').api.statusline.mode.get()
+          return require('noice').api.status.command.get()
         end,
         cond = function()
-          return package.loaded['noice'] and require('noice').api.statusline.mode.has()
+          return package.loaded['noice'] and require('noice').api.status.command.has()
         end,
         color = { fg = extras.fg('Statement') },
+      },
+      {
+        function()
+          return require('noice').api.status.mode.get()
+        end,
+        cond = function()
+          return package.loaded['noice'] and require('noice').api.status.mode.has()
+        end,
+        color = { fg = extras.fg('Constant') },
       },
       {
         function()

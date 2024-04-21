@@ -14,6 +14,6 @@ return {
     -- Show guide of keymaps
     'folke/which-key.nvim',
     name = 'whichkey',
-    lazy = false,
+    event = "VeryLazy",
   },
 }
