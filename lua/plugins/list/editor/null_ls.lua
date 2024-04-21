@@ -9,10 +9,4 @@ return {
       'nvimtools/none-ls-extras.nvim',
     },
   },
-  {
-    -- Linter and Formatter manager
-    'jayp0521/mason-null-ls.nvim',
-    name = 'mason_null_ls',
-    dependencies = { 'mason' },
-  },
 }

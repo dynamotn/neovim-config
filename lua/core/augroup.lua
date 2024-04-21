@@ -257,7 +257,6 @@ M.auto_install_mason_tools = function()
       local registry = require('mason-registry')
       local lsp_mapping = require('mason-lspconfig.mappings.server')
       local dap_mapping = require('mason-nvim-dap.mappings.source')
-      local null_ls_mapping = require('mason-null-ls.mappings.source')
 
       local bufnr = vim.api.nvim_get_current_buf()
 
