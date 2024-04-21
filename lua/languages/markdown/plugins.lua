@@ -12,4 +12,10 @@ return {
     name = 'obsidian',
     dependencies = { 'plenary' },
   },
+  {
+    -- LSP for codeblocks
+    'jmbuhr/otter.nvim',
+    name = 'otter',
+    dependencies = { 'cmp', 'lsp' },
+  },
 }
