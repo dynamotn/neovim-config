@@ -35,7 +35,7 @@ opt.scrolloff = 10
 opt.sidescrolloff = 10
 
 -- Smooth scroll
-if vim.fn.has("nvim-0.10") == 1 then
+if vim.fn.has('nvim-0.10') == 1 then
   opt.smoothscroll = true
 end
 

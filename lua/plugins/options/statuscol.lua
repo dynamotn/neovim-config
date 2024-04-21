@@ -12,7 +12,7 @@ statuscol.setup({
     {
       text = { '  %s' },
       sign = { name = { '.*' }, maxwidth = 2, colwidth = 1, auto = true },
-      click = "v:lua.ScSa"
+      click = 'v:lua.ScSa',
     },
     {
       text = { builtin.lnumfunc, ' ' },

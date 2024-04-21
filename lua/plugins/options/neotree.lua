@@ -1,5 +1,5 @@
 local neotree = require('neo-tree')
-local events = require("neo-tree.events")
+local events = require('neo-tree.events')
 
 local function on_move(data)
   require('util.lsp').on_rename(data.source, data.destination)
@@ -22,13 +22,13 @@ neotree.setup({
   default_component_configs = {
     indent = {
       with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-      expander_collapsed = "",
-      expander_expanded = "",
-      expander_highlight = "NeoTreeExpander",
+      expander_collapsed = '',
+      expander_expanded = '',
+      expander_highlight = 'NeoTreeExpander',
     },
   },
   event_handlers = {
     { event = events.FILE_MOVED, handler = on_move },
     { event = events.FILE_RENAMED, handler = on_move },
-  }
+  },
 })

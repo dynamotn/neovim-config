@@ -1,4 +1,4 @@
-return require("neotest-python")({
+return require('neotest-python')({
   dap = { justMyCode = false },
-  runner = "pytest",
+  runner = 'pytest',
 })

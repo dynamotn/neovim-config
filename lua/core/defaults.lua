@@ -118,5 +118,5 @@ return {
     terminal = 'Terminal',
     Regexplainer = 'Regex',
     tsplayground = 'TSPlayground',
-  }
+  },
 }

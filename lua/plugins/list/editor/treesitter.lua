@@ -36,5 +36,5 @@ return {
     name = 'context',
     event = { 'BufReadPost', 'BufNewFile' },
     dependencies = { 'treesitter' },
-  }
+  },
 }

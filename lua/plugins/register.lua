@@ -60,7 +60,7 @@ M.register_keymaps = function(plugin)
       group = vim.api.nvim_create_augroup('whichkey_' .. plugin.name, {}),
       callback = function()
         load_whichkey_keymaps({ buffer = 0 })
-      end
+      end,
     })
   else
     return keymaps

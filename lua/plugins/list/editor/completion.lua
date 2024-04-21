@@ -43,10 +43,10 @@ return {
         -- Codeium completion source
         'Exafunction/codeium.nvim',
         name = 'codeium',
-        build = ":Codeium Auth",
+        build = ':Codeium Auth',
         cmd = 'Codeium',
         dependencies = { 'plenary' },
-      }
+      },
     },
   },
 }

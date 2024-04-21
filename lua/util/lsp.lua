@@ -40,8 +40,8 @@ end
 M.on_rename = function(from, to)
   local clients = M.get_clients()
   for _, client in ipairs(clients) do
-    if client.supports_method("workspace/willRenameFiles") then
-      local resp = client.request_sync("workspace/willRenameFiles", {
+    if client.supports_method('workspace/willRenameFiles') then
+      local resp = client.request_sync('workspace/willRenameFiles', {
         files = {
           {
             oldUri = vim.uri_from_fname(from),

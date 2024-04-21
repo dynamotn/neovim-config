@@ -1,5 +1,5 @@
 local h = require('null-ls.helpers')
-local u = require("null-ls.utils")
+local u = require('null-ls.utils')
 local methods = require('null-ls.methods')
 
 return h.make_builtin({
