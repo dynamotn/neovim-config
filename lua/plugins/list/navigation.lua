@@ -20,7 +20,7 @@ return {
   },
   {
     -- Smoothly navigate between neovim and tmux
-    'numToStr/Navigator.nvim',
+    'dynamotn/Navigator.nvim',
     name = 'neomux',
     event = 'UIEnter',
   },
