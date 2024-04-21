@@ -6,6 +6,7 @@ local modules = {
   'snippet',
   'lsp',
   'null_ls',
+  'formatting',
   'treesitter',
   'typing',
   'refactoring',

@@ -226,27 +226,6 @@ M.disable_codeaction = function()
   vim.api.nvim_del_augroup_by_name('codeaction_lsp')
 end
 
-M.enable_formatting = function(client_id)
-  local client_ok, method_supported = pcall(function()
-    return vim.lsp.get_client_by_id(client_id).server_capabilities.documentFormattingProvider
-  end)
-  if not client_ok or not method_supported then
-    return
-  end
-
-  vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
-    buffer = 0,
-    group = vim.api.nvim_create_augroup('formatting_lsp', {}),
-    callback = function()
-      lsp.formatting()
-    end,
-  })
-end
-
-M.disable_formatting = function()
-  vim.api.nvim_del_augroup_by_name('formatting_lsp')
-end
-
 -- Install TS parsers for window buffer
 M.auto_install_ts_parser = function()
   vim.api.nvim_create_autocmd({ 'FileType' }, {
@@ -298,16 +277,13 @@ M.auto_install_mason_tools = function()
         end
       end
 
-      local null_ls_tools = languages.get_tools_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
-      if null_ls_tools == nil then
+      local tools = languages.get_tools_by_filetype(vim.api.nvim_buf_get_option(bufnr, 'ft'))
+      if tools == nil then
         return
       end
-      for null_ls_tool, is_external_tool in pairs(null_ls_tools) do
-        if not is_external_tool then
-          local tool = null_ls_mapping.getPackageFromNullLs[null_ls_tool]
-          if tool ~= nil and not registry.is_installed(tool) then
-            vim.api.nvim_command('MasonInstall ' .. tool)
-          end
+      for tool, is_mason_tool in pairs(tools) do
+        if is_mason_tool and not registry.is_installed(tool) then
+          vim.api.nvim_command('MasonInstall ' .. tool)
         end
       end
     end,

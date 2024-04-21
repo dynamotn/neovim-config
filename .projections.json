@@ -34,6 +34,9 @@
   "lua/languages/*/null_ls.lua": {
     "type": "null_ls"
   },
+  "lua/languages/*/formatter.lua": {
+    "type": "formatter"
+  },
   "lua/languages/*/dap.lua": {
     "type": "dap"
   },

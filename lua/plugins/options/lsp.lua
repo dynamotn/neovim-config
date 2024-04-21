@@ -10,7 +10,6 @@ local default_opts = {
     augroup.enable_highlight_document(client.id)
     augroup.enable_hover(client.id)
     augroup.enable_codelens(client.id)
-    augroup.enable_formatting(client.id)
 
     local present, colorizer = pcall(require, 'colorizer')
     if present then
