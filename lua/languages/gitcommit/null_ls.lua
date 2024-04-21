@@ -15,7 +15,5 @@ return {
     },
   },
   { 'jira', 'completion', is_custom_tool = true },
-  { 'ltrs', 'code_actions' },
-  { 'ltrs', 'diagnostics' },
   { 'dictionary', 'hover', is_external_tool = false },
 }

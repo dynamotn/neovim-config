@@ -9,8 +9,6 @@ for _, tool in pairs(configs) do
 end
 
 table.insert(sources, null_ls.builtins.diagnostics.trail_space)
-table.insert(sources, null_ls.builtins.formatting.trim_whitespace)
-table.insert(sources, null_ls.builtins.formatting.trim_newlines)
 if vim.fn.executable('git') == 1 then
   table.insert(sources, null_ls.builtins.code_actions.gitrebase)
 end

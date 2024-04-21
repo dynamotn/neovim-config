@@ -1,3 +1,4 @@
 return {
   'marksman',
+  'ltex',
 }

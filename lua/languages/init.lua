@@ -203,14 +203,15 @@ M.setup_null_ls = function()
 
   local nullls_util = require('util.null_ls')
   for tool_kind, source in pairs(list_tools) do
-    local tool = nullls_util.active_tool(
-      source[1],
-      source[2],
-      source.is_external_tool,
-      source.is_custom_tool,
-      source.with_config,
-      source.tool
-    )
+    local tool = nullls_util.active_tool({
+      name = source[1],
+      method = source[2],
+      is_external_tool = source.is_external_tool,
+      is_custom_tool = source.is_custom_tool,
+      with_config = source.with_config,
+      tool = source.tool,
+      is_none_ls_extra_tool = source.is_none_ls_extra_tool
+    })
     if tool then
       result[tool_kind] = tool
     end

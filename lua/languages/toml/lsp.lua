@@ -1,3 +1,3 @@
 return {
-  'ltex',
+  'taplo',
 }

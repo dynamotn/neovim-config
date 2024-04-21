@@ -1,6 +1,4 @@
 return {
-  { 'shellcheck', 'code_actions' },
-  { 'shellcheck', 'diagnostics' },
   {
     'shfmt',
     'formatting',
