@@ -72,7 +72,7 @@ lualine.setup({
       {
         function()
           local root = require('util.root').get()
-          local cwd = vim.loop.cwd()
+          local cwd = vim.uv.cwd()
           local result = ''
           if root:find(cwd, 1, true) == 1 then
             result = cwd
@@ -86,7 +86,7 @@ lualine.setup({
       {
         function()
           local root = require('util.root').get()
-          local cwd = vim.loop.cwd()
+          local cwd = vim.uv.cwd()
           local result = ''
 
           if root == cwd then

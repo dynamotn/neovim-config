@@ -9,19 +9,19 @@ M.improve = function(builtin, opts)
     opts = params.opts
     opts = vim.tbl_deep_extend('force', { cwd = root.get() }, opts or {})
     if builtin == 'files' then
-      if vim.loop.fs_stat((opts.cwd or vim.loop.cwd()) .. '/.git') then
+      if vim.uv.fs_stat((opts.cwd or vim.uv.cwd()) .. '/.git') then
         opts.show_untracked = true
         builtin = 'git_files'
       else
         builtin = 'find_files'
       end
     end
-    if opts.cwd and opts.cwd ~= vim.loop.cwd() then
+    if opts.cwd and opts.cwd ~= vim.uv.cwd() then
       opts.attach_mappings = function(_, map)
         map('i', '<a-c>', function()
           local action_state = require('telescope.actions.state')
           local line = action_state.get_current_line()
-          dynamo_telescope(
+          M.improve(
             params.builtin,
             vim.tbl_deep_extend('force', {}, params.opts or {}, { cwd = false, default_text = line })
           )()

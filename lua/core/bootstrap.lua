@@ -6,7 +6,7 @@ local g = vim.g -- Global variables
 
 ---------- Lazy ----------- {
 local lazy_path = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazy_path) then
+if not vim.uv.fs_stat(lazy_path) then
   print('Cloning lazy..')
   -- Remove the dir before cloning
   vim.fn.delete(lazy_path, 'rf')

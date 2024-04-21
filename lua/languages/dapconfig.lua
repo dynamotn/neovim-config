@@ -115,8 +115,8 @@ M.lldb = {
 M.delve = {
   mason_install = true,
   adapter = function(callback, config)
-    local stdout = vim.loop.new_pipe(false)
-    local stderr = vim.loop.new_pipe(false)
+    local stdout = vim.uv.new_pipe(false)
+    local stderr = vim.uv.new_pipe(false)
     local handle
     local pid_or_err
     local host = config.host or '127.0.0.1'
@@ -138,7 +138,7 @@ M.delve = {
         args = { 'dap', '-l', addr },
         detached = true,
       }
-      handle, pid_or_err = vim.loop.spawn('dlv', opts, function(code)
+      handle, pid_or_err = vim.uv.spawn('dlv', opts, function(code)
         stdout:close()
         stderr:close()
         handle:close()
@@ -277,7 +277,7 @@ M.ruby = {
   mason_install = false,
   adapter = function(callback, config)
     local handle
-    local stdout = vim.loop.new_pipe(false)
+    local stdout = vim.uv.new_pipe(false)
     local pid_or_err
     local waiting = config.waiting or 10
     local args
@@ -319,7 +319,7 @@ M.ruby = {
       rdbg = 'rdbg'
     end
 
-    handle, pid_or_err = vim.loop.spawn(rdbg, opts, function(code)
+    handle, pid_or_err = vim.uv.spawn(rdbg, opts, function(code)
       handle:close()
       if code ~= 0 then
         assert(handle, 'rdbg exited with code: ' .. tostring(code))
