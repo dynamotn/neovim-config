@@ -1,26 +1,8 @@
 local bufferline = require('bufferline')
 local extras = require('util.extras')
 
-local special_filetypes = {
-  help = 'Help Guide',
-  dapui_scopes = 'Scopes',
-  dapui_breakpoints = 'Breakpoints',
-  dapui_stacks = 'Stacks',
-  dapui_watches = 'Watches',
-  ['dap-repl'] = 'REPL',
-  dapui_console = 'Console',
-  dbui = 'Database',
-  dbout = 'Query Result',
-  GoogleKeepMenu = 'Google Keep Menu',
-  GoogleKeepList = 'Google Keep Notes',
-  OverseerList = 'List tasks',
-  terminal = 'Terminal',
-  Regexplainer = 'Regex',
-  tsplayground = 'TSPlayground',
-}
-
 local offsets = {}
-for filetype, text in pairs(special_filetypes) do
+for filetype, text in pairs(require('core.defaults').special_filetypes) do
   table.insert(offsets, {
     filetype = filetype,
     text = text,

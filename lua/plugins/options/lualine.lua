@@ -8,33 +8,13 @@ local lualine = require('lualine')
 local icons = require('core.defaults').icons
 local extras = require('util.extras')
 
-local special_filetypes = {
-  help = 'Help Guide',
-  sagaoutline = 'Outline',
-  dapui_scopes = 'Scopes',
-  dapui_breakpoints = 'Breakpoints',
-  dapui_stacks = 'Stacks',
-  dapui_watches = 'Watches',
-  ['dap-repl'] = 'REPL',
-  dapui_console = 'Console',
-  dbui = 'Database',
-  dbout = 'Query Result',
-  ['neo-tree'] = 'File Explorer',
-  GoogleKeepMenu = 'Google Keep Menu',
-  GoogleKeepList = 'Google Keep Notes',
-  OverseerList = 'List tasks',
-  terminal = 'Terminal',
-  Regexplainer = 'Regex',
-  tsplayground = 'TSPlayground',
-}
-
 local extensions = function(filetype)
   return {
     filetypes = { filetype },
     sections = {
       lualine_a = {
         function()
-          return special_filetypes[filetype] or 'N/A'
+          return require('core.defaults').special_filetypes[filetype] or 'N/A'
         end,
       },
     },

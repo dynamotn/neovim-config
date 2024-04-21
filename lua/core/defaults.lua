@@ -100,4 +100,23 @@ return {
     gh = 'https://github.com/',
     gl = 'https://gitlab.com/',
   },
+  special_filetypes = {
+    help = 'Help Guide',
+    sagaoutline = 'Outline',
+    dapui_scopes = 'Scopes',
+    dapui_breakpoints = 'Breakpoints',
+    dapui_stacks = 'Stacks',
+    dapui_watches = 'Watches',
+    ['dap-repl'] = 'REPL',
+    dapui_console = 'Console',
+    dbui = 'Database',
+    dbout = 'Query Result',
+    ['neo-tree'] = 'File Explorer',
+    GoogleKeepMenu = 'Google Keep Menu',
+    GoogleKeepList = 'Google Keep Notes',
+    OverseerList = 'List tasks',
+    terminal = 'Terminal',
+    Regexplainer = 'Regex',
+    tsplayground = 'TSPlayground',
+  }
 }
