@@ -1,6 +1,3 @@
-local bufferline = require('bufferline')
-local extras = require('util.extras')
-
 local offsets = {}
 for filetype, text in pairs(require('core.defaults').special_filetypes) do
   table.insert(offsets, {
@@ -11,13 +8,7 @@ for filetype, text in pairs(require('core.defaults').special_filetypes) do
   })
 end
 
-bufferline.setup({
-  highlights = function()
-    if require('core.defaults').colorscheme == 'catppuccin' and extras.has_plugin('catppuccin') then
-      return require('catppuccin.groups.integrations.bufferline').get()
-    end
-    return {}
-  end,
+require('bufferline').setup({
   options = {
     mode = 'tabs',
     numbers = function(opts)
@@ -35,5 +26,6 @@ bufferline.setup({
     separator_style = 'slant',
     sort_by = 'tabs',
     offsets = offsets,
+    always_show_bufferline = true,
   },
 })

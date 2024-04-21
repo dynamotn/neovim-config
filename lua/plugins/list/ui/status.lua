@@ -17,7 +17,7 @@ return {
     'akinsho/bufferline.nvim',
     name = 'bufferline',
     event = 'UIEnter',
-    dependencies = { require('core.defaults').colorscheme },
+    dependencies = { require('core.defaults').colorscheme, 'icon' },
     cond = not vim.g.started_by_firenvim,
   },
   {

@@ -1,4 +1,5 @@
 local h = require('null-ls.helpers')
+local u = require("null-ls.utils")
 local methods = require('null-ls.methods')
 
 return h.make_builtin({
@@ -22,7 +23,7 @@ return h.make_builtin({
     to_stdin = false,
     multiple_files = true,
     format = 'json',
-    check_exit_code = function(_code, _stderr)
+    check_exit_code = function(_, _)
       -- check for warnings even if there are no errors
       return false
     end,

@@ -74,6 +74,7 @@
   "neotest-vim-test": { "branch": "master", "commit": "75c4228882ae4883b11bfce9b8383e637eb44192" },
   "neotree": { "branch": "main", "commit": "25bfdbe802eb913276bb83874b043be57bd70347" },
   "noice": { "branch": "main", "commit": "0cbe3f88d038320bdbda3c4c5c95f43a13c3aa12" },
+  "none-ls-extras.nvim": { "branch": "main", "commit": "f0746bf4f1a21d6e1d2002f671fb9b46d2146de7" },
   "notify": { "branch": "master", "commit": "5371f4bfc1f6d3adf4fe9d62cd3a9d44356bfd15" },
   "nui": { "branch": "main", "commit": "cbd2668414331c10039278f558630ed19b93e69b" },
   "null_ls": { "branch": "main", "commit": "88821b67e6007041f43b802f58e3d9fa9bfce684" },

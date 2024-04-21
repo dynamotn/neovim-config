@@ -41,4 +41,11 @@ return {
     end,
     desc = 'Go to previous hunk',
   },
+  {
+    '<Space>gb',
+    function()
+      require('gitsigns').blame_line({ full = true })
+    end,
+    desc = 'Blame line',
+  },
 }

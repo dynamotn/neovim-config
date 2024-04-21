@@ -317,6 +317,7 @@ end
 -- Add LspOtter for codeblocks
 M.enable_otter = function()
   function _G.dynamo_otter_extensions(arglead, _, _)
+    require('lazy').load({ plugins = { 'otter' } })
     local extensions = require('otter.tools.extensions')
     local out = {}
     for k, v in pairs(extensions) do
@@ -362,6 +363,7 @@ M.auto_read_session = function()
 end
 
 M.setup = function()
+  local extras = require('util.extras')
   M.enable_mkdir_when_save()
   M.set_ft_terminal()
   M.enable_quick_quit()
@@ -370,10 +372,18 @@ M.setup = function()
   M.enable_highlight_on_yank()
   M.auto_resize_split()
   M.enable_cursorline()
-  M.auto_install_ts_parser()
-  M.auto_install_mason_tools()
-  M.enable_otter()
-  M.auto_read_session()
+  if extras.has_plugin('treesitter') then
+    M.auto_install_ts_parser()
+  end
+  if extras.has_plugin('mason') then
+    M.auto_install_mason_tools()
+  end
+  if extras.has_plugin('otter') then
+    M.enable_otter()
+  end
+  if extras.has_plugin('session') then
+    M.auto_read_session()
+  end
 
   local root = require('util.root')
   vim.opt.rtp:append(root.get() .. '/.nvim')

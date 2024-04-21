@@ -4,7 +4,10 @@ return {
     'nvimtools/none-ls.nvim',
     name = 'null_ls',
     event = 'VeryLazy',
-    dependencies = { 'refactoring' },
+    dependencies = {
+      'refactoring',
+      'nvimtools/none-ls-extras.nvim',
+    },
   },
   {
     -- Linter and Formatter manager

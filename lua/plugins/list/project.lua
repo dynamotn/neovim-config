@@ -14,7 +14,7 @@ return {
   {
     -- Granular project configuration
     'tpope/vim-projectionist',
-    event = { 'VimEnter' },
+    lazy = false,
   },
   {
     -- Manage global and project-local settings

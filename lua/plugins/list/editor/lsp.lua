@@ -10,6 +10,7 @@ return {
     -- LSP for codeblocks
     'jmbuhr/otter.nvim',
     name = 'otter',
+    event = 'BufReadPre',
     dependencies = { 'cmp', 'lsp' },
   },
   {

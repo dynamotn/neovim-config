@@ -7,6 +7,7 @@ return {
       'plenary',
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }, -- Increase performance with fzf (native port from Go to C)
     },
+    enabled = vim.fn.executable("make") == 1,
     cmd = 'Telescope',
   },
   {

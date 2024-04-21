@@ -1,5 +1,4 @@
 local telescope = require('telescope')
-local actions = require('telescope.actions')
 local telescope_util = require('util.telescope')
 
 telescope.setup({
