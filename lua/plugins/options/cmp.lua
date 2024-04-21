@@ -8,9 +8,12 @@ local has_words_before = function()
 end
 
 local cmp_default_sources = {
+  { name = 'codeium', group_index = 1, priority = 100 },
+  { name = 'nvim_lsp', group_index = 2 },
+  { name = 'luasnip', group_index = 3 },
   {
     name = 'fuzzy_buffer',
-    group_index = 1,
+    group_index = 4,
     option = {
       get_bufnrs = function()
         local bufs = {}
@@ -24,16 +27,13 @@ local cmp_default_sources = {
       end,
     },
   },
-  { name = 'luasnip', group_index = 2 },
-  { name = 'nvim_lsp', group_index = 3 },
-  { name = 'otter', group_index = 3 },
-  { name = 'calc', group_index = 4 },
-  { name = 'async_path', group_index = 5 },
-  { name = 'tmux', group_index = 6, option = { all_panes = true } },
-  { name = 'dap', group_index = 7 },
-  { name = 'dynamic', group_index = 8 },
-  { name = 'copilot', group_index = 9 },
-  { name = 'fuzzy_path', group_index = 10, option = { fd_timeout_msec = 200 } },
+  { name = 'otter', group_index = 5 },
+  { name = 'calc', group_index = 6 },
+  { name = 'async_path', group_index = 7 },
+  { name = 'tmux', group_index = 8, option = { all_panes = true } },
+  { name = 'dap', group_index = 9 },
+  { name = 'dynamic', group_index = 10 },
+  { name = 'fuzzy_path', group_index = 11, option = { fd_timeout_msec = 200 } },
 }
 vim.api.nvim_set_hl(0, 'CmpGhostText', { link = 'Comment', default = true })
 
@@ -117,7 +117,7 @@ cmp.setup({
             dap = '「DAP」',
             dynamic = '「CUS」',
             browser = '「WWW」',
-            copilot = '「COP」',
+            codeium = '「AI」',
 
             fish = '「FISH」',
             ['vim-dadbod-completion'] = '「DB」',
@@ -149,7 +149,7 @@ cmp.setup({
             Color = icons.Color,
             Reference = icons.Reference,
             Folder = icons.folder,
-            Copilot = icons.Copilot,
+            Codeium = icons.Codeium,
           },
         })(entry, vim_item)
 

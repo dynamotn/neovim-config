@@ -80,7 +80,7 @@ catppuccin.setup({
       CmpItemKindText = { fg = util.lighten(colors.surface0, 0.9, colors.teal), bg = colors.teal },
       CmpItemKindEnum = { fg = util.lighten(colors.surface0, 0.9, colors.teal), bg = colors.teal },
       CmpItemKindKeyword = { fg = util.lighten(colors.surface0, 0.9, colors.teal), bg = colors.teal },
-      CmpItemKindCopilot = { fg = util.lighten(colors.surface0, 0.9, colors.teal), bg = colors.teal },
+      CmpItemKindCodeium = { fg = util.lighten(colors.surface0, 0.9, colors.teal), bg = colors.teal },
 
       CmpItemKindEvent = { fg = util.lighten(colors.surface0, 0.9, colors.blue), bg = colors.blue },
       CmpItemKindFunction = { fg = util.lighten(colors.surface0, 0.9, colors.blue), bg = colors.blue },

@@ -119,18 +119,6 @@ lualine.setup({
     lualine_x = {
       {
         function()
-          local icon = require('core.defaults').icons.kinds.Copilot
-          local status = require('copilot.api').status.data
-          return icon .. (status.message or '')
-        end,
-        cond = function()
-          local ok, clients = pcall(vim.lsp.get_active_clients, { name = 'copilot', bufnr = 0 })
-          return ok and #clients > 0
-        end,
-        color = { fg = extras.fg('Function') },
-      },
-      {
-        function()
           local b = vim.api.nvim_get_current_buf()
           if next(vim.treesitter.highlighter.active[b]) then
             return icons.treesitter

@@ -40,19 +40,13 @@ return {
         name = 'cmp_dynamic',
       },
       {
-        -- Copilot completion source
-        'zbirenbaum/copilot-cmp',
-        name = 'cmp_copilot',
-        cond = vim.fn.executable('node') == 1,
-        dependencies = {
-          {
-            'zbirenbaum/copilot.lua',
-            cmd = 'Copilot',
-            event = 'InsertEnter',
-            name = 'copilot',
-          },
-        },
-      },
+        -- Codeium completion source
+        'Exafunction/codeium.nvim',
+        name = 'codeium',
+        build = ":Codeium Auth",
+        cmd = 'Codeium',
+        dependencies = { 'plenary' },
+      }
     },
   },
 }
