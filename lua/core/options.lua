@@ -5,6 +5,9 @@
 local opt = vim.opt -- Set options (global/buffer/windows-scoped)
 
 ------------ UI ------------- {
+-- Font for GUI
+opt.guifont = 'Iosevka Dynamo:h11'
+
 -- Status line look nicer
 opt.laststatus = 3
 
