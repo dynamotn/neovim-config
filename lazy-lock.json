@@ -1,466 +1,121 @@
 {
-  "align": {
-    "branch": "main",
-    "commit": "68a8d3205f0e7ce1bded057f4a851f42ef8fc584"
-  },
-  "animation.nvim": {
-    "branch": "main",
-    "commit": "fb77091ab72ec9971aee0562e7081182527aaa6a"
-  },
-  "autopairs": {
-    "branch": "master",
-    "commit": "c15de7e7981f1111642e7e53799e1211d4606cb9"
-  },
-  "autotag": {
-    "branch": "main",
-    "commit": "2692808eca8a4ac3311516a1c4a14bb97ecc6482"
-  },
-  "bufferline": {
-    "branch": "main",
-    "commit": "99337f63f0a3c3ab9519f3d1da7618ca4f91cffe"
-  },
-  "catppuccin": {
-    "branch": "main",
-    "commit": "cc8e290d4c0d572171243087f8541e49be2c8764"
-  },
-  "chatgpt": {
-    "branch": "main",
-    "commit": "df53728e05129278d6ea26271ec086aa013bed90"
-  },
-  "cmp": {
-    "branch": "main",
-    "commit": "a110e12d0b58eefcf5b771f533fc2cf3050680ac"
-  },
-  "cmp-async-path": {
-    "branch": "main",
-    "commit": "9d581eec5acf812316913565c135b0d1ee2c9a71"
-  },
-  "cmp-calc": {
-    "branch": "main",
-    "commit": "5947b412da67306c5b68698a02a846760059be2e"
-  },
-  "cmp-cmdline": {
-    "branch": "main",
-    "commit": "d250c63aa13ead745e3a40f61fdd3470efde3923"
-  },
-  "cmp-dap": {
-    "branch": "master",
-    "commit": "ea92773e84c0ad3288c3bc5e452ac91559669087"
-  },
-  "cmp-fish": {
-    "branch": "main",
-    "commit": "8ae7bfb1b3251d433c4adf4e64396ef929fbd91f"
-  },
-  "cmp-fuzzy-buffer": {
-    "branch": "main",
-    "commit": "ada6352bc7e3c32471ab6c08f954001870329de1"
-  },
-  "cmp-fuzzy-path": {
-    "branch": "master",
-    "commit": "9953c11a2510a04111b7b152cf50ae1e83f00798"
-  },
-  "cmp-nvim-lsp": {
-    "branch": "main",
-    "commit": "39e2eda76828d88b773cc27a3f61d2ad782c922d"
-  },
-  "cmp-tmux": {
-    "branch": "main",
-    "commit": "95b1b921802e6f60627b3e76afb9380fddd87f9a"
-  },
-  "cmp_dadbod": {
-    "branch": "master",
-    "commit": "5d5ad196fcde223509d7dabbade0148f7884c5e3"
-  },
-  "cmp_dynamic": {
-    "branch": "main",
-    "commit": "93f057a8cae33e32565ccfb68ca8629bec7554dc"
-  },
-  "cmp_luasnip": {
-    "branch": "master",
-    "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843"
-  },
-  "codeium": {
-    "branch": "main",
-    "commit": "d3b88eb3aa1de6da33d325c196b8a41da2bcc825"
-  },
-  "colorizer": {
-    "branch": "master",
-    "commit": "85855b38011114929f4058efc97af1059ab3e41d"
-  },
-  "comment": {
-    "branch": "main",
-    "commit": "c8406379987c321ecdef9f53e1ca741a55002104"
-  },
-  "conform": {
-    "branch": "master",
-    "commit": "07d1298739cd7c616cb683bfd848f6b369f93297"
-  },
-  "context": {
-    "branch": "master",
-    "commit": "5efba33af0f39942e426340da7bc15d7dec16474"
-  },
-  "context_comment": {
-    "branch": "main",
-    "commit": "cb064386e667def1d241317deed9fd1b38f0dc2e"
-  },
-  "csv.vim": {
-    "branch": "master",
-    "commit": "0a4361efb247fa98065e37fdf5e8dcf39f4219dd"
-  },
-  "dadbod": {
-    "branch": "master",
-    "commit": "7888cb7164d69783d3dce4e0283decd26b82538b"
-  },
-  "dadbod_ui": {
-    "branch": "master",
-    "commit": "0dc68d9225a70d42f8645049482e090c1a8dce25"
-  },
-  "dap": {
-    "branch": "master",
-    "commit": "6f79b822997f2e8a789c6034e147d42bc6706770"
-  },
-  "dap_ui": {
-    "branch": "master",
-    "commit": "b7267003ba4dd860350be86f75b9d9ea287cedca"
-  },
-  "dap_virtual_text": {
-    "branch": "master",
-    "commit": "d7c695ea39542f6da94ee4d66176f5d660ab0a77"
-  },
-  "dial": {
-    "branch": "master",
-    "commit": "7af2daaaf933b0617ded0f78b49f4d5fc45f9f64"
-  },
-  "diffview.nvim": {
-    "branch": "main",
-    "commit": "3afa6a053f680e9f1329c4a151db988a482306cd"
-  },
-  "dressing": {
-    "branch": "master",
-    "commit": "e3714c8049b2243e792492c4149e4cc395c68eb9"
-  },
-  "dropbar": {
-    "branch": "master",
-    "commit": "2b546383bdf4daa254ac70c760ee1e5524bc60b1"
-  },
-  "edgy": {
-    "branch": "main",
-    "commit": "de79b7d92a5979cd71a9a1d8b6282515345e5055"
-  },
-  "endwise": {
-    "branch": "master",
-    "commit": "8b34305ffc28bd75a22f5a0a9928ee726a85c9a6"
-  },
-  "flash": {
-    "branch": "main",
-    "commit": "43f67935d388fbb540f8b40e8cbfd80de54f978a"
-  },
-  "friendly-snippets": {
-    "branch": "main",
-    "commit": "700c4a25caacbb4648c9a27972c2fe203948e0c2"
-  },
-  "fuzzy": {
-    "branch": "master",
-    "commit": "68608f6a232f7e73ccf81437bf12108128f15bd4"
-  },
-  "gentoo-syntax": {
-    "branch": "master",
-    "commit": "2bbb23d32d0546e78e7ecc3b310951b86c781780"
-  },
-  "gitsigns": {
-    "branch": "main",
-    "commit": "4a143f13e122ab91abdc88f89eefbe70a4858a56"
-  },
-  "headlines": {
-    "branch": "master",
-    "commit": "618ef1b2502c565c82254ef7d5b04402194d9ce3"
-  },
-  "icon": {
-    "branch": "master",
-    "commit": "c0cfc1738361b5da1cd0a962dd6f774cc444f856"
-  },
-  "indent": {
-    "branch": "master",
-    "commit": "d98f537c3492e87b6dc6c2e3f66ac517528f406f"
-  },
-  "indent_scope": {
-    "branch": "main",
-    "commit": "f0d7faa064c892b96997810afcddfadc3f2a15b3"
-  },
-  "lazy.nvim": {
-    "branch": "main",
-    "commit": "eb4957442e3182f051b0ae11da32e06d22c190e3"
-  },
-  "lsp": {
-    "branch": "master",
-    "commit": "4d38bece98300e3e5cd24a9aa0d0ebfea4951c16"
-  },
-  "lsp_inlay": {
-    "branch": "main",
-    "commit": "d981f65c9ae0b6062176f0accb9c151daeda6f16"
-  },
-  "lsp_lines": {
-    "branch": "main",
-    "commit": "7d9e2748b61bff6ebba6e30adbc7173ccf21c055"
-  },
-  "lspkind.nvim": {
-    "branch": "master",
-    "commit": "1735dd5a5054c1fb7feaf8e8658dbab925f4f0cf"
-  },
-  "lspsaga": {
-    "branch": "main",
-    "commit": "343b71768c741432bab47d201624e92126a38686"
-  },
-  "lualine": {
-    "branch": "master",
-    "commit": "0a5a66803c7407767b799067986b4dc3036e1983"
-  },
-  "luasnip": {
-    "branch": "master",
-    "commit": "50fcf17db7c75af80e6b6109acfbfb4504768780"
-  },
-  "mason": {
-    "branch": "main",
-    "commit": "0950b15060067f752fde13a779a994f59516ce3d"
-  },
-  "mason_dap": {
-    "branch": "main",
-    "commit": "f5425eb1d0d794f0305d5eeebddabb74614683ff"
-  },
-  "mason_lsp": {
-    "branch": "main",
-    "commit": "8db12610bcb7ce67013cfdfaba4dd47a23c6e851"
-  },
-  "middleclass": {
-    "branch": "master",
-    "commit": "9fab4d5bca67262614960960ca35c4740eb2be2c"
-  },
-  "neoconf": {
-    "branch": "main",
-    "commit": "c81b91fbb39d4d46aedca2d1eacaa2389ae0eeaa"
-  },
-  "neodev": {
-    "branch": "main",
-    "commit": "02893eeb9d6e8503817bd52385e111cba9a90500"
-  },
-  "neogen": {
-    "branch": "main",
-    "commit": "6de0add4805165317ab7d3d36b5cef48b1b865f3"
-  },
-  "neogit": {
-    "branch": "master",
-    "commit": "e11bd464f3a3b4b3af8ea0a8e54ee1b70fee7371"
-  },
-  "neomux": {
-    "branch": "master",
-    "commit": "c6d30e3d4890d54d341174091bdc558d29e1fd9d"
-  },
-  "neotest": {
-    "branch": "master",
-    "commit": "f30bab1faef13d47f3905e065215c96a42d075ad"
-  },
-  "neotest-dotnet": {
-    "branch": "main",
-    "commit": "caeb52b602fa8a5855c5839c338fb65b50a40ab3"
-  },
-  "neotest-go": {
-    "branch": "main",
-    "commit": "92950ad7be2ca02a41abca5c6600ff6ffaf5b5d6"
-  },
-  "neotest-java": {
-    "branch": "main",
-    "commit": "154c937b9bd8613b943a27b989813f0532fd80ed"
-  },
-  "neotest-jest": {
-    "branch": "main",
-    "commit": "514fd4eae7da15fd409133086bb8e029b65ac43f"
-  },
-  "neotest-phpunit": {
-    "branch": "main",
-    "commit": "baae8dfa0a3aaacd9f0bb6845d6348f5bcdc48bb"
-  },
-  "neotest-python": {
-    "branch": "master",
-    "commit": "2e83d2bc00acbcc1fd529dbf0a0e677cabfe6b50"
-  },
-  "neotest-rspec": {
-    "branch": "main",
-    "commit": "48573d5882cbe8d8bcd3b735d9ee7705168b1b87"
-  },
-  "neotest-vim-test": {
-    "branch": "master",
-    "commit": "75c4228882ae4883b11bfce9b8383e637eb44192"
-  },
-  "neotree": {
-    "branch": "main",
-    "commit": "206241e451c12f78969ff5ae53af45616ffc9b72"
-  },
-  "noice": {
-    "branch": "main",
-    "commit": "e5cb20c6e14305d24025ecb77d7d4dd9d61f1a64"
-  },
-  "none-ls-extras.nvim": {
-    "branch": "main",
-    "commit": "336e84b9e43c0effb735b08798ffac382920053b"
-  },
-  "notify": {
-    "branch": "master",
-    "commit": "d333b6f167900f6d9d42a59005d82919830626bf"
-  },
-  "nui": {
-    "branch": "main",
-    "commit": "322978c734866996274467de084a95e4f9b5e0b1"
-  },
-  "null_ls": {
-    "branch": "main",
-    "commit": "8691504118b252d64fc5023a104aedd100ab754a"
-  },
-  "obsidian": {
-    "branch": "main",
-    "commit": "c6bd6d93e4724ac2dc0cae73ebe1d568bf406537"
-  },
-  "open": {
-    "branch": "master",
-    "commit": "1cabf5fc2c0d59d6273c932546d5465104ad278f"
-  },
-  "osv": {
-    "branch": "main",
-    "commit": "e92abbce0b9b77fed1aaf6f122fb18b7045b15ec"
-  },
-  "otter": {
-    "branch": "main",
-    "commit": "cbb1be0586eae18cbea38ada46af428d2bebf81a"
-  },
-  "overseer": {
-    "branch": "master",
-    "commit": "6271cab7ccc4ca840faa93f54440ffae3a3918bd"
-  },
-  "pantran": {
-    "branch": "main",
-    "commit": "250b1d8e81f83e6aff061f4c75db008c684f5971"
-  },
-  "playground": {
-    "branch": "master",
-    "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749"
-  },
-  "plenary": {
-    "branch": "master",
-    "commit": "a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683"
-  },
-  "promise-async": {
-    "branch": "main",
-    "commit": "28c1d5a295eb5310afa2523d4ae9aa41ec5a9de2"
-  },
-  "rainbow": {
-    "branch": "master",
-    "commit": "073e45546acaff6b4248e3faea8e67b399d3e864"
-  },
-  "rainbow_csv": {
-    "branch": "master",
-    "commit": "bb2f154fd9c2bedb6513aa533baa7769e57874f2"
-  },
-  "refactoring": {
-    "branch": "master",
-    "commit": "d2786877c91aa409c824f27b4ce8a9f560dda60a"
-  },
-  "regexplainer": {
-    "branch": "main",
-    "commit": "bc8d06fecb51148216e7b548217d29d31cee3de9"
-  },
-  "rest": {
-    "branch": "main",
-    "commit": "c7944769dc489b9e4bc493e40820c2818eab2569"
-  },
-  "session": {
-    "branch": "main",
-    "commit": "a36b78d12fc16c938ba7a1e5ad1300d43c8bb848"
-  },
-  "smartcolumn": {
-    "branch": "main",
-    "commit": "cefb17be095ad5526030a21bb2a80553cae09127"
-  },
-  "statuscol": {
-    "branch": "main",
-    "commit": "2eaca29ef3079dedc484dbd7824ad723e8d35676"
-  },
-  "surround": {
-    "branch": "main",
-    "commit": "27096c1a27324ee8f2044ea2adc77366d8a782de"
-  },
-  "tabout": {
-    "branch": "master",
-    "commit": "3d7fbc7f5e91ef0f96b4d787c78ad9f8820de3ec"
-  },
-  "telescope": {
-    "branch": "master",
-    "commit": "f12b15e1b3a33524eb06a1ae7bc852fb1fd92197"
-  },
-  "telescope-fzf-native.nvim": {
-    "branch": "main",
-    "commit": "9ef21b2e6bb6ebeaf349a0781745549bbb870d27"
-  },
-  "text_object": {
-    "branch": "master",
-    "commit": "34867c69838078df7d6919b130c0541c0b400c47"
-  },
-  "textcase": {
-    "branch": "main",
-    "commit": "d62c63a4e9a996c7321885937ab89920fca2c1c8"
-  },
-  "todo": {
-    "branch": "main",
-    "commit": "9c104cf7868f1c739b43a07e5593666cc9de2d67"
-  },
-  "toggleterm": {
-    "branch": "main",
-    "commit": "fee58a0473fd92b28c34f8f724e4918b15ba30a3"
-  },
-  "treesitter": {
-    "branch": "master",
-    "commit": "9a7ad2ff7a7ea81016aca2fc89c9b2c1a5365421"
-  },
-  "trouble": {
-    "branch": "main",
-    "commit": "483eb2d7590b3b87cf159e3bdf96170eaaa361e8"
-  },
-  "ufo": {
-    "branch": "main",
-    "commit": "aa2e676af592b4e99c105d80d6eafd1afc215d99"
-  },
-  "ultimate_autopair": {
-    "branch": "v0.6",
-    "commit": "035d92eab05ac1390afef7204e3fcad9a50fa443"
-  },
-  "vim-projectionist": {
-    "branch": "master",
-    "commit": "729f3630a4c19e52e1fd825802d2a1659daeaf48"
-  },
-  "vim-snippets": {
-    "branch": "master",
-    "commit": "96d79529edc3dee1ccf2ce7b75a88cb546ec2501"
-  },
-  "vim-startuptime": {
-    "branch": "master",
-    "commit": "ac2cccb5be617672add1f4f3c0a55ce99ba34e01"
-  },
-  "vim-test": {
-    "branch": "master",
-    "commit": "6acc7d96487abaaa57a19b0d43efaea6633d6bb7"
-  },
-  "whichkey": {
-    "branch": "main",
-    "commit": "0099511294f16b81c696004fa6a403b0ae61f7a0"
-  },
-  "window": {
-    "branch": "main",
-    "commit": "dd0a6b230003ef35524853d71e5413f88fd2ba74"
-  },
-  "winex": {
-    "branch": "main",
-    "commit": "c7492552b23d0ab30325e90b56066ec51242adc8"
-  },
-  "yaml_companion": {
-    "branch": "main",
-    "commit": "d190d6c0852a1b3fd2798cf1529655f7f68655d3"
-  }
+  "align": { "branch": "main", "commit": "b54d88b16bfac62ca6b3d699566135639a3ca4fa" },
+  "animation.nvim": { "branch": "main", "commit": "fb77091ab72ec9971aee0562e7081182527aaa6a" },
+  "autopairs": { "branch": "master", "commit": "78a4507bb9ffc9b00f11ae0ac48243d00cb9194d" },
+  "autotag": { "branch": "main", "commit": "323a3e16ed603e2e17b26b1c836d1e86c279f726" },
+  "bufferline": { "branch": "main", "commit": "aa16dafdc642594c7ade7e88d31a6119feb189d6" },
+  "catppuccin": { "branch": "main", "commit": "7946d1a195c66fed38b3e34f9fa8e0c5a2da0700" },
+  "chatgpt": { "branch": "main", "commit": "f081338f07216a46d3915ce46c1fcb083bcb5016" },
+  "cmp": { "branch": "main", "commit": "a110e12d0b58eefcf5b771f533fc2cf3050680ac" },
+  "cmp-async-path": { "branch": "main", "commit": "9d581eec5acf812316913565c135b0d1ee2c9a71" },
+  "cmp-calc": { "branch": "main", "commit": "5947b412da67306c5b68698a02a846760059be2e" },
+  "cmp-cmdline": { "branch": "main", "commit": "d250c63aa13ead745e3a40f61fdd3470efde3923" },
+  "cmp-dap": { "branch": "master", "commit": "ea92773e84c0ad3288c3bc5e452ac91559669087" },
+  "cmp-fish": { "branch": "main", "commit": "3a23492e2aead05522a9887ec685d70e8c987323" },
+  "cmp-fuzzy-buffer": { "branch": "main", "commit": "ada6352bc7e3c32471ab6c08f954001870329de1" },
+  "cmp-fuzzy-path": { "branch": "master", "commit": "9953c11a2510a04111b7b152cf50ae1e83f00798" },
+  "cmp-nvim-lsp": { "branch": "main", "commit": "39e2eda76828d88b773cc27a3f61d2ad782c922d" },
+  "cmp-tmux": { "branch": "main", "commit": "95b1b921802e6f60627b3e76afb9380fddd87f9a" },
+  "cmp_dadbod": { "branch": "master", "commit": "8c9051c1cfc73fcf5bfe9a84db7097e4f7c0180d" },
+  "cmp_dynamic": { "branch": "main", "commit": "93f057a8cae33e32565ccfb68ca8629bec7554dc" },
+  "cmp_luasnip": { "branch": "master", "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843" },
+  "codeium": { "branch": "main", "commit": "f6a2ef32a9e923cb0104a19d3e426b0e40e49505" },
+  "colorizer": { "branch": "master", "commit": "85855b38011114929f4058efc97af1059ab3e41d" },
+  "comment": { "branch": "main", "commit": "080f00bb91fea4bab799820bd2ce835a88d0703a" },
+  "conform": { "branch": "master", "commit": "cd75be867f2331b22905f47d28c0c270a69466aa" },
+  "context": { "branch": "master", "commit": "f56a1430f21334868a86eb980b12e0af55690e98" },
+  "context_comment": { "branch": "main", "commit": "6b5f95aa4d24f2c629a74f2c935c702b08dbde62" },
+  "csv.vim": { "branch": "master", "commit": "0a4361efb247fa98065e37fdf5e8dcf39f4219dd" },
+  "dadbod": { "branch": "master", "commit": "7888cb7164d69783d3dce4e0283decd26b82538b" },
+  "dadbod_ui": { "branch": "master", "commit": "d2ffc1bdae3041105f3b57423e0e81a5d9429267" },
+  "dap": { "branch": "master", "commit": "6f79b822997f2e8a789c6034e147d42bc6706770" },
+  "dap_ui": { "branch": "master", "commit": "754104da429457bff733444a3048bc8296daf775" },
+  "dap_virtual_text": { "branch": "master", "commit": "484995d573c0f0563f6a66ebdd6c67b649489615" },
+  "dial": { "branch": "master", "commit": "750f802879c90ea51f92b68c35fa562ee575804a" },
+  "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
+  "dressing": { "branch": "master", "commit": "6741f1062d3dc6e4755367a7e9b347b553623f04" },
+  "dropbar": { "branch": "master", "commit": "cab5e0226bc4f90a28cadcb0dc7341d550f1bdf0" },
+  "edgy": { "branch": "main", "commit": "64009ec349a36f5df9bda25582a537192ec076cf" },
+  "endwise": { "branch": "master", "commit": "8b34305ffc28bd75a22f5a0a9928ee726a85c9a6" },
+  "flash": { "branch": "main", "commit": "ec0bf2842189f65f60fd40bf3557cac1029cc932" },
+  "friendly-snippets": { "branch": "main", "commit": "45a1b96e46efe5fce8af325d4bed45feb9d29d0f" },
+  "fuzzy": { "branch": "master", "commit": "68608f6a232f7e73ccf81437bf12108128f15bd4" },
+  "gentoo-syntax": { "branch": "master", "commit": "2bbb23d32d0546e78e7ecc3b310951b86c781780" },
+  "gitsigns": { "branch": "main", "commit": "e9c4187c3774a46df2d086a66cf3a7e6bea4c432" },
+  "headlines": { "branch": "master", "commit": "618ef1b2502c565c82254ef7d5b04402194d9ce3" },
+  "hererocks": { "branch": "master", "commit": "8bd2fcfdd65cfa7535ce39ea372a63b0bdb8e528" },
+  "icon": { "branch": "master", "commit": "c0cfc1738361b5da1cd0a962dd6f774cc444f856" },
+  "indent": { "branch": "master", "commit": "65e20ab94a26d0e14acac5049b8641336819dfc7" },
+  "indent_scope": { "branch": "main", "commit": "1222393d9c5e8d92b913ccab6701a7164b21781c" },
+  "lazy.nvim": { "branch": "main", "commit": "1d451b4c2ce957da05e2123ce1a001804fc7ea96" },
+  "lsp": { "branch": "master", "commit": "216deb2d1b5fbf24398919228208649bbf5cbadf" },
+  "lsp_inlay": { "branch": "main", "commit": "d981f65c9ae0b6062176f0accb9c151daeda6f16" },
+  "lsp_lines": { "branch": "main", "commit": "7d9e2748b61bff6ebba6e30adbc7173ccf21c055" },
+  "lspkind.nvim": { "branch": "master", "commit": "1735dd5a5054c1fb7feaf8e8658dbab925f4f0cf" },
+  "lspsaga": { "branch": "main", "commit": "6f920cfabddb9b7de5a3a4d0b7cd4f0774ae23e2" },
+  "lualine": { "branch": "master", "commit": "6a40b530539d2209f7dc0492f3681c8c126647ad" },
+  "luasnip": { "branch": "master", "commit": "ce0a05ab4e2839e1c48d072c5236cce846a387bc" },
+  "mason": { "branch": "main", "commit": "f96a31855fa8aea55599cea412fe611b85a874ed" },
+  "mason_dap": { "branch": "main", "commit": "4ba55f9755ebe8297d92c419b90a946123292ae6" },
+  "mason_lsp": { "branch": "main", "commit": "37a336b653f8594df75c827ed589f1c91d91ff6c" },
+  "middleclass": { "branch": "master", "commit": "9fab4d5bca67262614960960ca35c4740eb2be2c" },
+  "neoconf": { "branch": "main", "commit": "519b6777ef2c1d9d0d944b090a51bd83022c0103" },
+  "neodev": { "branch": "main", "commit": "46aa467dca16cf3dfe27098042402066d2ae242d" },
+  "neogen": { "branch": "main", "commit": "6de0add4805165317ab7d3d36b5cef48b1b865f3" },
+  "neogit": { "branch": "master", "commit": "a20031fb5d7d12148764764059243135085e5c9b" },
+  "neomux": { "branch": "master", "commit": "c6d30e3d4890d54d341174091bdc558d29e1fd9d" },
+  "neotest": { "branch": "master", "commit": "0fe9186afac9b7874ba304fd28d6325d07e5e274" },
+  "neotest-dotnet": { "branch": "main", "commit": "caeb52b602fa8a5855c5839c338fb65b50a40ab3" },
+  "neotest-go": { "branch": "main", "commit": "92950ad7be2ca02a41abca5c6600ff6ffaf5b5d6" },
+  "neotest-java": { "branch": "main", "commit": "b48bd1621b532106ab8d1ba18e8a7bda4463ccc6" },
+  "neotest-jest": { "branch": "main", "commit": "514fd4eae7da15fd409133086bb8e029b65ac43f" },
+  "neotest-phpunit": { "branch": "main", "commit": "baae8dfa0a3aaacd9f0bb6845d6348f5bcdc48bb" },
+  "neotest-python": { "branch": "master", "commit": "2e83d2bc00acbcc1fd529dbf0a0e677cabfe6b50" },
+  "neotest-rspec": { "branch": "main", "commit": "48573d5882cbe8d8bcd3b735d9ee7705168b1b87" },
+  "neotest-vim-test": { "branch": "master", "commit": "75c4228882ae4883b11bfce9b8383e637eb44192" },
+  "neotree": { "branch": "main", "commit": "206241e451c12f78969ff5ae53af45616ffc9b72" },
+  "noice": { "branch": "main", "commit": "622d7e5b676605ce62569cf2bd15d06c825d0043" },
+  "noice.nvim": { "branch": "main", "commit": "622d7e5b676605ce62569cf2bd15d06c825d0043" },
+  "none-ls-extras.nvim": { "branch": "main", "commit": "ac3b973aa3fabddcb59a493570c63f913ebdb821" },
+  "notify": { "branch": "master", "commit": "d333b6f167900f6d9d42a59005d82919830626bf" },
+  "nui": { "branch": "main", "commit": "61574ce6e60c815b0a0c4b5655b8486ba58089a1" },
+  "null_ls": { "branch": "main", "commit": "0d1b3fa2ad0b371b94cb4b9a27ba6e5a1a915c91" },
+  "obsidian": { "branch": "main", "commit": "ae1f76a75c7ce36866e1d9342a8f6f5b9c2caf9b" },
+  "open": { "branch": "master", "commit": "1cabf5fc2c0d59d6273c932546d5465104ad278f" },
+  "osv": { "branch": "main", "commit": "730189c92c6fd80eb92bb6c1886392a142dba273" },
+  "otter": { "branch": "main", "commit": "0765951b40914ea895f644fdd18489e0c6553456" },
+  "overseer": { "branch": "master", "commit": "15b6249eaf71ebbc8bf0ed279e045f2bc1f28007" },
+  "pantran": { "branch": "main", "commit": "250b1d8e81f83e6aff061f4c75db008c684f5971" },
+  "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" },
+  "plenary": { "branch": "master", "commit": "a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683" },
+  "plenary.nvim": { "branch": "master", "commit": "a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683" },
+  "promise-async": { "branch": "main", "commit": "28c1d5a295eb5310afa2523d4ae9aa41ec5a9de2" },
+  "rainbow": { "branch": "master", "commit": "b29da4a6061a88270e875b38367d82c04c856128" },
+  "rainbow_csv": { "branch": "master", "commit": "3dbbfd7d17536aebfb80f571255548495574c32b" },
+  "refactoring": { "branch": "master", "commit": "d07218748c48e756c27aa6859bfa6e62a3d271af" },
+  "regexplainer": { "branch": "main", "commit": "bc8d06fecb51148216e7b548217d29d31cee3de9" },
+  "rest": { "branch": "main", "commit": "e7843c55f9df6a9db9f97dac180035c6ff895a90" },
+  "session": { "branch": "main", "commit": "67957ec024eed007edef1a253a66a49719baec17" },
+  "smartcolumn": { "branch": "main", "commit": "cefb17be095ad5526030a21bb2a80553cae09127" },
+  "statuscol": { "branch": "main", "commit": "d6f7f5437c5404d958b88bb73e0721b1c0e09223" },
+  "surround": { "branch": "main", "commit": "28e2821bcccf4a1891d0ad2e49a056602ca03929" },
+  "tabout": { "branch": "master", "commit": "3d7fbc7f5e91ef0f96b4d787c78ad9f8820de3ec" },
+  "telescope": { "branch": "master", "commit": "bfcc7d5c6f12209139f175e6123a7b7de6d9c18a" },
+  "telescope-fzf-native.nvim": { "branch": "main", "commit": "cf48d4dfce44e0b9a2e19a008d6ec6ea6f01a83b" },
+  "text_object": { "branch": "master", "commit": "34867c69838078df7d6919b130c0541c0b400c47" },
+  "textcase": { "branch": "main", "commit": "ec9925b27dd54809653cc766b8673acd979a888e" },
+  "todo": { "branch": "main", "commit": "313b04e5b02d29ab9275c9295ff5e2b73921b0eb" },
+  "toggleterm": { "branch": "main", "commit": "cd55bf6aab3f88c259fa29ea86bbdcb1a325687d" },
+  "treesitter": { "branch": "master", "commit": "972aa544efb56e2f2f53c5f3c2537e43467dd5cb" },
+  "trouble": { "branch": "main", "commit": "4453fea6bb597830fbd58d2c484612f37b97bd8c" },
+  "ufo": { "branch": "main", "commit": "a57e088487f099197246fd24be7423c6c4dedcef" },
+  "ultimate_autopair": { "branch": "v0.6", "commit": "035d92eab05ac1390afef7204e3fcad9a50fa443" },
+  "vim-projectionist": { "branch": "master", "commit": "3736bd4a5f23b30821cbb892385bb1f1b0088cfc" },
+  "vim-snippets": { "branch": "master", "commit": "96d79529edc3dee1ccf2ce7b75a88cb546ec2501" },
+  "vim-startuptime": { "branch": "master", "commit": "ac2cccb5be617672add1f4f3c0a55ce99ba34e01" },
+  "vim-test": { "branch": "master", "commit": "34aab77f7a63f20a623df45684156915f6182a55" },
+  "whichkey": { "branch": "main", "commit": "af4ded85542d40e190014c732fa051bdbf88be3d" },
+  "window": { "branch": "main", "commit": "dd0a6b230003ef35524853d71e5413f88fd2ba74" },
+  "winex": { "branch": "main", "commit": "c7492552b23d0ab30325e90b56066ec51242adc8" },
+  "yaml_companion": { "branch": "main", "commit": "d190d6c0852a1b3fd2798cf1529655f7f68655d3" }
 }
