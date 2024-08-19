@@ -48,5 +48,17 @@ vim.g.firenvim_config = {
       priority = 9,
       takeover = 'never',
     },
+    [ [[.*\.sharepoint\.com.*]] ] = {
+      priority = 9,
+      takeover = 'never',
+    },
+    [ [[.*\.office\.com.*]] ] = {
+      priority = 9,
+      takeover = 'never',
+    },
+    [ [[.*\.teams.microsoft\.com.*]] ] = {
+      priority = 9,
+      takeover = 'never',
+    },
   },
 }
