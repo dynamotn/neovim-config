@@ -38,16 +38,21 @@ M.register_keymaps = function(plugin)
 
   local load_whichkey_keymaps = function(args)
     local whichkey = require('which-key')
+    if args ~= nil then
+      args = function()
+        return require('which-key.extras').expand.buf()
+      end
+    end
 
     for _, keymap in ipairs(keymaps) do
       if keymap[2] then
-        whichkey.register({
-          [keymap[1]] = { keymap[2], keymap['desc'] },
-        }, args)
+        whichkey.add({
+          { keymap[1], keymap[2], desc = keymap['desc'], expand = args },
+        })
       else
-        whichkey.register({
-          [keymap[1]] = { name = keymap['desc'] },
-        }, args)
+        whichkey.add({
+          { keymap[1], group = keymap['desc'], expand = args },
+        })
       end
     end
   end
@@ -59,7 +64,7 @@ M.register_keymaps = function(plugin)
       pattern = plugin.ft,
       group = vim.api.nvim_create_augroup('whichkey_' .. plugin.name, {}),
       callback = function()
-        load_whichkey_keymaps({ buffer = 0 })
+        load_whichkey_keymaps(true)
       end,
     })
   else

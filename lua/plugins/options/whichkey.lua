@@ -1,18 +1,12 @@
 local whichkey = require('which-key')
 
 whichkey.setup({
-  key_labels = {
-    ['<space>'] = '<Space>',
-    ['<cr>'] = '<⏎>',
-    ['<tab>'] = '<Tab>',
-    ['<leader>'] = '<Leader>',
-  },
   icons = {
     breadcrumn = '»',
     separator = '→',
     group = '⍟ ',
   },
-  window = {
+  win = {
     border = 'single',
   },
   layout = {
