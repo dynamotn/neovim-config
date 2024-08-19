@@ -130,7 +130,8 @@ lualine.setup({
       {
         function(msg)
           msg = msg or icons.lsp .. 'Inactive'
-          local buf_clients = vim.lsp.buf_get_clients()
+          local b = vim.api.nvim_get_current_buf()
+          local buf_clients = vim.lsp.get_clients({ bufnr = b })
           if next(buf_clients) == nil then
             return msg
           end
