@@ -1,3 +1,3 @@
 return {
-  { 'fish', 'diagnostics' },
+  { 'fish', 'diagnostics', is_mason_tool = false },
 }
