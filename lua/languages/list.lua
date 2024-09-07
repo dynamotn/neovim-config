@@ -6,6 +6,9 @@ return {
     'sh',
     'bats',
   },
+  bicep = {
+    'bicep',
+  },
   c = { 'c' },
   cpp = { 'cpp' },
   c_sharp = { 'cs' },

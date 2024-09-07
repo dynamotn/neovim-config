@@ -68,6 +68,7 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 
 #### Tools & Markup
 * Ansible
+* Bicep
 * CSV
 * D2
 * DBML

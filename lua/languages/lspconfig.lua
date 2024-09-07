@@ -93,7 +93,13 @@ M.jsonls = function(default_opts)
       validate = { enable = true },
     },
   }
+  return opts
+end
 
+M.bicep = function(default_opts)
+  local opts = vim.deepcopy(default_opts)
+  opts.cmd = { 'bicep-lsp' }
+  opts.root_dir = require('util.root').get
   return opts
 end
 
