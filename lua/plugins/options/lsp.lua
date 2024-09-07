@@ -31,8 +31,8 @@ local default_opts = {
 local configs = languages.setup_ls()
 for server_name, config in pairs(configs) do
   if lspconfig[server_name] then
+    default_opts.filetypes = vim.deepcopy(config.filetypes)
     local opts = config.setup(default_opts)
-    opts.filetypes = config.filetypes
 
     local present, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
     if present then

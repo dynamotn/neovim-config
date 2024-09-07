@@ -1,7 +1,7 @@
 local M = {}
 
 M.lua_ls = function(default_opts)
-  local opts = default_opts
+  local opts = vim.deepcopy(default_opts)
   opts.settings = {
     Lua = {
       diagnostics = {
@@ -29,7 +29,7 @@ M.lua_ls = function(default_opts)
 end
 
 M.yamlls = function(default_opts)
-  local opts = default_opts
+  local opts = vim.deepcopy(default_opts)
   opts.settings = {
     redhat = { telemetry = { enabled = false } },
     yaml = {
@@ -54,7 +54,6 @@ end
 
 M.sqls = function(default_opts)
   local opts = vim.deepcopy(default_opts)
-
   opts.on_attach = function(client, buffer)
     default_opts.on_attach(client, buffer)
 
@@ -64,13 +63,11 @@ M.sqls = function(default_opts)
       vim.api.nvim_buf_create_user_command(buffer, 'SqlsEditConnections', 'split ~/.config/sqls/config.yml', {})
     end
   end
-
   return opts
 end
 
 M.gopls = function(default_opts)
-  local opts = default_opts
-
+  local opts = vim.deepcopy(default_opts)
   opts.settings = {
     gopls = {
       hints = {
@@ -83,13 +80,11 @@ M.gopls = function(default_opts)
       },
     },
   }
-
   return opts
 end
 
 M.jsonls = function(default_opts)
-  local opts = default_opts
-
+  local opts = vim.deepcopy(default_opts)
   opts.settings = {
     json = {
       format = {
