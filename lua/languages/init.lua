@@ -264,7 +264,11 @@ M.get_tools_by_filetype = function(filetype)
               if source.is_custom_tool then
                 result[tool] = false
               else
-                result[tool] = true
+                if source.is_mason_tool ~= nil then
+                  result[tool] = source.is_mason_tool
+                else
+                  result[tool] = true
+                end
               end
             end
           end
