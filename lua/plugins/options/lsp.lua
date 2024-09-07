@@ -22,9 +22,11 @@ local default_opts = {
     end
   end,
   on_exit = function(_, _)
-    augroup.disable_highlight_document()
-    augroup.disable_codelens()
-    augroup.disable_formatting()
+    vim.schedule(function()
+      augroup.disable_highlight_document()
+      augroup.disable_codelens()
+      augroup.disable_formatting()
+    end)
   end,
 }
 
