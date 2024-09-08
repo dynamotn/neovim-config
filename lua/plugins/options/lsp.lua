@@ -21,7 +21,6 @@ local default_opts = {
     vim.schedule(function()
       augroup.disable_highlight_document()
       augroup.disable_codelens()
-      augroup.disable_formatting()
     end)
   end,
 }
