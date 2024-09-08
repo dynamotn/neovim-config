@@ -10,15 +10,11 @@ local default_opts = {
     augroup.enable_highlight_document(client.id)
     augroup.enable_hover(client.id)
     augroup.enable_codelens(client.id)
+    augroup.enable_inlayhint(client.id)
 
     local present, colorizer = pcall(require, 'colorizer')
     if present then
       colorizer.attach_to_buffer(buffer)
-    end
-
-    local present, lsp_inlay = pcall(require, 'lsp-inlayhints')
-    if present then
-      lsp_inlay.on_attach(client, buffer)
     end
   end,
   on_exit = function(_, _)

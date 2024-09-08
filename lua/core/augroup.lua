@@ -226,6 +226,17 @@ M.disable_codeaction = function()
   vim.api.nvim_del_augroup_by_name('codeaction_lsp')
 end
 
+M.enable_inlayhint = function(client_id)
+  local client_ok, method_supported = pcall(function()
+    return vim.lsp.get_client_by_id(client_id).server_capabilities.inlayHintProvider
+  end)
+  if not client_ok or not method_supported then
+    return
+  end
+
+  vim.lsp.inlay_hint.enable(true)
+end
+
 -- Install TS parsers for window buffer
 M.auto_install_ts_parser = function()
   vim.api.nvim_create_autocmd({ 'FileType' }, {
