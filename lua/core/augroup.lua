@@ -154,10 +154,6 @@ M.enable_highlight_document = function(client_id)
   })
 end
 
-M.disable_highlight_document = function()
-  vim.api.nvim_del_augroup_by_name('highlight_lsp')
-end
-
 M.enable_codelens = function(client_id)
   local client_ok, method_supported = pcall(function()
     return vim.lsp.get_client_by_id(client_id).server_capabilities.codeLensProvider
@@ -174,10 +170,6 @@ M.enable_codelens = function(client_id)
       vim.lsp.codelens.display(nil, vim.api.nvim_get_current_buf(), client_id)
     end,
   })
-end
-
-M.disable_codelens = function()
-  vim.api.nvim_del_augroup_by_name('codelens_lsp')
 end
 
 M.enable_hover = function(client_id)
@@ -201,10 +193,6 @@ M.enable_hover = function(client_id)
   })
 end
 
-M.disable_hover = function()
-  vim.api.nvim_del_augroup_by_name('hover_lsp')
-end
-
 M.enable_codeaction = function(client_id)
   local client_ok, method_supported = pcall(function()
     return vim.lsp.get_client_by_id(client_id).server_capabilities.codeActionProvider
@@ -220,10 +208,6 @@ M.enable_codeaction = function(client_id)
       vim.lsp.buf.code_action()
     end,
   })
-end
-
-M.disable_codeaction = function()
-  vim.api.nvim_del_augroup_by_name('codeaction_lsp')
 end
 
 M.enable_inlayhint = function(client_id)

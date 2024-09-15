@@ -17,12 +17,6 @@ local default_opts = {
       colorizer.attach_to_buffer(buffer)
     end
   end,
-  on_exit = function(_, _)
-    vim.schedule(function()
-      augroup.disable_highlight_document()
-      augroup.disable_codelens()
-    end)
-  end,
 }
 
 local configs = languages.setup_ls()
