@@ -76,6 +76,7 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 * Git (rebase, commit)
 * GoTemplate (Helm template...)
 * HTTP
+* Hyprlang
 * JSON
 * Markdown
 * Nix

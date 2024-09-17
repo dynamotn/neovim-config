@@ -51,6 +51,7 @@ return {
   gitcommit = { 'gitcommit', 'NeogitCommitMessage' },
   gotmpl = { 'gotmpl' },
   http = { 'http' },
+  hyprlang = { 'hyprlang' },
   json = {
     'json',
     'jsonc',

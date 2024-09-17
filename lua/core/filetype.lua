@@ -34,5 +34,6 @@ vim.filetype.add({
         return require('util.filetype').detect_gotemplate(bufnr)
       end,
     },
+    ['.*/hypr/.*%.conf'] = 'hyprlang',
   },
 })
