@@ -60,5 +60,9 @@ vim.g.firenvim_config = {
       priority = 9,
       takeover = 'never',
     },
+    [ [[.*github\.com\/.*\/blob\/.*]] ] = {
+      priority = 9,
+      takeover = 'never',
+    },
   },
 }
