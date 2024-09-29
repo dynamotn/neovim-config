@@ -1,2 +1,3 @@
 IS_GENTOO = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
 IS_GUI_MACHINE = {{ ne .guiServer "0" }}
+ENABLED_OBSIDIAN = {{ eq .kind "pc" "laptop" "tablet" }}

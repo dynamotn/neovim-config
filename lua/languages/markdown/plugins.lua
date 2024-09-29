@@ -15,6 +15,7 @@ return {
     'epwalsh/obsidian.nvim',
     name = 'obsidian',
     dependencies = { 'plenary' },
+    enabled = ENABLED_OBSIDIAN,
   },
   {
     -- LSP for codeblocks
