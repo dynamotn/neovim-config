@@ -1,5 +1,2 @@
-{{- if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
-IS_GENTOO = true
-{{- else }}
-IS_GENTOO = false
-{{- end }}
+IS_GENTOO = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
+IS_GUI_MACHINE = {{ ne .guiServer "0" }}
