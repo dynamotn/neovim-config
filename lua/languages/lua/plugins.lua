@@ -2,7 +2,7 @@ return {
   { -- Neovim debugger
     'jbyuki/one-small-step-for-vimkind',
     name = 'osv',
-    cond = DEBUG,
+    enabled = DEBUG,
   },
   {
     -- Neovim development

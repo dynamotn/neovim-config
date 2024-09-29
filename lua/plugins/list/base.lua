@@ -8,7 +8,7 @@ return {
     -- View startup timing
     'dstein64/vim-startuptime',
     cmd = 'StartupTime',
-    cond = DEBUG,
+    enabled = DEBUG,
   },
   {
     -- Show guide of keymaps

@@ -11,7 +11,7 @@ return {
     name = 'playground',
     dependencies = { 'treesitter' },
     cmd = 'TSPlaygroundToggle',
-    cond = DEBUG,
+    enabled = DEBUG,
   },
   {
     -- Automatically ínstall language server, linter, dap server
