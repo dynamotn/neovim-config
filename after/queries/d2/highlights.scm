@@ -1,3 +1,5 @@
+;-------------------------------------------------------------------------------
+
 (container_key) @string.special
 (shape_key) @variable
 (attr_key) @property
@@ -11,6 +13,10 @@
 ] @keyword
 
 (keyword_underscore) @keyword.return
+
+; Literals
+;-------------------------------------------------------------------------------
+
 (string) @string
 (container_key (string (string_fragment) @string))
 (shape_key (string (string_fragment) @string))
@@ -20,12 +26,27 @@
 (integer) @number
 (float) @float
 (boolean) @boolean
+
+; Comments
+;-------------------------------------------------------------------------------
+
 [
   (language)
   (line_comment)
   (block_comment)
 ] @comment
-(arrow) @operator ; label
+
+; Punctiation
+;-------------------------------------------------------------------------------
+
+(arrow) @operator
+
+[
+  (dot)
+  (colon)
+  ";"
+] @punctuation.delimiter
+
 [
   "["
   "]"
@@ -33,4 +54,8 @@
   "}"
   "|"
 ] @punctuation.bracket
-[ ";" (dot) ] @punctuation.delimiter
+
+; Special
+;-------------------------------------------------------------------------------
+
+(ERROR) @error
