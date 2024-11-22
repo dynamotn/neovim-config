@@ -187,14 +187,14 @@ M.setup_null_ls = function()
     if ok then
       for _, source in ipairs(null_ls_config) do
         source.with_config = source.with_config or {}
-        source.with_config['extra_filetypes'] = {}
+        source.with_config['filetypes'] = {}
         local tool_kind = source[1] .. '_' .. source[2]
 
         if list_tools[tool_kind] == nil then
-          source.with_config['extra_filetypes'] = filetypes
+          source.with_config['filetypes'] = filetypes
         else
-          vim.list_extend(list_tools[tool_kind].with_config['extra_filetypes'], filetypes)
-          source.with_config['extra_filetypes'] = list_tools[tool_kind].with_config['extra_filetypes']
+          vim.list_extend(list_tools[tool_kind].with_config['filetypes'], filetypes)
+          source.with_config['filetypes'] = list_tools[tool_kind].with_config['filetypes']
         end
         list_tools[tool_kind] = source
       end
