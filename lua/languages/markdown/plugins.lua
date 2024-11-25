@@ -22,5 +22,6 @@ return {
     'jmbuhr/otter.nvim',
     name = 'otter',
     dependencies = { 'cmp', 'lsp' },
+    enabled = false,
   },
 }
