@@ -42,5 +42,6 @@ return {
       'nui',
       'telescope',
     },
+    enabled = os.getenv('OPENAI_API_KEY') ~= nil,
   },
 }
