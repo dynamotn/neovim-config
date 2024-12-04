@@ -150,7 +150,8 @@ lualine.setup({
       {
         function()
           local msg = icons.null_ls
-          for tool, _ in pairs(require('languages').get_tools_by_filetype(vim.bo.filetype)) do
+          local b = vim.api.nvim_get_current_buf()
+          for tool, _ in pairs(require('languages').get_tools_by_filetype(vim.api.nvim_buf_get_option(b, 'ft'))) do
             if vim.fn.executable(tool) == 1 then
               msg = msg .. tool .. ' '
             else
