@@ -15,6 +15,9 @@ function _G.dynamo_otter_extensions(arglead, _, _)
   end
   return out
 end
+if not ENABLED_OTTER then
+  return
+end
 vim.api.nvim_create_autocmd({ 'FileType' }, {
   group = vim.api.nvim_create_augroup('lspconfig', { clear = false }),
   pattern = 'markdown',
@@ -23,7 +26,7 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
     local ft = vim.api.nvim_get_option_value('filetype', { buf = buf })
     local matching_configs = require('lspconfig.util').get_config_by_ft(ft)
     for _, config in ipairs(matching_configs) do
-      print('Activating ', config.name, ' LspOtter in buffer ', buf, '...')
+      vim.notify('Activating ' .. config.name .. ' LspOtter in buffer ' .. buf .. '...')
       config.launch(buf)
     end
   end,

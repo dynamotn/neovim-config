@@ -1,6 +1,6 @@
 DEBUG = false
 FULL = false
-ENABLE_OTTER = false
+ENABLED_OTTER = true
 if vim.fn.has('nvim-0.10.0') == 1 then
   require('core')
   pcall(require, 'per_machine')

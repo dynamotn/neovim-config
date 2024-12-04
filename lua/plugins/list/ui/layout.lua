@@ -11,7 +11,7 @@ return {
     -- Notification
     'rcarriga/nvim-notify',
     name = 'notify',
-    event = 'UIEnter',
+    event = 'VeryLazy',
   },
   {
     -- Window layouts
