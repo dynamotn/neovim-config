@@ -7,8 +7,8 @@ return {
       require('lazy').load({ plugins = 'firenvim', wait = true })
       vim.fn['firenvim#install'](0)
     end,
-    enabled = IS_GUI_MACHINE,
-    cond = not not vim.g.started_by_firenvim,
+    enabled = IS_GUI_MACHINE or FULL,
+    cond = not not vim.g.started_by_firenvim or FULL,
     lazy = false,
   },
   {
@@ -42,6 +42,6 @@ return {
       'nui',
       'telescope',
     },
-    enabled = os.getenv('OPENAI_API_KEY') ~= nil,
+    enabled = os.getenv('OPENAI_API_KEY') ~= nil or FULL,
   },
 }

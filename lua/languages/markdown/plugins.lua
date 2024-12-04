@@ -3,7 +3,7 @@ return {
     'Saimo/peek.nvim',
     name = 'peek',
     build = 'deno task --quiet build:fast',
-    enabled = vim.fn.executable('deno') == 1,
+    enabled = vim.fn.executable('deno') == 1 or FULL,
   },
   {
     'MeanderingProgrammer/render-markdown.nvim', -- Highlight for headlines, codeblocks
@@ -15,13 +15,13 @@ return {
     'epwalsh/obsidian.nvim',
     name = 'obsidian',
     dependencies = { 'plenary' },
-    enabled = ENABLED_OBSIDIAN,
+    enabled = ENABLED_OBSIDIAN or FULL,
   },
   {
     -- LSP for codeblocks
     'jmbuhr/otter.nvim',
     name = 'otter',
     dependencies = { 'cmp', 'lsp' },
-    enabled = false,
+    enabled = ENABLE_OTTER or FULL,
   },
 }
