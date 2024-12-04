@@ -8,8 +8,7 @@ return {
       vim.fn['firenvim#install'](0)
     end,
     enabled = IS_GUI_MACHINE or FULL,
-    cond = not not vim.g.started_by_firenvim or FULL,
-    lazy = false,
+    lazy = not vim.g.started_by_firenvim,
   },
   {
     -- Terminal
