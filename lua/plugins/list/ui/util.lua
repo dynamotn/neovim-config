@@ -10,10 +10,10 @@ return {
     -- Foldtext customization
     'kevinhwang91/nvim-ufo',
     name = 'ufo',
-    event = 'BufReadPost',
     dependencies = {
       'kevinhwang91/promise-async',
     },
+    lazy = false,
   },
   {
     -- UI for dadbod
