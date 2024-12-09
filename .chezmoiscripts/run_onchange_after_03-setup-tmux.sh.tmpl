@@ -1,0 +1,8 @@
+#!{{ lookPath "bash" }}
+set -Eeou pipefail
+source {{ .chezmoi.sourceDir }}/../scripts/lib/message.sh
+trap "_error \"Can't setup neovim\"" ERR
+
+_notice "Setup neovim"
+nvim --headless "+Lazy! sync" +qa
+_success "Setup neovim"
