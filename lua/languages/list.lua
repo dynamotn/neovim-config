@@ -48,7 +48,7 @@ return {
   d2 = { 'd2' },
   dbml = { 'dbml' },
   dockerfile = { 'dockerfile' },
-  gitcommit = { 'gitcommit', 'NeogitCommitMessage' },
+  gitcommit = { 'gitcommit' },
   gotmpl = { 'gotmpl' },
   http = { 'http' },
   hyprlang = { 'hyprlang' },
