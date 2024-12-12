@@ -9,21 +9,21 @@ return {
   {
     'gi',
     function()
-      require('lspsaga.command').load_command('finder', 'imp')
+      require('lspsaga.command').load_command('finder', { 'imp' })
     end,
     desc = 'Go to implementation',
   },
   {
     'gt',
     function()
-      require('lspsaga.definition').load_command('peek_type_definition')
+      require('lspsaga.command').load_command('peek_type_definition')
     end,
     desc = 'Go to type definition',
   },
   {
     'gr',
     function()
-      require('lspsaga.command').load_command('finder', 'ref')
+      require('lspsaga.command').load_command('finder', { 'ref' })
     end,
     desc = 'Go to references',
   },
@@ -44,21 +44,21 @@ return {
   {
     '<Space>li',
     function()
-      require('lspsaga.command').load_command('incoming_calls')
+      require('lspsaga.command').load_command('incoming_calls', {})
     end,
     desc = 'Show incoming calls',
   },
   {
     '<Space>lo',
     function()
-      require('lspsaga.command').load_command('outgoing_calls')
+      require('lspsaga.command').load_command('outgoing_calls', {})
     end,
     desc = 'Show outgoing calls',
   },
   {
     '<Space>lr',
     function()
-      require('lspsaga.command').load_command('rename')
+      require('lspsaga.command').load_command('rename', {})
     end,
     desc = 'Rename',
   },
