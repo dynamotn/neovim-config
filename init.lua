@@ -1,6 +1,6 @@
 DEBUG = false
 FULL = false
-ENABLED_OTTER = true
+ENABLED_OTTER = false
 DEFAULT_ENABLED_LANGUAGES = {}
 if vim.fn.has('nvim-0.10.0') == 1 then
   require('core')
