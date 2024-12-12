@@ -111,6 +111,10 @@ M.get_parsers_by_filetype = function(filetype)
     return {}
   end
 
+  return M.get_parsers_by_language(language)
+end
+
+M.get_parsers_by_language = function(language)
   local ok, treesitter = pcall(require, 'languages.' .. language .. '.treesitter')
 
   local result = {}

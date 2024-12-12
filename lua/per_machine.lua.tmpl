@@ -1,3 +1,8 @@
 IS_GENTOO = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
 IS_GUI_MACHINE = {{ ne .guiServer "0" }}
 ENABLED_OBSIDIAN = {{ eq .kind "pc" "laptop" "tablet" }}
+{{- if eq .kind "container" }}
+DEFAULT_ENABLED_LANGUAGES = { 'gitcommit', 'bash' }
+{{- else }}
+DEFAULT_ENABLED_LANGUAGES = { 'gitcommit' }
+{{- end }}

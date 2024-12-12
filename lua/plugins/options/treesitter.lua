@@ -9,6 +9,10 @@ languages.setup_treesitter(parser_config)
 
 local parsers = { 'diff', 'regex', 'comment', 'query', 'vim' }
 
+for _, language in ipairs(DEFAULT_ENABLED_LANGUAGES) do
+  parsers = vim.tbl_extend('force', parsers, languages.get_parsers_by_language(language))
+end
+
 treesitter.setup({
   highlight = {
     enable = true,
