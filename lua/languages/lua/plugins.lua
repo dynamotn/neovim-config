@@ -6,7 +6,7 @@ return {
   },
   {
     -- Neovim development
-    'folke/neodev.nvim',
-    name = 'neodev',
+    'folke/lazydev.nvim',
+    name = 'lazydev',
   },
 }
