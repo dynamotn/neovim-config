@@ -59,6 +59,10 @@ M.get_ls_by_filetype = function(filetype)
     return {}
   end
 
+  return M.get_ls_by_language(language)
+end
+
+M.get_ls_by_language = function(language)
   local ok, server_names = pcall(require, 'languages.' .. language .. '.lsp')
 
   local result = {}
@@ -169,6 +173,10 @@ M.get_dap_by_filetype = function(filetype)
     return {}
   end
 
+  return M.get_dap_by_language(language)
+end
+
+M.get_dap_by_language = function(language)
   local ok, server_names = pcall(require, 'languages.' .. language .. '.dap')
 
   local result = {}
@@ -250,6 +258,42 @@ M.setup_conform = function()
   return result
 end
 
+M.get_tools_by_language = function(language, defaults)
+  local result = defaults
+  local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
+
+  if ok then
+    for _, source in ipairs(null_ls_config) do
+      if source.is_external_tool == true or source.is_external_tool == nil then
+        local tool = source.tool and source.tool or source[1]
+        if source.is_custom_tool then
+          result[tool] = false
+        else
+          if source.is_mason_tool ~= nil then
+            result[tool] = source.is_mason_tool
+          else
+            result[tool] = true
+          end
+        end
+      end
+    end
+  end
+
+  local ok, formatters = pcall(require, 'languages.' .. language .. '.formatter')
+  if ok then
+    for _, formatter in ipairs(formatters) do
+      if type(formatter) == 'table' then
+        local tool = formatter.tool and formatter.tool or formatter[1]
+        result[tool] = true
+      else
+        result[formatter] = true
+      end
+    end
+  end
+
+  return result
+end
+
 M.get_tools_by_filetype = function(filetype)
   local result = {
     ec = false,
@@ -259,41 +303,12 @@ M.get_tools_by_filetype = function(filetype)
   for language, filetypes in pairs(languages) do
     for _, ft in pairs(filetypes) do
       if ft == filetype then
-        local ok, null_ls_config = pcall(require, 'languages.' .. language .. '.null_ls')
-
-        if ok then
-          for _, source in ipairs(null_ls_config) do
-            if source.is_external_tool == true or source.is_external_tool == nil then
-              local tool = source.tool and source.tool or source[1]
-              if source.is_custom_tool then
-                result[tool] = false
-              else
-                if source.is_mason_tool ~= nil then
-                  result[tool] = source.is_mason_tool
-                else
-                  result[tool] = true
-                end
-              end
-            end
-          end
-        end
-
-        local ok, formatters = pcall(require, 'languages.' .. language .. '.formatter')
-        if ok then
-          for _, formatter in ipairs(formatters) do
-            if type(formatter) == 'table' then
-              local tool = formatter.tool and formatter.tool or formatter[1]
-              result[tool] = true
-            else
-              result[formatter] = true
-            end
-          end
-        end
-
-        return result
+        M.get_tools_by_language(language, result)
       end
     end
   end
+
+  return result
 end
 
 M.setup_test = function()
