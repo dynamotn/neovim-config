@@ -29,7 +29,7 @@ map('n', '<Esc>', ':noh<CR><Esc>')
 
 ------ Save and Exit -------- {
 -- Save with root permission
-map('c', 'w!!', 'w ! sudo tee % > /dev/null', { desc = 'Save with root permission' })
+map('c', 'ww', 'w ! sudo tee % > /dev/null', { desc = 'Save with root permission' })
 
 -- No one is really happy until you have this shortcuts
 cabbrev('W!', 'w!')
