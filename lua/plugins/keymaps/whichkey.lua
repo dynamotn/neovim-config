@@ -36,7 +36,7 @@ return {
 
   -- G key
   { '<Space>g', nil, desc = 'Git' },
-  { '<Space>gc', '/\v^[<|=>]{7}( .*|$ )<CR>', desc = 'Show conflict' },
+  { '<Space>gc', extras.cmdcr('/\\v^[<|=>]{7}( .*|$ )'), desc = 'Show conflict' },
 
   { '<Space>l', nil, desc = 'Language tool' },
   { '<Space>p', nil, desc = 'Project' },
