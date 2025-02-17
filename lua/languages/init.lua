@@ -361,7 +361,7 @@ end
 M.get_language_from_filetype = function(filetype)
   for language, filetypes in pairs(languages) do
     for _, ft in ipairs(filetypes) do
-      if filetype == ft then
+      if filetype == ft and vim.list_contains(_G.enabled_languages, ft) then
         return language
       end
     end

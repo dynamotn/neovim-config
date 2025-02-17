@@ -1,8 +1,7 @@
-IS_GENTOO = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
-IS_GUI_MACHINE = {{ ne .guiServer "0" }}
-ENABLED_OBSIDIAN = {{ eq .kind "pc" "laptop" "tablet" }}
+_G.is_gentoo = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
+_G.is_gui_machine = {{ ne .guiServer "0" }}
+_G.enabled_obsidian = {{ eq .kind "pc" "laptop" "tablet" }}
+_G.enabled_leetcode = {{ eq .kind "pc" "laptop" }}
 {{- if eq .kind "container" }}
-DEFAULT_ENABLED_LANGUAGES = { 'gitcommit', 'bash' }
-{{- else }}
-DEFAULT_ENABLED_LANGUAGES = { 'gitcommit' }
+_G.enabled_languages = { 'gitcommit', 'bash' }
 {{- end }}

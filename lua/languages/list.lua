@@ -26,7 +26,6 @@ return {
     'typescript',
     'javascriptreact',
     'typescriptreact',
-    'vue',
   },
   less = { 'less' },
   lua = { 'lua' },
@@ -40,6 +39,7 @@ return {
   },
   solidity = { 'solidity' },
   sql = { 'sql', 'mysql', 'plsql' },
+  vue = { 'vue' },
   ----------------------- }
 
   -- Tools & Markup {
