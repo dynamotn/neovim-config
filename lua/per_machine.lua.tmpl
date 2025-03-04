@@ -1,8 +1,72 @@
-IS_GENTOO = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
-IS_GUI_MACHINE = {{ ne .guiServer "0" }}
-ENABLED_OBSIDIAN = {{ eq .kind "pc" "laptop" "tablet" }}
+_G.is_gentoo = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
+_G.enabled_plugins.obsidian = {{ or (eq .kind "pc" "laptop") (eq .chezmoi.os "android") }}
+_G.enabled_plugins.leetcode = {{ eq .kind "pc" "laptop" }}
+_G.enabled_plugins.firenvim = {{ eq .kind "pc" "laptop" }}
+_G.enabled_plugins.otter = {{ eq .kind "pc" "laptop" }}
+_G.enabled_plugins.chezmoi = true
 {{- if eq .kind "container" }}
-DEFAULT_ENABLED_LANGUAGES = { 'gitcommit', 'bash' }
-{{- else }}
-DEFAULT_ENABLED_LANGUAGES = { 'gitcommit' }
+_G.enabled_languages = { 'gitcommit', 'gitrebase', 'bash', 'sql' }
+_G.bundle_languages = { 'gitcommit', 'bash', 'sql' }
 {{- end }}
+{{- if eq .chezmoi.os "android" }}
+_G.obsidian_vaults = {
+  {
+    name = 'notes',
+    path = '~/storage/shared/Documents/Notes',
+  },
+}
+{{- end }}
+_G.firenvim_site_settings = {
+  [ [[.*google\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*facebook\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*notion\.so.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*docs\.google\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*mail\.google\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*web\.telegram\.org.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*jira\..*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*chat\..*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*cloudflare\..*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*\.sharepoint\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*\.office\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*teams\.microsoft\.com.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+  [ [[.*github\.com\/.*\/blob\/.*]] ] = {
+    priority = 9,
+    takeover = 'never',
+  },
+}

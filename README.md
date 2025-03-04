@@ -7,12 +7,10 @@
   - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
     - [Languages](#languages)
     - [Frameworks](#frameworks)
-    <!--markdownlint-disable MD051-->
-    - [Tools & Markup](#tools-markup)
-    <!--markdownlint-enable MD051-->
+    - [Tools & Markup](#tools--markup)
   - [Installation](#installation)
   - [Key bindings](#key-bindings)
-  - [Note](#note)
+  - [Benchmark](#benchmark)
 <!--toc:end-->
 
 My customization configuration for neovim
@@ -23,43 +21,48 @@ My customization configuration for neovim
 
 ## Feature
 
-- Manage plugin and lazy-load plugin with [lazy](https://github.com/folke/lazy.nvim)
-- Elegant and beautiful UI:
-  - Beautiful theme [catppuccin](https://github.com/catppuccin/nvim)
-  - Managing tabs, buffers with [bufferline.nvim](https://github.com/akinsho/bufferline.nvim)
-  - Pretty and functional statusline with [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
-  - Beautiful icons with [nvim-web-devicons](https://github.com/kyazdani42/nvim-web-devicons)
-  - Indentlines with [indent-guides](https://github.com/glepnir/indent-guides.nvim)
-  - Highlight color with [colorizer.lua](https://github.com/norcalli/nvim-colorizer.lua)
-- Fast navigation with:
-  - [chadtree](https://github.com/ms-jpq/chadtree) as file explorer
-  - [nvim-window](https://gitlab.com/yorickpeterse/nvim-window) as window switcher
-  - [marks.nvim](chentau/marks.nvim) as mark switcher
-- Fully support Git and Diff with
-  - [neogit](https://github.com/TimUntersberger/neogit) as TUI of Git (although I rarely use it, I would prefer `git` command to it)
-  - [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim) to view diff
-  - [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) to show hunks of Git
-- Efficiency editing with a ton of tools
-- Support fuzzy finder, terminal, key mapping board, browser, ...
+- 🔥 Transform your Neovim into a full-fledged IDE
+- 🚀 Blazingly fast and furious (see [benchmark](#benchmark))
+- 🧹 Sane default settings for options, autocmds, and keymaps
+- 📦 Comes with a wealth of plugins pre-configured and ready to use **for DevOps and SA**, like me
+  - Supported many languages, frameworks and tools (see [here](#languages-frameworks-or-tools-support))
+  - Load per machine configurations via `lua/per_machine.lua` if exists (see [my config](./lua/per_machine.lua.tmpl), managed by [chezmoi](https://www.chezmoi.io/))
+  - Lazy install treesitter parsers, LSP servers, formatters, linters, debug adapters... if needed when open file
+  - Bundle languages/tools when containerize or builtin development environments by `_G.bundle_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
+  - Enable/disable languages/tools by `_G.enabled_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
+  - Easy to show which tools are installed in lualine
+  - Trigger linters/formatters if installed only
+  - Integrate with various tools:
+    - [Obsidian](https://obsidian.md/) by `_G.obsidian_vaults` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
+    - [chezmoi](https://www.chezmoi.io/)
+    - **Firefox** or **Chrome** browser with [embedded neovim](https://github.com/glacambre/firenvim)
+    - [zellij](https://zellij.dev/)
+    - [Codeium](https://codeium.com/), an AI power tools
+
+> [!CAUTION]
+>
+> - Not used for neovim < 0.10 or vim (any version)
+> - Used for Linux only or Mac (not sure)
 
 ## Languages, Frameworks, or Tools support
 
-See the list of supported things in `lua/languages/list.lua`. You can comment on lines that you don't want to use.
+See the list of supported things in [lua/config/languages.lua](./lua/config/languages.lua)
 
 ### Languages
 
 - Arduino
 - AWK
-- Bash
+- Bash (include some filetypes for build package on Arch, Gentoo)
 - C/C++
 - C#
-- CSS
+- CSS/Less
 - Cucumber
 - Fish
 - Go
 - HTML
-- Javascript
-- LESS
+- Javascript/Typescript
+- Java
+- LaTeX
 - Lua (of course)
 - PHP
 - Python
@@ -71,21 +74,31 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 
 ### Frameworks
 
+- Angular
+- Vue
+- Rust
+
 ### Tools & Markup
 
 - Ansible
+- Beancount
 - Bicep
+- CMake
 - CSV
 - D2
 - DBML
 - Dockerfile
 - Git (rebase, commit)
 - GoTemplate (Helm template...)
-- HTTP
+- Groovy (also for Jenkinsfile)
+- HTTP Rest file
 - Hyprlang
 - JSON
+- Make tools (autoconf, automake, make)
 - Markdown
+- Nginx
 - Nix
+- OpenAPI
 - Terraform
 - Terragrunt
 - TOML
@@ -99,7 +112,7 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 
 ```sh
   rm -rf ~/.config/nvim
-  git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch
+  git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch --depth 1
 ```
 
 - After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
@@ -108,8 +121,50 @@ See the list of supported things in `lua/languages/list.lua`. You can comment on
 
 My habit key is `Space`. You can explore it :)
 
-## Note
+## Benchmark
 
-- Not used for neovim < 0.10 or vim (any version)
-- Not used for neovim GUI
-- Used for Linux only or Mac (not sure)
+- Startup time (benchmark by [vim-startuptime](https://github.com/dstein64/vim-startuptime)):
+
+```
+       startup: 43.7
+event                  time percent plot
+init.lua              32.30   73.98 ██████████████████████████
+config.lazy           31.68   72.56 █████████████████████████▌
+UIEnter autocommands   3.86    8.84 ███▏
+dial.augend            2.22    5.08 █▊
+config.options         1.75    4.00 █▍
+reading ShaDa          1.55    3.54 █▎
+config.filetype        1.38    3.17 █▏
+catppuccin.vim         1.28    2.94 █
+vim.filetype           1.07    2.44 ▉
+neogen.utilities.nod   1.04    2.38 ▉
+
+```
+
+- By [hyprfine](https://github.com/sharkdp/hyperfine) on my laptop machine:
+
+```sh
+> hyperfine "nvim +q" "nvim +q --headless" "nvim README.md +q --headless" "nvim lua/config/lazy.lua +q"
+Benchmark 1: nvim +q
+  Time (mean ± σ):      45.0 ms ±   4.4 ms    [User: 31.3 ms, System: 12.1 ms]
+  Range (min … max):    40.3 ms …  60.4 ms    49 runs
+ 
+Benchmark 2: nvim +q --headless
+  Time (mean ± σ):      72.5 ms ±  41.4 ms    [User: 49.1 ms, System: 20.6 ms]
+  Range (min … max):    38.6 ms … 140.0 ms    68 runs
+ 
+Benchmark 3: nvim README.md +q --headless
+  Time (mean ± σ):      83.0 ms ±  46.1 ms    [User: 58.7 ms, System: 21.4 ms]
+  Range (min … max):    42.3 ms … 152.8 ms    21 runs
+ 
+Benchmark 4: nvim lua/config/lazy.lua +q
+  Time (mean ± σ):     328.6 ms ±  14.8 ms    [User: 331.3 ms, System: 160.7 ms]
+  Range (min … max):   298.3 ms … 353.1 ms    10 runs
+ 
+Summary
+  nvim +q ran
+    1.61 ± 0.93 times faster than nvim +q --headless
+    1.84 ± 1.04 times faster than nvim README.md +q --headless
+    7.30 ± 0.78 times faster than nvim lua/config/lazy.lua +q
+
+```
