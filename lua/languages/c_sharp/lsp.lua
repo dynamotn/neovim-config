@@ -1,3 +1,0 @@
-return {
-  'csharp_ls',
-}

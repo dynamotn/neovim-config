@@ -1,16 +1,10 @@
-snippet plugin_option
-  local ${2:name} = require('${1:plugin}')
-
-  ${2:name}.setup({
-    ${3:config...}
-  })
-
-snippet plugin_keymap
-  local ${2:name} = require('${1:plugin}')
-
-  return {
-    ${3:config...}
+snippet vplugin
+  {
+    '${1:plugin}',
+    opts = {
+      ${2:opts}
+    }
   }
 
 snippet vdebug
-  print(vim.inspect.inspect(${1}))
+  vim.print(${1})
