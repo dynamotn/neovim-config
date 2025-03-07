@@ -21,10 +21,10 @@ return {
     opts = {
       strategies = {
         chat = {
-          adapter = _G.companion_adapter or 'ollama',
+          adapter = vim.env.VIM_COMPANION_ADAPTER or _G.companion_adapter or 'ollama',
         },
         inline = {
-          adapter = _G.companion_adapter or 'ollama',
+          adapter = vim.env.VIM_COMPANION_ADAPTER or _G.companion_adapter or 'ollama',
         },
       },
     },
