@@ -417,7 +417,6 @@ return {
     parsers = { 'yaml' },
     lsp_servers = { 'ansiblels' },
     linters = { 'ansible-lint', 'yq' },
-    formatters = { 'yq' },
   },
   beancount = {
     filetypes = { 'beancount' },
@@ -540,7 +539,6 @@ return {
     parsers = { 'json5' },
     lsp_servers = { 'jsonls' },
     linters = { 'yq' },
-    formatters = { 'yq' },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
@@ -625,7 +623,6 @@ return {
     parsers = { 'yaml', 'json5' },
     lsp_servers = { 'vacuum' },
     linters = { 'yq' },
-    formatters = { 'yq' },
   },
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
@@ -683,7 +680,6 @@ return {
       'docker_compose_language_service',
     },
     linters = { 'yq' },
-    formatters = { 'yq' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
