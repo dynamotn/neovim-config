@@ -17,7 +17,12 @@ return {
   {
     -- AI Chat
     'olimorris/codecompanion.nvim',
-    cmd = { 'CodeCompanion' },
+    cmd = { 'CodeCompanion', 'CodeCompanionChat' },
+    init = function()
+      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
+        CodeCompanion = '「AI」',
+      })
+    end,
     opts = {
       strategies = {
         chat = {
