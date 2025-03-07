@@ -102,9 +102,7 @@ return condition
                 },
                 {
                   '<leader>cV',
-                  function()
-                    LazyVim.lsp.execute({ command = 'typescript.selectTypeScriptVersion' })
-                  end,
+                  function() LazyVim.lsp.execute({ command = 'typescript.selectTypeScriptVersion' }) end,
                   desc = 'Select TS workspace version',
                 },
               },
@@ -143,18 +141,14 @@ return condition
                     table.insert(files, 1, 'Enter new path...')
                     vim.ui.select(files, {
                       prompt = 'Select move destination:',
-                      format_item = function(f)
-                        return vim.fn.fnamemodify(f, ':~:.')
-                      end,
+                      format_item = function(f) return vim.fn.fnamemodify(f, ':~:.') end,
                     }, function(f)
                       if f and f:find('^Enter new path') then
                         vim.ui.input({
                           prompt = 'Enter move destination:',
                           default = vim.fn.fnamemodify(fname, ':h') .. '/',
                           completion = 'file',
-                        }, function(newf)
-                          return newf and move(newf)
-                        end)
+                        }, function(newf) return newf and move(newf) end)
                       elseif f then
                         move(f)
                       end
@@ -190,9 +184,7 @@ return condition
           end
           if not dap.adapters['node'] then
             dap.adapters['node'] = function(cb, config)
-              if config.type == 'node' then
-                config.type = 'pwa-node'
-              end
+              if config.type == 'node' then config.type = 'pwa-node' end
               local nativeAdapter = dap.adapters['pwa-node']
               if type(nativeAdapter) == 'function' then
                 nativeAdapter(cb, config)
@@ -251,9 +243,7 @@ return condition
               jestCommand = 'npm test --',
               jestConfigFile = 'custom.jest.config.ts',
               env = { CI = true },
-              cwd = function(_)
-                return require('lazyvim.util.root').get()
-              end,
+              cwd = function(_) return require('lazyvim.util.root').get() end,
             },
           },
         },

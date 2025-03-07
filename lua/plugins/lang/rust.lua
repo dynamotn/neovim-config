@@ -27,12 +27,18 @@ return vim.list_contains(_G.enabled_languages, 'rust')
         opts = {
           server = {
             on_attach = function(_, bufnr)
-              vim.keymap.set('n', '<leader>cR', function()
-                vim.cmd.RustLsp('codeAction')
-              end, { desc = 'Code Action', buffer = bufnr })
-              vim.keymap.set('n', '<leader>dr', function()
-                vim.cmd.RustLsp('debuggables')
-              end, { desc = 'Rust Debuggables', buffer = bufnr })
+              vim.keymap.set(
+                'n',
+                '<leader>cR',
+                function() vim.cmd.RustLsp('codeAction') end,
+                { desc = 'Code Action', buffer = bufnr }
+              )
+              vim.keymap.set(
+                'n',
+                '<leader>dr',
+                function() vim.cmd.RustLsp('debuggables') end,
+                { desc = 'Rust Debuggables', buffer = bufnr }
+              )
             end,
             default_settings = {
               -- rust-analyzer language server configuration
@@ -81,9 +87,7 @@ return vim.list_contains(_G.enabled_languages, 'rust')
             local codelldb = package_path .. '/extension/adapter/codelldb'
             local library_path = package_path .. '/extension/lldb/lib/liblldb.dylib'
             local uname = io.popen('uname'):read('*l')
-            if uname == 'Linux' then
-              library_path = package_path .. '/extension/lldb/lib/liblldb.so'
-            end
+            if uname == 'Linux' then library_path = package_path .. '/extension/lldb/lib/liblldb.so' end
             opts.dap = {
               adapter = require('rustaceanvim.config').get_codelldb_adapter(codelldb, library_path),
             }

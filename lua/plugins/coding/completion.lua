@@ -22,33 +22,23 @@ return {
       require('cmp_dynamic').register({
         {
           label = 'today',
-          insertText = function()
-            return os.date('%d/%m/%Y')
-          end,
+          insertText = function() return os.date('%d/%m/%Y') end,
         },
         {
           label = 'today',
-          insertText = function()
-            return os.date('%Y/%m/%d')
-          end,
+          insertText = function() return os.date('%Y/%m/%d') end,
         },
         {
           label = 'now',
-          insertText = function()
-            return os.date('%H:%M:%S %d/%m/%Y')
-          end,
+          insertText = function() return os.date('%H:%M:%S %d/%m/%Y') end,
         },
         {
           label = 'now',
-          insertText = function()
-            return os.date('%Y_%m_%d_%H_%M')
-          end,
+          insertText = function() return os.date('%Y_%m_%d_%H_%M') end,
         },
         {
           label = 'timestamp',
-          insertText = function()
-            return os.date('%s')
-          end,
+          insertText = function() return os.date('%s') end,
         },
       })
     end,
@@ -91,9 +81,7 @@ return {
           buffer = {
             opts = {
               get_bufnrs = function()
-                return vim.tbl_filter(function(bufnr)
-                  return vim.bo[bufnr].buftype == ''
-                end, vim.api.nvim_list_bufs())
+                return vim.tbl_filter(function(bufnr) return vim.bo[bufnr].buftype == '' end, vim.api.nvim_list_bufs())
               end,
             },
           },
@@ -102,22 +90,16 @@ return {
             module = 'blink.cmp.sources.path',
             name = 'project_path',
             opts = {
-              get_cwd = function(_)
-                return require('lazyvim.util.root').get()
-              end,
+              get_cwd = function(_) return require('lazyvim.util.root').get() end,
             },
           },
         },
-        default = function()
-          return require('util.cmp').default_sources()
-        end,
+        default = function() return require('util.cmp').default_sources() end,
         per_filetype = {},
       },
       -- enable fuzzy for input words with every length
       fuzzy = {
-        max_typos = function()
-          return 0
-        end,
+        max_typos = function() return 0 end,
       },
       -- show signature of LSP function...
       signature = { enabled = true },
@@ -133,9 +115,7 @@ return {
           -- auto accept ghost text by Right key
           ['<Right>'] = {
             function(cmp)
-              if cmp.is_ghost_text_visible() then
-                return cmp.accept()
-              end
+              if cmp.is_ghost_text_visible() then return cmp.accept() end
             end,
             'fallback',
           },
@@ -149,13 +129,9 @@ return {
         sources = function()
           local type = vim.fn.getcmdtype()
           -- Search forward and backward
-          if type == '/' or type == '?' then
-            return { 'buffer' }
-          end
+          if type == '/' or type == '?' then return { 'buffer' } end
           -- Commands
-          if type == ':' or type == '@' then
-            return { 'cmdline', 'path', 'fuzzy_path', 'buffer' }
-          end
+          if type == ':' or type == '@' then return { 'cmdline', 'path', 'fuzzy_path', 'buffer' } end
           return {}
         end,
       },
@@ -173,9 +149,7 @@ return {
                   -- Show icon of file when source is Path
                   if vim.tbl_contains({ 'Path', 'fuzzy_path', 'project_path' }, ctx.source_name) then
                     local dev_icon, _ = require('nvim-web-devicons').get_icon(ctx.label)
-                    if dev_icon then
-                      icon = dev_icon
-                    end
+                    if dev_icon then icon = dev_icon end
                   else
                     local kind_icons = require('config.defaults').icons.kinds
                     if kind_icons[ctx.source_name] then
@@ -198,9 +172,7 @@ return {
                     or require('blink.cmp.completion.windows.render.tailwind').get_hl(ctx)
                   if vim.tbl_contains({ 'Path', 'fuzzy_path', 'project_path' }, ctx.source_name) then
                     local dev_icon, dev_hl = require('nvim-web-devicons').get_icon(ctx.label)
-                    if dev_icon then
-                      hl = dev_hl
-                    end
+                    if dev_icon then hl = dev_hl end
                   end
                   return hl
                 end,

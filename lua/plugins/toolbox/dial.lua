@@ -17,36 +17,28 @@ return {
   keys = {
     {
       '<C-a>',
-      function()
-        return M.dial(true)
-      end,
+      function() return M.dial(true) end,
       expr = true,
       desc = 'Increment',
       mode = { 'n', 'v' },
     },
     {
       '<C-x>',
-      function()
-        return M.dial(false)
-      end,
+      function() return M.dial(false) end,
       expr = true,
       desc = 'Decrement',
       mode = { 'n', 'v' },
     },
     {
       'g<C-a>',
-      function()
-        return M.dial(true, true)
-      end,
+      function() return M.dial(true, true) end,
       expr = true,
       desc = 'Increment',
       mode = { 'n', 'v' },
     },
     {
       'g<C-x>',
-      function()
-        return M.dial(false, true)
-      end,
+      function() return M.dial(false, true) end,
       expr = true,
       desc = 'Decrement',
       mode = { 'n', 'v' },
@@ -142,9 +134,7 @@ return {
   config = function(_, opts)
     -- copy defaults to each group
     for name, group in pairs(opts.groups) do
-      if name ~= 'default' then
-        vim.list_extend(group, opts.groups.default)
-      end
+      if name ~= 'default' then vim.list_extend(group, opts.groups.default) end
     end
     require('dial.config').augends:register_group(opts.groups)
   end,

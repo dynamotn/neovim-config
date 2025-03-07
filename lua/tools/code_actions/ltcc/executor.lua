@@ -14,9 +14,7 @@ M.handle_output = function(params)
         if string.find(r.value, 'not shown') == nil then
           table.insert(actions, {
             title = 'Replace with “' .. r.value .. '”',
-            action = function()
-              vim.api.nvim_buf_set_text(params.bufnr, row, col_beg, row, col_end, { r.value })
-            end,
+            action = function() vim.api.nvim_buf_set_text(params.bufnr, row, col_beg, row, col_end, { r.value }) end,
           })
         end
       end

@@ -47,9 +47,7 @@ return {
     keys = {
       {
         'gx',
-        function()
-          require('open').open_cword()
-        end,
+        function() require('open').open_cword() end,
         desc = 'Open with system app',
         mode = { 'n', 'v' },
       },

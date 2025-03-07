@@ -14,9 +14,7 @@ return {
       table.insert(opts.sources, null_ls.builtins.code_actions.gitsigns)
 
       -- Unified null_ls source configs
-      local languages_list = vim.tbl_filter(function(language)
-        return language.null_ls
-      end, require('config.languages'))
+      local languages_list = vim.tbl_filter(function(language) return language.null_ls end, require('config.languages'))
       local source_configs = {}
       local filetypes = {}
       for _, language in ipairs(languages_list) do

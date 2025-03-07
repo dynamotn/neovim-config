@@ -10,24 +10,18 @@ return vim.list_contains(_G.enabled_languages, 'python')
           keys = {
             {
               '<leader>dPt',
-              function()
-                require('dap-python').test_method()
-              end,
+              function() require('dap-python').test_method() end,
               ft = language.filetypes,
               desc = 'Debug Method',
             },
             {
               '<leader>dPc',
-              function()
-                require('dap-python').test_class()
-              end,
+              function() require('dap-python').test_class() end,
               ft = language.filetypes,
               desc = 'Debug Class',
             },
           },
-          config = function()
-            require('dap-python').setup(LazyVim.get_pkg_path('debugpy', '/venv/bin/python'))
-          end,
+          config = function() require('dap-python').setup(LazyVim.get_pkg_path('debugpy', '/venv/bin/python')) end,
         },
       },
       {

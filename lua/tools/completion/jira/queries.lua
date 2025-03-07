@@ -34,18 +34,14 @@ M.generate_candidates = function(kind, candidates, entries, callback)
         '--plain',
         issue_key,
       },
-      on_start = function()
-        table.insert(candidates, candidate)
-      end,
+      on_start = function() table.insert(candidates, candidate) end,
       on_exit = function(self, exit_code)
         exited_view_jobs_count = exited_view_jobs_count + 1
         if exit_code == 0 then
           candidates[candidate_index].documentation.value =
             table.concat(require('vim.lsp.util').convert_input_to_markdown_lines(self:result()), '\n')
         end
-        if exited_view_jobs_count == #entries and type(callback) == 'function' then
-          callback()
-        end
+        if exited_view_jobs_count == #entries and type(callback) == 'function' then callback() end
       end,
       detached = true,
     }):start()

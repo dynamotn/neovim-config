@@ -13,9 +13,7 @@ return {
         {
           function()
             local b = vim.api.nvim_get_current_buf()
-            if next(vim.treesitter.highlighter.active[b]) then
-              return icons.treesitter
-            end
+            if next(vim.treesitter.highlighter.active[b]) then return icons.treesitter end
             return ''
           end,
           color = { fg = Snacks.util.color('String') },
@@ -24,9 +22,7 @@ return {
           function(msg)
             msg = msg or icons.lsp .. 'Inactive'
             local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
-            if next(buf_clients) == nil then
-              return msg
-            end
+            if next(buf_clients) == nil then return msg end
             local buf_client_names = {}
 
             for _, client in pairs(buf_clients) do
@@ -66,9 +62,7 @@ return {
             filetypes = { filetype },
             sections = {
               lualine_a = {
-                function()
-                  return name or 'N/A'
-                end,
+                function() return name or 'N/A' end,
               },
             },
           },
@@ -83,9 +77,7 @@ return {
     opts = {
       options = {
         mode = 'tabs',
-        numbers = function(number_opts)
-          return string.format('%s', number_opts.raise(number_opts.id))
-        end,
+        numbers = function(number_opts) return string.format('%s', number_opts.raise(number_opts.id)) end,
         show_buffer_close_icons = false,
         show_close_icon = false,
         separator_style = 'slant',

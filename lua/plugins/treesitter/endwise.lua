@@ -1,7 +1,5 @@
 local supported_filetypes = {}
-local languages_list = vim.tbl_filter(function(config)
-  return config.endwise
-end, require('config.languages'))
+local languages_list = vim.tbl_filter(function(config) return config.endwise end, require('config.languages'))
 for _, config in pairs(languages_list) do
   vim.list_extend(supported_filetypes, config.filetypes)
 end

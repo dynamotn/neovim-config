@@ -17,9 +17,7 @@ return vim.list_contains(_G.enabled_languages, 'cmake')
           check()
           vim.api.nvim_create_autocmd('DirChanged', {
             callback = function()
-              if not loaded then
-                check()
-              end
+              if not loaded then check() end
             end,
           })
         end,

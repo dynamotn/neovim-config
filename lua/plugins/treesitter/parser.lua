@@ -28,9 +28,7 @@ return {
               for _, ft in pairs(language.filetypes) do
                 vim.treesitter.language.register(parser, ft)
               end
-              if vim.list_contains(_G.bundle_languages, name) then
-                table.insert(opts.ensure_installed, { parser })
-              end
+              if vim.list_contains(_G.bundle_languages, name) then table.insert(opts.ensure_installed, { parser }) end
             elseif type(parser) == 'table' then
               local parser_name = parser[1]
               if parser_config[parser_name] then
@@ -57,9 +55,7 @@ return {
       end
 
       -- Setup from opts
-      if type(opts.ensure_installed) == 'table' then
-        opts.ensure_installed = LazyVim.dedup(opts.ensure_installed)
-      end
+      if type(opts.ensure_installed) == 'table' then opts.ensure_installed = LazyVim.dedup(opts.ensure_installed) end
       require('nvim-treesitter.configs').setup(opts)
 
       -- Automatic install parsers for window buffer

@@ -86,9 +86,7 @@ return vim.list_contains(_G.enabled_languages, 'sql')
             ft = 'dbui',
             pinned = true,
             width = 0.3,
-            open = function()
-              vim.cmd('DBUI')
-            end,
+            open = function() vim.cmd('DBUI') end,
           })
 
           opts.bottom = opts.bottom or {}

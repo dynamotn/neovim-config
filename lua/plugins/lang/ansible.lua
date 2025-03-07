@@ -9,9 +9,7 @@ return vim.list_contains(_G.enabled_languages, 'ansible')
         keys = {
           {
             '<leader>ta',
-            function()
-              require('ansible').run()
-            end,
+            function() require('ansible').run() end,
             ft = language.filetypes,
             desc = 'Ansible Run Playbook/Role',
             silent = true,

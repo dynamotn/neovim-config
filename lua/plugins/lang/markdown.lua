@@ -21,9 +21,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         keys = {
           {
             '<leader>cp',
-            function()
-              require('peek').open()
-            end,
+            function() require('peek').open() end,
             ft = language.filetypes,
             desc = 'Markdown Preview',
           },
@@ -54,9 +52,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
           require('render-markdown').setup(opts)
           Snacks.toggle({
             name = 'Render Markdown',
-            get = function()
-              return require('render-markdown.state').enabled
-            end,
+            get = function() return require('render-markdown.state').enabled end,
             set = function(enabled)
               local m = require('render-markdown')
               if enabled then

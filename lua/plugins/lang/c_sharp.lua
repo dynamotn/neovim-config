@@ -14,16 +14,12 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
           servers = {
             omnisharp = {
               handlers = {
-                ['textDocument/definition'] = function(...)
-                  return require('omnisharp_extended').handler(...)
-                end,
+                ['textDocument/definition'] = function(...) return require('omnisharp_extended').handler(...) end,
               },
               keys = {
                 {
                   'gd',
-                  function()
-                    require('omnisharp_extended').lsp_definitions()
-                  end,
+                  function() require('omnisharp_extended').lsp_definitions() end,
                   desc = 'Goto Definition',
                 },
               },
@@ -57,9 +53,7 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
                   name = 'Launch file',
                   request = 'launch',
                   ---@diagnostic disable-next-line: redundant-parameter
-                  program = function()
-                    return vim.fn.input('Path to dll: ', vim.fn.getcwd() .. '/', 'file')
-                  end,
+                  program = function() return vim.fn.input('Path to dll: ', vim.fn.getcwd() .. '/', 'file') end,
                   cwd = '${workspaceFolder}',
                 },
               }

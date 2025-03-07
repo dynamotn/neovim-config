@@ -77,9 +77,9 @@ return {
       LazyVim.format.register(LazyVim.lsp.formatter())
 
       -- setup keymaps
-      LazyVim.lsp.on_attach(function(client, buffer)
-        require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
-      end)
+      LazyVim.lsp.on_attach(
+        function(client, buffer) require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer) end
+      )
 
       LazyVim.lsp.setup()
       LazyVim.lsp.on_dynamic_capability(require('lazyvim.plugins.lsp.keymaps').on_attach)
@@ -113,9 +113,7 @@ return {
         opts.diagnostics.virtual_text.prefix = function(diagnostic)
           local icons = LazyVim.config.icons.diagnostics
           for d, icon in pairs(icons) do
-            if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
-              return icon
-            end
+            if diagnostic.severity == vim.diagnostic.severity[d:upper()] then return icon end
           end
         end
       end
@@ -139,24 +137,16 @@ return {
         local server_opts = vim.tbl_deep_extend('force', {
           capabilities = vim.deepcopy(capabilities),
         }, servers[server] or {})
-        if server_opts.enabled == false then
-          return
-        end
+        if server_opts.enabled == false then return end
 
         if opts.setup[server] then
-          if opts.setup[server](server, server_opts) then
-            return
-          end
+          if opts.setup[server](server, server_opts) then return end
         elseif opts.setup['*'] then
-          if opts.setup['*'](server, server_opts) then
-            return
-          end
+          if opts.setup['*'](server, server_opts) then return end
         end
 
         -- add not supported officially server
-        if opts.module[server] then
-          require('lspconfig.configs')[server] = require(opts.module[server])
-        end
+        if opts.module[server] then require('lspconfig.configs')[server] = require(opts.module[server]) end
         require('lspconfig')[server].setup(server_opts)
       end
 

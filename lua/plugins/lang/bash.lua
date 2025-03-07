@@ -47,9 +47,7 @@ neogen_configurations.data = {
   file = {
     ['program'] = {
       ['0'] = {
-        extract = function()
-          return {}
-        end,
+        extract = function() return {} end,
       },
     },
   },

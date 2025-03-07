@@ -15,9 +15,7 @@ return h.make_builtin({
     format = 'json',
     to_stdin = true,
     timeout = 60000,
-    check_exit_code = function(c)
-      return c <= 1
-    end,
+    check_exit_code = function(c) return c <= 1 end,
     on_output = require('tools.diagnostics.ltcc.executor').handle_output,
     use_cache = false,
   },

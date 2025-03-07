@@ -28,9 +28,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
             root_dir = LazyVim.lsp.get_raw_config('jdtls').default_config.root_dir,
 
             -- How to find the project name for a given root dir.
-            project_name = function(root_dir)
-              return root_dir and vim.fs.basename(root_dir)
-            end,
+            project_name = function(root_dir) return root_dir and vim.fs.basename(root_dir) end,
 
             -- Where are the config and workspace dirs for a project?
             jdtls_config_dir = function(project_name)
@@ -186,9 +184,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
                   then
                     -- custom init for Java debugger
                     require('jdtls').setup_dap(opts.dap)
-                    if opts.dap_main then
-                      require('jdtls.dap').setup_dap_main_class_configs(opts.dap_main)
-                    end
+                    if opts.dap_main then require('jdtls.dap').setup_dap_main_class_configs(opts.dap_main) end
 
                     -- Java Test require Java debugger to work
                     if opts.test and mason_registry.is_installed('java-test') then
@@ -224,9 +220,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
                 end
 
                 -- User can set additional keymaps in opts.on_attach
-                if opts.on_attach then
-                  opts.on_attach(args)
-                end
+                if opts.on_attach then opts.on_attach(args) end
               end
             end,
           })

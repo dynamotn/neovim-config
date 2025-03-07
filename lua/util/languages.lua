@@ -7,9 +7,7 @@ local M = {}
 M.get_language_from_filetype = function(filetype)
   for name, language in pairs(languages_list) do
     for _, ft in pairs(language.filetypes) do
-      if filetype == ft and vim.list_contains(_G.enabled_languages, name) then
-        return name
-      end
+      if filetype == ft and vim.list_contains(_G.enabled_languages, name) then return name end
     end
   end
 end
@@ -20,9 +18,7 @@ end
 M.get_parsers_by_filetype = function(filetype)
   local language = M.get_language_from_filetype(filetype)
   local result = {}
-  if not language then
-    return result
-  end
+  if not language then return result end
   for _, parser in ipairs(languages_list[language].parsers) do
     if type(parser) == 'string' then
       table.insert(result, parser)
@@ -85,9 +81,7 @@ M.check_lsp_is_for_bundled_language = function(lsp_name)
         elseif type(server) == 'table' then
           server_name = server[1]
         end
-        if server_name == lsp_name and vim.list_contains(_G.bundle_languages, name) then
-          return true
-        end
+        if server_name == lsp_name and vim.list_contains(_G.bundle_languages, name) then return true end
       end
     end
   end

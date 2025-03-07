@@ -118,9 +118,7 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
                 type = 'codelldb',
                 request = 'launch',
                 name = 'Launch file',
-                program = function()
-                  return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-                end,
+                program = function() return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file') end,
                 cwd = '${workspaceFolder}',
               },
               {
