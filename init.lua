@@ -23,12 +23,22 @@ if vim.env.ZELLIJ ~= nil then _G.test_strategy = 'zellij' end
 _G.dd = function(...) require('snacks.debug').inspect(...) end
 vim.print = _G.dd
 --- Obsidian vaults
-_G.obsidian_vaults = {
-  {
-    name = 'notes',
-    path = '~/Documents/Notes',
+_G.obsidian = {
+  paths = {
+    personal = '~/Documents/Notes',
   },
 }
+_G.obsidian.vaults = function()
+  local result = {}
+  for name, path in pairs(_G.obsidian.paths) do
+    table.insert(result, {
+      name = name,
+      path = path,
+    })
+  end
+  return result
+end
+_G.obsidian.todo_path = function() return _G.obsidian.paths.personal .. '/01_Fleeting Notes/TODO.md' end
 --- Firenvim setting
 _G.firenvim_site_settings = {}
 --- AI settings

@@ -9,12 +9,7 @@ _G.enabled_languages = { 'gitcommit', 'gitrebase', 'bash', 'sql' }
 _G.bundle_languages = { 'gitcommit', 'bash', 'sql' }
 {{- end }}
 {{- if eq .chezmoi.os "android" }}
-_G.obsidian_vaults = {
-  {
-    name = 'notes',
-    path = '~/storage/shared/Documents/Notes',
-  },
-}
+_G.obsidian.paths.personal = '~/storage/shared/Documents/Notes'
 {{- end }}
 _G.firenvim_site_settings = {
   [ [[.*google\.com.*]] ] = {

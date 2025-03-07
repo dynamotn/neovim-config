@@ -70,7 +70,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         ft = language.filetypes,
         enabled = _G.enabled_plugins.obsidian or _G.used_full_plugins,
         opts = {
-          workspaces = _G.obsidian_vaults,
+          workspaces = _G.obsidian.vaults(),
         },
         init = function()
           _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
@@ -88,6 +88,24 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
             per_filetype = {
               markdown = cmp_util.sources('markdown'),
             },
+          },
+        },
+      },
+      {
+        -- Todo notes
+        'folke/snacks.nvim',
+        keys = {
+          {
+            '<leader>T',
+            function()
+              Snacks.scratch({
+                icon = ' ',
+                name = 'Todo',
+                ft = 'markdown',
+                file = _G.obsidian.todo_path(),
+              })
+            end,
+            desc = 'Todo List',
           },
         },
       },
