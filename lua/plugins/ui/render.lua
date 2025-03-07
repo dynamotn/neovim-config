@@ -5,7 +5,7 @@ vim.list_extend(diagram_filetypes, languages_list.d2.filetypes)
 return {
   {
     -- Render diagram as code
-    '3rd/diagram.nvim',
+    'dynamotn/diagram.nvim',
     ft = diagram_filetypes,
     dependencies = {
       '3rd/image.nvim',
@@ -16,6 +16,7 @@ return {
     },
     opts = {
       renderer_options = {
+        enabled_events = { 'BufWritePost', 'BufWinEnter' },
         d2 = {
           theme_id = 4,
           dark_theme_id = 4,
