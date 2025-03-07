@@ -4,9 +4,10 @@ return {
   {
     'nvimtools/none-ls.nvim',
     -- I don't want to use default LazyVim sources
-    opts = function(_, opts)
+    config = function(_, opts)
       local null_ls = require('null-ls')
       opts.root_dir = opts.root_dir or require('null-ls.utils').root_pattern('.neoconf.json', 'Makefile', '.git')
+      opts.sources = {}
 
       -- Default sources
       table.insert(opts.sources, null_ls.builtins.diagnostics.trail_space)
@@ -42,6 +43,7 @@ return {
           })
         )
       end
+      null_ls.setup(opts)
     end,
   },
 }
