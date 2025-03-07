@@ -39,6 +39,13 @@
 ---@type DyLangRootSpec
 return {
   -- Programming language & Frameworks {
+  angular = { -- See html and javascript
+    filetypes = { 'htmlangular' },
+    parsers = { 'angular' },
+    lsp_servers = { 'angularls' },
+    linters = { 'biomejs' },
+    formatters = { 'biome', 'html_beautify' },
+  },
   arduino = {
     filetypes = { 'arduino' },
     parsers = { 'cpp' },
@@ -196,13 +203,6 @@ return {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
     },
-  },
-  angular = { -- See html and javascript
-    filetypes = { 'htmlangular' },
-    parsers = { 'angular' },
-    lsp_servers = { 'angularls' },
-    linters = { 'biomejs' },
-    formatters = { 'biome', 'html_beautify' },
   },
   java = {
     filetypes = { 'java' },
@@ -530,6 +530,10 @@ return {
     filetypes = { 'hyprlang' },
     parsers = { 'hyprlang' },
     lsp_servers = { 'hyprls' },
+  },
+  ini = {
+    filetypes = { 'ini' },
+    parsers = { 'ini' },
   },
   json = {
     filetypes = { 'json', 'jsonc', 'json5' },

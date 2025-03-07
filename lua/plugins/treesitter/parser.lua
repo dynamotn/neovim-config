@@ -71,6 +71,15 @@ return {
           end
         end,
       })
+
+      -- Setup predicates
+      for predicate, regex in pairs(opts.custom_predicates) do
+        require('vim.treesitter.query').add_predicate(predicate, function(_, _, bufnr, _)
+          local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
+          local filename = vim.fn.fnamemodify(filepath, ':t')
+          return string.match(filename, regex)
+        end, { force = true, all = false })
+      end
     end,
   },
 }
