@@ -24,6 +24,7 @@ return vim.list_contains(_G.enabled_languages, 'gotmpl')
             ['is-ini-file?'] = '.*%.ini%.tmpl$',
             ['is-js-file?'] = '.*%.js%.tmpl$',
             ['is-python-file?'] = '.*%.py%.tmpl$',
+            ['is-lua-file?'] = '.*%.lua%.tmpl$',
           },
         },
       },

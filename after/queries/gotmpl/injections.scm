@@ -34,3 +34,8 @@
   (#is-python-file?)
   (#set! injection.language "python")
   (#set! injection.combined))
+
+((text) @injection.content
+  (#is-lua-file?)
+  (#set! injection.language "lua")
+  (#set! injection.combined))
