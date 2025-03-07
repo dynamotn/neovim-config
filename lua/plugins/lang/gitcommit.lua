@@ -19,7 +19,7 @@ return vim.list_contains(_G.enabled_languages, 'gitcommit')
           sources = {
             compat = { 'git' },
             per_filetype = {
-              gitcommit = cmp_util.per_filetype_sources({ 'git' }),
+              gitcommit = cmp_util.sources('gitcommit'),
             },
           },
         },

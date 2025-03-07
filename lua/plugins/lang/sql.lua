@@ -65,9 +65,9 @@ return vim.list_contains(_G.enabled_languages, 'sql')
           sources = {
             compat = { 'dadbod', 'sql' },
             per_filetype = {
-              sql = cmp_util.per_filetype_sources({ 'dadbod', 'sql' }),
-              mysql = cmp_util.per_filetype_sources({ 'dadbod', 'sql' }),
-              plsql = cmp_util.per_filetype_sources({ 'dadbod', 'sql' }),
+              sql = cmp_util.sources('sql'),
+              mysql = cmp_util.sources('sql'),
+              plsql = cmp_util.sources('sql'),
             },
             providers = {
               dadbod = { name = 'Dadbod', module = 'vim_dadbod_completion.blink' },

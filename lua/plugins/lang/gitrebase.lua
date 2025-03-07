@@ -11,7 +11,7 @@ return vim.list_contains(_G.enabled_languages, 'gitrebase')
           sources = {
             compat = { 'git' },
             per_filetype = {
-              gitrebase = cmp_util.per_filetype_sources({ 'git' }),
+              gitrebase = cmp_util.sources('git'),
             },
           },
         },

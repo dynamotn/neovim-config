@@ -1,3 +1,5 @@
+local cmp_util = require('util.cmp')
+
 return {
   -- Debug Adapter implementation
   { import = 'lazyvim.plugins.extras.dap.core' },
@@ -32,9 +34,9 @@ return {
       sources = {
         compat = { 'dap' },
         per_filetype = {
-          ['dap-repl'] = { 'dap', 'buffer' },
-          dapui_watches = { 'dap', 'buffer' },
-          dapui_hover = { 'dap', 'buffer' },
+          ['dap-repl'] = cmp_util.sources('dap'),
+          dapui_watches = cmp_util.sources('dap'),
+          dapui_hover = cmp_util.sources('dap'),
         },
       },
     },

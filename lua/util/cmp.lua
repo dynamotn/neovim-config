@@ -1,32 +1,39 @@
 local M = {}
 
---- Get default sources of each filetypes
-M.default_sources = function()
+--- Setup default sources of cmp
+M.setup_default_sources = function()
   local success, node = pcall(vim.treesitter.get_node)
   if success and node and vim.tbl_contains({ 'comment', 'line_comment', 'block_comment' }, node:type()) then
-    return M.comment_sources()
+    return M.sources('comment')
   else
-    return M.per_filetype_with_predefined_sources({})
+    return M.sources('*')
   end
 end
 
---- Sources for comment
-M.comment_sources = function() return { 'buffer', 'ripgrep', 'dictionary', 'dynamic' } end
+--- Sources for filetype
+---@param filetype string Filetype to enable sources. `*` for undefined
+M.sources = function(filetype)
+  local common_sources =
+    { 'lsp', 'path', 'project_path', 'snippets', 'buffer', 'ripgrep', 'calc', 'tmux', 'dynamic', 'dictionary' }
+  local unique_sources = {
+    markdown = { 'obsidian' },
+    fish = { 'fish' },
+    sql = { 'dadbod', 'sql' },
+  }
 
---- Sources for all filetypes
-M.common_sources = function() return { 'snippets', 'buffer', 'ripgrep', 'calc', 'tmux', 'dynamic', 'dictionary' } end
-
---- Sources for unique filetype
----@param unique_sources string[] Unique sources
-M.per_filetype_sources = function(unique_sources) return vim.list_extend(unique_sources, M.common_sources()) end
-
---- Sources for unique filetype with predefined sources
----@param unique_sources string[] Unique sources
-M.per_filetype_with_predefined_sources = function(unique_sources)
-  local result = { 'lsp' }
-  vim.list_extend(result, unique_sources)
-  vim.list_extend(result, { 'path', 'project_path' })
-  return vim.list_extend(result, M.common_sources())
+  if filetype == 'comment' then
+    return { 'buffer', 'ripgrep', 'dictionary', 'dynamic' }
+  elseif filetype == 'comment' then
+    return { 'dap', 'buffer', 'ripgrep' }
+  elseif vim.list_contains({ 'gitcommit', 'gitrebase' }, filetype) then
+    return { 'lsp', 'snippets', 'buffer', 'dynamic', 'dictionary' }
+  elseif vim.list_contains({ 'markdown', 'fish', 'sql' }, filetype) then
+    local result = {}
+    vim.list_extend(result, unique_sources[filetype])
+    return vim.list_extend(result, common_sources)
+  elseif filetype == '*' then
+    return common_sources
+  end
 end
 
 return M
