@@ -21,10 +21,10 @@ return {
     opts = {
       strategies = {
         chat = {
-          adapter = 'ollama',
+          adapter = _G.companion_adapter or 'ollama',
         },
         inline = {
-          adapter = 'ollama',
+          adapter = _G.companion_adapter or 'ollama',
         },
       },
     },

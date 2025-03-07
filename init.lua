@@ -31,6 +31,8 @@ _G.obsidian_vaults = {
 }
 --- Firenvim setting
 _G.firenvim_site_settings = {}
+--- AI settings
+_G.companion_adapter = 'ollama'
 
 if vim.fn.has('nvim-0.10.0') == 1 then
   -- Load specific configurations per machine
