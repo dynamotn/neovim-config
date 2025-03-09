@@ -27,7 +27,9 @@ return vim.list_contains(_G.enabled_languages, 'ruby')
       {
         -- Extended snippets for Rails
         'friendly-snippets',
-        config = function() require('luasnip').filetype_extend('ruby', { 'rails' }) end,
+        config = function()
+          require('luasnip').filetype_extend('ruby', { 'rails' })
+        end,
       },
     }
   or {}

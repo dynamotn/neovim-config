@@ -14,7 +14,13 @@ M.handle_output = function(params)
     local offenses = {}
 
     for _, m in ipairs(file) do
-      local tip = table.concat(vim.tbl_map(function(r) return '“' .. r.value .. '”' end, m.replacements), ', ')
+      local tip = table.concat(
+        vim.tbl_map(
+          function(r) return '“' .. r.value .. '”' end,
+          m.replacements
+        ),
+        ', '
+      )
 
       table.insert(offenses, {
         message = m.message .. ' Try: ' .. tip,

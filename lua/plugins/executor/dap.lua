@@ -24,9 +24,10 @@ return {
       {
         'rcarriga/cmp-dap',
         init = function()
-          _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-            dap = '「DAP」',
-          })
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              dap = '「DAP」',
+            })
         end,
       },
     },

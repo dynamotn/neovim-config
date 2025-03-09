@@ -102,7 +102,11 @@ return condition
                 },
                 {
                   '<leader>cV',
-                  function() LazyVim.lsp.execute({ command = 'typescript.selectTypeScriptVersion' }) end,
+                  function()
+                    LazyVim.lsp.execute({
+                      command = 'typescript.selectTypeScriptVersion',
+                    })
+                  end,
                   desc = 'Select TS workspace version',
                 },
               },
@@ -111,7 +115,10 @@ return condition
           setup = {
             vtsls = function(_, opts)
               LazyVim.lsp.on_attach(function(client, buffer)
-                client.commands['_typescript.moveToFileRefactoring'] = function(command, ctx)
+                client.commands['_typescript.moveToFileRefactoring'] = function(
+                  command,
+                  ctx
+                )
                   ---@type string, string, lsp.Range
                   local action, uri, range = unpack(command.arguments)
 
@@ -141,14 +148,18 @@ return condition
                     table.insert(files, 1, 'Enter new path...')
                     vim.ui.select(files, {
                       prompt = 'Select move destination:',
-                      format_item = function(f) return vim.fn.fnamemodify(f, ':~:.') end,
+                      format_item = function(f)
+                        return vim.fn.fnamemodify(f, ':~:.')
+                      end,
                     }, function(f)
                       if f and f:find('^Enter new path') then
                         vim.ui.input({
                           prompt = 'Enter move destination:',
                           default = vim.fn.fnamemodify(fname, ':h') .. '/',
                           completion = 'file',
-                        }, function(newf) return newf and move(newf) end)
+                        }, function(newf)
+                          return newf and move(newf)
+                        end)
                       elseif f then
                         move(f)
                       end
@@ -157,8 +168,12 @@ return condition
                 end
               end, 'vtsls')
               -- copy typescript settings to javascript
-              opts.settings.javascript =
-                vim.tbl_deep_extend('force', {}, opts.settings.typescript, opts.settings.javascript or {})
+              opts.settings.javascript = vim.tbl_deep_extend(
+                'force',
+                {},
+                opts.settings.typescript,
+                opts.settings.javascript or {}
+              )
             end,
           },
         },
@@ -176,7 +191,11 @@ return condition
               executable = {
                 command = 'node',
                 args = {
-                  LazyVim.get_pkg_path('js-debug-adapter', '/js-debug/src/dapDebugServer.js', { warn = false }),
+                  LazyVim.get_pkg_path(
+                    'js-debug-adapter',
+                    '/js-debug/src/dapDebugServer.js',
+                    { warn = false }
+                  ),
                   '${port}',
                 },
               },

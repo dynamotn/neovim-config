@@ -56,7 +56,9 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
                 )(fname) or require('lspconfig.util').root_pattern(
                   'compile_commands.json',
                   'compile_flags.txt'
-                )(fname) or require('lspconfig.util').find_git_ancestor(fname)
+                )(fname) or require('lspconfig.util').find_git_ancestor(
+                  fname
+                )
               end,
               capabilities = {
                 offsetEncoding = { 'utf-16' },
@@ -80,7 +82,13 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
           setup = {
             clangd = function(_, opts)
               local clangd_ext_opts = LazyVim.opts('clangd_extensions.nvim')
-              require('clangd_extensions').setup(vim.tbl_deep_extend('force', clangd_ext_opts or {}, { server = opts }))
+              require('clangd_extensions').setup(
+                vim.tbl_deep_extend(
+                  'force',
+                  clangd_ext_opts or {},
+                  { server = opts }
+                )
+              )
               return false
             end,
           },
@@ -118,7 +126,13 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
                 type = 'codelldb',
                 request = 'launch',
                 name = 'Launch file',
-                program = function() return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file') end,
+                program = function()
+                  return vim.fn.input(
+                    'Path to executable: ',
+                    vim.fn.getcwd() .. '/',
+                    'file'
+                  )
+                end,
                 cwd = '${workspaceFolder}',
               },
               {

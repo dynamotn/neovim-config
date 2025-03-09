@@ -18,7 +18,8 @@ return {
     config = function(_, opts)
       -- Setup treesitter parser to work with defined filetypes
       local builtin_supported_filetypes = {}
-      local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+      local parser_config =
+        require('nvim-treesitter.parsers').get_parser_configs()
       for name, language in pairs(require('config.languages')) do
         vim.list_extend(builtin_supported_filetypes, language.filetypes)
 
@@ -28,7 +29,9 @@ return {
               for _, ft in pairs(language.filetypes) do
                 vim.treesitter.language.register(parser, ft)
               end
-              if vim.list_contains(_G.bundle_languages, name) then table.insert(opts.ensure_installed, { parser }) end
+              if vim.list_contains(_G.bundle_languages, name) then
+                table.insert(opts.ensure_installed, { parser })
+              end
             elseif type(parser) == 'table' then
               local parser_name = parser[1]
               if parser_config[parser_name] then
@@ -55,7 +58,9 @@ return {
       end
 
       -- Setup from opts
-      if type(opts.ensure_installed) == 'table' then opts.ensure_installed = LazyVim.dedup(opts.ensure_installed) end
+      if type(opts.ensure_installed) == 'table' then
+        opts.ensure_installed = LazyVim.dedup(opts.ensure_installed)
+      end
       require('nvim-treesitter.configs').setup(opts)
 
       -- Automatic install parsers for window buffer
@@ -63,9 +68,17 @@ return {
         pattern = builtin_supported_filetypes,
         group = vim.api.nvim_create_augroup('ts_parser_manager', {}),
         callback = function()
-          local parsers = require('util.languages').get_parsers_by_filetype(vim.bo.filetype)
+          local parsers =
+            require('util.languages').get_parsers_by_filetype(vim.bo.filetype)
           for _, parser in ipairs(parsers) do
-            if next(vim.api.nvim_get_runtime_file('parser/' .. parser .. '.so', true)) == nil then
+            if
+              next(
+                vim.api.nvim_get_runtime_file(
+                  'parser/' .. parser .. '.so',
+                  true
+                )
+              ) == nil
+            then
               vim.api.nvim_command('TSInstall ' .. parser)
             end
           end
@@ -74,11 +87,15 @@ return {
 
       -- Setup predicates
       for predicate, regex in pairs(opts.custom_predicates) do
-        require('vim.treesitter.query').add_predicate(predicate, function(_, _, bufnr, _)
-          local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
-          local filename = vim.fn.fnamemodify(filepath, ':t')
-          return string.match(filename, regex)
-        end, { force = true, all = false })
+        require('vim.treesitter.query').add_predicate(
+          predicate,
+          function(_, _, bufnr, _)
+            local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
+            local filename = vim.fn.fnamemodify(filepath, ':t')
+            return string.match(filename, regex)
+          end,
+          { force = true, all = false }
+        )
       end
     end,
   },

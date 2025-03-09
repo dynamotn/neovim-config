@@ -42,9 +42,10 @@ return vim.list_contains(_G.enabled_languages, 'sql')
         'kristijanhusak/vim-dadbod-completion',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-            Dadbod = '「DB」',
-          })
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              Dadbod = '「DB」',
+            })
         end,
       },
       {
@@ -52,9 +53,10 @@ return vim.list_contains(_G.enabled_languages, 'sql')
         'ray-x/cmp-sql',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-            sql = '「SQL」',
-          })
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              sql = '「SQL」',
+            })
         end,
       },
       {
@@ -70,7 +72,10 @@ return vim.list_contains(_G.enabled_languages, 'sql')
               plsql = cmp_util.sources('sql'),
             },
             providers = {
-              dadbod = { name = 'Dadbod', module = 'vim_dadbod_completion.blink' },
+              dadbod = {
+                name = 'Dadbod',
+                module = 'vim_dadbod_completion.blink',
+              },
             },
           },
         },

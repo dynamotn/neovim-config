@@ -41,9 +41,10 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         'lazydev.nvim',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-            Lazydev = '「VIM」',
-          })
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              Lazydev = '「VIM」',
+            })
         end,
       },
       {

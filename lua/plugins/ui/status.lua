@@ -13,7 +13,9 @@ return {
         {
           function()
             local b = vim.api.nvim_get_current_buf()
-            if next(vim.treesitter.highlighter.active[b]) then return icons.treesitter end
+            if next(vim.treesitter.highlighter.active[b]) then
+              return icons.treesitter
+            end
             return ''
           end,
           color = { fg = Snacks.util.color('String') },
@@ -26,7 +28,9 @@ return {
             local buf_client_names = {}
 
             for _, client in pairs(buf_clients) do
-              if not vim.list_contains({ 'null-ls', 'copilot' }, client.name) then
+              if
+                not vim.list_contains({ 'null-ls', 'copilot' }, client.name)
+              then
                 table.insert(buf_client_names, client.name)
               end
             end
@@ -37,7 +41,11 @@ return {
         {
           function()
             local msg = icons.null_ls
-            for _, tool in ipairs(require('util.languages').get_tools_by_filetype(vim.bo.filetype)) do
+            for _, tool in
+              ipairs(
+                require('util.languages').get_tools_by_filetype(vim.bo.filetype)
+              )
+            do
               if vim.fn.executable(tool) == 1 or tool == 'injected' then
                 msg = msg .. tool .. ' '
               else
@@ -77,7 +85,9 @@ return {
     opts = {
       options = {
         mode = 'tabs',
-        numbers = function(number_opts) return string.format('%s', number_opts.raise(number_opts.id)) end,
+        numbers = function(number_opts)
+          return string.format('%s', number_opts.raise(number_opts.id))
+        end,
         show_buffer_close_icons = false,
         show_close_icon = false,
         separator_style = 'slant',

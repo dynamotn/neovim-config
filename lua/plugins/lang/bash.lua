@@ -23,7 +23,11 @@ neogen_configurations.data = {
                   retrieve = 'all',
                   recursive = true,
                   subtree = {
-                    { node_type = 'variable_name', retrieve = 'all', extract = true },
+                    {
+                      node_type = 'variable_name',
+                      retrieve = 'all',
+                      extract = true,
+                    },
                   },
                 },
                 {
@@ -31,7 +35,11 @@ neogen_configurations.data = {
                   recursive = true,
                   retrieve = 'all',
                   subtree = {
-                    { node_type = 'variable_name', retrieve = 'all', extract = true },
+                    {
+                      node_type = 'variable_name',
+                      retrieve = 'all',
+                      extract = true,
+                    },
                   },
                 },
               },
@@ -56,9 +64,17 @@ neogen_configurations.data = {
 neogen_configurations.template = {
   annotation_convention = 'dynamo_bash',
   dynamo_bash = {
-    { nil, '#######################################', { no_results = true, type = { 'func' } } },
+    {
+      nil,
+      '#######################################',
+      { no_results = true, type = { 'func' } },
+    },
     { nil, '# $1', { no_results = true, type = { 'func' } } },
-    { nil, '#######################################', { no_results = true, type = { 'func' } } },
+    {
+      nil,
+      '#######################################',
+      { no_results = true, type = { 'func' } },
+    },
 
     { nil, '#!/usr/bin/env bash', { no_results = true, type = { 'file' } } },
     { nil, '#', { no_results = true, type = { 'file' } } },

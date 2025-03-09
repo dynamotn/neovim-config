@@ -36,7 +36,9 @@ return {
                   execute "!zellij run --floating -- " . a:cmd
                 endfunction
               ]])
-              vim.cmd([[ let g:test#custom_strategies = {'zellij': function('ZellijStrategy')} ]])
+              vim.cmd(
+                [[ let g:test#custom_strategies = {'zellij': function('ZellijStrategy')} ]]
+              )
             end
             vim.g['test#strategy'] = _G.test_strategy
           end,

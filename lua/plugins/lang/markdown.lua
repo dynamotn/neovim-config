@@ -73,9 +73,10 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
           workspaces = _G.obsidian.vaults(),
         },
         init = function()
-          _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-            obsidian = '「NOTE」',
-          })
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              obsidian = '「NOTE」',
+            })
         end,
       },
       {

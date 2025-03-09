@@ -38,7 +38,13 @@ return vim.list_contains(_G.enabled_languages, 'go')
                   usePlaceholders = true,
                   completeUnimported = true,
                   staticcheck = true,
-                  directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
+                  directoryFilters = {
+                    '-.git',
+                    '-.vscode',
+                    '-.idea',
+                    '-.vscode-test',
+                    '-node_modules',
+                  },
                   semanticTokens = true,
                 },
               },
@@ -50,7 +56,8 @@ return vim.list_contains(_G.enabled_languages, 'go')
               -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
               LazyVim.lsp.on_attach(function(client, _)
                 if not client.server_capabilities.semanticTokensProvider then
-                  local semantic = client.config.capabilities.textDocument.semanticTokens
+                  local semantic =
+                    client.config.capabilities.textDocument.semanticTokens
                   client.server_capabilities.semanticTokensProvider = {
                     full = true,
                     legend = {

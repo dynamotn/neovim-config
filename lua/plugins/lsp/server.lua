@@ -78,42 +78,63 @@ return {
 
       -- setup keymaps
       LazyVim.lsp.on_attach(
-        function(client, buffer) require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer) end
+        function(client, buffer)
+          require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
+        end
       )
 
       LazyVim.lsp.setup()
-      LazyVim.lsp.on_dynamic_capability(require('lazyvim.plugins.lsp.keymaps').on_attach)
+      LazyVim.lsp.on_dynamic_capability(
+        require('lazyvim.plugins.lsp.keymaps').on_attach
+      )
 
       -- inlay hints
       if opts.inlay_hints.enabled then
-        LazyVim.lsp.on_supports_method('textDocument/inlayHint', function(client, buffer)
-          if
-            vim.api.nvim_buf_is_valid(buffer)
-            and vim.bo[buffer].buftype == ''
-            and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
-          then
-            vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+        LazyVim.lsp.on_supports_method(
+          'textDocument/inlayHint',
+          function(client, buffer)
+            if
+              vim.api.nvim_buf_is_valid(buffer)
+              and vim.bo[buffer].buftype == ''
+              and not vim.tbl_contains(
+                opts.inlay_hints.exclude,
+                vim.bo[buffer].filetype
+              )
+            then
+              vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+            end
           end
-        end)
+        )
       end
 
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
-        LazyVim.lsp.on_supports_method('textDocument/codeLens', function(client, buffer)
-          vim.lsp.codelens.refresh()
-          vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-            buffer = buffer,
-            callback = vim.lsp.codelens.refresh,
-          })
-        end)
+        LazyVim.lsp.on_supports_method(
+          'textDocument/codeLens',
+          function(client, buffer)
+            vim.lsp.codelens.refresh()
+            vim.api.nvim_create_autocmd(
+              { 'BufEnter', 'CursorHold', 'InsertLeave' },
+              {
+                buffer = buffer,
+                callback = vim.lsp.codelens.refresh,
+              }
+            )
+          end
+        )
       end
 
       -- virtual text
-      if type(opts.diagnostics.virtual_text) == 'table' and opts.diagnostics.virtual_text.prefix == 'icons' then
+      if
+        type(opts.diagnostics.virtual_text) == 'table'
+        and opts.diagnostics.virtual_text.prefix == 'icons'
+      then
         opts.diagnostics.virtual_text.prefix = function(diagnostic)
           local icons = LazyVim.config.icons.diagnostics
           for d, icon in pairs(icons) do
-            if diagnostic.severity == vim.diagnostic.severity[d:upper()] then return icon end
+            if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+              return icon
+            end
           end
         end
       end
@@ -146,7 +167,9 @@ return {
         end
 
         -- add not supported officially server
-        if opts.module[server] then require('lspconfig.configs')[server] = require(opts.module[server]) end
+        if opts.module[server] then
+          require('lspconfig.configs')[server] = require(opts.module[server])
+        end
         require('lspconfig')[server].setup(server_opts)
       end
 
@@ -154,7 +177,9 @@ return {
       local have_mason, mlsp = pcall(require, 'mason-lspconfig')
       local all_mslp_servers = {}
       if have_mason then
-        all_mslp_servers = vim.tbl_keys(require('mason-lspconfig.mappings.server').lspconfig_to_package)
+        all_mslp_servers = vim.tbl_keys(
+          require('mason-lspconfig.mappings.server').lspconfig_to_package
+        )
       end
 
       local ensure_installed = {} ---@type string[]
@@ -165,10 +190,17 @@ return {
             -- run manual setup if
             -- mason=false
             -- or if this is a server that cannot be installed with mason-lspconfig
-            if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+            if
+              server_opts.mason == false
+              or not vim.tbl_contains(all_mslp_servers, server)
+            then
               setup(server)
             -- install server of language in bundle languages
-            elseif require('util.languages').check_lsp_is_for_bundled_language(server) then
+            elseif
+              require('util.languages').check_lsp_is_for_bundled_language(
+                server
+              )
+            then
               ensure_installed[#ensure_installed + 1] = server
             end
           end

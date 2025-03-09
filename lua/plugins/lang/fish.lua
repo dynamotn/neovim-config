@@ -10,9 +10,10 @@ return vim.list_contains(_G.enabled_languages, 'fish')
           'mtoohey31/cmp-fish',
           ft = language.filetypes,
           init = function()
-            _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-              fish = '「FISH」',
-            })
+            _G.completion_sources =
+              vim.tbl_extend('force', _G.completion_sources, {
+                fish = '「FISH」',
+              })
           end,
         },
         opts = {

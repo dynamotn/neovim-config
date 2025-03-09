@@ -397,7 +397,9 @@ return {
           :replace_endpair(function(opts)
             local prev_3char = opts.line:sub(opts.col - 3, opts.col - 2)
             local next_char = opts.line:sub(opts.col, opts.col)
-            if prev_3char:match('%)$') then return '<BS><BS> => {  }' .. next_char end
+            if prev_3char:match('%)$') then
+              return '<BS><BS> => {  }' .. next_char
+            end
             return ' {  }'
           end)
           :set_end_pair_length(2),
@@ -502,7 +504,9 @@ return {
       return {
         -- Add parentheses in function
         rule('{{', '  }', filetypes):set_end_pair_length(2),
-        rule('{-', '{-  }', filetypes):replace_endpair(function(_) return '<BS><BS>{{-  }' end):set_end_pair_length(2),
+        rule('{-', '{-  }', filetypes)
+          :replace_endpair(function(_) return '<BS><BS>{{-  }' end)
+          :set_end_pair_length(2),
       }
     end,
   },
@@ -521,7 +525,9 @@ return {
       return {
         -- Add parentheses in function
         rule('{{', '  }', filetypes):set_end_pair_length(2),
-        rule('{-', '{-  }', filetypes):replace_endpair(function(_) return '<BS><BS>{{-  }' end):set_end_pair_length(2),
+        rule('{-', '{-  }', filetypes)
+          :replace_endpair(function(_) return '<BS><BS>{{-  }' end)
+          :set_end_pair_length(2),
       }
     end,
   },
@@ -567,7 +573,9 @@ return {
         'markdown-toc',
         opts = {
           condition = function(_, ctx)
-            for _, line in ipairs(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)) do
+            for _, line in
+              ipairs(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false))
+            do
               if line:find('<!%-%- toc %-%->') then return true end
             end
           end,
@@ -577,7 +585,10 @@ return {
         'markdownlint-cli2',
         opts = {
           condition = function(_, ctx)
-            local diag = vim.tbl_filter(function(d) return d.source == 'markdownlint' end, vim.diagnostic.get(ctx.buf))
+            local diag = vim.tbl_filter(
+              function(d) return d.source == 'markdownlint' end,
+              vim.diagnostic.get(ctx.buf)
+            )
             return #diag > 0
           end,
         },

@@ -10,7 +10,9 @@ return {
             for _, tool in ipairs(language.formatters) do
               -- Add formatter's config to list of tools if exist
               if type(tool) == 'string' then
-                if vim.fn.executable(tool) == 1 then table.insert(opts.formatters_by_ft[ft], tool) end
+                if vim.fn.executable(tool) == 1 then
+                  table.insert(opts.formatters_by_ft[ft], tool)
+                end
               elseif type(tool) == 'table' then
                 local tool_name = tool[1]
                 if vim.fn.executable(tool_name) == 1 then

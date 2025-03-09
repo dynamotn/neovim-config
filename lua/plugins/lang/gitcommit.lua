@@ -10,9 +10,10 @@ return vim.list_contains(_G.enabled_languages, 'gitcommit')
           'petertriho/cmp-git',
           ft = language.filetypes,
           init = function()
-            _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-              git = '「GIT」',
-            })
+            _G.completion_sources =
+              vim.tbl_extend('force', _G.completion_sources, {
+                git = '「GIT」',
+              })
           end,
         },
         opts = {

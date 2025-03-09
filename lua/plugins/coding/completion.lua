@@ -81,7 +81,10 @@ return {
           buffer = {
             opts = {
               get_bufnrs = function()
-                return vim.tbl_filter(function(bufnr) return vim.bo[bufnr].buftype == '' end, vim.api.nvim_list_bufs())
+                return vim.tbl_filter(
+                  function(bufnr) return vim.bo[bufnr].buftype == '' end,
+                  vim.api.nvim_list_bufs()
+                )
               end,
             },
           },
@@ -131,7 +134,9 @@ return {
           -- Search forward and backward
           if type == '/' or type == '?' then return { 'buffer' } end
           -- Commands
-          if type == ':' or type == '@' then return { 'cmdline', 'path', 'fuzzy_path', 'buffer' } end
+          if type == ':' or type == '@' then
+            return { 'cmdline', 'path', 'fuzzy_path', 'buffer' }
+          end
           return {}
         end,
       },
@@ -140,15 +145,24 @@ return {
         menu = {
           border = 'rounded',
           draw = {
-            columns = { { 'source_name', 'kind_icon' }, { 'label', 'label_description', gap = 1 } },
+            columns = {
+              { 'source_name', 'kind_icon' },
+              { 'label', 'label_description', gap = 1 },
+            },
             components = {
               kind_icon = {
                 ellipsis = false,
                 text = function(ctx)
                   local icon = ctx.kind_icon
                   -- Show icon of file when source is Path
-                  if vim.tbl_contains({ 'Path', 'fuzzy_path', 'project_path' }, ctx.source_name) then
-                    local dev_icon, _ = require('nvim-web-devicons').get_icon(ctx.label)
+                  if
+                    vim.tbl_contains(
+                      { 'Path', 'fuzzy_path', 'project_path' },
+                      ctx.source_name
+                    )
+                  then
+                    local dev_icon, _ =
+                      require('nvim-web-devicons').get_icon(ctx.label)
                     if dev_icon then icon = dev_icon end
                   else
                     local kind_icons = require('config.defaults').icons.kinds
@@ -169,9 +183,17 @@ return {
                 -- keep the highlight groups in sync with the icons.
                 highlight = function(ctx)
                   local hl = 'BlinkCmpKind' .. ctx.kind
-                    or require('blink.cmp.completion.windows.render.tailwind').get_hl(ctx)
-                  if vim.tbl_contains({ 'Path', 'fuzzy_path', 'project_path' }, ctx.source_name) then
-                    local dev_icon, dev_hl = require('nvim-web-devicons').get_icon(ctx.label)
+                    or require('blink.cmp.completion.windows.render.tailwind').get_hl(
+                      ctx
+                    )
+                  if
+                    vim.tbl_contains(
+                      { 'Path', 'fuzzy_path', 'project_path' },
+                      ctx.source_name
+                    )
+                  then
+                    local dev_icon, dev_hl =
+                      require('nvim-web-devicons').get_icon(ctx.label)
                     if dev_icon then hl = dev_hl end
                   end
                   return hl
@@ -179,10 +201,13 @@ return {
               },
               source_name = {
                 text = function(ctx)
-                  if vim.tbl_contains({ 'Path', 'fuzzy_path' }, ctx.source_name) then
+                  if
+                    vim.tbl_contains({ 'Path', 'fuzzy_path' }, ctx.source_name)
+                  then
                     return _G.completion_sources['Path']
                   end
-                  return _G.completion_sources[ctx.source_name] or ctx.source_name
+                  return _G.completion_sources[ctx.source_name]
+                    or ctx.source_name
                 end,
               },
             },

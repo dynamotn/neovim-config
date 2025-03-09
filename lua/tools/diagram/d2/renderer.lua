@@ -21,16 +21,21 @@ vim.fn.mkdir(tmpdir, 'p')
 ---@param options D2Options
 ---@return string|nil
 M.render = function(source, options)
-  local out = vim.fn.system(string.format('grep "# d2:disabled render" %s', source))
+  local out =
+    vim.fn.system(string.format('grep "# d2:disabled render" %s', source))
   if type(out) == 'string' and out:match('d2:') then return nil end
 
-  local hash = vim.fn.sha256(M.id .. ':' .. source .. ':' .. vim.uv.fs_stat(source).mtime.sec)
+  local hash = vim.fn.sha256(
+    M.id .. ':' .. source .. ':' .. vim.uv.fs_stat(source).mtime.sec
+  )
   if cache[hash] then return cache[hash] end
 
   local path = vim.fn.resolve(tmpdir .. '/' .. hash .. '.png')
   if vim.fn.filereadable(path) == 1 then return path end
 
-  if not vim.fn.executable('d2') then error('diagram/d2: d2 not found in PATH') end
+  if not vim.fn.executable('d2') then
+    error('diagram/d2: d2 not found in PATH')
+  end
 
   local command_parts = {
     'd2',

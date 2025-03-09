@@ -21,7 +21,11 @@ return vim.list_contains(_G.enabled_languages, 'python')
               desc = 'Debug Class',
             },
           },
-          config = function() require('dap-python').setup(LazyVim.get_pkg_path('debugpy', '/venv/bin/python')) end,
+          config = function()
+            require('dap-python').setup(
+              LazyVim.get_pkg_path('debugpy', '/venv/bin/python')
+            )
+          end,
         },
       },
       {

@@ -56,7 +56,18 @@ return {
           :use_key(']'),
 
         -- Add space on equal sign
-        rule('=', ' ', { '-sh', '-sh.ebuild', '-bats', '-sh.PKGBUILD', '-yaml', '-dockerfile' })
+        rule(
+            '=',
+            ' ',
+            {
+              '-sh',
+              '-sh.ebuild',
+              '-bats',
+              '-sh.PKGBUILD',
+              '-yaml',
+              '-dockerfile',
+            }
+          )
           :with_pair(cond.not_inside_quote())
           :with_pair(function(opts)
             local last_char = opts.line:sub(opts.col - 1, opts.col - 1)
@@ -87,9 +98,14 @@ return {
       })
 
       -- Auto pair rules per filetype
-      local languages_list = vim.tbl_filter(function(config) return config.autopairs end, require('config.languages'))
+      local languages_list = vim.tbl_filter(
+        function(config) return config.autopairs end,
+        require('config.languages')
+      )
       for _, config in pairs(languages_list) do
-        autopairs.add_rules(config.autopairs(config.filetypes, rule, cond, ts_cond))
+        autopairs.add_rules(
+          config.autopairs(config.filetypes, rule, cond, ts_cond)
+        )
       end
     end,
   },

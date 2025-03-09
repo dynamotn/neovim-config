@@ -19,8 +19,13 @@ return vim.list_contains(_G.enabled_languages, 'java')
           local cmd = { vim.fn.exepath('jdtls') }
           if LazyVim.has('mason.nvim') then
             local mason_registry = require('mason-registry')
-            local lombok_jar = mason_registry.get_package('jdtls'):get_install_path() .. '/lombok.jar'
-            table.insert(cmd, string.format('--jvm-arg=-javaagent:%s', lombok_jar))
+            local lombok_jar = mason_registry
+              .get_package('jdtls')
+              :get_install_path() .. '/lombok.jar'
+            table.insert(
+              cmd,
+              string.format('--jvm-arg=-javaagent:%s', lombok_jar)
+            )
           end
           return {
             -- How to find the root dir for a given filename. The default comes from
@@ -28,14 +33,22 @@ return vim.list_contains(_G.enabled_languages, 'java')
             root_dir = LazyVim.lsp.get_raw_config('jdtls').default_config.root_dir,
 
             -- How to find the project name for a given root dir.
-            project_name = function(root_dir) return root_dir and vim.fs.basename(root_dir) end,
+            project_name = function(root_dir)
+              return root_dir and vim.fs.basename(root_dir)
+            end,
 
             -- Where are the config and workspace dirs for a project?
             jdtls_config_dir = function(project_name)
-              return vim.fn.stdpath('cache') .. '/jdtls/' .. project_name .. '/config'
+              return vim.fn.stdpath('cache')
+                .. '/jdtls/'
+                .. project_name
+                .. '/config'
             end,
             jdtls_workspace_dir = function(project_name)
-              return vim.fn.stdpath('cache') .. '/jdtls/' .. project_name .. '/workspace'
+              return vim.fn.stdpath('cache')
+                .. '/jdtls/'
+                .. project_name
+                .. '/workspace'
             end,
 
             -- How to run jdtls. This can be overridden to a full java command-line
@@ -84,10 +97,12 @@ return vim.list_contains(_G.enabled_languages, 'java')
               and LazyVim.has('mfussenegger/nvim-dap')
               and mason_registry.is_installed('java-debug-adapter')
             then
-              local java_dbg_pkg = mason_registry.get_package('java-debug-adapter')
+              local java_dbg_pkg =
+                mason_registry.get_package('java-debug-adapter')
               local java_dbg_path = java_dbg_pkg:get_install_path()
               local jar_patterns = {
-                java_dbg_path .. '/extension/server/com.microsoft.java.debug.plugin-*.jar',
+                java_dbg_path
+                  .. '/extension/server/com.microsoft.java.debug.plugin-*.jar',
               }
               -- java-test also depends on java-debug-adapter.
               if opts.test and mason_registry.is_installed('java-test') then
@@ -98,7 +113,9 @@ return vim.list_contains(_G.enabled_languages, 'java')
                 })
               end
               for _, jar_pattern in ipairs(jar_patterns) do
-                for _, bundle in ipairs(vim.split(vim.fn.glob(jar_pattern), '\n')) do
+                for _, bundle in
+                  ipairs(vim.split(vim.fn.glob(jar_pattern), '\n'))
+                do
                   table.insert(bundles, bundle)
                 end
               end
@@ -116,7 +133,9 @@ return vim.list_contains(_G.enabled_languages, 'java')
               },
               settings = opts.settings,
               -- enable CMP capabilities
-              capabilities = LazyVim.has('cmp-nvim-lsp') and require('cmp_nvim_lsp').default_capabilities() or nil,
+              capabilities = LazyVim.has('cmp-nvim-lsp') and require(
+                'cmp_nvim_lsp'
+              ).default_capabilities() or nil,
             }, opts.jdtls)
 
             -- Existing server will be reused if the root_dir matches.
@@ -145,11 +164,31 @@ return vim.list_contains(_G.enabled_languages, 'java')
                     mode = 'n',
                     buffer = args.buf,
                     { '<leader>cx', group = 'extract' },
-                    { '<leader>cxv', require('jdtls').extract_variable_all, desc = 'Extract Variable' },
-                    { '<leader>cxc', require('jdtls').extract_constant, desc = 'Extract Constant' },
-                    { '<leader>cgs', require('jdtls').super_implementation, desc = 'Goto Super' },
-                    { '<leader>cgS', require('jdtls.tests').goto_subjects, desc = 'Goto Subjects' },
-                    { '<leader>co', require('jdtls').organize_imports, desc = 'Organize Imports' },
+                    {
+                      '<leader>cxv',
+                      require('jdtls').extract_variable_all,
+                      desc = 'Extract Variable',
+                    },
+                    {
+                      '<leader>cxc',
+                      require('jdtls').extract_constant,
+                      desc = 'Extract Constant',
+                    },
+                    {
+                      '<leader>cgs',
+                      require('jdtls').super_implementation,
+                      desc = 'Goto Super',
+                    },
+                    {
+                      '<leader>cgS',
+                      require('jdtls.tests').goto_subjects,
+                      desc = 'Goto Subjects',
+                    },
+                    {
+                      '<leader>co',
+                      require('jdtls').organize_imports,
+                      desc = 'Organize Imports',
+                    },
                   },
                 })
                 wk.add({
@@ -184,10 +223,16 @@ return vim.list_contains(_G.enabled_languages, 'java')
                   then
                     -- custom init for Java debugger
                     require('jdtls').setup_dap(opts.dap)
-                    if opts.dap_main then require('jdtls.dap').setup_dap_main_class_configs(opts.dap_main) end
+                    if opts.dap_main then
+                      require('jdtls.dap').setup_dap_main_class_configs(
+                        opts.dap_main
+                      )
+                    end
 
                     -- Java Test require Java debugger to work
-                    if opts.test and mason_registry.is_installed('java-test') then
+                    if
+                      opts.test and mason_registry.is_installed('java-test')
+                    then
                       -- custom keymaps for Java test runner (not yet compatible with neotest)
                       wk.add({
                         {
@@ -198,7 +243,9 @@ return vim.list_contains(_G.enabled_languages, 'java')
                             '<leader>tt',
                             function()
                               require('jdtls.dap').test_class({
-                                config_overrides = type(opts.test) ~= 'boolean' and opts.test.config_overrides or nil,
+                                config_overrides = type(opts.test) ~= 'boolean'
+                                    and opts.test.config_overrides
+                                  or nil,
                               })
                             end,
                             desc = 'Run All Test',
@@ -207,12 +254,18 @@ return vim.list_contains(_G.enabled_languages, 'java')
                             '<leader>tr',
                             function()
                               require('jdtls.dap').test_nearest_method({
-                                config_overrides = type(opts.test) ~= 'boolean' and opts.test.config_overrides or nil,
+                                config_overrides = type(opts.test) ~= 'boolean'
+                                    and opts.test.config_overrides
+                                  or nil,
                               })
                             end,
                             desc = 'Run Nearest Test',
                           },
-                          { '<leader>tT', require('jdtls.dap').pick_test, desc = 'Run Test' },
+                          {
+                            '<leader>tT',
+                            require('jdtls.dap').pick_test,
+                            desc = 'Run Test',
+                          },
                         },
                       })
                     end
