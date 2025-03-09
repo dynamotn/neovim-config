@@ -635,6 +635,11 @@ return {
     lsp_servers = { 'vacuum' },
     linters = { 'yq' },
   },
+  systemd = {
+    filetypes = { 'systemd' },
+    parsers = {},
+    lsp_servers = { 'systemd-language-server' },
+  },
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
     parsers = { 'hcl', 'terraform' },

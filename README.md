@@ -99,6 +99,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Nginx
 - Nix
 - OpenAPI
+- SystemD
 - Terraform
 - Terragrunt
 - TOML
