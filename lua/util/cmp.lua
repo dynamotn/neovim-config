@@ -26,7 +26,7 @@ M.sources = function(filetype)
     'project_path',
     'snippets',
     'buffer',
-    'ripgrep',
+    -- 'ripgrep',
     'calc',
     'tmux',
     'dynamic',
