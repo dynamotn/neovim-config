@@ -82,7 +82,6 @@ return {
     },
     linters = { 'shellcheck' },
     formatters = {
-      'shellharden',
       'shellcheck',
       {
         'shfmt',
