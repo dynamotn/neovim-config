@@ -28,28 +28,29 @@ return {
       for _, language in ipairs(languages_list) do
         for _, tool in ipairs(language.null_ls) do
           local tool_name = tool[1]
-          if source_configs[tool_name] then
-            source_configs[tool_name].filetypes =
-              vim.list_extend(filetypes[tool_name], language.filetypes)
+          local key = tool.type .. '.' .. tool_name
+          if source_configs[key] then
+            source_configs[key].filetypes =
+              vim.list_extend(filetypes[key], language.filetypes)
           else
-            source_configs[tool_name] = {
+            source_configs[key] = {
               info = tool,
-              filetypes = language.filetypes,
+              filetypes = vim.deepcopy(language.filetypes),
             }
-            filetypes[tool_name] = vim.list_slice(language.filetypes)
+            filetypes[key] = vim.list_slice(language.filetypes)
           end
         end
       end
 
       -- Setup null_ls configs with predefined filetypes
-      for name, config in pairs(source_configs) do
+      for _, config in pairs(source_configs) do
         table.insert(
           opts.sources,
           require(
             (config.info.custom and 'tools.' or 'null-ls.builtins.')
               .. config.info.type
               .. '.'
-              .. name
+              .. config.info[1]
           ).with({
             filetypes = config.filetypes,
           })
