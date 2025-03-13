@@ -23,6 +23,7 @@
 ---@class DyLinterSpec
 ---@field [1] string
 ---@field opts? table
+---@field command? string
 
 ---@class DyFormatterSpec
 ---@field [1] string
@@ -38,8 +39,30 @@
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
 return {
+  ---@diagnostic disable-next-line: missing-fields
+  ['*'] = { -- For all filetypes
+    filetypes = { '*' },
+    formatters = {
+      { 'trim_whitespace', command = 'lua' },
+      { 'trim_newlines', command = 'lua' },
+    },
+    linters = { 'typos' },
+    null_ls = {
+      { 'dictionary', type = 'hover', command = 'curl' },
+      { 'trail_space', type = 'diagnostics', command = 'lua' },
+      { 'gitsigns', type = 'code_actions', command = 'git' },
+    },
+  },
+  ---@diagnostic disable-next-line: missing-fields
+  ['_'] = { -- For only non-configured filetypes
+    filetypes = { '_' },
+    linters = {
+      { 'compiler', command = 'lua' },
+    },
+  },
+
   -- Programming language & Frameworks {
-  angular = { -- See html and javascript
+  angular = { -- See `html` and `javascript`
     filetypes = { 'htmlangular' },
     parsers = { 'angular' },
     lsp_servers = { 'angularls' },
@@ -176,7 +199,6 @@ return {
     parsers = { 'fish' },
     lsp_servers = { 'fish_lsp' },
     linters = { 'fish' },
-    -- formatters = { 'fish_indent' }, -- I don't want to use 4 spaces style of fish_indent
     endwise = true,
   },
   go = {
@@ -486,7 +508,6 @@ return {
     linters = { 'gitlint' },
     null_ls = {
       { 'jira', type = 'completion', command = 'jira', custom = true },
-      { 'dictionary', type = 'hover', command = 'curl' },
     },
   },
   gitrebase = {
@@ -567,6 +588,7 @@ return {
             bash = 'sh',
           },
         },
+        command = 'lua',
       },
       {
         'markdown-toc',
@@ -595,7 +617,6 @@ return {
     },
     null_ls = {
       { 'jira', type = 'completion', command = 'jira', custom = true },
-      { 'dictionary', type = 'hover', command = 'curl' },
     },
     dial = function()
       local augend = require('dial.augend')

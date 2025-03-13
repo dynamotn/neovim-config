@@ -14,35 +14,26 @@ return {
         )
       opts.sources = {}
 
-      -- Default sources
-      table.insert(opts.sources, null_ls.builtins.diagnostics.trail_space)
-      table.insert(opts.sources, null_ls.builtins.code_actions.gitsigns)
-
       -- Unified null_ls source configs
-      local languages_list = vim.tbl_filter(
-        function(language) return language.null_ls end,
-        require('config.languages')
-      )
       local source_configs = {}
-      local filetypes = {}
-      for _, language in ipairs(languages_list) do
-        for _, tool in ipairs(language.null_ls) do
+      for name, language in pairs(require('config.languages')) do
+        for _, tool in ipairs(language.null_ls or {}) do
           local tool_name = tool[1]
           local key = tool.type .. '.' .. tool_name
           if source_configs[key] then
             source_configs[key].filetypes =
-              vim.list_extend(filetypes[key], language.filetypes)
+              vim.list_extend(source_configs[key].filetypes, language.filetypes)
           else
             source_configs[key] = {
               info = tool,
-              filetypes = vim.deepcopy(language.filetypes),
+              filetypes = name == '*' and {}
+                or vim.deepcopy(language.filetypes),
             }
-            filetypes[key] = vim.list_slice(language.filetypes)
           end
         end
       end
 
-      -- Setup null_ls configs with predefined filetypes
+      -- Setup null_ls configs with predefined file types
       for _, config in pairs(source_configs) do
         table.insert(
           opts.sources,

@@ -37,41 +37,47 @@ end
 ---@return string[]
 M.get_tools_by_filetype = function(filetype)
   local result = {}
-  local language_name = M.get_language_from_filetype(filetype)
-  local formatters = languages_list[language_name].formatters
-  local linters = languages_list[language_name].linters
-  local null_ls = languages_list[language_name].null_ls
+  local language_name = M.get_language_from_filetype(filetype) or '_'
+  local formatters = vim.tbl_deep_extend(
+    'force',
+    languages_list['*'].formatters or {},
+    languages_list[language_name].formatters or {}
+  )
+  local linters = vim.tbl_deep_extend(
+    'force',
+    languages_list['*'].linters or {},
+    languages_list[language_name].linters or {}
+  )
+  local null_ls = vim.tbl_deep_extend(
+    'force',
+    languages_list['*'].null_ls or {},
+    languages_list[language_name].null_ls or {}
+  )
 
-  if formatters then
-    for _, tool in ipairs(formatters) do
-      if type(tool) == 'string' then
-        table.insert(result, tool)
-      elseif type(formatters) == 'table' then
-        table.insert(result, tool.command and tool.command or tool[1])
-      end
+  for _, tool in ipairs(formatters or {}) do
+    if type(tool) == 'string' then
+      table.insert(result, tool)
+    elseif type(formatters) == 'table' then
+      table.insert(result, tool.command and tool.command or tool[1])
     end
   end
 
-  if linters then
-    for _, tool in ipairs(linters) do
-      if type(tool) == 'string' then
-        table.insert(result, tool)
-      elseif type(linters) == 'table' then
-        table.insert(result, tool[1])
-      end
+  for _, tool in ipairs(linters or {}) do
+    if type(tool) == 'string' then
+      table.insert(result, tool)
+    elseif type(linters) == 'table' then
+      table.insert(result, tool.command and tool.command or tool[1])
     end
   end
 
-  if null_ls then
-    for _, tool in ipairs(null_ls) do
-      table.insert(result, tool.command)
-    end
+  for _, tool in ipairs(null_ls or {}) do
+    table.insert(result, tool.command)
   end
   return LazyVim.dedup(result)
 end
 
---- Check a LSP server of a language is in bundle languages or not
----@param lsp_name string LSP server name (follow by lspconfig)
+--- Check an LSP server of a language is in bundle languages or not
+---@param lsp_name string LSP server name (follow by `lspconfig` plugin)
 ---@return boolean
 M.check_lsp_is_for_bundled_language = function(lsp_name)
   for name, language in pairs(languages_list) do
