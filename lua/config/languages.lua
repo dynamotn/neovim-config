@@ -512,6 +512,7 @@ return {
     filetypes = { 'gotmpl' },
     parsers = { 'helm' },
     lsp_servers = { 'helm_ls' },
+    linters = { 'trivy' },
     autopairs = function(filetypes, rule)
       return {
         -- Add parentheses in function
@@ -535,7 +536,7 @@ return {
     filetypes = { 'json', 'jsonc', 'json5' },
     parsers = { 'json5' },
     lsp_servers = { 'jsonls' },
-    linters = { 'yq' },
+    linters = { 'yq', 'trivy' },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
@@ -680,7 +681,7 @@ return {
       'azure_pipelines_ls',
       'docker_compose_language_service',
     },
-    linters = { 'yq' },
+    linters = { 'yq', 'trivy' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
