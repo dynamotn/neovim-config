@@ -65,7 +65,7 @@ return {
   angular = { -- See `html` and `javascript`
     filetypes = { 'htmlangular' },
     parsers = { 'angular' },
-    lsp_servers = { 'angularls' },
+    lsp_servers = { 'angularls', 'harper_ls' },
     linters = { 'biomejs' },
     formatters = { 'biome', 'html_beautify' },
   },
@@ -102,6 +102,7 @@ return {
     lsp_servers = {
       'bashls',
       'termuxls',
+      'harper_ls',
     },
     linters = { 'shellcheck' },
     formatters = {
@@ -119,10 +120,6 @@ return {
         },
       },
     },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-    },
     dap = { 'bash-debug-adapter' },
     test = { 'vim-test' },
     endwise = true,
@@ -130,13 +127,9 @@ return {
   cpp = {
     filetypes = { 'c', 'cpp' },
     parsers = { 'cpp' },
-    lsp_servers = { 'clangd' },
+    lsp_servers = { 'clangd', 'harper_ls' },
     linters = { 'clang-tidy' },
     formatters = { 'clang-format' },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-    },
     dap = { 'codelldb' },
     test = {
       'neotest-gtest',
@@ -146,7 +139,7 @@ return {
   c_sharp = {
     filetypes = { 'cs' },
     parsers = { 'c_sharp' },
-    lsp_servers = { 'omnisharp' },
+    lsp_servers = { 'omnisharp', 'harper_ls' },
     formatters = {
       {
         'csharpier',
@@ -204,13 +197,11 @@ return {
   go = {
     filetypes = { 'go', 'gomod', 'gowork', 'gosum' },
     parsers = { 'go', 'gomod', 'gowork', 'gosum' },
-    lsp_servers = { 'gopls' },
+    lsp_servers = { 'gopls', 'harper_ls' },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
       { 'gomodifytags', type = 'code_actions', command = 'gomodifytags' },
       { 'impl', type = 'code_actions', command = 'impl' },
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
     },
     dap = { 'delve' },
     test = { 'neotest-golang' },
@@ -218,17 +209,13 @@ return {
   html = {
     filetypes = { 'html' },
     parsers = { 'html' },
-    lsp_servers = { 'emmet_ls', 'tailwindcss', 'html' },
+    lsp_servers = { 'emmet_ls', 'tailwindcss', 'html', 'harper_ls' },
     formatters = { 'html_beautify' },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-    },
   },
   java = {
     filetypes = { 'java' },
     parsers = { 'java' },
-    lsp_servers = { 'jdtls' },
+    lsp_servers = { 'jdtls', 'harper_ls' },
     dap = { 'java-debug-adapter' },
     test = { 'neotest-java' },
     dial = function()
@@ -251,12 +238,8 @@ return {
   lua = {
     filetypes = { 'lua' },
     parsers = { 'lua' },
-    lsp_servers = { 'lua_ls' },
+    lsp_servers = { 'lua_ls', 'harper_ls' },
     formatters = { 'stylua' },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-    },
     dial = function()
       local augend = require('dial.augend')
       return {
@@ -272,7 +255,7 @@ return {
   php = {
     filetypes = { 'php' },
     parsers = { 'php' },
-    lsp_servers = { 'intelephense' },
+    lsp_servers = { 'intelephense', 'harper_ls' },
     linters = { 'phpcs' },
     formatters = { 'php_cs_fixer' },
     dap = { 'php-debug-adapter' },
@@ -281,7 +264,7 @@ return {
   python = {
     filetypes = { 'python' },
     parsers = { 'python' },
-    lsp_servers = { 'pyright' },
+    lsp_servers = { 'pyright', 'harper_ls' },
     linters = { 'ruff' },
     formatters = {
       {
@@ -296,10 +279,6 @@ return {
         'ruff_organize_imports',
         command = 'ruff',
       },
-    },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
     },
     dap = { 'debugpy' },
     test = { 'neotest-python' },
@@ -317,7 +296,7 @@ return {
   ruby = {
     filetypes = { 'ruby' },
     parsers = { 'ruby' },
-    lsp_servers = { 'ruby_lsp' },
+    lsp_servers = { 'ruby_lsp', 'harper_ls' },
     linters = { 'rubocop' },
     formatters = { 'rubocop' },
     test = {
@@ -329,12 +308,8 @@ return {
   rust = {
     filetypes = { 'rust' },
     parsers = { 'rust' },
-    lsp_servers = { 'rust_analyzer' },
+    lsp_servers = { 'rust_analyzer', 'harper_ls' },
     formatters = { 'rust_analyzer' },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-    },
     dap = { 'codelldb' },
   },
   sass = {
@@ -387,7 +362,7 @@ return {
       'typescript.tsx',
     },
     parsers = { 'javascript' },
-    lsp_servers = { 'vtsls' },
+    lsp_servers = { 'vtsls', 'harper_ls' },
     linters = { 'biomejs' },
     formatters = { 'biome' },
     dap = { 'js-debug-adapter' },
@@ -396,10 +371,6 @@ return {
       'neotest-vitest',
       'neotest-playwright',
       'vim-test',
-    },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
     },
     dial = function()
       local augend = require('dial.augend')
@@ -457,7 +428,7 @@ return {
   cmake = {
     filetypes = { 'cmake' },
     parsers = { 'cmake' },
-    lsp_servers = { 'neocmake' },
+    lsp_servers = { 'neocmake', 'harper_ls' },
     linters = { 'cmakelint' },
     formatters = { 'cmake_format' },
   },
@@ -504,7 +475,7 @@ return {
   gitcommit = {
     filetypes = { 'gitcommit' },
     parsers = { 'gitcommit' },
-    lsp_servers = { 'ltex' },
+    lsp_servers = { 'harper_ls' },
     linters = { 'gitlint' },
     null_ls = {
       { 'jira', type = 'completion', command = 'jira', custom = true },
@@ -578,7 +549,7 @@ return {
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
     parsers = { 'markdown', 'markdown_inline' },
-    lsp_servers = { 'marksman', 'ltex', 'vale_ls' },
+    lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
     linters = { 'markdownlint-cli2' },
     formatters = {
       {
@@ -640,12 +611,10 @@ return {
   nix = {
     filetypes = { 'nix' },
     parsers = { 'nix' },
-    lsp_servers = { 'nil_ls' },
+    lsp_servers = { 'nil_ls', 'harper_ls' },
     linters = { 'nix' },
     formatters = { 'nixfmt' },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
       { 'statix', type = 'code_actions', command = 'statix' },
     },
   },
@@ -686,12 +655,8 @@ return {
   toml = {
     filetypes = { 'toml' },
     parsers = { 'toml' },
-    lsp_servers = { 'taplo' },
+    lsp_servers = { 'taplo', 'harper_ls' },
     formatters = { 'taplo' },
-    null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-    },
     otter = true,
   },
   treesitter = {
