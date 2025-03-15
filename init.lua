@@ -1,6 +1,6 @@
---- Flag to install gentoo syntax
+--- Flag to install Gentoo syntax
 _G.is_gentoo = false
---- Flag to install all plugins, useful for update ./lazy-lock.json
+--- Flag to install all plugins, useful for update `lazy-lock.json`
 _G.used_full_plugins = false
 --- List of flag to enable each misc plugin
 _G.enabled_plugins = {

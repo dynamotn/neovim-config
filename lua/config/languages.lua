@@ -1,7 +1,7 @@
 ---@class DyLangSpec
 ---@field filetypes string[]
 ---@field parsers (string|DyParserSpec)[]
----@field lsp_servers? string[]
+---@field lsp_servers? (string|DyLspSpec)[]
 ---@field linters? (string|DyLinterSpec)[]
 ---@field formatters? (string|DyFormatterSpec)[]
 ---@field null_ls? DyNullLsSpec[]
@@ -19,6 +19,10 @@
 ---@class DyParserInstallSpec:InstallInfo
 ---@field url string
 ---@field files string[]
+
+---@class DyLspSpec
+---@field [1] string
+---@field opts _.lspconfig.options
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -62,7 +66,7 @@ return {
   },
 
   -- Programming language & Frameworks {
-  angular = { -- See `html` and `javascript`
+  angular = { -- See `html` and `typescript`
     filetypes = { 'htmlangular' },
     parsers = { 'angular' },
     lsp_servers = { 'angularls', 'harper_ls' },
@@ -238,7 +242,38 @@ return {
   lua = {
     filetypes = { 'lua' },
     parsers = { 'lua' },
-    lsp_servers = { 'lua_ls', 'harper_ls' },
+    lsp_servers = {
+      {
+        'lua_ls',
+        opts = {
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              codeLens = {
+                enable = true,
+              },
+              completion = {
+                callSnippet = 'Replace',
+              },
+              doc = {
+                privateName = { '^_' },
+              },
+              hint = {
+                enable = true,
+                setType = false,
+                paramType = true,
+                paramName = 'Disable',
+                semicolon = 'Disable',
+                arrayIndex = 'Disable',
+              },
+            },
+          },
+        },
+      },
+      'harper_ls',
+    },
     formatters = { 'stylua' },
     dial = function()
       local augend = require('dial.augend')
@@ -398,15 +433,26 @@ return {
       }
     end,
   },
-  vue = {
+  vue = { -- See `typescript`
     filetypes = { 'vue' },
     parsers = { 'vue' },
-    lsp_servers = { 'volar' },
+    lsp_servers = {
+      {
+        'volar',
+        configs = {
+          init_options = {
+            vue = {
+              hybridMode = true,
+            },
+          },
+        },
+      },
+    },
   },
   ------------------------------------ {
 
   -- Tools & Markup {
-  ansible = { -- See yaml
+  ansible = { -- See `yaml`
     filetypes = { 'yaml.ansible' },
     parsers = { 'yaml' },
     lsp_servers = { 'ansiblels' },
@@ -508,7 +554,7 @@ return {
     linters = { 'npm-groovy-lint' },
     formatters = { 'npm-groovy-lint' },
   },
-  helm = { -- See gotmpl
+  helm = { -- See `gotmpl`
     filetypes = { 'gotmpl' },
     parsers = { 'helm' },
     lsp_servers = { 'helm_ls' },

@@ -3,40 +3,6 @@ local language = require('config.languages').lua
 return vim.list_contains(_G.enabled_languages, 'lua')
     and {
       {
-        -- LSP config
-        'neovim/nvim-lspconfig',
-        opts = {
-          servers = {
-            lua_ls = {
-              settings = {
-                Lua = {
-                  workspace = {
-                    checkThirdParty = false,
-                  },
-                  codeLens = {
-                    enable = true,
-                  },
-                  completion = {
-                    callSnippet = 'Replace',
-                  },
-                  doc = {
-                    privateName = { '^_' },
-                  },
-                  hint = {
-                    enable = true,
-                    setType = false,
-                    paramType = true,
-                    paramName = 'Disable',
-                    semicolon = 'Disable',
-                    arrayIndex = 'Disable',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      {
         -- Nvim LSP
         'lazydev.nvim',
         ft = language.filetypes,
