@@ -1,5 +1,4 @@
 local language = require('config.languages').vue
-local augend = require('dial.augend')
 
 return vim.list_contains(_G.enabled_languages, 'vue')
     and {
@@ -16,11 +15,24 @@ return vim.list_contains(_G.enabled_languages, 'vue')
               },
             },
             vtsls = {},
+            tailwindcss = {},
+            harper_ls = {},
           },
         },
       },
       {
-        -- Extend LSP config of vtsls by plugin for vue
+        -- Extend LSP config for HTML
+        'neovim/nvim-lspconfig',
+        opts = function(_, opts)
+          LazyVim.extend(
+            opts.servers.harper_ls,
+            'filetypes',
+            language.filetypes
+          )
+        end,
+      },
+      {
+        -- Extend LSP config of vtsls by plugin for Vue
         'neovim/nvim-lspconfig',
         opts = function(_, opts)
           table.insert(opts.servers.vtsls.filetypes, 'vue')
@@ -49,11 +61,7 @@ return vim.list_contains(_G.enabled_languages, 'vue')
         'monaqa/dial.nvim',
         opts = {
           groups = {
-            vue = {
-              augend.constant.new({ elements = { 'let', 'const' } }),
-              augend.hexcolor.new({ case = 'lower' }),
-              augend.hexcolor.new({ case = 'upper' }),
-            },
+            vue = language.dial(),
           },
         },
       },

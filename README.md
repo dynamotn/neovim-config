@@ -71,12 +71,14 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - SASS/SCSS
 - Solidity
 - SQL
+- Zig
 
 ### Frameworks
 
 - Angular
-- Vue
+- Rails
 - Rust
+- Vue
 
 ### Tools & Markup
 

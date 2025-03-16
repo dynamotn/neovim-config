@@ -29,6 +29,7 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
               organize_imports_on_format = true,
               enable_import_completion = true,
             },
+            harper_ls = {},
           },
         },
       },

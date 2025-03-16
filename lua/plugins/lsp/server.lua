@@ -8,7 +8,10 @@ return {
       { 'williamboman/mason-lspconfig.nvim', config = function() end },
     },
     opts = function()
-      ---@class PluginLspOpts
+      ---@class DyLspOpts: PluginLspOpts
+      ---@field servers table<string, _.lspconfig.options>
+      ---@field setup table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+      ---@field module table<string, string>
       return {
         -- options for vim.diagnostic.config()
         ---@type vim.diagnostic.Opts
@@ -60,18 +63,15 @@ return {
           timeout_ms = nil,
         },
         -- LSP Server Settings
-        ---@type lspconfig.options
         servers = {},
         -- you can do any additional lsp server setup here
         -- return true if you don't want this server to be setup with lspconfig
-        ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
         setup = {},
         -- you can add not officially supported servers here
-        ---@type table<string, string>
-        configs = {},
+        module = {},
       }
     end,
-    ---@param opts PluginLspOpts
+    ---@param opts DyLspOpts
     config = function(_, opts)
       -- setup autoformat
       LazyVim.format.register(LazyVim.lsp.formatter())
@@ -208,6 +208,7 @@ return {
       end
 
       if have_mason then
+        ---@diagnostic disable-next-line: missing-fields
         mlsp.setup({
           ensure_installed = vim.tbl_deep_extend(
             'force',

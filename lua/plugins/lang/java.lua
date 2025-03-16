@@ -3,11 +3,17 @@ local language = require('config.languages').java
 return vim.list_contains(_G.enabled_languages, 'java')
     and {
       {
-        -- Custom dial
-        'monaqa/dial.nvim',
+        -- LSP config
+        'neovim/nvim-lspconfig',
         opts = {
-          groups = {
-            java = language.dial(),
+          servers = {
+            jdtls = {},
+            harper_ls = {},
+          },
+          setup = {
+            jdtls = function()
+              return true -- avoid duplicate servers
+            end,
           },
         },
       },
@@ -292,6 +298,15 @@ return vim.list_contains(_G.enabled_languages, 'java')
         opts = {
           adapters = {
             ['neotest-java'] = {},
+          },
+        },
+      },
+      {
+        -- Custom dial
+        'monaqa/dial.nvim',
+        opts = {
+          groups = {
+            java = language.dial(),
           },
         },
       },

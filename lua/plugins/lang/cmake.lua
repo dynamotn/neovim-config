@@ -3,6 +3,16 @@ local language = require('config.languages').cmake
 return vim.list_contains(_G.enabled_languages, 'cmake')
     and {
       {
+        -- LSP config
+        'neovim/nvim-lspconfig',
+        opts = {
+          servers = {
+            neocmake = {},
+            harper_ls = {},
+          },
+        },
+      },
+      {
         -- Powerful toolbox for CMake
         'Civitasv/cmake-tools.nvim',
         init = function()

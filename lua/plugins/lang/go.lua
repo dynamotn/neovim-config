@@ -3,6 +3,7 @@ local language = require('config.languages').go
 return vim.list_contains(_G.enabled_languages, 'go')
     and {
       {
+        -- LSP config
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
@@ -49,6 +50,7 @@ return vim.list_contains(_G.enabled_languages, 'go')
                 },
               },
             },
+            harper_ls = {},
           },
           setup = {
             gopls = function(_, opts)

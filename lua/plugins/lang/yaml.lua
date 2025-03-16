@@ -50,6 +50,18 @@ return condition
                 },
               },
             },
+            gitlab_ci_ls = {
+              filetypes = { 'yaml.gl-ci' },
+            },
+            gh_actions_ls = {
+              filetypes = { 'yaml.gh-action' },
+            },
+            azure_pipelines_ls = {
+              filetypes = { 'yaml.az-pl' },
+            },
+            docker_compose_language_service = {
+              filetypes = { 'yaml.docker-compose' },
+            },
           },
         },
       },

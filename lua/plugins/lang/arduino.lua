@@ -10,5 +10,16 @@ return vim.list_contains(_G.enabled_languages, 'arduino')
           },
         },
       },
+      {
+        -- Extend LSP config of harper_ls by plugin for Arduino
+        'neovim/nvim-lspconfig',
+        opts = function(_, opts)
+          LazyVim.extend(
+            opts.servers.harper_ls,
+            'filetypes',
+            language.filetypes
+          )
+        end,
+      },
     }
   or {}

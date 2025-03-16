@@ -1,7 +1,7 @@
 ---@class DyLangSpec
 ---@field filetypes string[]
 ---@field parsers (string|DyParserSpec)[]
----@field lsp_servers? string[]
+---@field lsp_servers? (string|DyLspSpec)[]
 ---@field linters? (string|DyLinterSpec)[]
 ---@field formatters? (string|DyFormatterSpec)[]
 ---@field null_ls? DyNullLsSpec[]
@@ -19,6 +19,10 @@
 ---@class DyParserInstallSpec:InstallInfo
 ---@field url string
 ---@field files string[]
+
+---@class DyLspSpec
+---@field [1] string
+---@field opts _.lspconfig.options
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -62,34 +66,19 @@ return {
   },
 
   -- Programming language & Frameworks {
-  angular = { -- See `html` and `javascript`
+  angular = { -- See `html` and `typescript`
     filetypes = { 'htmlangular' },
     parsers = { 'angular' },
-    lsp_servers = { 'angularls', 'harper_ls' },
+    lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = { 'biomejs' },
     formatters = { 'biome', 'html_beautify' },
   },
-  arduino = {
+  arduino = { -- See `cpp`
     filetypes = { 'arduino' },
     parsers = { 'cpp' },
-    lsp_servers = { 'arduino_language_server' },
+    lsp_servers = { 'arduino_language_server', 'harper_ls' },
     linters = { 'clang-tidy' },
     formatters = { 'clang-format' },
-  },
-  awk = {
-    filetypes = { 'awk' },
-    parsers = {
-      {
-        'awk',
-        install_info = {
-          url = 'https://github.com/Beaglefoot/tree-sitter-awk',
-          files = { 'src/parser.c', 'src/scanner.c' },
-        },
-      },
-    },
-    lsp_servers = { 'awk_ls' },
-    linters = { 'gawk' },
-    formatters = { 'gawk' },
   },
   bash = {
     filetypes = {
@@ -165,12 +154,8 @@ return {
     dial = function()
       local augend = require('dial.augend')
       return {
-        augend.hexcolor.new({
-          case = 'lower',
-        }),
-        augend.hexcolor.new({
-          case = 'upper',
-        }),
+        augend.hexcolor.new({ case = 'lower' }),
+        augend.hexcolor.new({ case = 'upper' }),
       }
     end,
   },
@@ -209,7 +194,7 @@ return {
   html = {
     filetypes = { 'html' },
     parsers = { 'html' },
-    lsp_servers = { 'emmet_ls', 'tailwindcss', 'html', 'harper_ls' },
+    lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
     formatters = { 'html_beautify' },
   },
   java = {
@@ -264,7 +249,7 @@ return {
   python = {
     filetypes = { 'python' },
     parsers = { 'python' },
-    lsp_servers = { 'pyright', 'harper_ls' },
+    lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
     linters = { 'ruff' },
     formatters = {
       {
@@ -292,6 +277,21 @@ return {
         }),
       }
     end,
+  },
+  rails = { -- See `ruby` and `html`
+    filetypes = { 'eruby' },
+    parsers = {
+      {
+        'embedded_template',
+        install_info = {
+          url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
+          files = { 'src/parser.c' },
+        },
+      },
+    },
+    lsp_servers = { 'ruby_lsp', 'tailwindcss', 'harper_ls' },
+    linters = { 'erb_lint', 'html_beautify' },
+    formatters = { 'erb_formatter' },
   },
   ruby = {
     filetypes = { 'ruby' },
@@ -321,19 +321,16 @@ return {
     dial = function()
       local augend = require('dial.augend')
       return {
-        augend.hexcolor.new({
-          case = 'lower',
-        }),
-        augend.hexcolor.new({
-          case = 'upper',
-        }),
+        augend.hexcolor.new({ case = 'lower' }),
+        augend.hexcolor.new({ case = 'upper' }),
       }
     end,
   },
   solidity = {
     filetypes = { 'solidity' },
     parsers = { 'solidity' },
-    lsp_servers = { 'solidity_ls' },
+    lsp_servers = { 'solang' },
+    formatters = { 'forge_fmt' },
   },
   sql = {
     filetypes = { 'sql', 'mysql', 'plsql' },
@@ -398,19 +395,55 @@ return {
       }
     end,
   },
-  vue = {
+  vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
     parsers = { 'vue' },
-    lsp_servers = { 'volar' },
+    lsp_servers = { 'volar', 'vtsls', 'tailwindcss', 'harper_ls' },
+    dial = function()
+      local augend = require('dial.augend')
+      return {
+        augend.constant.new({
+          elements = { 'let', 'const' },
+          word = true,
+          cyclic = true,
+        }),
+        augend.hexcolor.new({
+          case = 'lower',
+        }),
+        augend.hexcolor.new({
+          case = 'upper',
+        }),
+      }
+    end,
+  },
+  zig = {
+    filetypes = { 'zig' },
+    parsers = { 'zig' },
+    lsp_servers = { 'zls' },
   },
   ------------------------------------ {
 
   -- Tools & Markup {
-  ansible = { -- See yaml
+  ansible = { -- See `yaml`
     filetypes = { 'yaml.ansible' },
     parsers = { 'yaml' },
     lsp_servers = { 'ansiblels' },
     linters = { 'ansible-lint', 'yq' },
+  },
+  awk = {
+    filetypes = { 'awk' },
+    parsers = {
+      {
+        'awk',
+        install_info = {
+          url = 'https://github.com/Beaglefoot/tree-sitter-awk',
+          files = { 'src/parser.c', 'src/scanner.c' },
+        },
+      },
+    },
+    lsp_servers = { 'awk_ls' },
+    linters = { 'gawk' },
+    formatters = { 'gawk' },
   },
   beancount = {
     filetypes = { 'beancount' },
@@ -508,7 +541,7 @@ return {
     linters = { 'npm-groovy-lint' },
     formatters = { 'npm-groovy-lint' },
   },
-  helm = { -- See gotmpl
+  helm = { -- See `gotmpl`
     filetypes = { 'gotmpl' },
     parsers = { 'helm' },
     lsp_servers = { 'helm_ls' },

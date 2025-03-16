@@ -3,20 +3,11 @@ local language = require('config.languages').rust
 return vim.list_contains(_G.enabled_languages, 'rust')
     and {
       {
-        -- Work with crates
-        'Saecki/crates.nvim',
-        event = { 'BufRead Cargo.toml' },
+        -- LSP config
+        'neovim/nvim-lspconfig',
         opts = {
-          completion = {
-            crates = {
-              enabled = true,
-            },
-          },
-          lsp = {
-            enabled = true,
-            actions = true,
-            completion = true,
-            hover = true,
+          servers = {
+            harper_ls = {},
           },
         },
       },

@@ -99,11 +99,23 @@ return vim.list_contains(_G.enabled_languages, 'bash')
           servers = {
             bashls = {},
             termuxls = {},
+            harper_ls = {},
           },
           module = {
             termuxls = 'tools.lsp.termuxls',
           },
         },
+      },
+      {
+        -- Extend LSP config of harper_ls by plugin for Bash
+        'neovim/nvim-lspconfig',
+        opts = function(_, opts)
+          LazyVim.extend(
+            opts.servers.harper_ls,
+            'filetypes',
+            language.filetypes
+          )
+        end,
       },
       {
         -- Map termuxls with termux-language-server in mason

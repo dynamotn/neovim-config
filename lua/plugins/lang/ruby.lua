@@ -3,6 +3,16 @@ local language = require('config.languages').ruby
 return vim.list_contains(_G.enabled_languages, 'ruby')
     and {
       {
+        -- LSP config
+        'neovim/nvim-lspconfig',
+        opts = {
+          servers = {
+            ruby_lsp = {},
+            harper_ls = {},
+          },
+        },
+      },
+      {
         -- Debug adapters & configurations
         'mfussenegger/nvim-dap',
         dependencies = {
@@ -23,13 +33,6 @@ return vim.list_contains(_G.enabled_languages, 'ruby')
             ['neotest-rspec'] = {},
           },
         },
-      },
-      {
-        -- Extended snippets for Rails
-        'friendly-snippets',
-        config = function()
-          require('luasnip').filetype_extend('ruby', { 'rails' })
-        end,
       },
     }
   or {}

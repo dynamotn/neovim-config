@@ -5,30 +5,11 @@ local condition = vim.list_contains(_G.enabled_languages, 'typescript')
 return condition
     and {
       {
-        -- Custom dial
-        'monaqa/dial.nvim',
-        opts = {
-          groups = {
-            typescript = language.dial(),
-          },
-        },
-      },
-      {
         -- LSP config
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
             vtsls = {
-              -- explicitly add default filetypes, so that we can extend
-              -- them in related extras
-              filetypes = {
-                'javascript',
-                'javascriptreact',
-                'javascript.jsx',
-                'typescript',
-                'typescriptreact',
-                'typescript.tsx',
-              },
               settings = {
                 complete_function_calls = true,
                 vtsls = {
@@ -111,6 +92,7 @@ return condition
                 },
               },
             },
+            harper_ls = {},
           },
           setup = {
             vtsls = function(_, opts)
@@ -177,6 +159,13 @@ return condition
             end,
           },
         },
+      },
+      {
+        -- Extend LSP config of vtsls by plugin for Typescript and Javascript
+        'neovim/nvim-lspconfig',
+        opts = function(_, opts)
+          LazyVim.extend(opts.servers.vtsls, 'filetypes', language.filetypes)
+        end,
       },
       {
         -- Debug adapters & configurations
@@ -281,6 +270,15 @@ return condition
             ['tsconfig.json'] = { glyph = ' ', hl = 'MiniIconsAzure' },
             ['tsconfig.build.json'] = { glyph = ' ', hl = 'MiniIconsAzure' },
             ['yarn.lock'] = { glyph = ' ', hl = 'MiniIconsBlue' },
+          },
+        },
+      },
+      {
+        -- Custom dial
+        'monaqa/dial.nvim',
+        opts = {
+          groups = {
+            typescript = language.dial(),
           },
         },
       },

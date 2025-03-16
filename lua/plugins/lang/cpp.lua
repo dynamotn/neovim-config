@@ -32,6 +32,7 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
         },
       },
       {
+        -- LSP config
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
@@ -78,6 +79,7 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
                 clangdFileStatus = true,
               },
             },
+            harper_ls = {},
           },
           setup = {
             clangd = function(_, opts)

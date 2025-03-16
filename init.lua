@@ -1,6 +1,6 @@
---- Flag to install gentoo syntax
+--- Flag to install Gentoo syntax
 _G.is_gentoo = false
---- Flag to install all plugins, useful for update ./lazy-lock.json
+--- Flag to install all plugins, useful for update `lazy-lock.json`
 _G.used_full_plugins = false
 --- List of flag to enable each misc plugin
 _G.enabled_plugins = {
@@ -14,7 +14,7 @@ _G.enabled_plugins = {
 _G.enabled_languages = vim.tbl_keys(require('config.languages'))
 --- List bundle language, include TS parsers, LSP servers, DAP adapters, Linters and Formatters. Useful for containerize
 _G.bundle_languages = {}
---- Name of completion sources, diplay when show completion menu
+--- Name of completion sources, display when show completion menu
 _G.completion_sources = {}
 --- Test strategy for vim-test
 _G.test_strategy = 'toggleterm'

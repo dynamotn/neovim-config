@@ -14,7 +14,6 @@ opt.backspace = 'indent,eol,start' -- Flexible backspace
 opt.mouse:remove('a') -- Not use mouse
 opt.title = true -- Allow to change terminal's title
 opt.autoread = true -- Automatically read a file changed outside of vim
-opt.iskeyword:remove('.#-') -- End of word designator
 opt.colorcolumn = '80,120' -- 80, 120 column chars line length
 
 -- Disable non-Lua provider
@@ -31,5 +30,5 @@ for abbr, full_text in pairs(require('config.defaults').abbreviations) do
   vim.cmd({ cmd = 'inoreabbrev', args = { abbr, full_text } })
 end
 
--- Setup project config with .nvim folder in project root
+-- Setup project config with `.nvim` folder in project root
 vim.opt.rtp:append(require('lazyvim.util.root').get() .. '/.nvim')
