@@ -667,7 +667,7 @@ return {
   systemd = {
     filetypes = { 'systemd' },
     parsers = {},
-    lsp_servers = { 'systemd-language-server' },
+    lsp_servers = { 'systemd_ls' },
   },
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
