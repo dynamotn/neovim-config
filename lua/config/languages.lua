@@ -28,11 +28,13 @@
 ---@field [1] string
 ---@field opts? table
 ---@field command? string
+---@field is_mason_tool? boolean
 
 ---@class DyFormatterSpec
 ---@field [1] string
 ---@field opts? table
 ---@field command? string
+---@field is_mason_tool? boolean
 
 ---@class DyNullLsSpec
 ---@field [1] string
@@ -47,8 +49,8 @@ return {
   ['*'] = { -- For all filetypes
     filetypes = { '*' },
     formatters = {
-      { 'trim_whitespace', command = 'lua' },
-      { 'trim_newlines', command = 'lua' },
+      { 'trim_whitespace', command = 'lua', is_mason_tool = false },
+      { 'trim_newlines', command = 'lua', is_mason_tool = false },
     },
     linters = { 'typos' },
     null_ls = {
@@ -61,7 +63,7 @@ return {
   ['_'] = { -- For only non-configured filetypes
     filetypes = { '_' },
     linters = {
-      { 'compiler', command = 'lua' },
+      { 'compiler', command = 'lua', is_mason_tool = false },
     },
   },
 
@@ -70,7 +72,9 @@ return {
     filetypes = { 'htmlangular' },
     parsers = { 'angular' },
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
-    linters = { 'biomejs' },
+    linters = {
+      { 'biomejs', command = 'biome' },
+    },
     formatters = { 'biome', 'html_beautify' },
   },
   arduino = { -- See `cpp`
@@ -109,7 +113,7 @@ return {
         },
       },
     },
-    dap = { 'bash-debug-adapter' },
+    dap = { 'bash' },
     test = { 'vim-test' },
     endwise = true,
   },
@@ -132,13 +136,10 @@ return {
     formatters = {
       {
         'csharpier',
-        opts = {
-          command = 'dotnet-csharpier',
-          args = { '--write-stdout' },
-        },
+        command = 'dotnet',
       },
     },
-    dap = { 'netcoredbg' },
+    dap = { 'coreclr' },
     test = { 'neotest-dotnet' },
   },
   css = {
@@ -201,7 +202,7 @@ return {
     filetypes = { 'java' },
     parsers = { 'java' },
     lsp_servers = { 'jdtls', 'harper_ls' },
-    dap = { 'java-debug-adapter' },
+    dap = { 'javadbg' },
     test = { 'neotest-java' },
     dial = function()
       local augend = require('dial.augend')
@@ -243,7 +244,7 @@ return {
     lsp_servers = { 'intelephense', 'harper_ls' },
     linters = { 'phpcs' },
     formatters = { 'php_cs_fixer' },
-    dap = { 'php-debug-adapter' },
+    dap = { 'php' },
     test = { 'neotest-phpunit' },
   },
   python = {
@@ -265,7 +266,7 @@ return {
         command = 'ruff',
       },
     },
-    dap = { 'debugpy' },
+    dap = { 'python' },
     test = { 'neotest-python' },
     dial = function()
       local augend = require('dial.augend')
@@ -362,7 +363,7 @@ return {
     lsp_servers = { 'vtsls', 'harper_ls' },
     linters = { 'biomejs' },
     formatters = { 'biome' },
-    dap = { 'js-debug-adapter' },
+    dap = { 'js', 'firefox' },
     test = {
       'neotest-jest',
       'neotest-vitest',

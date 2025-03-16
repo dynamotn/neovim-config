@@ -158,7 +158,6 @@ return {
         local server_opts = vim.tbl_deep_extend('force', {
           capabilities = vim.deepcopy(capabilities),
         }, servers[server] or {})
-        if server_opts.enabled == false then return end
 
         if opts.setup[server] then
           if opts.setup[server](server, server_opts) then return end
@@ -174,50 +173,66 @@ return {
       end
 
       -- get all the servers that are available through mason-lspconfig
-      local have_mason, mlsp = pcall(require, 'mason-lspconfig')
-      local all_mslp_servers = {}
-      if have_mason then
-        all_mslp_servers = vim.tbl_keys(
-          require('mason-lspconfig.mappings.server').lspconfig_to_package
-        )
-      end
-
+      local mlsp = require('mason-lspconfig')
       local ensure_installed = {} ---@type string[]
-      for server, server_opts in pairs(servers) do
-        if server_opts then
-          server_opts = server_opts == true and {} or server_opts
-          if server_opts.enabled ~= false then
-            -- run manual setup if
-            -- mason=false
-            -- or if this is a server that cannot be installed with mason-lspconfig
-            if
-              server_opts.mason == false
-              or not vim.tbl_contains(all_mslp_servers, server)
-            then
-              setup(server)
+      local all_mslp_servers = vim.tbl_keys(
+        require('mason-lspconfig.mappings.server').lspconfig_to_package
+      )
+      for name, language in pairs(require('config.languages')) do
+        if language.lsp_servers then
+          for _, lsp_server in ipairs(language.lsp_servers) do
+            -- run manual setup if this is a server
+            -- that cannot be installed with mason-lspconfig
+            if not vim.tbl_contains(all_mslp_servers, lsp_server) then
+              setup(lsp_server)
             -- install server of language in bundle languages
-            elseif
-              require('util.languages').check_lsp_is_for_bundled_language(
-                server
-              )
-            then
-              ensure_installed[#ensure_installed + 1] = server
+            else
+              if vim.list_contains(_G.bundle_languages, name) then
+                table.insert(ensure_installed, lsp_server)
+              end
+              -- lazy install server of language not in bundle languages
+              if vim.list_contains(_G.enabled_languages, name) then
+                vim.api.nvim_create_autocmd({ 'FileType' }, {
+                  pattern = language.filetypes,
+                  group = vim.api.nvim_create_augroup(
+                    'mason_lsp_' .. lsp_server,
+                    {}
+                  ),
+                  callback = function()
+                    local registry = require('mason-registry')
+                    local lsp_mapping =
+                      require('mason-lspconfig.mappings.server')
+                    local server = lsp_mapping.lspconfig_to_package[lsp_server]
+                    if server ~= nil and not registry.is_installed(server) then
+                      vim.api.nvim_command('MasonInstall ' .. server)
+                    end
+                  end,
+                })
+              end
             end
           end
         end
       end
 
-      if have_mason then
-        ---@diagnostic disable-next-line: missing-fields
-        mlsp.setup({
-          ensure_installed = vim.tbl_deep_extend(
-            'force',
-            ensure_installed,
-            LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
-          ),
-          handlers = { setup },
-        })
-      end
+      ---@diagnostic disable-next-line: missing-fields
+      mlsp.setup({
+        automatic_installation = false,
+        ensure_installed = vim.tbl_deep_extend(
+          'force',
+          LazyVim.dedup(ensure_installed),
+          LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
+        ),
+        handlers = { setup },
+      })
     end,
+  },
+  {
+    -- Disable default tools
+    'williamboman/mason.nvim',
+    cmd = { 'Mason', 'MasonInstall' },
+    opts_extend = { 'ensure_installed' },
+    opts = {
+      ensure_installed = {},
+    },
   },
 }

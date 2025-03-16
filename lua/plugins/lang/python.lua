@@ -33,9 +33,15 @@ return vim.list_contains(_G.enabled_languages, 'python')
             },
           },
           config = function()
-            require('dap-python').setup(
-              LazyVim.get_pkg_path('debugpy', '/venv/bin/python')
-            )
+            local registry = require('mason-registry')
+            local dap_mapping = require('mason-nvim-dap.mappings.source')
+            if
+              registry.is_installed(dap_mapping.nvim_dap_to_package['python'])
+            then
+              require('dap-python').setup(
+                LazyVim.get_pkg_path('debugpy', '/venv/bin/python')
+              )
+            end
           end,
         },
       },

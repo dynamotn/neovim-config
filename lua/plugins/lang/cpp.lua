@@ -100,12 +100,6 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
         -- Debug adapters & configurations
         'mfussenegger/nvim-dap',
         optional = true,
-        dependencies = {
-          -- Ensure C/C++ debugger is installed
-          'williamboman/mason.nvim',
-          optional = true,
-          opts = { ensure_installed = { 'codelldb' } },
-        },
         opts = function()
           local dap = require('dap')
           if not dap.adapters['codelldb'] then
