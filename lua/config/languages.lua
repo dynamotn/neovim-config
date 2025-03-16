@@ -395,6 +395,12 @@ return {
       }
     end,
   },
+  typst = {
+    filetypes = { 'typst' },
+    parsers = { 'typst' },
+    lsp_servers = { 'tinymist' },
+    formatters = { 'typstyle' },
+  },
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
     parsers = { 'vue' },

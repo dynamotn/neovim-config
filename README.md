@@ -71,6 +71,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - SASS/SCSS
 - Solidity
 - SQL
+- Typst
 - Zig
 
 ### Frameworks
