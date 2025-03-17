@@ -33,15 +33,13 @@ return {
     opts = function(_, opts)
       for name, language in pairs(require('config.languages')) do
         for _, tool in ipairs(language.linters or {}) do
-          local tool_name, tool_command, is_mason_tool
+          local tool_package
+          local is_mason_tool = true
           if type(tool) == 'string' then
-            tool_name = tool
-            tool_command = tool
-            is_mason_tool = true
+            tool_package = tool
           elseif type(tool) == 'table' then
-            tool_name = tool[1]
-            tool_command = tool.command or tool_name
-            is_mason_tool = tool.is_mason_tool
+            if tool.mason then is_mason_tool = tool.mason.enabled ~= false end
+            tool_package = tool.mason and tool.mason.package or tool[1]
           end
           if is_mason_tool then
             -- install server of language in bundle languages
@@ -50,20 +48,20 @@ return {
               or name == '*'
               or name == '_'
             then
-              table.insert(opts.ensure_installed, tool_command)
+              table.insert(opts.ensure_installed, tool_package)
             end
             -- lazy install server of language not in bundle languages
             if vim.list_contains(_G.enabled_languages, name) then
               vim.api.nvim_create_autocmd({ 'FileType' }, {
                 pattern = language.filetypes,
                 group = vim.api.nvim_create_augroup(
-                  'mason_linter_' .. tool_command,
+                  'mason_linter_' .. name .. '_' .. tool_package,
                   {}
                 ),
                 callback = function()
                   local registry = require('mason-registry')
-                  if not registry.is_installed(tool_command) then
-                    vim.api.nvim_command('MasonInstall ' .. tool_command)
+                  if not registry.is_installed(tool_package) then
+                    vim.api.nvim_command('MasonInstall ' .. tool_package)
                   end
                 end,
               })

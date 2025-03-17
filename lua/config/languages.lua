@@ -28,13 +28,17 @@
 ---@field [1] string
 ---@field opts? table
 ---@field command? string
----@field is_mason_tool? boolean
+---@field mason? DyMasonSpec
 
 ---@class DyFormatterSpec
 ---@field [1] string
 ---@field opts? table
 ---@field command? string
----@field is_mason_tool? boolean
+---@field mason? DyMasonSpec
+
+---@class DyMasonSpec
+---@field enabled? boolean
+---@field package string
 
 ---@class DyNullLsSpec
 ---@field [1] string
@@ -44,13 +48,25 @@
 
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
+
 return {
-  ---@diagnostic disable-next-line: missing-fields
-  ['*'] = { -- For all filetypes
+  -- For all filetypes
+  ['*'] = {
     filetypes = { '*' },
+    parsers = {},
     formatters = {
-      { 'trim_whitespace', command = 'lua', is_mason_tool = false },
-      { 'trim_newlines', command = 'lua', is_mason_tool = false },
+      {
+        'trim_whitespace',
+        command = 'lua',
+        ---@diagnostic disable-next-line: missing-fields
+        mason = { enabled = false },
+      },
+      {
+        'trim_newlines',
+        command = 'lua',
+        ---@diagnostic disable-next-line: missing-fields
+        mason = { enabled = false },
+      },
     },
     linters = { 'typos' },
     null_ls = {
@@ -227,7 +243,12 @@ return {
   ['_'] = {
     filetypes = { '_' },
     linters = {
-      { 'compiler', command = 'lua', is_mason_tool = false },
+      {
+        'compiler',
+        command = 'lua',
+        ---@diagnostic disable-next-line: missing-fields
+        mason = { enabled = false },
+      },
     },
   },
 
@@ -237,15 +258,29 @@ return {
     parsers = { 'angular' },
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = {
-      { 'biomejs', command = 'biome' },
+      {
+        'biomejs',
+        command = 'biome',
+        mason = { package = 'biome' },
+      },
     },
-    formatters = { 'biome', 'html_beautify' },
+    formatters = {
+      'biome',
+      {
+        'html_beautify',
+        command = 'js-beautify',
+        mason = {
+          package = 'js-beautify',
+        },
+      },
+    },
   },
   arduino = { -- See `cpp`
     filetypes = { 'arduino' },
     parsers = { 'cpp' },
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
-    linters = { 'clang-tidy' },
+    ---@diagnostic disable-next-line: missing-fields
+    linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
   },
   bash = {
@@ -285,7 +320,8 @@ return {
     filetypes = { 'c', 'cpp' },
     parsers = { 'cpp' },
     lsp_servers = { 'clangd', 'harper_ls' },
-    linters = { 'clang-tidy' },
+    ---@diagnostic disable-next-line: missing-fields
+    linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
     test = {
@@ -354,12 +390,21 @@ return {
     },
     dap = { 'delve' },
     test = { 'neotest-golang' },
+    linguist = { 'go' },
   },
   html = {
     filetypes = { 'html' },
     parsers = { 'html' },
     lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
-    formatters = { 'html_beautify' },
+    formatters = {
+      {
+        'html_beautify',
+        command = 'js-beautify',
+        mason = {
+          package = 'js-beautify',
+        },
+      },
+    },
   },
   java = {
     filetypes = { 'java' },
@@ -758,6 +803,8 @@ return {
           },
         },
         command = 'lua',
+        ---@diagnostic disable-next-line: missing-fields
+        mason = { enabled = false },
       },
       {
         'markdown-toc',

@@ -195,7 +195,7 @@ return {
                 vim.api.nvim_create_autocmd({ 'FileType' }, {
                   pattern = language.filetypes,
                   group = vim.api.nvim_create_augroup(
-                    'mason_lsp_' .. lsp_server,
+                    'mason_lsp_' .. name .. '_' .. lsp_server,
                     {}
                   ),
                   callback = function()
