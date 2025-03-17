@@ -665,6 +665,12 @@ return {
     lsp_servers = { 'vacuum' },
     linters = { 'yq' },
   },
+  promql = {
+    filetypes = { 'promql' },
+    parsers = { 'promql' },
+    lsp_servers = { 'promqlls' },
+    linguist = { 'promql' },
+  },
   systemd = {
     filetypes = { 'systemd' },
     parsers = {},

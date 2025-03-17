@@ -11,6 +11,7 @@ vim.filetype.add({
     wofi = 'rasi',
     ebuild = 'sh.ebuild',
     install = 'sh.install',
+    promql = 'promql',
   },
   filename = {
     ['.git/ignore'] = 'gitignore',
