@@ -273,14 +273,5 @@ return condition
           },
         },
       },
-      {
-        -- Custom dial
-        'monaqa/dial.nvim',
-        opts = {
-          groups = {
-            typescript = language.dial(),
-          },
-        },
-      },
     }
   or {}

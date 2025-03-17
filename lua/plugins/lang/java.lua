@@ -301,14 +301,5 @@ return vim.list_contains(_G.enabled_languages, 'java')
           },
         },
       },
-      {
-        -- Custom dial
-        'monaqa/dial.nvim',
-        opts = {
-          groups = {
-            java = language.dial(),
-          },
-        },
-      },
     }
   or {}

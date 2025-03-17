@@ -7,7 +7,7 @@
 ---@field null_ls? DyNullLsSpec[]
 ---@field dap? string[]
 ---@field test? string[]
----@field dial? fun(): Augend[]
+---@field dial? fun(augend: Augend): Augend[]
 ---@field autopairs? fun(filetypes: string[], rule: Rule, cond: CondOpts, ts_cond: table): Rule[]
 ---@field endwise? boolean
 ---@field otter? boolean
@@ -58,9 +58,173 @@ return {
       { 'trail_space', type = 'diagnostics', command = 'lua' },
       { 'gitsigns', type = 'code_actions', command = 'git' },
     },
+    dial = function(augend)
+      local logical_alias = augend.constant.new({
+        elements = { '&&', '||' },
+        word = false,
+        cyclic = true,
+      })
+
+      local ordinal_numbers = augend.constant.new({
+        elements = {
+          'first',
+          'second',
+          'third',
+          'fourth',
+          'fifth',
+          'sixth',
+          'seventh',
+          'eighth',
+          'ninth',
+          'tenth',
+        },
+        word = false,
+        cyclic = true,
+      })
+
+      local weekdays = augend.constant.new({
+        elements = {
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday',
+        },
+        word = true,
+        cyclic = true,
+      })
+
+      local months = augend.constant.new({
+        elements = {
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        },
+        word = true,
+        cyclic = true,
+      })
+
+      local capitalized_boolean = augend.constant.new({
+        elements = {
+          'True',
+          'False',
+        },
+        word = true,
+        cyclic = true,
+      })
+
+      return {
+        augend.integer.alias.decimal, -- nonnegative decimal number (0, 1, 2, 3, ...)
+        augend.integer.alias.decimal_int, -- nonnegative and negative decimal number
+        augend.integer.alias.hex, -- nonnegative hex number  (0x01, 0x1a1f, etc.)
+        augend.date.alias['%Y/%m/%d'], -- date (2022/02/19, etc.)
+        augend.date.alias['%d/%m/%Y'], -- date (19/02/2022, ...)
+        capitalized_boolean,
+        augend.constant.alias.bool, -- boolean value (true <-> false)
+        augend.semver.alias.semver, -- semver
+        ordinal_numbers,
+        weekdays,
+        months,
+        logical_alias,
+      }
+    end,
+    -- See rules API: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
+    autopairs = function(_, rule, cond, _)
+      local languages_list = require('config.languages')
+      local equal_rule_ignored_filetypes = function()
+        local result = vim.list_extend({}, languages_list.bash.filetypes)
+        result = vim.list_extend(result, languages_list.yaml.filetypes)
+        result = vim.list_extend(result, languages_list.dockerfile.filetypes)
+        for i, filetype in ipairs(result) do
+          result[i] = '-' .. filetype
+        end
+        return result
+      end
+
+      return {
+        -- Add spaces between parentheses
+        rule(' ', ' ')
+          :with_pair(cond.done())
+          :replace_endpair(function(opts)
+            local pair = opts.line:sub(opts.col - 1, opts.col)
+            if vim.tbl_contains({ '()', '{}', '[]' }, pair) then
+              return ' ' -- it return space here
+            end
+            return '' -- return empty
+          end)
+          :with_move(cond.none())
+          :with_cr(cond.none())
+          :with_del(function(opts)
+            local col = vim.api.nvim_win_get_cursor(0)[2]
+            local context = opts.line:sub(col - 1, col + 2)
+            return vim.tbl_contains({ '(  )', '{  }', '[  ]' }, context)
+          end),
+        rule('', ' )')
+          :with_pair(cond.none())
+          :with_move(function(opts) return opts.char == ')' end)
+          :with_cr(cond.none())
+          :with_del(cond.none())
+          :use_key(')'),
+        rule('', ' }')
+          :with_pair(cond.none())
+          :with_move(function(opts) return opts.char == '}' end)
+          :with_cr(cond.none())
+          :with_del(cond.none())
+          :use_key('}'),
+        rule('', ' ]')
+          :with_pair(cond.none())
+          :with_move(function(opts) return opts.char == ']' end)
+          :with_cr(cond.none())
+          :with_del(cond.none())
+          :use_key(']'),
+
+        -- Add space after comma when have following text after comma
+        rule(',', ' ')
+          :replace_endpair(function(opts)
+            local next_char = opts.line:sub(opts.col, opts.col)
+            if next_char:match('%w$') then return ' ' end
+            return ''
+          end)
+          :set_end_pair_length(0),
+
+        -- Add space on equal sign
+        rule('=', ' ', equal_rule_ignored_filetypes())
+          :with_pair(cond.not_inside_quote())
+          :with_pair(function(opts)
+            local last_char = opts.line:sub(opts.col - 1, opts.col - 1)
+            if last_char:match('[%w%=%s]') then return true end
+            return false
+          end)
+          :replace_endpair(function(opts)
+            local prev_2char = opts.line:sub(opts.col - 2, opts.col - 1)
+            local next_char = opts.line:sub(opts.col, opts.col)
+            next_char = next_char == ' ' and '' or ' '
+            if prev_2char:match('%w$') then return '<BS> =' .. next_char end
+            if prev_2char:match('%=$') then return next_char end
+            if prev_2char:match('=') then return '<BS><BS>=' .. next_char end
+            return ''
+          end)
+          :set_end_pair_length(0)
+          :with_move(cond.none())
+          :with_del(cond.none()),
+      }
+    end,
   },
+  -- For only non-configured filetypes, effectively with
+  -- `conform` and `nvim-lint` plugins
   ---@diagnostic disable-next-line: missing-fields
-  ['_'] = { -- For only non-configured filetypes
+  ['_'] = {
     filetypes = { '_' },
     linters = {
       { 'compiler', command = 'lua', is_mason_tool = false },
@@ -152,8 +316,7 @@ return {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
     },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.hexcolor.new({ case = 'lower' }),
         augend.hexcolor.new({ case = 'upper' }),
@@ -204,8 +367,7 @@ return {
     lsp_servers = { 'jdtls', 'harper_ls' },
     dap = { 'javadbg' },
     test = { 'neotest-java' },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.constant.new({
           elements = { 'public', 'protected', 'private' },
@@ -226,8 +388,7 @@ return {
     parsers = { 'lua' },
     lsp_servers = { 'lua_ls', 'harper_ls' },
     formatters = { 'stylua' },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.constant.new({
           elements = { 'and', 'or' },
@@ -268,8 +429,7 @@ return {
     },
     dap = { 'python' },
     test = { 'neotest-python' },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.constant.new({
           elements = { 'and', 'or' },
@@ -319,8 +479,7 @@ return {
     lsp_servers = { 'tailwindcss' },
     linters = { 'stylelint' },
     formatters = { 'prettier' },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.hexcolor.new({ case = 'lower' }),
         augend.hexcolor.new({ case = 'upper' }),
@@ -370,8 +529,7 @@ return {
       'neotest-playwright',
       'vim-test',
     },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.constant.new({
           elements = { 'let', 'const' },
@@ -406,8 +564,7 @@ return {
     filetypes = { 'vue' },
     parsers = { 'vue' },
     lsp_servers = { 'volar', 'vtsls', 'tailwindcss', 'harper_ls' },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.constant.new({
           elements = { 'let', 'const' },
@@ -630,8 +787,7 @@ return {
     null_ls = {
       { 'jira', type = 'completion', command = 'jira', custom = true },
     },
-    dial = function()
-      local augend = require('dial.augend')
+    dial = function(augend)
       return {
         augend.constant.new({
           elements = { '[ ]', '[x]' },

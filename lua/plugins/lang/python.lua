@@ -61,14 +61,5 @@ return vim.list_contains(_G.enabled_languages, 'python')
           },
         },
       },
-      {
-        -- Custom dial
-        'monaqa/dial.nvim',
-        opts = {
-          groups = {
-            python = language.dial(),
-          },
-        },
-      },
     }
   or {}

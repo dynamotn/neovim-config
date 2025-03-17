@@ -1,4 +1,5 @@
 local language = require('config.languages').lua
+local cmp_util = require('util.cmp')
 
 return vim.list_contains(_G.enabled_languages, 'lua')
     and {
@@ -44,9 +45,21 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         init = function()
           _G.completion_sources =
             vim.tbl_extend('force', _G.completion_sources, {
-              Lazydev = '「VIM」',
+              lazydev = '「VIM」',
             })
         end,
+        opts = {
+          library = {
+            { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+            { path = 'LazyVim', words = { 'LazyVim' } },
+            { path = 'snacks.nvim', words = { 'Snacks' } },
+            { path = 'lazy.nvim', words = { 'LazyVim' } },
+            { path = 'dial.nvim' },
+            { path = 'nvim-autopairs' },
+            { path = 'nvim-treesitter' },
+            { path = 'neoconf' },
+          },
+        },
       },
       {
         -- Debug adapters & configurations
@@ -95,11 +108,20 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         end,
       },
       {
-        -- Custom dial
-        'monaqa/dial.nvim',
+        -- Completion for Nvim LSP
+        'blink.cmp',
         opts = {
-          groups = {
-            lua = language.dial(),
+          sources = {
+            per_filetype = {
+              lua = cmp_util.sources('lazydev'),
+            },
+            providers = {
+              lazydev = {
+                name = 'lazydev',
+                module = 'lazydev.integrations.blink',
+                score_offset = 100,
+              },
+            },
           },
         },
       },

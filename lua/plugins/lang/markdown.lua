@@ -18,15 +18,6 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         },
       },
       {
-        -- Custom dial
-        'monaqa/dial.nvim',
-        opts = {
-          groups = {
-            markdown = language.dial(),
-          },
-        },
-      },
-      {
         -- Preview markdown
         'toppair/peek.nvim',
         ft = language.filetypes,

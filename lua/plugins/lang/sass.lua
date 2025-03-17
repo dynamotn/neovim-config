@@ -11,14 +11,5 @@ return vim.list_contains(_G.enabled_languages, 'sass')
           },
         },
       },
-      {
-        -- Custom dial
-        'monaqa/dial.nvim',
-        opts = {
-          groups = {
-            sass = language.dial(),
-          },
-        },
-      },
     }
   or {}
