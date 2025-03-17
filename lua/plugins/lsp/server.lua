@@ -233,6 +233,10 @@ return {
     opts_extend = { 'ensure_installed' },
     opts = {
       ensure_installed = {},
+      registries = {
+        'github:mason-org/mason-registry',
+        'github:dynamotn/mason-registry',
+      },
     },
   },
 }
