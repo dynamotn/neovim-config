@@ -867,6 +867,10 @@ return {
     parsers = { 'query' },
     formatters = { 'format-queries' },
   },
+  xml = {
+    filetypes = { 'xml' },
+    parsers = { 'xml' },
+  },
   yaml = {
     filetypes = {
       'yaml',

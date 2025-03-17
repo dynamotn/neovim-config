@@ -108,6 +108,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Terragrunt
 - TOML
 - Treesitter
+- XML
 - YAML
 - Yuck
 
@@ -153,19 +154,19 @@ neogen.utilities.nod   1.04    2.38 ▉
 Benchmark 1: nvim +q
   Time (mean ± σ):      45.0 ms ±   4.4 ms    [User: 31.3 ms, System: 12.1 ms]
   Range (min … max):    40.3 ms …  60.4 ms    49 runs
- 
+
 Benchmark 2: nvim +q --headless
   Time (mean ± σ):      72.5 ms ±  41.4 ms    [User: 49.1 ms, System: 20.6 ms]
   Range (min … max):    38.6 ms … 140.0 ms    68 runs
- 
+
 Benchmark 3: nvim README.md +q --headless
   Time (mean ± σ):      83.0 ms ±  46.1 ms    [User: 58.7 ms, System: 21.4 ms]
   Range (min … max):    42.3 ms … 152.8 ms    21 runs
- 
+
 Benchmark 4: nvim lua/config/lazy.lua +q
   Time (mean ± σ):     328.6 ms ±  14.8 ms    [User: 331.3 ms, System: 160.7 ms]
   Range (min … max):   298.3 ms … 353.1 ms    10 runs
- 
+
 Summary
   nvim +q ran
     1.61 ± 0.93 times faster than nvim +q --headless
