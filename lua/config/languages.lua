@@ -691,6 +691,9 @@ return {
   gotmpl = {
     filetypes = { 'gotmpl' },
     parsers = { 'gotmpl' },
+    formatters = {
+      { 'injected', command = 'lua', mason = { enabled = false } },
+    },
     autopairs = function(filetypes, rule)
       return {
         -- Add parentheses in function
@@ -713,6 +716,9 @@ return {
     parsers = { 'helm' },
     lsp_servers = { 'helm_ls' },
     linters = { 'trivy' },
+    formatters = {
+      { 'injected', command = 'lua', mason = { enabled = false } },
+    },
     autopairs = function(filetypes, rule)
       return {
         -- Add parentheses in function
@@ -865,7 +871,10 @@ return {
     filetypes = { 'toml' },
     parsers = { 'toml' },
     lsp_servers = { 'taplo', 'harper_ls' },
-    formatters = { 'taplo' },
+    formatters = {
+      'tablo',
+      { 'injected', command = 'lua', mason = { enabled = false } },
+    },
     otter = true,
   },
   treesitter = {
@@ -894,7 +903,10 @@ return {
       'docker_compose_language_service',
     },
     linters = { 'yamllint', 'trivy' },
-    formatters = { 'yamlfmt' },
+    formatters = {
+      'yamlfmt',
+      { 'injected', command = 'lua', mason = { enabled = false } },
+    },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },

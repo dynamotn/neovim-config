@@ -19,7 +19,11 @@ return {
                 opts.formatters[tool_name] = tool.opts
               end
             end
-            if vim.fn.executable(tool_command) == 1 or name == '*' then
+            if
+              vim.fn.executable(tool_command) == 1
+              or name == '*'
+              or tool_name == 'injected'
+            then
               table.insert(opts.formatters_by_ft[ft], tool_name)
             end
           end
