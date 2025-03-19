@@ -350,7 +350,9 @@ return {
     filetypes = { 'fish' },
     parsers = { 'fish' },
     lsp_servers = { 'fish_lsp' },
-    linters = { 'fish' },
+    linters = {
+      { 'fish', mason = { enabled = false } },
+    },
     endwise = true,
   },
   go = {
