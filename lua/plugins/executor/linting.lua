@@ -15,8 +15,12 @@ return {
             elseif type(tool) == 'table' then
               tool_name = tool[1]
               tool_command = tool.command or tool_name
-              if vim.fn.executable(tool_command) == 1 or name == '*' then
-                opts.linters[tool_name] = tool.opts
+              if tool.opts then
+                opts.linters[tool_name] = vim.tbl_extend(
+                  'force',
+                  opts.linters[tool_name] or {},
+                  tool.opts
+                )
               end
             end
             if vim.fn.executable(tool_command) == 1 or name == '*' then
