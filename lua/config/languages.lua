@@ -36,15 +36,16 @@
 ---@field command? string
 ---@field mason? DyMasonSpec
 
----@class DyMasonSpec
----@field enabled? boolean
----@field package string
-
 ---@class DyNullLsSpec
 ---@field [1] string
 ---@field type string
 ---@field command string
 ---@field custom? boolean
+---@field mason? DyMasonSpec
+
+---@class DyMasonSpec
+---@field enabled? boolean
+---@field package string
 
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
@@ -55,24 +56,29 @@ return {
     filetypes = { '*' },
     parsers = {},
     formatters = {
-      {
-        'trim_whitespace',
-        command = 'lua',
-        ---@diagnostic disable-next-line: missing-fields
-        mason = { enabled = false },
-      },
-      {
-        'trim_newlines',
-        command = 'lua',
-        ---@diagnostic disable-next-line: missing-fields
-        mason = { enabled = false },
-      },
+      { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
+      { 'trim_newlines', command = 'lua', mason = { enabled = false } },
     },
     linters = { 'typos' },
     null_ls = {
-      { 'dictionary', type = 'hover', command = 'curl' },
-      { 'trail_space', type = 'diagnostics', command = 'lua' },
-      { 'gitsigns', type = 'code_actions', command = 'git' },
+      {
+        'dictionary',
+        type = 'hover',
+        command = 'curl',
+        mason = { enabled = false },
+      },
+      {
+        'trail_space',
+        type = 'diagnostics',
+        command = 'lua',
+        mason = { enabled = false },
+      },
+      {
+        'gitsigns',
+        type = 'code_actions',
+        command = 'git',
+        mason = { enabled = false },
+      },
     },
     dial = function(augend)
       local logical_alias = augend.constant.new({
@@ -132,10 +138,7 @@ return {
       })
 
       local capitalized_boolean = augend.constant.new({
-        elements = {
-          'True',
-          'False',
-        },
+        elements = { 'True', 'False' },
         word = true,
         cyclic = true,
       })
@@ -243,11 +246,7 @@ return {
   ['_'] = {
     filetypes = { '_' },
     linters = {
-      {
-        'compiler',
-        command = 'lua',
-        mason = { enabled = false },
-      },
+      { 'compiler', command = 'lua', mason = { enabled = false } },
     },
   },
 
@@ -287,18 +286,7 @@ return {
     linters = { 'shellcheck' },
     formatters = {
       'shellcheck',
-      {
-        'shfmt',
-        opts = {
-          prepend_args = {
-            '-i',
-            '2',
-            '-ci',
-            '-bn',
-            '-sr',
-          },
-        },
-      },
+      { 'shfmt', opts = { prepend_args = { '-i', '2', '-ci', '-bn', '-sr' } } },
     },
     dap = { 'bash' },
     test = { 'vim-test' },
@@ -311,10 +299,7 @@ return {
     linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
-    test = {
-      'neotest-gtest',
-      'vim-test',
-    },
+    test = { 'neotest-gtest', 'vim-test' },
   },
   c_sharp = {
     filetypes = { 'cs' },
@@ -408,7 +393,8 @@ return {
   latex = {
     filetypes = { 'tex' },
     parsers = { 'latex' },
-    lsp_servers = { 'ltex', 'texlab' },
+    lsp_servers = { 'ltex', 'texlab', 'vale_ls' },
+    linters = { 'vale' },
     formatters = { 'tex-fmt' },
   },
   lua = {
@@ -442,18 +428,9 @@ return {
     lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
     linters = { 'ruff' },
     formatters = {
-      {
-        'ruff_fix',
-        command = 'ruff',
-      },
-      {
-        'ruff_format',
-        command = 'ruff',
-      },
-      {
-        'ruff_organize_imports',
-        command = 'ruff',
-      },
+      { 'ruff_fix', command = 'ruff' },
+      { 'ruff_format', command = 'ruff' },
+      { 'ruff_organize_imports', command = 'ruff' },
     },
     dap = { 'python' },
     test = { 'neotest-python' },
@@ -488,10 +465,7 @@ return {
     lsp_servers = { 'ruby_lsp', 'harper_ls' },
     linters = { 'rubocop' },
     formatters = { 'rubocop' },
-    test = {
-      'neotest-rspec',
-      'vim-test',
-    },
+    test = { 'neotest-rspec', 'vim-test' },
     endwise = true,
   },
   rust = {
@@ -525,12 +499,7 @@ return {
     parsers = { 'sql' },
     linters = { 'sqlfluff' },
     formatters = {
-      {
-        'sqlfluff',
-        opts = {
-          args = { 'format', '--dialect=ansi', '-' },
-        },
-      },
+      { 'sqlfluff', opts = { args = { 'format', '--dialect=ansi', '-' } } },
     },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -620,7 +589,7 @@ return {
     filetypes = { 'yaml.ansible' },
     parsers = { 'yaml' },
     lsp_servers = { 'ansiblels' },
-    linters = { 'ansible-lint', 'yq' },
+    linters = { 'ansible-lint', 'yamllint' },
   },
   awk = {
     filetypes = { 'awk' },
@@ -692,6 +661,7 @@ return {
     filetypes = { 'dockerfile' },
     parsers = { 'dockerfile' },
     lsp_servers = { 'dockerls' },
+    linters = { 'hadolint' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
@@ -766,7 +736,7 @@ return {
     filetypes = { 'json', 'jsonc', 'json5' },
     parsers = { 'json5' },
     lsp_servers = { 'jsonls' },
-    linters = { 'yq', 'trivy' },
+    linters = { 'jsonlint', 'trivy' },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
@@ -781,18 +751,9 @@ return {
     filetypes = { 'markdown', 'markdown.mdx' },
     parsers = { 'markdown', 'markdown_inline' },
     lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
-    linters = { 'markdownlint-cli2' },
+    linters = { 'markdownlint-cli2', 'vale' },
     formatters = {
-      {
-        'injected',
-        opts = {
-          lang_to_ft = {
-            bash = 'sh',
-          },
-        },
-        command = 'lua',
-        mason = { enabled = false },
-      },
+      { 'injected', command = 'lua', mason = { enabled = false } },
       {
         'markdown-toc',
         opts = {
@@ -854,6 +815,7 @@ return {
     parsers = { 'yaml', 'json5' },
     lsp_servers = { 'vacuum' },
     linters = { 'yq' },
+    formatters = { 'yq' },
   },
   promql = {
     filetypes = { 'promql' },
@@ -931,7 +893,8 @@ return {
       'azure_pipelines_ls',
       'docker_compose_language_service',
     },
-    linters = { 'yq', 'trivy' },
+    linters = { 'yamllint', 'trivy' },
+    formatters = { 'yamlfmt' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
