@@ -8,9 +8,14 @@ return {
       'yaml', -- *.yaml (queries inside)
     },
     root_dir = function(fname, _)
-      return util.root_pattern({ 'promql-lsp.yaml', '.git' })(fname)
+      return util.root_pattern({ 'promql-lsp.yaml' })(fname)
     end,
     single_file_support = true,
+    on_new_config = function(config, root_dir)
+      if not util.root_pattern({ 'promql-lsp.yaml' })(root_dir) then
+        config.enabled = false
+      end
+    end,
   },
   docs = {
     description = [[
