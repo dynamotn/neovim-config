@@ -11,11 +11,11 @@ return {
         light = 'latte',
         dark = 'macchiato',
       },
-      transparent_background = true,
+      transparent_background = false,
       dim_inactive = {
         enabled = true,
-        shade = 'dark',
-        percentage = 0.15,
+        shade = 'light',
+        percentage = 0.5,
       },
       styles = {
         keywords = { 'italic', 'bold' },
