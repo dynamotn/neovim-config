@@ -874,7 +874,7 @@ return {
     parsers = { 'toml' },
     lsp_servers = { 'taplo', 'harper_ls' },
     formatters = {
-      'tablo',
+      'taplo',
       { 'injected', command = 'lua', mason = { enabled = false } },
     },
     otter = true,
