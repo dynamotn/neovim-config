@@ -246,7 +246,6 @@ return {
       {
         'compiler',
         command = 'lua',
-        ---@diagnostic disable-next-line: missing-fields
         mason = { enabled = false },
       },
     },
@@ -258,28 +257,17 @@ return {
     parsers = { 'angular' },
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = {
-      {
-        'biomejs',
-        command = 'biome',
-        mason = { package = 'biome' },
-      },
+      { 'biomejs', command = 'biome' },
     },
     formatters = {
       'biome',
-      {
-        'html_beautify',
-        command = 'js-beautify',
-        mason = {
-          package = 'js-beautify',
-        },
-      },
+      { 'html_beautify', command = 'js-beautify' },
     },
   },
   arduino = { -- See `cpp`
     filetypes = { 'arduino' },
     parsers = { 'cpp' },
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
-    ---@diagnostic disable-next-line: missing-fields
     linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
   },
@@ -320,7 +308,6 @@ return {
     filetypes = { 'c', 'cpp' },
     parsers = { 'cpp' },
     lsp_servers = { 'clangd', 'harper_ls' },
-    ---@diagnostic disable-next-line: missing-fields
     linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
@@ -337,6 +324,7 @@ return {
       {
         'csharpier',
         command = 'dotnet',
+        mason = { package = 'csharpier' },
       },
     },
     dap = { 'coreclr' },
@@ -398,13 +386,7 @@ return {
     parsers = { 'html' },
     lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
     formatters = {
-      {
-        'html_beautify',
-        command = 'js-beautify',
-        mason = {
-          package = 'js-beautify',
-        },
-      },
+      { 'html_beautify', command = 'js-beautify' },
     },
   },
   java = {
@@ -728,7 +710,12 @@ return {
     filetypes = { 'gitrebase' },
     parsers = { 'girebase' },
     null_ls = {
-      { 'gitrebase', type = 'code_actions', command = 'git' },
+      {
+        'gitrebase',
+        type = 'code_actions',
+        command = 'git',
+        mason = { enabled = false },
+      },
     },
   },
   gotmpl = {
@@ -804,7 +791,6 @@ return {
           },
         },
         command = 'lua',
-        ---@diagnostic disable-next-line: missing-fields
         mason = { enabled = false },
       },
       {
@@ -857,7 +843,7 @@ return {
     filetypes = { 'nix' },
     parsers = { 'nix' },
     lsp_servers = { 'nil_ls', 'harper_ls' },
-    linters = { 'nix' },
+    linters = { 'nix', 'statix' },
     formatters = { 'nixfmt' },
     null_ls = {
       { 'statix', type = 'code_actions', command = 'statix' },
@@ -889,7 +875,12 @@ return {
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-      { 'terraform_validate', type = 'diagnostics', command = 'terraform' },
+      {
+        'terraform_validate',
+        type = 'diagnostics',
+        command = 'terraform',
+        mason = { enabled = false },
+      },
     },
   },
   terragrunt = {
@@ -900,7 +891,12 @@ return {
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
-      { 'terragrunt_validate', type = 'diagnostics', command = 'terragrunt' },
+      {
+        'terragrunt_validate',
+        type = 'diagnostics',
+        command = 'terragrunt',
+        mason = { enabled = false },
+      },
     },
   },
   toml = {

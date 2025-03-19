@@ -39,7 +39,8 @@ return {
             tool_package = tool
           elseif type(tool) == 'table' then
             if tool.mason then is_mason_tool = tool.mason.enabled ~= false end
-            tool_package = tool.mason and tool.mason.package or tool[1]
+            tool_package = tool.command
+              or (tool.mason and tool.mason.package or tool[1])
           end
           if is_mason_tool then
             -- install server of language in bundle languages
