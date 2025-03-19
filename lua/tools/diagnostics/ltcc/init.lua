@@ -14,6 +14,7 @@ return h.make_builtin({
     args = { 'check', '-l', 'en-US', '-f', '$FILENAME' },
     format = 'json',
     to_stdin = true,
+    ignore_stderr = true,
     timeout = 60000,
     check_exit_code = function(c) return c <= 1 end,
     on_output = function(params)
