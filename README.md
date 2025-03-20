@@ -17,7 +17,7 @@ My customization configuration for neovim
 
 [![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.10-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Feature
 
@@ -32,6 +32,12 @@ My customization configuration for neovim
   - Enable/disable languages/tools by `_G.enabled_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
   - Easy to show which tools are installed in lualine
   - Trigger linters/formatters if installed only
+  - Add bunch of missing features of the different tools:
+    - `jira`
+    - `shellcheck`
+    - Spell check for comments
+    - Render diagram on kitty terminal (also support `zellij`)
+    - etc
   - Integrate with various tools:
     - [Obsidian](https://obsidian.md/) by `_G.obsidian_vaults` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
     - [chezmoi](https://www.chezmoi.io/)
