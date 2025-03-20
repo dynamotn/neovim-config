@@ -11,7 +11,10 @@ return {
       '3rd/image.nvim',
       ft = diagram_filetypes,
       opts = {
-        backend = vim.env.ZELLIJ ~= nil and 'ueberzug' or 'kitty',
+        backend = vim.env.ZELLIJ ~= nil
+            and vim.fn.executable('ueberzug') == 1
+            and 'ueberzug'
+          or 'kitty',
       },
     },
     opts = {
