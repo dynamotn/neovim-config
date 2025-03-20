@@ -170,6 +170,18 @@ local generate_disable_actions = function(bufnr, code, row, indentation)
   }
 end
 
+local generate_view_errorcode = function(code)
+  local present, open = pcall(require, 'open')
+  if present then
+    return {
+      title = 'Open wiki link of code SC' .. code,
+      action = function()
+        return open.open('https://www.shellcheck.net/wiki/SC' .. code)
+      end,
+    }
+  end
+end
+
 local code_action_handler = function(params)
   if not (params.output and params.output.comments) then return end
   local actions = {}
@@ -185,6 +197,7 @@ local code_action_handler = function(params)
           indentation
         )
       )
+      vim.list_extend(actions, { generate_view_errorcode(comment.code) })
     end
   end
   return actions
