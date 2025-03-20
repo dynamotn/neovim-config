@@ -288,6 +288,14 @@ return {
       'shellcheck',
       { 'shfmt', opts = { prepend_args = { '-i', '2', '-ci', '-bn', '-sr' } } },
     },
+    null_ls = {
+      {
+        'shellcheck',
+        type = 'code_actions',
+        command = 'shellcheck',
+        custom = true,
+      },
+    },
     dap = { 'bash' },
     test = { 'vim-test' },
     endwise = true,
