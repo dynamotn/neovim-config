@@ -283,7 +283,7 @@ return {
       'termuxls',
       'harper_ls',
     },
-    linters = { 'shellcheck' },
+    -- linters = { 'shellcheck' }, # bashls cover it
     formatters = {
       'shellcheck',
       { 'shfmt', opts = { prepend_args = { '-i', '2', '-ci', '-bn', '-sr' } } },
