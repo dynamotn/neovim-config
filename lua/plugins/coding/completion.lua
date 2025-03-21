@@ -227,7 +227,7 @@ return {
         calc = '「CALC」',
         tmux = '「MUX」',
         dynamic = '「MISC」',
-        cmdline = '「CMD」',
+        Cmdline = '「CMD」',
       })
     end,
   },
