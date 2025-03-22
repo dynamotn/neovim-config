@@ -69,6 +69,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
           {
             '<leader>dn',
             function() require('osv').launch({ port = 8086 }) end,
+            ft = language.filetypes,
             desc = 'Launch debug Neovim',
           },
         },

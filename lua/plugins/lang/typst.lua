@@ -18,6 +18,7 @@ return vim.list_contains(_G.enabled_languages, 'typst')
                       arguments = { buf_name },
                     })
                   end,
+                  ft = language.filetypes,
                   desc = 'Pin main file',
                 },
               },
@@ -37,7 +38,7 @@ return vim.list_contains(_G.enabled_languages, 'typst')
         keys = {
           {
             '<leader>cp',
-            ft = 'typst',
+            ft = language.filetypes,
             '<cmd>TypstPreviewToggle<cr>',
             desc = 'Toggle Typst Preview',
           },
