@@ -256,7 +256,11 @@ return {
     parsers = { 'angular' },
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = {
-      { 'biomejs', command = 'biome' },
+      {
+        'biomejs',
+        command = 'biome',
+        mason = { package = 'biome' },
+      },
     },
     formatters = {
       'biome',
@@ -527,7 +531,13 @@ return {
     },
     parsers = { 'javascript' },
     lsp_servers = { 'vtsls', 'harper_ls' },
-    linters = { 'biomejs' },
+    linters = {
+      {
+        'biomejs',
+        command = 'biome',
+        mason = { package = 'biome' },
+      },
+    },
     formatters = { 'biome' },
     dap = { 'js', 'firefox' },
     test = {
@@ -702,7 +712,7 @@ return {
     filetypes = { 'gotmpl' },
     parsers = { 'gotmpl' },
     formatters = {
-      { 'injected', command = 'lua', mason = { enabled = false } },
+      -- { 'injected', command = 'lua', mason = { enabled = false } },
     },
     autopairs = function(filetypes, rule)
       return {
@@ -727,7 +737,7 @@ return {
     lsp_servers = { 'helm_ls' },
     linters = { 'trivy' },
     formatters = {
-      { 'injected', command = 'lua', mason = { enabled = false } },
+      -- { 'injected', command = 'lua', mason = { enabled = false } },
     },
     autopairs = function(filetypes, rule)
       return {
@@ -769,7 +779,7 @@ return {
     lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
     linters = { 'markdownlint-cli2', 'vale' },
     formatters = {
-      { 'injected', command = 'lua', mason = { enabled = false } },
+      -- { 'injected', command = 'lua', mason = { enabled = false } },
       {
         'markdown-toc',
         opts = {
@@ -883,7 +893,7 @@ return {
     lsp_servers = { 'taplo', 'harper_ls' },
     formatters = {
       'taplo',
-      { 'injected', command = 'lua', mason = { enabled = false } },
+      -- { 'injected', command = 'lua', mason = { enabled = false } },
     },
     otter = true,
   },
@@ -915,7 +925,7 @@ return {
     linters = { 'yamllint', 'trivy' },
     formatters = {
       'yamlfmt',
-      { 'injected', command = 'lua', mason = { enabled = false } },
+      -- { 'injected', command = 'lua', mason = { enabled = false } },
     },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
