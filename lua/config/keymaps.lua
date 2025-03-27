@@ -40,3 +40,13 @@ end
 
 -- Replace selected text without copying it
 vim.keymap.set('v', 'p', '"_dP', { desc = 'Paste' })
+
+-- Fast tab
+for number = 1, 9, 1 do
+  vim.keymap.set(
+    'n',
+    '<leader><tab>' .. number,
+    '<cmd>tabn' .. number .. '<cr>',
+    { desc = 'Go to Tab ' .. number }
+  )
+end
