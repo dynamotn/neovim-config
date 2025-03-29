@@ -87,6 +87,7 @@ return {
                 )
               end,
             },
+            score_offset = 18,
           },
           -- path with start point from root of project, not current folder
           project_path = {
@@ -95,6 +96,19 @@ return {
             opts = {
               get_cwd = function(_) return require('lazyvim.util.root').get() end,
             },
+          },
+          lsp = {
+            score_offset = 20,
+          },
+          snippets = {
+            score_offset = 19,
+          },
+          cmdline = {
+            score_offset = 20,
+          },
+          fuzzy_path = {
+            min_keyword_length = 3,
+            score_offset = -20,
           },
         },
         default = function() return require('util.cmp').setup_default_sources() end,
