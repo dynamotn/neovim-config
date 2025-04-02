@@ -57,6 +57,8 @@ return {
         opts.groups.default = language.dial(augend)
       elseif language.dial then
         opts.groups[name] = language.dial(augend)
+      else
+        opts.groups[name] = {}
       end
     end
     return opts
