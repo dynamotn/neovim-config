@@ -71,7 +71,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
       },
       {
         -- Obsidian
-        'epwalsh/obsidian.nvim',
+        'obsidian-nvim/obsidian.nvim',
         ft = language.filetypes,
         enabled = _G.enabled_plugins.obsidian or _G.used_full_plugins,
         opts = {
@@ -104,6 +104,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
           {
             '<leader>T',
             function()
+              ---@diagnostic disable-next-line: missing-fields
               Snacks.scratch({
                 icon = ' ',
                 name = 'Todo',
