@@ -5,7 +5,7 @@ return {
     event = 'LazyFile',
     dependencies = {
       'mason.nvim',
-      { 'williamboman/mason-lspconfig.nvim', config = function() end },
+      { 'mason-org/mason-lspconfig.nvim', config = function() end },
     },
     opts = function()
       ---@class DyLspOpts: PluginLspOpts
@@ -228,7 +228,7 @@ return {
   },
   {
     -- Disable default tools
-    'williamboman/mason.nvim',
+    'mason-org/mason.nvim',
     cmd = { 'Mason', 'MasonInstall' },
     opts_extend = { 'ensure_installed' },
     opts = {

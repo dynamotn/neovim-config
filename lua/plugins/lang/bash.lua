@@ -119,7 +119,7 @@ return vim.list_contains(_G.enabled_languages, 'bash')
       },
       {
         -- Map termuxls with termux-language-server in mason
-        'williamboman/mason-lspconfig.nvim',
+        'mason-org/mason-lspconfig.nvim',
         config = function()
           local server = require('mason-lspconfig.mappings.server')
           server.lspconfig_to_package['termuxls'] = 'termux-language-server'

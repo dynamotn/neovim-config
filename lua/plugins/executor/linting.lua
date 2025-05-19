@@ -33,7 +33,7 @@ return {
   },
   {
     -- Auto install linters
-    'williamboman/mason.nvim',
+    'mason-org/mason.nvim',
     opts = function(_, opts)
       for name, language in pairs(require('config.languages')) do
         for _, tool in ipairs(language.linters or {}) do
