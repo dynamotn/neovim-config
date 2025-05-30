@@ -4,6 +4,7 @@ return {
   {
     -- AI Engine for coding
     'Exafunction/codeium.nvim',
+    enabled = _G.enabled_plugins.codeium,
     build = function()
       require('lazy').load({ plugins = { 'codeium.nvim' }, wait = true })
       vim.cmd(':Codeium Auth')

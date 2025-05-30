@@ -4,6 +4,7 @@ _G.enabled_plugins.leetcode = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.firenvim = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.otter = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.chezmoi = true
+_G.enabled_plugins.codeium = {{ eq .kind "pc" "laptop" "vm" }}
 {{- if eq .kind "container" }}
 _G.enabled_languages = { 'gitcommit', 'gitrebase', 'bash', 'sql' }
 _G.bundle_languages = { 'gitcommit', 'bash', 'sql' }
