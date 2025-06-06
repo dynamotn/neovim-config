@@ -1,6 +1,6 @@
-local language = require('config.languages').bash
+local language = require('config.languages').promql
 
-return vim.list_contains(_G.enabled_languages, 'bash')
+return vim.list_contains(_G.enabled_languages, 'promql')
     and {
       {
         -- LSP config
