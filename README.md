@@ -26,7 +26,7 @@ My customization configuration for neovim
 - 🧹 Sane default settings for options, autocmds, and keymaps
 - 📦 Comes with a wealth of plugins pre-configured and ready to use **for DevOps and SA**, like me
   - Supported many languages, frameworks and tools (see [here](#languages-frameworks-or-tools-support))
-  - Load per machine configurations via `lua/per_machine.lua` if exists (see [my config](./lua/per_machine.lua.tmpl), managed by [chezmoi](https://www.chezmoi.io/))
+  - Load per machine configurations via `lua/per_machine/init.lua` if exists (see [my config](./lua/per_machine/init.lua.tmpl), managed by [chezmoi](https://www.chezmoi.io/))
   - Lazy install treesitter parsers, LSP servers, formatters, linters, debug adapters... if needed when open file
   - Bundle languages/tools when containerize or builtin development environments by `_G.bundle_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
   - Enable/disable languages/tools by `_G.enabled_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
