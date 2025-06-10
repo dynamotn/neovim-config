@@ -49,8 +49,7 @@ _G.companion_adapter = 'ollama'
 
 if vim.fn.has('nvim-0.11.0') == 1 then
   -- Load specific configurations per machine
-  pcall(require, 'per_machine')
-  pcall(require, 'per_machine_secret')
+  require('per_machine')
   -- Load LazyVim
   require('config.lazy')
 end

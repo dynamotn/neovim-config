@@ -66,3 +66,6 @@ _G.firenvim_site_settings = {
     takeover = 'never',
   },
 }
+{{- if has "F1" .decryptEnterprise }}
+require('per_machine.F1')
+{{- end }}
