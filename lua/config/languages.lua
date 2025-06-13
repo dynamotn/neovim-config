@@ -375,8 +375,8 @@ return {
     endwise = true,
   },
   go = {
-    filetypes = { 'go', 'gomod', 'gowork', 'gosum' },
-    parsers = { 'go', 'gomod', 'gowork', 'gosum' },
+    filetypes = { 'go' },
+    parsers = { 'go' },
     lsp_servers = { 'gopls', 'harper_ls', 'sonarlint' },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
@@ -715,6 +715,16 @@ return {
       },
     },
   },
+  gomod = {
+    filetypes = { 'gomod' },
+    parsers = { 'gomod' },
+    lsp_servers = { 'sonarlint' },
+  },
+  gosum = {
+    filetypes = { 'gosum' },
+    parsers = { 'gosum' },
+    lsp_servers = { 'sonarlint' },
+  },
   gotmpl = {
     filetypes = { 'gotmpl' },
     parsers = { 'gotmpl' },
@@ -731,6 +741,11 @@ return {
           :set_end_pair_length(2),
       }
     end,
+  },
+  gowork = {
+    filetypes = { 'gowork' },
+    parsers = { 'gowork' },
+    lsp_servers = { 'sonarlint' },
   },
   groovy = {
     filetypes = { 'groovy' },
