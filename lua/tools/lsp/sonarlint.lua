@@ -9,26 +9,33 @@ local did_change_configuration = function(client, settings)
   })
 end
 
+local cmd = {
+  'sonarlint-language-server',
+  '-stdio',
+}
+
+if (vim.uv or vim.loop).fs_stat(extension_dir) then
+  cmd = vim.list_extend(cmd, {
+    '-analyzers',
+    extension_dir .. '/analyzers/csharpenterprise.jar',
+    extension_dir .. '/analyzers/sonarcsharp.jar',
+    extension_dir .. '/analyzers/sonargo.jar',
+    extension_dir .. '/analyzers/sonarhtml.jar',
+    extension_dir .. '/analyzers/sonariac.jar',
+    extension_dir .. '/analyzers/sonarjava.jar',
+    extension_dir .. '/analyzers/sonarjavasymbolicexecution.jar',
+    extension_dir .. '/analyzers/sonarjs.jar',
+    extension_dir .. '/analyzers/sonarlintomnisharp.jar',
+    extension_dir .. '/analyzers/sonarphp.jar',
+    extension_dir .. '/analyzers/sonarpython.jar',
+    extension_dir .. '/analyzers/sonartext.jar',
+    extension_dir .. '/analyzers/sonarxml.jar',
+  })
+end
+
 return {
   default_config = {
-    cmd = {
-      'sonarlint-language-server',
-      '-stdio',
-      '-analyzers',
-      extension_dir .. '/analyzers/csharpenterprise.jar',
-      extension_dir .. '/analyzers/sonarcsharp.jar',
-      extension_dir .. '/analyzers/sonargo.jar',
-      extension_dir .. '/analyzers/sonarhtml.jar',
-      extension_dir .. '/analyzers/sonariac.jar',
-      extension_dir .. '/analyzers/sonarjava.jar',
-      extension_dir .. '/analyzers/sonarjavasymbolicexecution.jar',
-      extension_dir .. '/analyzers/sonarjs.jar',
-      extension_dir .. '/analyzers/sonarlintomnisharp.jar',
-      extension_dir .. '/analyzers/sonarphp.jar',
-      extension_dir .. '/analyzers/sonarpython.jar',
-      extension_dir .. '/analyzers/sonartext.jar',
-      extension_dir .. '/analyzers/sonarxml.jar',
-    },
+    cmd = cmd,
     filetypes = {
       'cs',
       'go',
@@ -65,7 +72,7 @@ return {
       'xslt',
       'svg',
     },
-    root_dir = function(fname, _) return util.root_pattern({ '.git' })(fname) end,
+    root_dir = function(fname) return util.find_git_ancestor(fname) end,
     settings = {
       sonarlint = {
         rules = vim.empty_dict(),
@@ -201,7 +208,7 @@ return {
       end,
     },
     commands = {
-      ['SonarLint.DeactivateRule'] = function(rule, ctx)
+      LspSonarlintDeactivateRule = function(rule, ctx)
         local client = vim.lsp.get_client_by_id(ctx.client_id)
         did_change_configuration(client, {
           sonarlint = {

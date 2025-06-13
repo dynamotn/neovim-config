@@ -6,12 +6,20 @@ return {
     dependencies = {
       'mason.nvim',
       {
-        -- Map sonarlint with sonarlint-language-server in mason
         'mason-org/mason-lspconfig.nvim',
         config = function()
           local server = require('mason-lspconfig.mappings.server')
+          -- Map sonarlint with sonarlint-language-server
           server.lspconfig_to_package['sonarlint'] = 'sonarlint-language-server'
           server.package_to_lspconfig['sonarlint-language-server'] = 'sonarlint'
+
+          -- Map termuxls with termux-language-server
+          server.lspconfig_to_package['termuxls'] = 'termux-language-server'
+          server.package_to_lspconfig['termux-language-server'] = 'termuxls'
+
+          -- Map promqlls with promql-langserver
+          server.lspconfig_to_package['promqlls'] = 'promql-langserver'
+          server.package_to_lspconfig['promql-langserver'] = 'promqlls'
         end,
       },
     },
@@ -181,7 +189,8 @@ return {
         if opts.module[server] then
           require('lspconfig.configs')[server] = require(opts.module[server])
         end
-        require('lspconfig')[server].setup(server_opts)
+        local setup_fn = require('lspconfig')[server].setup
+        if setup_fn then setup_fn(server_opts) end
       end
 
       -- get all the servers that are available through mason-lspconfig

@@ -118,15 +118,6 @@ return vim.list_contains(_G.enabled_languages, 'bash')
         end,
       },
       {
-        -- Map termuxls with termux-language-server in mason
-        'mason-org/mason-lspconfig.nvim',
-        config = function()
-          local server = require('mason-lspconfig.mappings.server')
-          server.lspconfig_to_package['termuxls'] = 'termux-language-server'
-          server.package_to_lspconfig['termux-language-server'] = 'termuxls'
-        end,
-      },
-      {
         -- Custom neogen with my Shell style guide
         'neogen',
         opts = {
