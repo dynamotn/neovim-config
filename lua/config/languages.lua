@@ -323,7 +323,7 @@ return {
   c_sharp = {
     filetypes = { 'cs' },
     parsers = { 'c_sharp' },
-    lsp_servers = { 'omnisharp', 'harper_ls' },
+    lsp_servers = { 'omnisharp', 'harper_ls', 'sonarlint' },
     formatters = {
       {
         'csharpier',
@@ -377,7 +377,7 @@ return {
   go = {
     filetypes = { 'go', 'gomod', 'gowork', 'gosum' },
     parsers = { 'go', 'gomod', 'gowork', 'gosum' },
-    lsp_servers = { 'gopls', 'harper_ls' },
+    lsp_servers = { 'gopls', 'harper_ls', 'sonarlint' },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
       { 'gomodifytags', type = 'code_actions', command = 'gomodifytags' },
@@ -390,7 +390,7 @@ return {
   html = {
     filetypes = { 'html' },
     parsers = { 'html' },
-    lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
+    lsp_servers = { 'tailwindcss', 'html', 'harper_ls', 'sonarlint' },
     formatters = {
       { 'html_beautify', command = 'js-beautify' },
     },
@@ -398,7 +398,7 @@ return {
   java = {
     filetypes = { 'java' },
     parsers = { 'java' },
-    lsp_servers = { 'jdtls', 'harper_ls' },
+    lsp_servers = { 'jdtls', 'harper_ls', 'sonarlint' },
     dap = { 'javadbg' },
     test = { 'neotest-java' },
     dial = function(augend)
@@ -414,7 +414,7 @@ return {
   latex = {
     filetypes = { 'tex' },
     parsers = { 'latex' },
-    lsp_servers = { 'ltex', 'texlab', 'vale_ls' },
+    lsp_servers = { 'ltex', 'texlab', 'vale_ls', 'sonarlint' },
     linters = { 'vale' },
     formatters = { 'tex-fmt' },
   },
@@ -437,7 +437,7 @@ return {
   php = {
     filetypes = { 'php' },
     parsers = { 'php' },
-    lsp_servers = { 'intelephense', 'harper_ls' },
+    lsp_servers = { 'intelephense', 'harper_ls', 'sonarlint' },
     linters = { 'phpcs' },
     formatters = { 'php_cs_fixer' },
     dap = { 'php' },
@@ -446,7 +446,7 @@ return {
   python = {
     filetypes = { 'python' },
     parsers = { 'python' },
-    lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
+    lsp_servers = { 'pyright', 'ruff', 'harper_ls', 'sonarlint' },
     linters = { 'ruff' },
     formatters = {
       { 'ruff_fix', command = 'ruff' },
@@ -537,7 +537,7 @@ return {
       'typescript.tsx',
     },
     parsers = { 'javascript' },
-    lsp_servers = { 'vtsls', 'harper_ls' },
+    lsp_servers = { 'vtsls', 'harper_ls', 'sonarlint' },
     linters = {
       {
         'biomejs',
@@ -687,7 +687,7 @@ return {
   dockerfile = {
     filetypes = { 'dockerfile' },
     parsers = { 'dockerfile' },
-    lsp_servers = { 'dockerls' },
+    lsp_servers = { 'dockerls', 'sonarlint' },
     linters = { 'hadolint' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -721,6 +721,7 @@ return {
     formatters = {
       -- { 'injected', command = 'lua', mason = { enabled = false } },
     },
+    lsp_servers = { 'sonarlint' },
     autopairs = function(filetypes, rule)
       return {
         -- Add parentheses in function
@@ -768,7 +769,7 @@ return {
   json = {
     filetypes = { 'json', 'jsonc', 'json5' },
     parsers = { 'json5' },
-    lsp_servers = { 'jsonls' },
+    lsp_servers = { 'jsonls', 'sonarlint' },
     linters = { 'jsonlint', 'trivy' },
   },
   make = {
@@ -783,7 +784,7 @@ return {
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
     parsers = { 'markdown', 'markdown_inline' },
-    lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
+    lsp_servers = { 'marksman', 'vale_ls', 'harper_ls', 'sonarlint' },
     linters = { 'markdownlint-cli2', 'vale' },
     formatters = {
       -- { 'injected', command = 'lua', mason = { enabled = false } },
@@ -864,7 +865,7 @@ return {
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
     parsers = { 'hcl', 'terraform' },
-    lsp_servers = { 'terraformls' },
+    lsp_servers = { 'terraformls', 'sonarlint' },
     linters = { 'tflint', 'trivy' },
     formatters = { 'terraform_fmt' },
     null_ls = {
@@ -881,7 +882,7 @@ return {
   terragrunt = {
     filetypes = { 'terragrunt' },
     parsers = { 'hcl' },
-    lsp_servers = { 'terraformls' },
+    lsp_servers = { 'terraformls', 'sonarlint' },
     formatters = { 'terraform_fmt' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -912,6 +913,7 @@ return {
   xml = {
     filetypes = { 'xml' },
     parsers = { 'xml' },
+    lsp_servers = { 'sonarlint' },
   },
   yaml = {
     filetypes = {
@@ -928,6 +930,7 @@ return {
       'gh_actions_ls',
       'azure_pipelines_ls',
       'docker_compose_language_service',
+      'sonarlint',
     },
     linters = { 'yamllint', 'trivy' },
     formatters = {

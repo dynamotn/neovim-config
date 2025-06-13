@@ -35,6 +35,7 @@ My customization configuration for neovim
   - Add bunch of missing features of the different tools:
     - `jira`
     - `shellcheck`
+    - `sonarlint` (with connected mode for both SonarQube and SonarCloud)
     - Spell check for comments
     - Render diagram on kitty terminal (also support `zellij`)
     - etc

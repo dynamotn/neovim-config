@@ -5,7 +5,15 @@ return {
     event = 'LazyFile',
     dependencies = {
       'mason.nvim',
-      { 'mason-org/mason-lspconfig.nvim', config = function() end },
+      {
+        -- Map sonarlint with sonarlint-language-server in mason
+        'mason-org/mason-lspconfig.nvim',
+        config = function()
+          local server = require('mason-lspconfig.mappings.server')
+          server.lspconfig_to_package['sonarlint'] = 'sonarlint-language-server'
+          server.package_to_lspconfig['sonarlint-language-server'] = 'sonarlint'
+        end,
+      },
     },
     opts = function()
       ---@class DyLspOpts: PluginLspOpts
@@ -63,12 +71,16 @@ return {
           timeout_ms = nil,
         },
         -- LSP Server Settings
-        servers = {},
+        servers = {
+          sonarlint = {},
+        },
         -- you can do any additional lsp server setup here
         -- return true if you don't want this server to be setup with lspconfig
         setup = {},
         -- you can add not officially supported servers here
-        module = {},
+        module = {
+          sonarlint = 'tools.lsp.sonarlint',
+        },
       }
     end,
     ---@param opts DyLspOpts
