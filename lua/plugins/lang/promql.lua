@@ -9,9 +9,6 @@ return vim.list_contains(_G.enabled_languages, 'promql')
           servers = {
             promqlls = {},
           },
-          module = {
-            promqlls = 'tools.lsp.promqlls',
-          },
         },
       },
     }

@@ -22,7 +22,7 @@
 
 ---@class DyLspSpec
 ---@field [1] string
----@field opts _.lspconfig.options
+---@field custom? boolean
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -55,6 +55,12 @@ return {
   ['*'] = {
     filetypes = { '*' },
     parsers = {},
+    lsp_servers = {
+      {
+        'sonarlint',
+        custom = true,
+      },
+    },
     formatters = {
       { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
       { 'trim_newlines', command = 'lua', mason = { enabled = false } },
@@ -291,7 +297,10 @@ return {
     parsers = { 'bash' },
     lsp_servers = {
       'bashls',
-      'termuxls',
+      {
+        'termuxls',
+        custom = true,
+      },
       'harper_ls',
     },
     -- linters = { 'shellcheck' }, # bashls cover it
@@ -323,7 +332,7 @@ return {
   c_sharp = {
     filetypes = { 'cs' },
     parsers = { 'c_sharp' },
-    lsp_servers = { 'omnisharp', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'omnisharp', 'harper_ls' },
     formatters = {
       {
         'csharpier',
@@ -377,7 +386,7 @@ return {
   go = {
     filetypes = { 'go' },
     parsers = { 'go' },
-    lsp_servers = { 'gopls', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'gopls', 'harper_ls' },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
       { 'gomodifytags', type = 'code_actions', command = 'gomodifytags' },
@@ -390,7 +399,7 @@ return {
   html = {
     filetypes = { 'html' },
     parsers = { 'html' },
-    lsp_servers = { 'tailwindcss', 'html', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
     formatters = {
       { 'html_beautify', command = 'js-beautify' },
     },
@@ -398,7 +407,7 @@ return {
   java = {
     filetypes = { 'java' },
     parsers = { 'java' },
-    lsp_servers = { 'jdtls', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'jdtls', 'harper_ls' },
     dap = { 'javadbg' },
     test = { 'neotest-java' },
     dial = function(augend)
@@ -414,7 +423,7 @@ return {
   latex = {
     filetypes = { 'tex' },
     parsers = { 'latex' },
-    lsp_servers = { 'ltex', 'texlab', 'vale_ls', 'sonarlint' },
+    lsp_servers = { 'ltex', 'texlab', 'vale_ls' },
     linters = { 'vale' },
     formatters = { 'tex-fmt' },
   },
@@ -437,7 +446,7 @@ return {
   php = {
     filetypes = { 'php' },
     parsers = { 'php' },
-    lsp_servers = { 'intelephense', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'intelephense', 'harper_ls' },
     linters = { 'phpcs' },
     formatters = { 'php_cs_fixer' },
     dap = { 'php' },
@@ -446,7 +455,7 @@ return {
   python = {
     filetypes = { 'python' },
     parsers = { 'python' },
-    lsp_servers = { 'pyright', 'ruff', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
     linters = { 'ruff' },
     formatters = {
       { 'ruff_fix', command = 'ruff' },
@@ -537,7 +546,7 @@ return {
       'typescript.tsx',
     },
     parsers = { 'javascript' },
-    lsp_servers = { 'vtsls', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'vtsls', 'harper_ls' },
     linters = {
       {
         'biomejs',
@@ -687,7 +696,7 @@ return {
   dockerfile = {
     filetypes = { 'dockerfile' },
     parsers = { 'dockerfile' },
-    lsp_servers = { 'dockerls', 'sonarlint' },
+    lsp_servers = { 'dockerls' },
     linters = { 'hadolint' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -718,12 +727,10 @@ return {
   gomod = {
     filetypes = { 'gomod' },
     parsers = { 'gomod' },
-    lsp_servers = { 'sonarlint' },
   },
   gosum = {
     filetypes = { 'gosum' },
     parsers = { 'gosum' },
-    lsp_servers = { 'sonarlint' },
   },
   gotmpl = {
     filetypes = { 'gotmpl' },
@@ -731,7 +738,6 @@ return {
     formatters = {
       -- { 'injected', command = 'lua', mason = { enabled = false } },
     },
-    lsp_servers = { 'sonarlint' },
     autopairs = function(filetypes, rule)
       return {
         -- Add parentheses in function
@@ -745,7 +751,6 @@ return {
   gowork = {
     filetypes = { 'gowork' },
     parsers = { 'gowork' },
-    lsp_servers = { 'sonarlint' },
   },
   groovy = {
     filetypes = { 'groovy' },
@@ -784,7 +789,7 @@ return {
   json = {
     filetypes = { 'json', 'jsonc', 'json5' },
     parsers = { 'json5' },
-    lsp_servers = { 'jsonls', 'sonarlint' },
+    lsp_servers = { 'jsonls' },
     linters = { 'jsonlint', 'trivy' },
   },
   make = {
@@ -799,7 +804,7 @@ return {
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
     parsers = { 'markdown', 'markdown_inline' },
-    lsp_servers = { 'marksman', 'vale_ls', 'harper_ls', 'sonarlint' },
+    lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
     linters = { 'markdownlint-cli2', 'vale' },
     formatters = {
       -- { 'injected', command = 'lua', mason = { enabled = false } },
@@ -869,7 +874,12 @@ return {
   promql = {
     filetypes = { 'promql' },
     parsers = { 'promql' },
-    lsp_servers = { 'promqlls' },
+    lsp_servers = {
+      {
+        'promqlls',
+        custom = true,
+      },
+    },
     linguist = { 'promql' },
   },
   systemd = {
@@ -880,7 +890,7 @@ return {
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
     parsers = { 'hcl', 'terraform' },
-    lsp_servers = { 'terraformls', 'sonarlint' },
+    lsp_servers = { 'terraformls' },
     linters = { 'tflint', 'trivy' },
     formatters = { 'terraform_fmt' },
     null_ls = {
@@ -897,7 +907,7 @@ return {
   terragrunt = {
     filetypes = { 'terragrunt' },
     parsers = { 'hcl' },
-    lsp_servers = { 'terraformls', 'sonarlint' },
+    lsp_servers = { 'terraformls' },
     formatters = { 'terraform_fmt' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -928,7 +938,6 @@ return {
   xml = {
     filetypes = { 'xml' },
     parsers = { 'xml' },
-    lsp_servers = { 'sonarlint' },
   },
   yaml = {
     filetypes = {
@@ -945,7 +954,6 @@ return {
       'gh_actions_ls',
       'azure_pipelines_ls',
       'docker_compose_language_service',
-      'sonarlint',
     },
     linters = { 'yamllint', 'trivy' },
     formatters = {

@@ -101,9 +101,6 @@ return vim.list_contains(_G.enabled_languages, 'bash')
             termuxls = {},
             harper_ls = {},
           },
-          module = {
-            termuxls = 'tools.lsp.termuxls',
-          },
         },
       },
       {

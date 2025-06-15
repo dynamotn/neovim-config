@@ -2,32 +2,12 @@ return {
   {
     -- I want to self-managed LSP by my way
     'neovim/nvim-lspconfig',
-    event = 'LazyFile',
-    dependencies = {
-      'mason.nvim',
-      {
-        'mason-org/mason-lspconfig.nvim',
-        config = function()
-          local server = require('mason-lspconfig.mappings.server')
-          -- Map sonarlint with sonarlint-language-server
-          server.lspconfig_to_package['sonarlint'] = 'sonarlint-language-server'
-          server.package_to_lspconfig['sonarlint-language-server'] = 'sonarlint'
-
-          -- Map termuxls with termux-language-server
-          server.lspconfig_to_package['termuxls'] = 'termux-language-server'
-          server.package_to_lspconfig['termux-language-server'] = 'termuxls'
-
-          -- Map promqlls with promql-langserver
-          server.lspconfig_to_package['promqlls'] = 'promql-langserver'
-          server.package_to_lspconfig['promql-langserver'] = 'promqlls'
-        end,
-      },
-    },
+    event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
+    dependencies = {},
     opts = function()
       ---@class DyLspOpts: PluginLspOpts
       ---@field servers table<string, _.lspconfig.options>
       ---@field setup table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
-      ---@field module table<string, string>
       return {
         -- options for vim.diagnostic.config()
         ---@type vim.diagnostic.Opts
@@ -85,10 +65,6 @@ return {
         -- you can do any additional lsp server setup here
         -- return true if you don't want this server to be setup with lspconfig
         setup = {},
-        -- you can add not officially supported servers here
-        module = {
-          sonarlint = 'tools.lsp.sonarlint',
-        },
       }
     end,
     ---@param opts DyLspOpts
@@ -107,6 +83,16 @@ return {
       LazyVim.lsp.on_dynamic_capability(
         require('lazyvim.plugins.lsp.keymaps').on_attach
       )
+
+      -- diagnostics signs
+      if type(opts.diagnostics.signs) ~= 'boolean' then
+        for severity, icon in pairs(opts.diagnostics.signs.text) do
+          local name =
+            vim.diagnostic.severity[severity]:lower():gsub('^%l', string.upper)
+          name = 'DiagnosticSign' .. name
+          vim.fn.sign_define(name, { text = icon, texthl = name, numhl = '' })
+        end
+      end
 
       -- inlay hints
       if opts.inlay_hints.enabled then
@@ -184,55 +170,88 @@ return {
         elseif opts.setup['*'] then
           if opts.setup['*'](server, server_opts) then return end
         end
-
-        -- add not supported officially server
-        if opts.module[server] then
-          require('lspconfig.configs')[server] = require(opts.module[server])
-        end
-        local setup_fn = require('lspconfig')[server].setup
-        if setup_fn then setup_fn(server_opts) end
+        require('lspconfig')[server].setup(server_opts)
       end
 
-      -- get all the servers that are available through mason-lspconfig
-      local mlsp = require('mason-lspconfig')
-      local ensure_installed = {} ---@type string[]
-      local all_mslp_servers = vim.tbl_keys(
-        require('mason-lspconfig.mappings.server').lspconfig_to_package
-      )
+      -- get all the servers that are available through my config
       for name, language in pairs(require('config.languages')) do
-        if language.lsp_servers then
-          for _, lsp_server in ipairs(language.lsp_servers) do
-            -- run manual setup if this is a server
-            -- that cannot be installed with mason-lspconfig
-            if not vim.tbl_contains(all_mslp_servers, lsp_server) then
-              setup(lsp_server)
+        if not language.lsp_servers then goto continue end
+        for _, lsp_server in ipairs(language.lsp_servers) do
+          if type(lsp_server) == 'table' then
+            local lsp_server_name = lsp_server[1]
+            if lsp_server.custom then
+              -- Load custom library for non-officially LSP server
+              require('lspconfig.configs')[lsp_server_name] =
+                require('tools.lsp.' .. lsp_server_name)
+            end
+            lsp_server = lsp_server_name
+          end
+          setup(lsp_server)
+        end
+        ::continue::
+      end
+    end,
+  },
+  {
+    -- Auto install LSP servers with needed
+    'mason-org/mason-lspconfig.nvim',
+    dependencies = {
+      {
+        -- Disable default tools
+        'mason-org/mason.nvim',
+        version = false,
+        opts = {
+          ensure_installed = {},
+          registries = {
+            -- 'file:' .. vim.fn.stdpath('config') .. '/mason-registry',
+            -- HACK: I can't use file method because it's lazy load and slow to
+            -- append to mason registry and affect to initialize
+            -- my custom LSP servers
+            'lua:tools.mason-registry',
+            'github:mason-org/mason-registry',
+          },
+        },
+      },
+    },
+    version = false,
+    config = function()
+      local ensure_installed = {} ---@type string[]
+      local mlsp = require('mason-lspconfig')
+      local all_mslp_servers =
+        vim.tbl_keys(mlsp.get_mappings().lspconfig_to_package)
+      for name, language in pairs(require('config.languages')) do
+        if not language.lsp_servers then goto continue end
+        for _, lsp_server in ipairs(language.lsp_servers) do
+          if type(lsp_server) == 'table' then
+            local lsp_server_name = lsp_server[1]
+            lsp_server = lsp_server_name
+          end
+          if vim.tbl_contains(all_mslp_servers, lsp_server) then
             -- install server of language in bundle languages
-            else
-              if vim.list_contains(_G.bundle_languages, name) then
-                table.insert(ensure_installed, lsp_server)
-              end
-              -- lazy install server of language not in bundle languages
-              if vim.list_contains(_G.enabled_languages, name) then
-                vim.api.nvim_create_autocmd({ 'FileType' }, {
-                  pattern = language.filetypes,
-                  group = vim.api.nvim_create_augroup(
-                    'mason_lsp_' .. name .. '_' .. lsp_server,
-                    {}
-                  ),
-                  callback = function()
-                    local registry = require('mason-registry')
-                    local lsp_mapping =
-                      require('mason-lspconfig.mappings.server')
-                    local server = lsp_mapping.lspconfig_to_package[lsp_server]
-                    if server ~= nil and not registry.is_installed(server) then
-                      vim.api.nvim_command('MasonInstall ' .. server)
-                    end
-                  end,
-                })
-              end
+            if vim.list_contains(_G.bundle_languages, name) then
+              table.insert(ensure_installed, lsp_server)
+            end
+            -- lazy install server of language not in bundle languages
+            if vim.list_contains(_G.enabled_languages, name) then
+              vim.api.nvim_create_autocmd({ 'FileType' }, {
+                pattern = language.filetypes,
+                group = vim.api.nvim_create_augroup(
+                  'mason_lsp_' .. name .. '_' .. lsp_server,
+                  {}
+                ),
+                callback = function()
+                  local registry = require('mason-registry')
+                  local server =
+                    require('mason-lspconfig').get_mappings().lspconfig_to_package[lsp_server]
+                  if server ~= nil and not registry.is_installed(server) then
+                    vim.api.nvim_command('MasonInstall ' .. server)
+                  end
+                end,
+              })
             end
           end
         end
+        ::continue::
       end
 
       ---@diagnostic disable-next-line: missing-fields
@@ -243,20 +262,7 @@ return {
           LazyVim.dedup(ensure_installed),
           LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
         ),
-        handlers = { setup },
       })
     end,
-  },
-  {
-    -- Disable default tools
-    'mason-org/mason.nvim',
-    cmd = { 'Mason', 'MasonInstall' },
-    opts_extend = { 'ensure_installed' },
-    opts = {
-      ensure_installed = {},
-      registries = {
-        'github:dynamotn/mason-registry',
-      },
-    },
   },
 }
