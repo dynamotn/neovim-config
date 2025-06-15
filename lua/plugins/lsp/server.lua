@@ -170,7 +170,9 @@ return {
         elseif opts.setup['*'] then
           if opts.setup['*'](server, server_opts) then return end
         end
-        require('lspconfig')[server].setup(server_opts)
+        local lspconfig = require('lspconfig')
+        if server == 'vue_ls' then lspconfig[server] = lspconfig['volar'] end
+        lspconfig[server].setup(server_opts)
       end
 
       -- get all the servers that are available through my config

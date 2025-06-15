@@ -7,7 +7,7 @@ return vim.list_contains(_G.enabled_languages, 'vue')
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
-            volar = {
+            vue_ls = {
               init_options = {
                 vue = {
                   hybridMode = true,

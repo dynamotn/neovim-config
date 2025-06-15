@@ -596,7 +596,7 @@ return {
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
     parsers = { 'vue' },
-    lsp_servers = { 'volar', 'vtsls', 'tailwindcss', 'harper_ls' },
+    lsp_servers = { 'vue_ls', 'vtsls', 'tailwindcss', 'harper_ls' },
     dial = function(augend)
       return {
         augend.constant.new({
