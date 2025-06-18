@@ -69,3 +69,6 @@ _G.firenvim_site_settings = {
 {{- if has "F1" .decryptEnterprise }}
 require('per_machine.F1')
 {{- end }}
+{{- if eq .company "F1" }}
+_G.enabled_plugins.codeium = false
+{{- end }}
