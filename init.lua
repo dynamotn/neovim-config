@@ -10,6 +10,7 @@ _G.enabled_plugins = {
   firenvim = false,
   chezmoi = false,
   codeium = false,
+  copilot = false,
 }
 --- List enable each language, useful for install only plugins for needed language. Default is all supported languages.
 _G.enabled_languages = vim.tbl_keys(require('config.languages'))

@@ -1,8 +1,10 @@
 return {
   -- Codeium
   { import = 'lazyvim.plugins.extras.ai.codeium' },
+  -- Github Copilot
+  { import = 'lazyvim.plugins.extras.ai.copilot' },
   {
-    -- AI Engine for coding
+    -- AI Engine (Codeium) for coding
     'Exafunction/codeium.nvim',
     enabled = _G.enabled_plugins.codeium,
     build = function()
@@ -12,6 +14,20 @@ return {
     init = function()
       _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
         codeium = '「AI」',
+      })
+    end,
+  },
+  {
+    -- AI Engine (Github Copilot) for coding
+    'zbirenbaum/copilot.lua',
+    enabled = _G.enabled_plugins.copilot,
+    build = function()
+      require('lazy').load({ plugins = { 'copilot.lua' }, wait = true })
+      vim.cmd(':Copilot auth')
+    end,
+    init = function()
+      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
+        copilot = '「AI」',
       })
     end,
   },
