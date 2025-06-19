@@ -47,6 +47,7 @@ return {
     -- Engine for completion
     'saghen/blink.cmp',
     dependencies = {
+      'saghen/blink.compat',
       'onsails/lspkind.nvim', -- pictograms
       'cmp-fuzzy-path',
       'blink-cmp-dictionary',
