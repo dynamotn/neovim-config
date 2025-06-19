@@ -180,11 +180,6 @@ return {
         for _, lsp_server in ipairs(language.lsp_servers) do
           if type(lsp_server) == 'table' then
             local lsp_server_name = lsp_server[1]
-            if lsp_server.custom then
-              -- Load custom library for non-officially LSP server
-              require('lspconfig.configs')[lsp_server_name] =
-                require('tools.lsp.' .. lsp_server_name)
-            end
             lsp_server = lsp_server_name
           end
           setup(lsp_server)

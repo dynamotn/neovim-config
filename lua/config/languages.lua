@@ -22,7 +22,6 @@
 
 ---@class DyLspSpec
 ---@field [1] string
----@field custom? boolean
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -55,12 +54,7 @@ return {
   ['*'] = {
     filetypes = { '*' },
     parsers = {},
-    lsp_servers = {
-      {
-        'sonarlint',
-        custom = true,
-      },
-    },
+    lsp_servers = { 'sonarlint' },
     formatters = {
       { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
       { 'trim_newlines', command = 'lua', mason = { enabled = false } },
@@ -295,14 +289,7 @@ return {
       'sh.PKGBUILD',
     },
     parsers = { 'bash' },
-    lsp_servers = {
-      'bashls',
-      {
-        'termuxls',
-        custom = true,
-      },
-      'harper_ls',
-    },
+    lsp_servers = { 'bashls', 'termuxls', 'harper_ls' },
     -- linters = { 'shellcheck' }, # bashls cover it
     formatters = {
       'shellcheck',
@@ -874,12 +861,7 @@ return {
   promql = {
     filetypes = { 'promql' },
     parsers = { 'promql' },
-    lsp_servers = {
-      {
-        'promqlls',
-        custom = true,
-      },
-    },
+    lsp_servers = { 'promqlls' },
     linguist = { 'promql' },
   },
   systemd = {
