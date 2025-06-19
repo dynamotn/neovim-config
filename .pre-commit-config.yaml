@@ -1,4 +1,20 @@
+---
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args:
+          - --fix=lf
+        description: Forces to replace line ending by the UNIX 'lf' character.
+      - id: trailing-whitespace
   - repo: https://github.com/JohnnyMorganz/StyLua
     rev: v0.12.3
     hooks:
