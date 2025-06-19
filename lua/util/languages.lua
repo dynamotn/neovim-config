@@ -55,4 +55,26 @@ M.get_tools_by_filetype = function(filetype)
   return LazyVim.dedup(result)
 end
 
+--- Return list of LSP servers for filetype
+---@param filetype string Filetype of buffer
+---@return string[]
+M.get_lsp_servers_by_filetype = function(filetype)
+  local result = {}
+  local language_name = M.get_language_from_filetype(filetype) or '_'
+  local lsp_servers = vim.list_extend(
+    vim.deepcopy(languages_list['*'].lsp_servers or {}),
+    languages_list[language_name].lsp_servers or {}
+  )
+
+  for _, server in ipairs(lsp_servers) do
+    if type(server) == 'string' then
+      table.insert(result, server)
+    elseif type(server) == 'table' then
+      table.insert(result, server[1])
+    end
+  end
+
+  return LazyVim.dedup(result)
+end
+
 return M

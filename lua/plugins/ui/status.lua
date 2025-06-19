@@ -22,19 +22,29 @@ return {
         },
         {
           function(msg)
-            msg = msg or icons.lsp .. 'Inactive'
+            msg = icons.lsp
             local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
             if next(buf_clients) == nil then return msg end
             local buf_client_names = {}
 
             for _, client in pairs(buf_clients) do
-              if
-                not vim.list_contains({ 'null-ls', 'copilot' }, client.name)
-              then
-                table.insert(buf_client_names, client.name)
+              table.insert(buf_client_names, client.name)
+            end
+
+            for _, server_name in
+              ipairs(
+                require('util.languages').get_lsp_servers_by_filetype(
+                  vim.bo.filetype
+                )
+              )
+            do
+              if vim.list_contains(buf_client_names, server_name) then
+                msg = msg .. server_name .. ' '
+              else
+                msg = msg .. server_name .. '! '
               end
             end
-            return icons.lsp .. table.concat(buf_client_names, ', ')
+            return vim.trim(msg)
           end,
           color = { fg = Snacks.util.color('Label'), gui = 'bold' },
         },
