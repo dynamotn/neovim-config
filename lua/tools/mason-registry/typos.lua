@@ -11,7 +11,7 @@ return {
     'Linter',
   },
   source = {
-    id = 'pkg:github/crate-ci/typos@v1.33.1',
+    id = 'pkg:github/crate-ci/typos@v1.80.0',
     asset = {
       {
         target = 'darwin_x64',
@@ -35,5 +35,7 @@ return {
       },
     },
   },
-  bin = null,
+  bin = {
+    typos = '{{source.asset.bin}}',
+  },
 }
