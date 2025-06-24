@@ -24,11 +24,15 @@ return condition
                   },
                 },
               },
+              before_init = function(_, client_config)
+                client_config.settings.json =
+                  require('schemastore').json.schemas()
+              end,
               -- lazy-load schemastore when needed
-              on_new_config = function(new_config)
-                new_config.settings.yaml.schemas = vim.tbl_deep_extend(
+              on_init = function(client)
+                client.settings.yaml.schemas = vim.tbl_deep_extend(
                   'force',
-                  new_config.settings.yaml.schemas or {},
+                  client.settings.yaml.schemas or {},
                   require('schemastore').yaml.schemas()
                 )
               end,
@@ -39,7 +43,7 @@ return condition
                   format = {
                     enable = true,
                   },
-                  validate = true,
+                  validate = { enable = true },
                   schemaStore = {
                     -- Must disable built-in schemaStore support to use
                     -- schemas from SchemaStore.nvim plugin
