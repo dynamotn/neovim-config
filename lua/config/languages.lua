@@ -747,7 +747,7 @@ return {
     formatters = { 'npm-groovy-lint' },
   },
   helm = { -- See `gotmpl`
-    filetypes = { 'gotmpl' },
+    filetypes = { 'helm', 'yaml.helm-values' },
     parsers = { 'helm' },
     lsp_servers = { 'helm_ls' },
     linters = { 'trivy' },

@@ -25,8 +25,8 @@ return condition
                 },
               },
               before_init = function(_, client_config)
-                client_config.settings.json =
-                  require('schemastore').json.schemas()
+                client_config.settings.yaml =
+                  require('schemastore').yaml.schemas()
               end,
               -- lazy-load schemastore when needed
               on_init = function(client)
