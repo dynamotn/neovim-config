@@ -170,7 +170,6 @@ return {
         elseif opts.setup['*'] then
           if opts.setup['*'](server, server_opts) then return end
         end
-        vim.lsp.enable(server)
         vim.lsp.config(server, server_opts)
       end
 
