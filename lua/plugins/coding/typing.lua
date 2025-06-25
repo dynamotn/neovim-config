@@ -32,4 +32,17 @@ return {
     'saghen/blink.cmp',
     opts = { completion = { accept = { auto_brackets = { enabled = true } } } },
   },
+  {
+    -- Convert text case
+    'johmsalas/text-case.nvim',
+    event = { 'BufWinEnter' },
+    keys = {
+      'ga',
+    },
+    config = function()
+      require('textcase').setup({
+        prefix = 'ga',
+      })
+    end,
+  },
 }
