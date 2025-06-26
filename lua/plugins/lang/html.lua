@@ -1,10 +1,10 @@
 local language = require('config.languages').html
 local condition = vim.list_contains(_G.enabled_languages, 'html')
   or vim.list_contains(_G.enabled_languages, 'angular')
-  or vim.list_contains(_G.enabled_languages, 'rails')
+  or vim.list_contains(_G.enabled_languages, 'rail')
   or vim.list_contains(_G.enabled_languages, 'vue')
 
-return vim.list_contains(_G.enabled_languages, 'html')
+return condition
     and {
       {
         -- LSP config
