@@ -172,6 +172,7 @@ return {
         local result = vim.list_extend({}, languages_list.bash.filetypes)
         result = vim.list_extend(result, languages_list.yaml.filetypes)
         result = vim.list_extend(result, languages_list.dockerfile.filetypes)
+        result = vim.list_extend(result, { 'gitattributes' })
         for i, filetype in ipairs(result) do
           result[i] = '-' .. filetype
         end
