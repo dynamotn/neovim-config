@@ -41,7 +41,7 @@ _G.obsidian.vaults = function()
   return result
 end
 _G.obsidian.todo_path = function()
-  return _G.obsidian.paths.personal .. '/01_Fleeting Notes/TODO.md'
+  return _G.obsidian.paths.personal .. '/01_Fleeting/TODO.md'
 end
 --- Firenvim setting
 _G.firenvim_site_settings = {}
