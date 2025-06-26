@@ -180,8 +180,12 @@ return {
           if type(lsp_server) == 'table' then
             local lsp_server_name = lsp_server[1]
             lsp_server = lsp_server_name
+            if lsp_server.enabled ~= nil and not lsp_server.enabled then
+              goto inner_continue
+            end
           end
           setup(lsp_server)
+          ::inner_continue::
         end
         ::continue::
       end

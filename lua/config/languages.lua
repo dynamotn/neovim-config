@@ -22,6 +22,7 @@
 
 ---@class DyLspSpec
 ---@field [1] string
+---@field enabled? boolean
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -54,7 +55,12 @@ return {
   ['*'] = {
     filetypes = { '*' },
     parsers = {},
-    lsp_servers = { 'sonarlint' },
+    lsp_servers = {
+      {
+        'sonarlint',
+        enabled = vim.fn.executable('java') == 1,
+      },
+    },
     formatters = {
       { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
       { 'trim_newlines', command = 'lua', mason = { enabled = false } },
