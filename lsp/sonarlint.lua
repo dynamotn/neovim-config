@@ -266,9 +266,14 @@ return {
         nargs = 1,
       }
     )
-    vim.api.nvim_buf_create_user_command(bufnr, 'SonarlintToken', input_token, {
-      desc = 'Input Sonarlint token for the organization / cloud',
-      nargs = 1,
-    })
+    vim.api.nvim_buf_create_user_command(
+      bufnr,
+      'SonarlintToken',
+      function(opts) input_token(opts.args) end,
+      {
+        desc = 'Input Sonarlint token for the organization / cloud',
+        nargs = 1,
+      }
+    )
   end,
 }
