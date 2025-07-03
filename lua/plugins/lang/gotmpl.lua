@@ -89,7 +89,10 @@ return vim.list_contains(_G.enabled_languages, 'gotmpl')
         'nvim-treesitter/nvim-treesitter',
         opts = {
           custom_predicates = {
-            ['is-bash-file?'] = '.*%.sh%.tmpl$',
+            ['is-bash-file?'] = {
+              '.*%.sh%.tmpl$',
+              'executable_.*%.tmpl$',
+            },
             ['is-fish-file?'] = '.*%.fish%.tmpl$',
             ['is-yaml-file?'] = '.*%.ya?ml%.tmpl$',
             ['is-toml-file?'] = '.*%.toml%.tmpl$',

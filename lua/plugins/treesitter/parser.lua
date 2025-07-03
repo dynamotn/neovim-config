@@ -89,7 +89,16 @@ return {
           function(_, _, bufnr, _)
             local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
             local filename = vim.fn.fnamemodify(filepath, ':t')
-            return string.match(filename, regex) == filename
+            if type(regex) == 'string' then
+              return string.match(filename, regex) == filename
+            elseif type(regex) == 'table' then
+              for _, r in ipairs(regex) do
+                if string.match(filename, r) == filename then return true end
+              end
+              return false
+            else
+              return false
+            end
           end,
           { force = true, all = false }
         )
