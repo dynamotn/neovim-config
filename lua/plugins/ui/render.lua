@@ -35,6 +35,6 @@ return {
         },
       }, opts))
     end,
-    enabled = vim.fn.executable('magick') == 1,
+    enabled = vim.fn.executable('magick') == 1 or _G.used_full_plugins,
   },
 }
