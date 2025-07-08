@@ -27,7 +27,7 @@
   "copilot.lua": { "branch": "master", "commit": "46f4b7d026cba9497159dcd3e6aa61a185cb1c48" },
   "crates.nvim": { "branch": "main", "commit": "5d8b1bef686db0fabe5f1bb593744b617e8f1405" },
   "csvview.nvim": { "branch": "main", "commit": "2a2631ed90a9e6b038a6e3047b6cf332d5b45ff3" },
-  "diagram.nvim": { "branch": "master", "commit": "e8f8eff0749406576e95469631f811d90efdfe08" },
+  "diagram.nvim": { "branch": "master", "commit": "84fe677aa940605ef248f36c0ea23561690c95eb" },
   "dial.nvim": { "branch": "master", "commit": "78bd73aaf2b9c8f80715a878feaf56f7ffa8b6ff" },
   "dropbar.nvim": { "branch": "master", "commit": "64f5540824ab350f02dabc1276f4a1f4f141276b" },
   "edgy.nvim": { "branch": "main", "commit": "7e8dedc39abebe40c289b8012cc89b11c69aa7a0" },
