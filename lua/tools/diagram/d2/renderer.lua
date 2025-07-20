@@ -6,7 +6,6 @@
 ---@field sketch? boolean
 
 ---@type table<string, string>
-local cache = {} -- session cache
 
 ---@class Renderer<D2Options>
 local M = {
@@ -14,24 +13,19 @@ local M = {
 }
 
 -- fs cache
-local tmpdir = vim.fn.resolve(vim.fn.stdpath('cache') .. '/diagram-cache/d2')
-vim.fn.mkdir(tmpdir, 'p')
+local cache_dir = vim.fn.resolve(vim.fn.stdpath('cache') .. '/diagram-cache/d2')
+vim.fn.mkdir(cache_dir, 'p')
 
 ---@param source string
 ---@param options D2Options
----@return string|nil
+---@return table|nil
 M.render = function(source, options)
-  local out =
-    vim.fn.system(string.format('grep "# d2:disabled render" %s', source))
-  if type(out) == 'string' and out:match('d2:') then return nil end
-
   local hash = vim.fn.sha256(
     M.id .. ':' .. source .. ':' .. vim.uv.fs_stat(source).mtime.sec
   )
-  if cache[hash] then return cache[hash] end
 
-  local path = vim.fn.resolve(tmpdir .. '/' .. hash .. '.png')
-  if vim.fn.filereadable(path) == 1 then return path end
+  local path = vim.fn.resolve(cache_dir .. '/' .. hash .. '.png')
+  if vim.fn.filereadable(path) == 1 then return { file_path = path } end
 
   if not vim.fn.executable('d2') then
     error('diagram/d2: d2 not found in PATH')
@@ -61,17 +55,25 @@ M.render = function(source, options)
   if options.sketch then table.insert(command_parts, '-s') end
 
   local command = table.concat(command_parts, ' ')
-  vim.fn.system(command)
-  if vim.v.shell_error ~= 0 then
-    vim.notify('diagram/d2: d2 failed to render diagram', vim.log.levels.ERROR)
-    return nil
-  end
 
-  if vim.uv.fs_stat(path) then
-    cache[hash] = path
-    return path
-  end
-  return nil
+  local job_id = vim.fn.jobstart(command, {
+    on_stdout = function(job_id, data, event) end,
+    on_stderr = function(job_id, data, event)
+      -- local error_msg = table.concat(data, '\n')
+      -- vim.notify(
+      --   'diagram/d2: d2 failed to render diagram\n' .. error_msg,
+      --   vim.log.levels.ERROR
+      -- )
+      -- return nil
+    end,
+    on_exit = function(job_id, exit_code, event)
+      -- local msg =
+      --   string.format('Job %d exited with code %d.', job_id, exit_code)
+      -- vim.notify(msg, vim.log.levels.INFO)
+    end,
+  })
+
+  return { file_path = path, job_id = job_id }
 end
 
 return M

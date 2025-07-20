@@ -10,6 +10,7 @@ return {
     dependencies = {
       '3rd/image.nvim',
       ft = diagram_filetypes,
+      commit = '21909e3eb03bc738cce497f45602bf157b396672',
       opts = {
         backend = vim.env.ZELLIJ ~= nil
             and vim.fn.executable('ueberzug') == 1
