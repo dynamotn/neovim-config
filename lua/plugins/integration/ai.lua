@@ -103,7 +103,7 @@ return {
       table.insert(opts.right, {
         ft = 'codecompanion',
         title = 'CodeCompanion Chat',
-        size = { width = 50 },
+        size = { width = 80 },
       })
     end,
   },
