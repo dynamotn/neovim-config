@@ -51,6 +51,46 @@ return condition
                     -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
                     url = '',
                   },
+                  customTags = {
+                    -- Intrinsic Functions
+                    '!Ref scalar',
+                    '!GetAtt scalar',
+                    '!GetAtt sequence',
+                    '!Sub scalar',
+                    '!Sub sequence',
+                    '!Join sequence',
+                    '!Select sequence',
+                    '!Split sequence',
+                    '!Base64 scalar',
+                    '!Cidr sequence',
+                    '!FindInMap sequence',
+                    '!GetAZs scalar',
+                    '!ImportValue scalar',
+
+                    -- Condition Functions
+                    '!And sequence',
+                    '!Equals sequence',
+                    '!If sequence',
+                    '!Not sequence',
+                    '!Or sequence',
+                    '!Condition scalar',
+
+                    -- Transform Functions
+                    '!Transform mapping',
+
+                    -- Additional AWS-specific tags
+                    '!AWS::AccountId',
+                    '!AWS::NoValue',
+                    '!AWS::NotificationARNs',
+                    '!AWS::Partition',
+                    '!AWS::Region',
+                    '!AWS::StackId',
+                    '!AWS::StackName',
+                    '!AWS::URLSuffix',
+
+                    -- GitLab CI
+                    '!reference sequence',
+                  },
                 },
               },
             },
