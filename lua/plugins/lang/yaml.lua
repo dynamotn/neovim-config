@@ -25,8 +25,11 @@ return condition
                 },
               },
               before_init = function(_, client_config)
-                client_config.settings.yaml =
+                client_config.settings.yaml.schemas = vim.tbl_deep_extend(
+                  'force',
+                  client_config.settings.yaml.schemas or {},
                   require('schemastore').yaml.schemas()
+                )
               end,
               -- lazy-load schemastore when needed
               on_init = function(client)
