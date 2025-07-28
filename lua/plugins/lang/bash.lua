@@ -1,92 +1,98 @@
 local language = require('config.languages').bash
-local nodes_utils = require('neogen.utilities.nodes')
-local extractors = require('neogen.utilities.extractors')
-local neogen_configurations = {}
+local neogen_config = require('neogen.configurations.sh')
 
-neogen_configurations.parent = {
-  func = { 'function_definition' },
-  file = { 'program' },
-}
+local function extract_expect_args(node)
+  local args = {}
+  local idx = 1
+  -- Iterate child nodes of function_definition
+  for child in node:iter_children() do
+    if child:type() == 'compound_statement' then
+      for stmt in child:iter_children() do
+        if stmt:type() == 'command' then
+          local command_name_node = nil
+          for subchild in stmt:iter_children() do
+            if subchild:type() == 'command_name' then
+              command_name_node = subchild
+              break
+            end
+          end
+          if
+            command_name_node
+            and vim.treesitter.get_node_text(command_name_node, 0)
+              == 'dybatpho::expect_args'
+          then
+            for subchild in stmt:iter_children() do
+              if subchild:type() == 'word' then
+                local arg = vim.treesitter.get_node_text(subchild, 0)
+                if arg == '--' then goto end_func end
+                table.insert(args, {
+                  arg = { arg },
+                  index = { idx },
+                })
+                idx = idx + 1
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  ::end_func::
+  return {
+    args = args,
+  }
+end
 
-neogen_configurations.data = {
-  func = {
-    ['function_definition'] = {
-      ['0'] = {
-        extract = function(node)
-          local tree = {
-            {
-              node_type = 'compound_statement',
-              retrieve = 'first',
-              subtree = {
-                {
-                  node_type = 'simple_expansion',
-                  retrieve = 'all',
-                  recursive = true,
-                  subtree = {
-                    {
-                      node_type = 'variable_name',
-                      retrieve = 'all',
-                      extract = true,
-                    },
-                  },
-                },
-                {
-                  node_type = 'expansion',
-                  recursive = true,
-                  retrieve = 'all',
-                  subtree = {
-                    {
-                      node_type = 'variable_name',
-                      retrieve = 'all',
-                      extract = true,
-                    },
-                  },
-                },
-              },
-            },
-          }
-          local nodes = nodes_utils:matching_nodes_from(node, tree)
-          local res = extractors:extract_from_matched(nodes)
-          return res
-        end,
-      },
-    },
-  },
-  file = {
-    ['program'] = {
-      ['0'] = {
-        extract = function() return {} end,
-      },
-    },
-  },
-}
+neogen_config.data.func['function_definition']['0'].extract =
+  extract_expect_args
 
-neogen_configurations.template = {
-  annotation_convention = 'dynamo_bash',
-  dynamo_bash = {
+neogen_config.template = {
+  use_default_comment = false,
+  --- @diagnostic disable-next-line: assign-type-mismatch
+  position = nil,
+  annotation_convention = 'dynamo_shdoc',
+  dynamo_shdoc = {
     {
       nil,
       '#######################################',
       { no_results = true, type = { 'func' } },
     },
-    { nil, '# $1', { no_results = true, type = { 'func' } } },
+    {
+      nil,
+      '# @description $1',
+      { no_results = true, type = { 'func' } },
+    },
+    {
+      nil,
+      '# @noargs',
+      { no_results = true, type = { 'func' } },
+    },
     {
       nil,
       '#######################################',
-      { no_results = true, type = { 'func' } },
+      {
+        no_results = true,
+        type = { 'func' },
+      },
     },
 
     { nil, '#!/usr/bin/env bash', { no_results = true, type = { 'file' } } },
-    { nil, '#', { no_results = true, type = { 'file' } } },
     { nil, '# @file $1', { no_results = true, type = { 'file' } } },
     { nil, '# @brief $1', { no_results = true, type = { 'file' } } },
     { nil, '# @description $1', { no_results = true, type = { 'file' } } },
     { nil, '', { no_results = true, type = { 'file' } } },
 
-    { nil, '#######################################' },
-    { nil, '# @description $1' },
-    { 'variable_name', '# @arg %s $1' },
-    { nil, '#######################################' },
+    { nil, '#######################################', { type = { 'func' } } },
+    { nil, '# @description $1', { type = { 'func' } } },
+    {
+      { 'index', 'arg' },
+      '# @arg %d string %s',
+      {
+        required = 'args',
+        type = { 'func' },
+      },
+    },
+    { nil, '#######################################', { type = { 'func' } } },
   },
 }
 
@@ -119,7 +125,7 @@ return vim.list_contains(_G.enabled_languages, 'bash')
         'neogen',
         opts = {
           languages = {
-            sh = neogen_configurations,
+            sh = neogen_config,
           },
         },
       },
