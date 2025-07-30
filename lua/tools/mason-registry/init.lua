@@ -6,6 +6,7 @@ local list_tools = {
   'promql-langserver',
   'termux-language-server',
   'sonarlint-language-server',
+  'd2',
 }
 
 local M = {}
