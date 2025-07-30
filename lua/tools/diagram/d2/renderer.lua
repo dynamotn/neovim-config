@@ -1,12 +1,3 @@
----@class D2Options
----@field theme_id? number
----@field dark_theme_id? number
----@field scale? number
----@field layout? string
----@field sketch? boolean
-
----@type table<string, string>
-
 ---@class Renderer<D2Options>
 local M = {
   id = 'd2_file',
@@ -20,15 +11,20 @@ vim.fn.mkdir(cache_dir, 'p')
 ---@param options D2Options
 ---@return table|nil
 M.render = function(source, options)
-  local hash = vim.fn.sha256(
-    M.id .. ':' .. source .. ':' .. vim.uv.fs_stat(source).mtime.sec
-  )
+  local hash
+  if not vim.uv.fs_stat(source) then
+    hash = vim.fn.sha256(M.id .. ':' .. source)
+  else
+    hash = vim.fn.sha256(
+      M.id .. ':' .. source .. ':' .. vim.uv.fs_stat(source).mtime.sec
+    )
+  end
 
   local path = vim.fn.resolve(cache_dir .. '/' .. hash .. '.png')
   if vim.fn.filereadable(path) == 1 then return { file_path = path } end
 
   if not vim.fn.executable('d2') then
-    error('diagram/d2: d2 not found in PATH')
+    vim.notify('[diagram/d2] d2 not found in PATH', vim.log.levels.ERROR)
   end
 
   local command_parts = {
@@ -56,22 +52,30 @@ M.render = function(source, options)
 
   local command = table.concat(command_parts, ' ')
 
+  local stdout, stderr, exit_code = {}, {}, nil
   local job_id = vim.fn.jobstart(command, {
-    on_stdout = function(job_id, data, event) end,
-    on_stderr = function(job_id, data, event)
-      -- local error_msg = table.concat(data, '\n')
-      -- vim.notify(
-      --   'diagram/d2: d2 failed to render diagram\n' .. error_msg,
-      --   vim.log.levels.ERROR
-      -- )
-      -- return nil
+    on_stdout = function(_, data, _)
+      data = table.concat(data, '\n')
+      if #data > 0 then stdout[#stdout + 1] = data end
     end,
-    on_exit = function(job_id, exit_code, event)
-      -- local msg =
-      --   string.format('Job %d exited with code %d.', job_id, exit_code)
-      -- vim.notify(msg, vim.log.levels.INFO)
+    on_stderr = function(_, data, _)
+      stderr[#stderr + 1] = table.concat(data, '\n')
     end,
+    on_exit = function(_, code, _) exit_code = code end,
+    stdout_buffered = true,
+    stderr_buffered = true,
   })
+
+  if exit_code ~= nil then
+    vim.notify(
+      ('[diagram/d2] failed to render with code %s:\n%s\n%s'):format(
+        exit_code,
+        command,
+        table.concat(stderr, '')
+      ),
+      vim.log.levels.ERROR
+    )
+  end
 
   return { file_path = path, job_id = job_id }
 end

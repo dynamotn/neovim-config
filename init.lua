@@ -27,7 +27,7 @@ vim.print = _G.dd
 --- Obsidian vaults
 _G.obsidian = {
   paths = {
-    personal = '~/Documents/Notes',
+    personal = vim.fn.expand('$HOME/Documents/Notes'),
   },
 }
 _G.obsidian.vaults = function()
