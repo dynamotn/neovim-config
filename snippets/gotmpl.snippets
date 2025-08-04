@@ -1,6 +1,40 @@
-snippet dytoy
+snippet dytoy_binary
   name: ${1:name}
   method: binary
   github:
     repo: ${2:repo}
     release_asset: ${3:asset}
+
+snippet dytoy_os
+  name: ${1:name}
+  method: os
+  gentoo:
+    packages:
+      - name: ${2:package}
+  arch:
+    packages:
+      - name: ${2:package}
+  ubuntu:
+    packages:
+      - name: ${2:package}
+  alpine:
+    packages:
+      - name: ${2:package}
+  termux:
+    packages:
+      - name: ${2:package}
+  macos:
+    packages:
+      - name: ${2:package}
+
+snippet dytoy_mise
+  name: ${1:name}
+  method: mise
+
+snippet dytoy_shell
+  name: ${1:name}
+  method: shell
+  dependencies:
+    - ${2:dependency}
+  content: |
+    ${3:script}

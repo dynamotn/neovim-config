@@ -30,3 +30,22 @@ snippet test test simple
 
 snippet update update simple
   update: ${1}
+
+snippet bump bump version
+  chore: bump version to v${1:major}.${2:minor}.${3:patch}${4:-${5:prerelease}${6:build}}
+
+snippet bump-all-plugins update version plugins
+  chore: update version of plugins
+
+snippet sub-all update submodules
+  chore: update all submodules
+
+snippet sub submodule
+  chore: update submodule ${1:submodule}
+
+snippet license
+  chore(license): use ${1:license}
+
+snippet break breaking changes
+  BREAKING CHANGES:
+    - ${1:description}
