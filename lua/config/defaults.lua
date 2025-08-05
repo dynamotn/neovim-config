@@ -97,6 +97,8 @@ return {
 
       cmdline = ' ',
       codeium = ' ',
+      CodeCompanion = '󰚩 ',
+      copilot = ' ',
       dictionary = ' ',
       calc = ' ',
       sql = ' ',
