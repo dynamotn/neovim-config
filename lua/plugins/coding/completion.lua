@@ -15,6 +15,8 @@ return {
   'Kaiser-Yang/blink-cmp-dictionary', -- Dictionary source
   'hrsh7th/cmp-calc', -- Math calculation
   'andersevenrud/cmp-tmux', -- Tmux buffer source
+  'moyiz/blink-emoji.nvim', -- Emoji source
+  'MahanRahmati/blink-nerdfont.nvim', -- Nerdfont source
   {
     -- Dynamic source
     'uga-rosa/cmp-dynamic',
@@ -55,6 +57,8 @@ return {
       'cmp-tmux',
       'cmp-dynamic',
       'blink-ripgrep.nvim',
+      'blink-emoji.nvim',
+      'blink-nerdfont.nvim',
     },
     opts = {
       sources = {
@@ -77,6 +81,18 @@ return {
           ripgrep = {
             module = 'blink-ripgrep',
             name = 'ripgrep',
+          },
+          emoji = {
+            module = 'blink-emoji',
+            name = 'emoji',
+            score_offset = 21,
+            opts = { insert = true },
+          },
+          nerdfont = {
+            module = 'blink-nerdfont',
+            name = 'nerdfont',
+            score_offset = 22,
+            opts = { insert = true },
           },
           -- text from all buffers
           buffer = {
@@ -243,6 +259,8 @@ return {
         tmux = '「MUX」',
         dynamic = '「MISC」',
         Cmdline = '「CMD」',
+        emoji = '「EMOJI」',
+        nerdfont = '「NERD」',
       })
     end,
   },

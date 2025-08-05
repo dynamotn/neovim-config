@@ -104,6 +104,8 @@ return {
       dap = ' ',
       fish = '󰈺 ',
       git = ' ',
+      emoji = '󰞅 ',
+      nerdfont = '󰀺 ',
     },
   },
   ---@type table<string, string>

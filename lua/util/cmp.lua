@@ -29,11 +29,13 @@ M.sources = function(filetype)
     -- 'ripgrep',
     'calc',
     'tmux',
+    'emoji',
     'dynamic',
     'dictionary',
   }
   local unique_sources = {
-    markdown = { 'obsidian' },
+    markdown = { 'obsidian', 'nerdfont' },
+    typst = { 'nerdfont' },
     fish = { 'fish' },
     sql = { 'dadbod', 'sql' },
   }
@@ -42,12 +44,20 @@ M.sources = function(filetype)
   if _G.enabled_plugins.copilot then table.insert(common_sources, 'copilot') end
 
   if filetype == 'comment' then
-    return { 'buffer', 'ripgrep', 'dictionary', 'dynamic' }
-  elseif filetype == 'comment' then
+    return { 'buffer', 'ripgrep', 'dictionary', 'emoji', 'nerdfont', 'dynamic' }
+  elseif filetype == 'dap' then
     return { 'dap', 'buffer', 'ripgrep' }
   elseif vim.list_contains({ 'gitcommit', 'gitrebase' }, filetype) then
-    return { 'lsp', 'snippets', 'buffer', 'dynamic', 'dictionary' }
-  elseif vim.list_contains({ 'markdown', 'fish', 'sql' }, filetype) then
+    return {
+      'lsp',
+      'snippets',
+      'buffer',
+      'emoji',
+      'nerdfont',
+      'dynamic',
+      'dictionary',
+    }
+  elseif vim.list_contains(vim.tbl_keys(unique_sources), filetype) then
     local result = {}
     vim.list_extend(result, unique_sources[filetype])
     return vim.list_extend(result, common_sources)
