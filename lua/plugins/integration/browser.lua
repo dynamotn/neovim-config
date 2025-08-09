@@ -20,7 +20,7 @@ return {
       require('lazy').load({ plugins = { 'firenvim' }, wait = true })
       vim.fn['firenvim#install'](0)
     end,
-    enabled = _G.enabled_plugins.firenvim or _G.used_full_plugins,
+    enabled = _G.used_full_plugins or _G.enabled_plugins.firenvim,
     lazy = not vim.g.started_by_firenvim,
     config = function(_, _)
       vim.o.laststatus = 0

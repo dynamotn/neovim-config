@@ -4,7 +4,7 @@ return {
     'Exafunction/codeium.nvim',
     cmd = 'Codeium',
     event = 'InsertEnter',
-    enabled = _G.enabled_plugins.codeium,
+    enabled = _G.used_full_plugins or _G.enabled_plugins.codeium,
     build = function()
       require('lazy').load({ plugins = { 'codeium.nvim' }, wait = true })
       vim.cmd(':Codeium Auth')
@@ -36,7 +36,7 @@ return {
     -- AI Engine (Github Copilot) for coding
     'zbirenbaum/copilot.lua',
     cmd = 'Copilot',
-    enabled = _G.enabled_plugins.copilot,
+    enabled = _G.used_full_plugins or _G.enabled_plugins.copilot,
     event = 'BufReadPost',
     build = function()
       require('lazy').load({ plugins = { 'copilot.lua' }, wait = true })
@@ -140,7 +140,7 @@ return {
     dependencies = {
       {
         'codeium.nvim',
-        enabled = _G.enabled_plugins.codeium,
+        enabled = _G.used_full_plugins or _G.enabled_plugins.codeium,
         init = function()
           _G.completion_sources =
             vim.tbl_extend('force', _G.completion_sources, {
@@ -168,7 +168,7 @@ return {
     dependencies = {
       {
         'giuxtaposition/blink-cmp-copilot',
-        enabled = _G.enabled_plugins.copilot,
+        enabled = _G.used_full_plugins or _G.enabled_plugins.copilot,
         init = function()
           _G.completion_sources =
             vim.tbl_extend('force', _G.completion_sources, {

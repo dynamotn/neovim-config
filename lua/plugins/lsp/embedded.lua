@@ -10,7 +10,7 @@ return {
   {
     -- LSP for embedded language
     'jmbuhr/otter.nvim',
-    enabled = _G.enabled_plugins.otter or _G.used_full_plugins,
+    enabled = _G.used_full_plugins or _G.enabled_plugins.otter,
     keys = {
       {
         '<leader>co',

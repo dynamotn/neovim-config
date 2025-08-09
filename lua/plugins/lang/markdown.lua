@@ -22,7 +22,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         'toppair/peek.nvim',
         ft = language.filetypes,
         build = 'deno task --quiet build:fast',
-        enabled = vim.fn.executable('deno') == 1 or _G.used_full_plugins,
+        enabled = _G.used_full_plugins or vim.fn.executable('deno') == 1,
         keys = {
           {
             '<leader>cp',
@@ -73,7 +73,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         -- Obsidian
         'obsidian-nvim/obsidian.nvim',
         ft = language.filetypes,
-        enabled = _G.enabled_plugins.obsidian or _G.used_full_plugins,
+        enabled = _G.used_full_plugins or _G.enabled_plugins.obsidian,
         opts = {
           workspaces = _G.obsidian.vaults(),
         },

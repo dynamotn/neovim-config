@@ -7,7 +7,7 @@ return {
       dependencies = {
         'nvim-telescope/telescope-fzf-native.nvim',
         build = 'make',
-        enabled = vim.fn.executable('make') == 1 or _G.used_full_plugins,
+        enabled = _G.used_full_plugins or vim.fn.executable('make') == 1,
       },
     },
   },

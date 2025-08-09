@@ -60,7 +60,7 @@ return {
         },
       }, opts))
     end,
-    enabled = vim.fn.executable('magick') == 1 or _G.used_full_plugins,
+    enabled = _G.used_full_plugins or vim.fn.executable('magick') == 1,
   },
   {
     -- Render images in a file

@@ -6,6 +6,6 @@ return {
     opts = {
       lang = 'python3',
     },
-    cond = _G.enabled_plugins.leetcode or _G.used_full_plugins,
+    enabled = _G.used_full_plugins or _G.enabled_plugins.leetcode,
   },
 }
