@@ -3,11 +3,15 @@ return {
     -- I want to self-managed LSP by my way
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
-    dependencies = {},
+    dependencies = {
+      -- Workspace diagnostics
+      -- NOTE: will be removed in neovim v0.12.0
+      'artemave/workspace-diagnostics.nvim',
+    },
     opts = function()
       ---@class DyLspOpts: PluginLspOpts
-      ---@field servers table<string, _.lspconfig.options>
-      ---@field setup table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+      ---@field servers table<string, table>
+      ---@field setup table<string, fun(server:string, opts:table):boolean?>
       return {
         -- options for vim.diagnostic.config()
         ---@type vim.diagnostic.Opts
@@ -73,11 +77,13 @@ return {
       LazyVim.format.register(LazyVim.lsp.formatter())
 
       -- setup keymaps
-      LazyVim.lsp.on_attach(
-        function(client, buffer)
-          require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
-        end
-      )
+      LazyVim.lsp.on_attach(function(client, buffer)
+        require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
+        require('workspace-diagnostics').populate_workspace_diagnostics(
+          client,
+          buffer
+        )
+      end)
 
       LazyVim.lsp.setup()
       LazyVim.lsp.on_dynamic_capability(
@@ -98,7 +104,7 @@ return {
       if opts.inlay_hints.enabled then
         LazyVim.lsp.on_supports_method(
           'textDocument/inlayHint',
-          function(client, buffer)
+          function(_, buffer)
             if
               vim.api.nvim_buf_is_valid(buffer)
               and vim.bo[buffer].buftype == ''
@@ -117,7 +123,7 @@ return {
       if opts.codelens.enabled and vim.lsp.codelens then
         LazyVim.lsp.on_supports_method(
           'textDocument/codeLens',
-          function(client, buffer)
+          function(_, buffer)
             vim.lsp.codelens.refresh()
             vim.api.nvim_create_autocmd(
               { 'BufEnter', 'CursorHold', 'InsertLeave' },
@@ -142,6 +148,7 @@ return {
               return icon
             end
           end
+          return ''
         end
       end
 
@@ -174,12 +181,13 @@ return {
       end
 
       -- get all the servers that are available through my config
-      for name, language in pairs(require('config.languages')) do
+      for _, language in pairs(require('config.languages')) do
         if not language.lsp_servers then goto continue end
         for _, lsp_server in ipairs(language.lsp_servers) do
           if type(lsp_server) == 'table' then
             local lsp_server_name = lsp_server[1]
             lsp_server = lsp_server_name
+            ---@diagnostic disable-next-line: undefined-field
             if lsp_server.enabled ~= nil and not lsp_server.enabled then
               goto inner_continue
             end
