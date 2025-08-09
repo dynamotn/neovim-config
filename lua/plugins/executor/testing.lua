@@ -28,7 +28,7 @@ return {
               desc = 'Run File (Vimtest)',
             },
           },
-          config = function(_, opts)
+          config = function(_, _)
             -- Run zellij floating pane
             if _G.test_strategy == 'zellij' then
               vim.cmd([[

@@ -2,7 +2,7 @@ return {
   -- Project setting
   { import = 'lazyvim.plugins.extras.lsp.neoconf' },
   {
-    -- Intergrate project management with which-key
+    -- Integrate project management with which-key
     'folke/which-key.nvim',
     opts = {
       spec = {

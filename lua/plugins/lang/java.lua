@@ -1,5 +1,18 @@
 local language = require('config.languages').java
 
+-- Utility function to extend or override a config table, similar to the way
+-- that Plugin.opts works.
+---@param config table
+---@param custom function | table | nil
+local function extend_or_override(config, custom, ...)
+  if type(custom) == 'function' then
+    config = custom(config, ...) or config
+  elseif custom then
+    config = vim.tbl_deep_extend('force', config, custom) --[[@as table]]
+  end
+  return config
+end
+
 return vim.list_contains(_G.enabled_languages, 'java')
     and {
       {
@@ -35,6 +48,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
           return {
             -- How to find the root dir for a given filename. The default comes from
             -- lspconfig which provides a function specifically for java projects.
+            ---@diagnostic disable-next-line: undefined-field
             root_dir = LazyVim.lsp.get_raw_config('jdtls').default_config.root_dir,
 
             -- How to find the project name for a given root dir.
@@ -63,6 +77,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
               local fname = vim.api.nvim_buf_get_name(0)
               local root_dir = opts.root_dir(fname)
               local project_name = opts.project_name(root_dir)
+              ---@diagnostic disable-next-line: redefined-local
               local cmd = vim.deepcopy(opts.cmd)
               if project_name then
                 vim.list_extend(cmd, {

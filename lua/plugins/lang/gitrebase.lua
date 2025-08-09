@@ -1,3 +1,4 @@
+---@diagnostic disable-next-line: unused-local
 local language = require('config.languages').gitrebase
 local cmp_util = require('util.cmp')
 

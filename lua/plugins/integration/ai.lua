@@ -9,7 +9,7 @@ return {
       require('lazy').load({ plugins = { 'codeium.nvim' }, wait = true })
       vim.cmd(':Codeium Auth')
     end,
-    opts = function(opts)
+    opts = function(_)
       ---@diagnostic disable-next-line: duplicate-set-field
       LazyVim.cmp.actions.ai_accept = function()
         if require('codeium.virtual_text').get_current_completion_item() then
@@ -42,7 +42,7 @@ return {
       require('lazy').load({ plugins = { 'copilot.lua' }, wait = true })
       vim.cmd(':Copilot auth')
     end,
-    opts = function(opts)
+    opts = function(_)
       ---@diagnostic disable-next-line: duplicate-set-field
       LazyVim.cmp.actions.ai_accept = function()
         if require('copilot.suggestion').is_visible() then
@@ -125,7 +125,7 @@ return {
               and LazyVim.lsp.get_clients({ name = 'copilot', bufnr = 0 })
             or {}
           if #clients > 0 then
-            local status = require('copilot.api').status.data.status
+            local status = require('copilot.status').data.status
             return (status == 'InProgress' and 'pending')
               or (status == 'Warning' and 'error')
               or 'ok'

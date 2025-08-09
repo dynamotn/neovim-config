@@ -12,7 +12,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
               settings = {
                 Lua = {
                   workspace = {
-                    checkThirdParty = false,
+                    checkThirdParty = true,
                   },
                   codeLens = {
                     enable = true,
@@ -83,6 +83,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
             }
             if conf.start_neovim then
               local dap_run = dap.run
+              ---@diagnostic disable-next-line: duplicate-set-field
               dap.run = function(c)
                 adapter.port = c.port
                 adapter.host = c.host

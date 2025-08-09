@@ -1,3 +1,10 @@
+---@class D2Options
+---@field theme_id? number
+---@field dark_theme_id? number
+---@field scale? number
+---@field layout? string
+---@field sketch? boolean
+
 ---@class Renderer<D2Options>
 local M = {
   id = 'd2_file',

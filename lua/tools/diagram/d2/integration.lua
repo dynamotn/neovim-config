@@ -11,12 +11,6 @@ local M = {
   },
 }
 
-local function get_max_end_col_of_descendants(root_node)
-  if not root_node then return 0 end
-
-  return max_end_col
-end
-
 M.query_buffer_diagrams = function(bufnr)
   if not query then query = ts_query.parse('d2', '(source_file)') end
   local buf = bufnr or vim.api.nvim_get_current_buf()

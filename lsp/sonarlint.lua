@@ -131,7 +131,7 @@ return {
     ['sonarlint/canShowMissingRequirementsNotification'] = function()
       return true
     end,
-    ['sonarlint/isOpenInEditor'] = function(_, file_uri, _) return true end,
+    ['sonarlint/isOpenInEditor'] = function(_, _, _) return true end,
     ['sonarlint/isIgnoredByScm'] = function(_, file_uri, _)
       local output =
         vim.fn.system('git check-ignore ' .. vim.uri_from_fname(file_uri))

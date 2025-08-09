@@ -41,7 +41,7 @@ return condition
                 {
                   'gD',
                   function()
-                    local params = vim.lsp.util.make_position_params()
+                    local params = vim.lsp.util.make_position_params(0, 'utf-8')
                     LazyVim.lsp.execute({
                       command = 'typescript.goToSourceDefinition',
                       arguments = { params.textDocument.uri, params.position },
@@ -96,23 +96,23 @@ return condition
           },
           setup = {
             vtsls = function(_, opts)
-              LazyVim.lsp.on_attach(function(client, buffer)
+              LazyVim.lsp.on_attach(function(client, _)
                 client.commands['_typescript.moveToFileRefactoring'] = function(
                   command,
-                  ctx
+                  _
                 )
-                  ---@type string, string, lsp.Range
+                  ---@type string, string, boolean|string|number|boolean|string|number|table<string, lsp.LSPAny>|table<string, lsp.LSPAny>[]
                   local action, uri, range = unpack(command.arguments)
 
                   local function move(newf)
-                    client.request('workspace/executeCommand', {
+                    client:request('workspace/executeCommand', {
                       command = command.command,
                       arguments = { action, uri, range, newf },
                     })
                   end
 
                   local fname = vim.uri_to_fname(uri)
-                  client.request('workspace/executeCommand', {
+                  client:request('workspace/executeCommand', {
                     command = 'typescript.tsserverRequest',
                     arguments = {
                       'getMoveToRefactoringFileSuggestions',
@@ -140,6 +140,7 @@ return condition
                           default = vim.fn.fnamemodify(fname, ':h') .. '/',
                           completion = 'file',
                         }, function(newf)
+                          ---@diagnostic disable-next-line: redundant-return-value
                           return newf and move(newf)
                         end)
                       elseif f then

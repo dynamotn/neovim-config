@@ -1,7 +1,7 @@
 local h = require('null-ls.helpers')
 local methods = require('null-ls.methods')
 
-local neoconf = require('neoconf')
+-- local neoconf = require('neoconf')
 
 return h.make_builtin({
   name = 'ltcc',

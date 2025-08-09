@@ -24,6 +24,7 @@ return {
     config = function()
       if LazyVim.is_loaded('nvim-treesitter') then
         local opts = LazyVim.opts('nvim-treesitter')
+        ---@diagnostic disable-next-line: missing-fields
         require('nvim-treesitter.configs').setup({ endwise = opts.endwise })
       end
     end,
