@@ -14,7 +14,7 @@ return {
           function()
             local b = vim.api.nvim_get_current_buf()
             if next(vim.treesitter.highlighter.active[b]) then
-              return icons.treesitter
+              return icons.treesitter.core
             end
             return ''
           end,

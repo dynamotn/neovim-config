@@ -22,7 +22,7 @@
 
 ---@class DyLspSpec
 ---@field [1] string
----@field enabled? boolean
+---@field enabled? boolean|fun(filetype:string):boolean
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -939,10 +939,22 @@ return {
     parsers = { 'yaml' },
     lsp_servers = {
       'yamlls',
-      'gitlab_ci_ls',
-      'gh_actions_ls',
-      'azure_pipelines_ls',
-      'docker_compose_language_service',
+      {
+        'gitlab_ci_ls',
+        enabled = function(filetype) return filetype == 'yaml.gl-ci' end,
+      },
+      {
+        'gh_actions_ls',
+        enabled = function(filetype) return filetype == 'yaml.gh-action' end,
+      },
+      {
+        'azure_pipelines_ls',
+        enabled = function(filetype) return filetype == 'yaml.az-pl' end,
+      },
+      {
+        'docker_compose_language_service',
+        enabled = function(filetype) return filetype == 'yaml.docker-compose' end,
+      },
     },
     linters = { 'yamllint', 'trivy' },
     formatters = {

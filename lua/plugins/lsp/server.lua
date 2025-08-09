@@ -177,7 +177,8 @@ return {
         elseif opts.setup['*'] then
           if opts.setup['*'](server, server_opts) then return end
         end
-        vim.lsp.config(server, server_opts)
+        vim.lsp.config[server] =
+          vim.tbl_deep_extend('force', vim.lsp.config[server], server_opts)
       end
 
       -- get all the servers that are available through my config

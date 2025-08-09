@@ -2,6 +2,8 @@ local language = require('config.languages').yaml
 local condition = vim.list_contains(_G.enabled_languages, 'yaml')
   or vim.list_contains(_G.enabled_languages, 'ansible')
   or vim.list_contains(_G.enabled_languages, 'openapi')
+local icons = require('config.defaults').icons
+
 return condition
     and {
       {
@@ -96,21 +98,63 @@ return condition
                   },
                 },
               },
+              filetypes = language.filetypes,
             },
             gitlab_ci_ls = {
-              filetypes = { 'yaml.gl-ci' },
+              filetypes = { language.filetypes[2] },
             },
             gh_actions_ls = {
-              filetypes = { 'yaml.gh-action' },
+              filetypes = { language.filetypes[3] },
             },
             azure_pipelines_ls = {
-              filetypes = { 'yaml.az-pl' },
+              filetypes = { language.filetypes[4] },
             },
             docker_compose_language_service = {
-              filetypes = { 'yaml.docker-compose' },
+              filetypes = { language.filetypes[5] },
             },
           },
         },
+      },
+      {
+        -- Lualine integration
+        'nvim-lualine/lualine.nvim',
+        opts = function(_, opts)
+          table.insert(opts.sections.lualine_y, 1, {
+            function(msg)
+              msg = icons.treesitter.schema
+              local bufnr = vim.api.nvim_get_current_buf()
+              local clients = LazyVim.lsp.get_clients({
+                bufnr = bufnr,
+                name = 'yamlls',
+              })
+              for _, client in pairs(clients) do
+                local response, _ = client:request_sync(
+                  ---@diagnostic disable-next-line: param-type-mismatch
+                  'yaml/get/jsonSchema',
+                  { vim.uri_from_bufnr(bufnr) },
+                  20,
+                  bufnr
+                )
+                if response and response.result and response.result[1] then
+                  local schema = response.result[1]
+                  if schema.uri then
+                    return package.loaded['schemastore']
+                      and msg
+                        .. require('util.schemastore').get_yaml_schema_name(
+                          schema.uri
+                        )
+                  else
+                    return msg .. 'N/A'
+                  end
+                end
+              end
+              return msg
+            end,
+            cond = function()
+              return vim.list_contains(language.filetypes, vim.bo.filetype)
+            end,
+          })
+        end,
       },
     }
   or {}

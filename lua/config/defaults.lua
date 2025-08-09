@@ -8,7 +8,10 @@ return {
     ft = {
       octo = '',
     },
-    treesitter = ' ',
+    treesitter = {
+      core = ' ',
+      schema = '󰏃 ',
+    },
     lsp = '  ',
     null_ls = '󰉼 ',
     dap = {

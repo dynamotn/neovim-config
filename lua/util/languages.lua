@@ -70,7 +70,13 @@ M.get_lsp_servers_by_filetype = function(filetype)
     if type(server) == 'string' then
       table.insert(result, server)
     elseif type(server) == 'table' then
-      table.insert(result, server[1])
+      local enabled = true
+      if type(server.enabled) == 'boolean' then
+        enabled = server.enabled
+      elseif type(server.enabled) == 'function' then
+        enabled = server.enabled(filetype)
+      end
+      if enabled then table.insert(result, server[1]) end
     end
   end
 
