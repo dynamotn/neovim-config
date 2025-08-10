@@ -34,7 +34,8 @@ return {
   },
   {
     -- AI Engine (Github Copilot) for coding
-    'zbirenbaum/copilot.lua',
+    -- 'zbirenbaum/copilot.lua',
+    'AbaoFromCUG/copilot.lua',
     cmd = 'Copilot',
     enabled = _G.used_full_plugins or _G.enabled_plugins.copilot,
     event = 'BufReadPost',
@@ -67,6 +68,7 @@ return {
           markdown = true,
           help = true,
         },
+        disable_limit_reached_message = true,
       }
     end,
   },
