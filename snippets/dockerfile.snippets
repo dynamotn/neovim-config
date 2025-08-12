@@ -1,0 +1,8 @@
+snippet lint-disable
+  # hadolint ignore=${1:rule}
+
+snippet lint-disable-global
+  # hadolint global ignore=${1:rule}
+
+snippet copy-stage
+  COPY --from=${1:stage} ${2:path} ${3:folder}
