@@ -1,3 +1,5 @@
+--- Flag to set background
+_G.dark_mode = true
 --- Flag to install Gentoo syntax
 _G.is_gentoo = false
 --- Flag to install all plugins, useful for update `lazy-lock.json`

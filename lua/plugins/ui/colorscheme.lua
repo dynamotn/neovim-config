@@ -6,7 +6,7 @@ return {
     name = 'catppuccin',
     event = 'UIEnter',
     opts = {
-      flavour = 'macchiato',
+      flavour = _G.dark_mode and 'macchiato' or 'latte',
       background = {
         light = 'latte',
         dark = 'macchiato',
