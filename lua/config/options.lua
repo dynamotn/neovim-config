@@ -23,9 +23,6 @@ g.loaded_perl_provider = 0
 g.loaded_ruby_provider = 0
 g.loaded_node_provider = 0
 
--- Detect filetype
-require('config.filetype')
-
 -- Setup abbreviations
 for abbr, full_text in pairs(require('config.defaults').abbreviations) do
   vim.cmd({ cmd = 'inoreabbrev', args = { abbr, full_text } })
