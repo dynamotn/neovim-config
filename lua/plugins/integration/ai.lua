@@ -34,8 +34,7 @@ return {
   },
   {
     -- AI Engine (Github Copilot) for coding
-    -- 'zbirenbaum/copilot.lua',
-    'AbaoFromCUG/copilot.lua',
+    'zbirenbaum/copilot.lua',
     cmd = 'Copilot',
     enabled = _G.used_full_plugins or _G.enabled_plugins.copilot,
     event = 'BufReadPost',
