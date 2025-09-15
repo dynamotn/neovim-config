@@ -65,6 +65,10 @@ return {
         -- compatible sources from nvim-cmp
         compat = { 'fuzzy_path', 'calc', 'tmux', 'dynamic' },
         providers = {
+          path = {
+            -- Path sources triggered by "/" interfere with CopilotChat commands
+            enabled = function() return vim.bo.filetype ~= 'copilot-chat' end,
+          },
           -- self download dictionaries
           dictionary = {
             module = 'blink-cmp-dictionary',

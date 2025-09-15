@@ -102,7 +102,7 @@ return vim.list_contains(_G.enabled_languages, 'go')
       },
       {
         -- Filetype icons
-        'echasnovski/mini.icons',
+        'nvim-mini/mini.icons',
         opts = {
           file = {
             ['.go-version'] = { glyph = ' ', hl = 'MiniIconsBlue' },

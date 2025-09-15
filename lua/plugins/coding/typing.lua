@@ -1,5 +1,5 @@
 return {
-  { 'echasnovski/mini.pairs', enabled = false }, -- Disable mini.pairs from LazyVim
+  { 'nvim-mini/mini.pairs', enabled = false }, -- Disable mini.pairs from LazyVim
   {
     -- Automatically insert/delete brackets, parentheses, quotes...
     'windwp/nvim-autopairs',

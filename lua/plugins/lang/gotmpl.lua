@@ -78,7 +78,7 @@ return vim.list_contains(_G.enabled_languages, 'gotmpl')
       },
       {
         -- Filetype icons
-        'echasnovski/mini.icons',
+        'nvim-mini/mini.icons',
         opts = {
           filetype = {
             gotmpl = { glyph = '󰟓 ', hl = 'MiniIconsGrey' },
