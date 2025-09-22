@@ -3,9 +3,28 @@ return {
     -- I want to self-managed LSP by my way
     'neovim/nvim-lspconfig',
     dependencies = {
-      -- Workspace diagnostics
-      -- NOTE: will be removed in neovim v0.12.0
-      'artemave/workspace-diagnostics.nvim',
+      {
+        -- Workspace diagnostics
+        -- NOTE: will be removed in neovim v0.12.0
+        'artemave/workspace-diagnostics.nvim',
+        keys = {
+          {
+            '<leader>xw',
+            function()
+              for _, client in ipairs(vim.lsp.get_clients()) do
+                if vim.tbl_get(client.config, 'filetypes') then
+                  require('workspace-diagnostics').populate_workspace_diagnostics(
+                    client,
+                    0
+                  )
+                end
+              end
+            end,
+            mode = { 'n' },
+            desc = 'Workspace Diagnostics',
+          },
+        },
+      },
     },
     opts = function(_, opts)
       opts.servers.sonarlint = {}
@@ -17,15 +36,11 @@ return {
       LazyVim.format.register(LazyVim.lsp.formatter())
 
       -- setup keymaps
-      LazyVim.lsp.on_attach(function(client, buffer)
-        require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
-        if vim.tbl_get(client.config, 'filetypes') then
-          require('workspace-diagnostics').populate_workspace_diagnostics(
-            client,
-            buffer
-          )
+      LazyVim.lsp.on_attach(
+        function(client, buffer)
+          require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
         end
-      end)
+      )
 
       LazyVim.lsp.setup()
       LazyVim.lsp.on_dynamic_capability(
