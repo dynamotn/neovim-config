@@ -94,7 +94,7 @@ return {
   --   'xslt',
   --   'svg',
   -- },
-  root_markers = { '.git' },
+  root_markers = { '.git', '.neoconf.json', 'sonar-project.properties' },
   init_options = {
     sonarlint = {
       rules = vim.empty_dict(),
