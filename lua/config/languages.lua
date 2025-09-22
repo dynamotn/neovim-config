@@ -85,6 +85,13 @@ return {
         command = 'git',
         mason = { enabled = false },
       },
+      {
+        'condense_blank_lines',
+        type = 'formatting',
+        command = 'lua',
+        mason = { enabled = false },
+        custom = true,
+      },
     },
     dial = function(augend)
       local logical_alias = augend.constant.new({
