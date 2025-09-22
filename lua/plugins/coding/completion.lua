@@ -48,6 +48,7 @@ return {
   {
     -- Engine for completion
     'saghen/blink.cmp',
+    event = { 'InsertEnter', 'CmdlineEnter' },
     dependencies = {
       'saghen/blink.compat',
       'onsails/lspkind.nvim', -- pictograms
@@ -61,6 +62,12 @@ return {
       'blink-nerdfont.nvim',
     },
     opts = {
+      keymap = {
+        ['<Tab>'] = {
+          LazyVim.cmp.map({ 'snippet_forward', 'ai_accept' }),
+          'fallback',
+        },
+      },
       sources = {
         -- compatible sources from nvim-cmp
         compat = { 'fuzzy_path', 'calc', 'tmux', 'dynamic' },
@@ -163,7 +170,13 @@ return {
           },
         },
         -- need to auto show completion menu
-        completion = { menu = { auto_show = true } },
+        completion = {
+          list = { selection = { preselect = false } },
+          menu = {
+            auto_show = function(ctx) return vim.fn.getcmdtype() == ':' end,
+          },
+          ghost_text = { enabled = true },
+        },
         sources = function()
           local type = vim.fn.getcmdtype()
           -- Search forward and backward

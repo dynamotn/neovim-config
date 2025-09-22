@@ -23,11 +23,6 @@ return vim.list_contains(_G.enabled_languages, 'java')
             jdtls = {},
             harper_ls = {},
           },
-          setup = {
-            jdtls = function()
-              return true -- avoid duplicate servers
-            end,
-          },
         },
       },
       {
@@ -46,10 +41,9 @@ return vim.list_contains(_G.enabled_languages, 'java')
             )
           end
           return {
-            -- How to find the root dir for a given filename. The default comes from
-            -- lspconfig which provides a function specifically for java projects.
-            ---@diagnostic disable-next-line: undefined-field
-            root_dir = LazyVim.lsp.get_raw_config('jdtls').default_config.root_dir,
+            root_dir = function(path)
+              return vim.fs.root(path, vim.lsp.config.jdtls.root_markers)
+            end,
 
             -- How to find the project name for a given root dir.
             project_name = function(root_dir)
@@ -117,23 +111,17 @@ return vim.list_contains(_G.enabled_languages, 'java')
               and LazyVim.has('mfussenegger/nvim-dap')
               and mason_registry.is_installed('java-debug-adapter')
             then
-              local jar_patterns = {
-                vim.fn.expand(
-                  '$MASON/share/java-debug-adapter/com.microsoft.java.debug.plugin-*.jar'
-                ),
-              }
+              bundles = vim.fn.glob(
+                '$MASON/share/java-debug-adapter/com.microsoft.java.debug.plugin-*jar',
+                false,
+                true
+              )
               -- java-test also depends on java-debug-adapter.
               if opts.test and mason_registry.is_installed('java-test') then
-                vim.list_extend(jar_patterns, {
-                  vim.fn.expand('$MASON/share/java-test/*.jar'),
-                })
-              end
-              for _, jar_pattern in ipairs(jar_patterns) do
-                for _, bundle in
-                  ipairs(vim.split(vim.fn.glob(jar_pattern), '\n'))
-                do
-                  table.insert(bundles, bundle)
-                end
+                vim.list_extend(
+                  bundles,
+                  vim.fn.glob('$MASON/share/java-test/*.jar', false, true)
+                )
               end
             end
           end

@@ -18,7 +18,7 @@
 
 ---@class DyParserInstallSpec:InstallInfo
 ---@field url string
----@field files string[]
+---@field branch? string
 
 ---@class DyLspSpec
 ---@field [1] string
@@ -64,6 +64,11 @@ return {
     formatters = {
       { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
       { 'trim_newlines', command = 'lua', mason = { enabled = false } },
+      {
+        'condense_blank_lines',
+        command = 'sed',
+        mason = { enabled = false },
+      },
     },
     linters = { 'typos' },
     null_ls = {
@@ -84,13 +89,6 @@ return {
         type = 'code_actions',
         command = 'git',
         mason = { enabled = false },
-      },
-      {
-        'condense_blank_lines',
-        type = 'formatting',
-        command = 'lua',
-        mason = { enabled = false },
-        custom = true,
       },
     },
     dial = function(augend)
@@ -368,8 +366,6 @@ return {
         'gherkin',
         install_info = {
           url = 'https://github.com/binhtran432k/tree-sitter-gherkin',
-          branch = 'main',
-          files = { 'src/parser.c', 'src/scanner.c' },
         },
       },
     },
@@ -482,7 +478,6 @@ return {
         'embedded_template',
         install_info = {
           url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
-          files = { 'src/parser.c' },
         },
       },
     },
@@ -635,7 +630,6 @@ return {
         'awk',
         install_info = {
           url = 'https://github.com/Beaglefoot/tree-sitter-awk',
-          files = { 'src/parser.c', 'src/scanner.c' },
         },
       },
     },
@@ -673,9 +667,7 @@ return {
       {
         'd2',
         install_info = {
-          url = 'https://git.pleshevski.ru/pleshevskiy/tree-sitter-d2/',
-          branch = 'main',
-          files = { 'src/parser.c', 'src/scanner.cc' },
+          url = 'https://github.com/madmaxieee/tree-sitter-d2',
         },
       },
     },
@@ -688,8 +680,6 @@ return {
         'dbml',
         install_info = {
           url = 'https://github.com/dynamotn/tree-sitter-dbml',
-          branch = 'main',
-          files = { 'src/parser.c' },
         },
       },
     },

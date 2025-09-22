@@ -46,9 +46,9 @@ return {
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
       opts = function(_, opts)
-        opts.ensure_installed = {
+        opts.ensure_installed = vim.list_extend(opts.ensure_installed, {
           'jsonc', -- for devcontainer.json
-        }
+        })
       end,
     },
   },

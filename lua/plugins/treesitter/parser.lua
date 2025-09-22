@@ -40,10 +40,9 @@ return {
               vim.api.nvim_create_autocmd('User', {
                 pattern = 'TSUpdate',
                 callback = function()
-                  parsers[parser_name] = {
+                  require('nvim-treesitter.parsers')[parser_name] = {
                     install_info = parser.install_info,
-                    tier = 2,
-                    maintainers = { 'dynamotn' },
+                    tier = 0,
                   }
                 end,
               })

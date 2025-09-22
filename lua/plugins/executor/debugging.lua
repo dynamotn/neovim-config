@@ -26,9 +26,15 @@ return {
                 local registry = require('mason-registry')
                 local dap_mapping = require('mason-nvim-dap.mappings.source')
                 for _, dap_server in ipairs(language.dap) do
-                  local server = dap_mapping.nvim_dap_to_package[dap_server]
-                  if server ~= nil and not registry.is_installed(server) then
-                    vim.api.nvim_command('MasonInstall ' .. server)
+                  local server_package =
+                    dap_mapping.nvim_dap_to_package[dap_server]
+                  if
+                    server_package ~= nil
+                    and not require('mason-registry').is_installed(
+                      server_package
+                    )
+                  then
+                    require('mason.api.command').MasonInstall({ server_package })
                   end
                 end
               end,

@@ -3,6 +3,11 @@ return {
     -- Formatters
     'stevearc/conform.nvim',
     opts = function(_, opts)
+      require('conform').formatters.condense_blank_lines = {
+        command = 'sed',
+        args = { ':a;N;$!ba;s/\\n\\n\\+/\\n\\n/g' },
+      }
+
       for name, language in pairs(require('config.languages')) do
         for _, ft in ipairs(language.filetypes) do
           opts.formatters_by_ft[ft] = {}
@@ -68,9 +73,10 @@ return {
                   {}
                 ),
                 callback = function()
-                  local registry = require('mason-registry')
-                  if not registry.is_installed(tool_package) then
-                    vim.api.nvim_command('MasonInstall ' .. tool_package)
+                  if
+                    not require('mason-registry').is_installed(tool_package)
+                  then
+                    require('mason.api.command').MasonInstall({ tool_package })
                   end
                 end,
               })

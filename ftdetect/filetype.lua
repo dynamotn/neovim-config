@@ -13,6 +13,7 @@ vim.filetype.add({
     install = 'sh.install',
     promql = 'promql',
     bean = 'beancount',
+    snippets = 'snippets',
   },
   filename = {
     ['.git/ignore'] = 'gitignore',

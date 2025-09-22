@@ -83,9 +83,10 @@ return {
                   {}
                 ),
                 callback = function()
-                  local registry = require('mason-registry')
-                  if not registry.is_installed(tool_package) then
-                    vim.api.nvim_command('MasonInstall ' .. tool_package)
+                  if
+                    not require('mason-registry').is_installed(tool_package)
+                  then
+                    require('mason.api.command').MasonInstall({ tool_package })
                   end
                 end,
               })

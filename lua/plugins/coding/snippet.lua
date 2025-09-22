@@ -1,5 +1,5 @@
 return {
-  -- Use Luasnip for Snipmate Snipmate
+  -- Use Luasnip for Snipmate
   { import = 'lazyvim.plugins.extras.coding.luasnip' },
   {
     'L3MON4D3/LuaSnip',

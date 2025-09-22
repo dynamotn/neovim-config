@@ -56,7 +56,7 @@ return {
                 require('util.languages').get_tools_by_filetype(vim.bo.filetype)
               )
             do
-              if vim.list_contains({ 'lua', 'git', 'curl' }, tool) then
+              if vim.list_contains({ 'lua', 'git', 'curl', 'sed' }, tool) then
               elseif vim.fn.executable(tool) == 1 then
                 msg = msg .. tool .. ' '
               else

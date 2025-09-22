@@ -123,7 +123,7 @@ return {
         2,
         LazyVim.lualine.status(LazyVim.config.icons.kinds.Copilot, function()
           local clients = package.loaded['copilot']
-              and LazyVim.lsp.get_clients({ name = 'copilot', bufnr = 0 })
+              and vim.lsp.get_clients({ name = 'copilot', bufnr = 0 })
             or {}
           if #clients > 0 then
             local status = require('copilot.status').data.status
