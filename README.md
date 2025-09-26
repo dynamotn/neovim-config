@@ -5,18 +5,19 @@
 [![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.11-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-<!--toc:start-->
-<!--markdownlint-disable MD013-->
-- [neovim-config](#neovim-config)
-  - [Features](#features)
-  - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
-    - [Languages](#languages)
-    - [Frameworks](#frameworks)
-    - [Tools & Markup](#tools--markup)
-  - [Installation](#installation)
-  - [Key bindings](#key-bindings)
-  - [Benchmark](#benchmark)
-<!--toc:end-->
+
+<!-- toc -->
+
+- [Features](#features)
+- [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
+  - [Languages](#languages)
+  - [Frameworks](#frameworks)
+  - [Tools & Markup](#tools--markup)
+- [Installation](#installation)
+- [Key bindings](#key-bindings)
+- [Benchmark](#benchmark)
+
+<!-- tocstop -->
 
 ## Features
 
