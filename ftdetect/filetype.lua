@@ -54,5 +54,7 @@ vim.filetype.add({
     ['.*%.dbml'] = 'dbml',
     ['.*%.d2'] = 'd2',
     ['.*/hypr/.*%.conf'] = 'hyprlang',
+
+    ['Dockerfile-.*'] = 'dockerfile',
   },
 })
