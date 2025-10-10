@@ -24,6 +24,9 @@ return {
       custom_highlights = function(colors)
         local util = require('catppuccin.utils.colors')
         return {
+          Type = { fg = colors.sapphire },
+          CurSearch = { fg = colors.mantle, bg = colors.peach },
+          Search = { fg = colors.text, bg = colors.blue },
           CmpItemAbbrMatch = { fg = colors.blue, bg = colors.none, bold = true },
           CmpItemAbbrMatchFuzzy = {
             fg = colors.blue,
