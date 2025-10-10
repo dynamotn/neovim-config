@@ -782,6 +782,7 @@ return {
     parsers = { 'json5' },
     lsp_servers = { 'jsonls' },
     linters = { 'jsonlint', 'trivy' },
+    formatters = { 'jq' },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
