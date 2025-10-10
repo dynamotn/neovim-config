@@ -40,7 +40,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
       },
       {
         -- Nvim LSP
-        'lazydev.nvim',
+        'folke/lazydev.nvim',
         ft = language.filetypes,
         init = function()
           _G.completion_sources =
