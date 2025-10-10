@@ -928,7 +928,7 @@ return {
   yaml = {
     filetypes = {
       'yaml',
-      'yaml.gl-ci',
+      'yaml.gitlab',
       'yaml.gh-action',
       'yaml.az-pl',
       'yaml.docker-compose',
@@ -938,7 +938,7 @@ return {
       'yamlls',
       {
         'gitlab_ci_ls',
-        enabled = function(filetype) return filetype == 'yaml.gl-ci' end,
+        enabled = function(filetype) return filetype == 'yaml.gitlab' end,
       },
       {
         'gh_actions_ls',

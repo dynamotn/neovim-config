@@ -39,7 +39,7 @@ vim.filetype.add({
     ['openapi.*%.ya?ml'] = 'yaml.openapi',
     ['openapi.*%.json'] = 'json.openapi',
 
-    ['.*%.gitlab%-ci%.ya?ml'] = 'yaml.gl-ci',
+    ['.*%.gitlab%-ci%.ya?ml'] = 'yaml.gitlab',
     ['.*%.github/workflows/.*.ya?ml'] = 'yaml.gh-action',
 
     ['.*%.component%.html'] = 'htmlangular',
