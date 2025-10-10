@@ -67,17 +67,19 @@ M.get_lsp_servers_by_filetype = function(filetype)
   )
 
   for _, server in ipairs(lsp_servers) do
-    if type(server) == 'string' then
-      table.insert(result, server)
-    elseif type(server) == 'table' then
-      local enabled = true
-      if type(server.enabled) == 'boolean' then
-        enabled = server.enabled
-      elseif type(server.enabled) == 'function' then
-        enabled = server.enabled(filetype)
-      end
-      if enabled then table.insert(result, server[1]) end
+    local server_name = server --[[@as string]]
+    if type(server) == 'table' then
+      if server.enabled ~= false then server_name = server[1] end
     end
+    local lsp_config = vim.lsp.config[server_name]
+    if lsp_config == nil or lsp_config.filetypes == nil then goto continue end
+    if
+      lsp_config.filetypes == '*'
+      or vim.list_contains(lsp_config.filetypes, filetype)
+    then
+      table.insert(result, server_name)
+    end
+    ::continue::
   end
 
   return LazyVim.dedup(result)

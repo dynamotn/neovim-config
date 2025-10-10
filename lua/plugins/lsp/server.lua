@@ -32,7 +32,9 @@ return {
       },
     },
     opts = function(_, opts)
-      opts.servers.sonarlint = {}
+      opts.servers.sonarlint = {
+        filetypes = { '*' },
+      }
       opts.setup = {}
     end,
     ---@param opts PluginLspOpts
