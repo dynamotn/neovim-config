@@ -90,7 +90,8 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         dependencies = { 'obsidian.nvim' },
         opts = {
           sources = {
-            compat = { 'obsidian' },
+            -- Not need to have compat for obsidian.nvim, because it is already handled in obsidian.nvim
+            -- compat = { 'obsidian' },
             per_filetype = {
               markdown = cmp_util.sources('markdown'),
             },
