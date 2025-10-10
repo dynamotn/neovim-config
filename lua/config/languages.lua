@@ -932,6 +932,7 @@ return {
       'yaml.gh-action',
       'yaml.az-pl',
       'yaml.docker-compose',
+      'yaml.helm-values',
     },
     parsers = { 'yaml' },
     lsp_servers = {

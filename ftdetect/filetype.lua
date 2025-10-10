@@ -50,6 +50,7 @@ vim.filetype.add({
     ['.*/templates/.*%.tpl'] = 'helm',
     ['.*/templates/.*%.ya?ml'] = 'helm',
     ['helmfile.*%.ya?ml'] = 'helm',
+    ['values.*%.yaml'] = 'yaml.helm-values',
 
     ['.*%.dbml'] = 'dbml',
     ['.*%.d2'] = 'd2',
