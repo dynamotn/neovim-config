@@ -17,6 +17,8 @@ return {
     end,
     config = function(_, opts)
       local treesitter = require('nvim-treesitter')
+      -- Setup from opts
+      treesitter.setup(opts)
       LazyVim.treesitter.get_installed(true) -- initialize the installed langs
 
       -- Setup treesitter parser to work with defined filetypes
@@ -93,9 +95,6 @@ return {
           end)
         end)
       end
-
-      -- Setup from opts
-      treesitter.setup(opts)
 
       vim.api.nvim_create_autocmd('FileType', {
         group = vim.api.nvim_create_augroup(
