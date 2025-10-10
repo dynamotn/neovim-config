@@ -116,7 +116,7 @@ return condition
             function(msg)
               msg = icons.treesitter.schema
               local bufnr = vim.api.nvim_get_current_buf()
-              local clients = LazyVim.lsp.get_clients({
+              local clients = vim.lsp.get_clients({
                 bufnr = bufnr,
                 name = 'yamlls',
               })
