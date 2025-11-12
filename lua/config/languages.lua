@@ -384,7 +384,9 @@ return {
     filetypes = { 'go' },
     parsers = { 'go' },
     lsp_servers = { 'gopls', 'harper_ls' },
-    linters = { 'golangcilint' },
+    linters = {
+      { 'golangcilint', mason = { enabled = false } },
+    },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
       { 'gomodifytags', type = 'code_actions', command = 'gomodifytags' },
