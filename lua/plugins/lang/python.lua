@@ -38,9 +38,7 @@ return vim.list_contains(_G.enabled_languages, 'python')
             if
               registry.is_installed(dap_mapping.nvim_dap_to_package['python'])
             then
-              require('dap-python').setup(
-                LazyVim.get_pkg_path('debugpy', '/venv/bin/python')
-              )
+              require('dap-python').setup('debugpy-adapter')
             end
           end,
         },

@@ -43,22 +43,20 @@ return {
       LazyVim.format.register(LazyVim.lsp.formatter())
 
       -- setup keymaps
-      LazyVim.lsp.on_attach(
-        function(client, buffer)
-          require('lazyvim.plugins.lsp.keymaps').on_attach(client, buffer)
+      for server, server_opts in pairs(opts.servers) do
+        if type(server_opts) == 'table' and server_opts.keys then
+          require('lazyvim.plugins.lsp.keymaps').set(
+            { name = server ~= '*' and server or nil },
+            server_opts.keys
+          )
         end
-      )
-
-      LazyVim.lsp.setup()
-      LazyVim.lsp.on_dynamic_capability(
-        require('lazyvim.plugins.lsp.keymaps').on_attach
-      )
+      end
 
       -- inlay hints
       if opts.inlay_hints.enabled then
-        LazyVim.lsp.on_supports_method(
-          'textDocument/inlayHint',
-          function(_, buffer)
+        Snacks.util.lsp.on(
+          { method = 'textDocument/inlayHint' },
+          function(buffer)
             if
               vim.api.nvim_buf_is_valid(buffer)
               and vim.bo[buffer].buftype == ''
@@ -75,21 +73,18 @@ return {
 
       -- folds
       if opts.folds.enabled then
-        LazyVim.lsp.on_supports_method(
-          'textDocument/foldingRange',
-          function(_, _)
-            if LazyVim.set_default('foldmethod', 'expr') then
-              LazyVim.set_default('foldexpr', 'v:lua.vim.lsp.foldexpr()')
-            end
+        Snacks.util.lsp.on({ method = 'textDocument/foldingRange' }, function()
+          if LazyVim.set_default('foldmethod', 'expr') then
+            LazyVim.set_default('foldexpr', 'v:lua.vim.lsp.foldexpr()')
           end
-        )
+        end)
       end
 
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
-        LazyVim.lsp.on_supports_method(
-          'textDocument/codeLens',
-          function(_, buffer)
+        Snacks.util.lsp.on(
+          { method = 'textDocument/codeLens' },
+          function(buffer)
             vim.lsp.codelens.refresh()
             vim.api.nvim_create_autocmd(
               { 'BufEnter', 'CursorHold', 'InsertLeave' },
@@ -129,14 +124,19 @@ return {
 
       -- default capabilities
       if opts.capabilities then
-        vim.lsp.config('*', { capabilities = opts.capabilities })
+        opts.servers['*'] =
+          vim.tbl_deep_extend('force', opts.servers['*'] or {}, {
+            capabilities = opts.capabilities,
+          })
       end
+      if opts.servers['*'] then vim.lsp.config('*', opts.servers['*']) end
 
       -- get all the servers that are available through mason-lspconfig
       local mason_configs =
         require('mason-lspconfig').get_mappings().lspconfig_to_package
       local ensure_installed = {} ---@type string[]
       local function configure(server, enabled, name, language)
+        if server == '*' then return end
         local server_opts = opts.servers[server] or {}
         server_opts = server_opts == true and {}
           or (not server_opts) and { enabled = false }

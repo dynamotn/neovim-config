@@ -95,6 +95,8 @@ return {
       },
     },
   },
+  -- Vibe Coding
+  { import = 'lazyvim.plugins.extras.ai.avante' },
   {
     -- Edgy integration
     'folke/edgy.nvim',

@@ -137,9 +137,9 @@ return vim.list_contains(_G.enabled_languages, 'java')
               },
               settings = opts.settings,
               -- enable CMP capabilities
-              capabilities = LazyVim.has('cmp-nvim-lsp') and require(
-                'cmp_nvim_lsp'
-              ).default_capabilities() or nil,
+              capabilities = LazyVim.has('blink.cmp')
+                  and require('blink.cmp').get_lsp_capabilities()
+                or nil,
             }, opts.jdtls)
 
             -- Existing server will be reused if the root_dir matches.
@@ -197,7 +197,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
                 })
                 wk.add({
                   {
-                    mode = 'v',
+                    mode = 'x',
                     buffer = args.buf,
                     { '<leader>cx', group = 'extract' },
                     {

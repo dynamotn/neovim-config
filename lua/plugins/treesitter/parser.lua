@@ -89,7 +89,7 @@ return {
         opts.ensure_installed or {}
       )
       if #install > 0 then
-        LazyVim.treesitter.ensure_treesitter_cli(function()
+        LazyVim.treesitter.build(function()
           treesitter.install(install, { summary = true }):await(function()
             LazyVim.treesitter.get_installed(true) -- refresh the installed langs
           end)
@@ -102,18 +102,28 @@ return {
           { clear = true }
         ),
         callback = function(ev)
-          if not LazyVim.treesitter.have(ev.match) then return end
+          local ft, lang = ev.match, vim.treesitter.language.get_lang(ev.match)
+          if not LazyVim.treesitter.have(ft) then return end
+
+          ---@param feat string
+          ---@param query string
+          local function enabled(feat, query)
+            local f = opts[feat] or {} ---@type lazyvim.TSFeat
+            return f.enable ~= false
+              and not (type(f.disable) == 'table' and vim.tbl_contains(
+                f.disable,
+                lang
+              ))
+              and LazyVim.treesitter.have(ft, query)
+          end
 
           -- highlighting
-          if vim.tbl_get(opts, 'highlight', 'enable') ~= false then
-            pcall(vim.treesitter.start)
+          if enabled('highlight', 'highlights') then
+            pcall(vim.treesitter.start, ev.buf)
           end
 
           -- indents
-          if
-            vim.tbl_get(opts, 'indent', 'enable') ~= false
-            and LazyVim.treesitter.have(ev.match, 'indents')
-          then
+          if enabled('indent', 'indents') then
             LazyVim.set_default(
               'indentexpr',
               'v:lua.LazyVim.treesitter.indentexpr()'
@@ -121,10 +131,7 @@ return {
           end
 
           -- folds
-          if
-            vim.tbl_get(opts, 'folds', 'enable') ~= false
-            and LazyVim.treesitter.have(ev.match, 'folds')
-          then
+          if enabled('folds', 'folds') then
             if LazyVim.set_default('foldmethod', 'expr') then
               LazyVim.set_default(
                 'foldexpr',

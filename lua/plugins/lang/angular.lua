@@ -21,10 +21,10 @@ return vim.list_contains(_G.enabled_languages, 'angular')
           },
           setup = {
             angularls = function()
-              LazyVim.lsp.on_attach(function(client)
+              Snacks.util.lsp.on({ name = 'angularls' }, function(_, client)
                 --HACK: disable angular renaming capability due to duplicate rename popping up
                 client.server_capabilities.renameProvider = false
-              end, 'angularls')
+              end)
             end,
           },
         },

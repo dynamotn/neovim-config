@@ -49,14 +49,9 @@ return vim.list_contains(_G.enabled_languages, 'rust')
                 },
                 procMacro = {
                   enable = true,
-                  ignored = {
-                    ['async-trait'] = { 'async_trait' },
-                    ['napi-derive'] = { 'napi' },
-                    ['async-recursion'] = { 'async_recursion' },
-                  },
                 },
                 files = {
-                  excludeDirs = {
+                  exclude = {
                     '.direnv',
                     '.git',
                     '.github',
@@ -67,6 +62,8 @@ return vim.list_contains(_G.enabled_languages, 'rust')
                     'venv',
                     '.venv',
                   },
+                  -- Avoid Roots Scanned hanging, see https://github.com/rust-lang/rust-analyzer/issues/12613#issuecomment-2096386344
+                  watcher = 'client',
                 },
               },
             },

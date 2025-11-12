@@ -1,6 +1,9 @@
 local language = require('config.languages').sql
 local cmp_util = require('util.cmp')
 
+vim.g.omni_sql_default_compl_type = 'syntax'
+vim.g.loaded_sql_completion = true
+
 return vim.list_contains(_G.enabled_languages, 'sql')
     and {
       {

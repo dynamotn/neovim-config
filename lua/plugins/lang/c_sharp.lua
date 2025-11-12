@@ -74,7 +74,7 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
         -- Test adapter
         'nvim-neotest/neotest',
         dependencies = {
-          'Issafalcon/neotest-dotnet',
+          'Nsidorenco/neotest-vstest',
           ft = language.filetypes,
         },
         opts = {

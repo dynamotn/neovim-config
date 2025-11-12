@@ -53,7 +53,7 @@ return {
         'gx',
         function() require('open').open_cword() end,
         desc = 'Open with system app',
-        mode = { 'n', 'v' },
+        mode = { 'n', 'x' },
       },
     },
     config = function(_, opts)

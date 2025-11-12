@@ -41,7 +41,9 @@ return condition
                 {
                   'gD',
                   function()
-                    local params = vim.lsp.util.make_position_params(0, 'utf-8')
+                    local win = vim.api.nvim_get_current_win()
+                    local params =
+                      vim.lsp.util.make_position_params(win, 'utf-16')
                     LazyVim.lsp.execute({
                       command = 'typescript.goToSourceDefinition',
                       arguments = { params.textDocument.uri, params.position },
@@ -96,7 +98,7 @@ return condition
           },
           setup = {
             vtsls = function(_, opts)
-              LazyVim.lsp.on_attach(function(client, _)
+              Snacks.util.lsp.on({ name = 'vtsls' }, function(buffer, client)
                 client.commands['_typescript.moveToFileRefactoring'] = function(
                   command,
                   _
@@ -149,7 +151,7 @@ return condition
                     end)
                   end)
                 end
-              end, 'vtsls')
+              end)
               -- copy typescript settings to javascript
               opts.settings.javascript = vim.tbl_deep_extend(
                 'force',
@@ -173,32 +175,33 @@ return condition
         'mfussenegger/nvim-dap',
         opts = function()
           local dap = require('dap')
-          if not dap.adapters['pwa-node'] then
-            require('dap').adapters['pwa-node'] = {
-              type = 'server',
-              host = 'localhost',
-              port = '${port}',
-              executable = {
-                command = 'node',
-                args = {
-                  LazyVim.get_pkg_path(
-                    'js-debug-adapter',
-                    '/js-debug/src/dapDebugServer.js',
-                    { warn = false }
-                  ),
-                  '${port}',
+          for _, adapterType in ipairs({ 'node', 'firefox' }) do
+            local pwaType = 'pwa-' .. adapterType
+
+            if not dap.adapters[pwaType] then
+              dap.adapters[pwaType] = {
+                type = 'server',
+                host = 'localhost',
+                port = '${port}',
+                executable = {
+                  command = 'js-debug-adapter',
+                  args = { '${port}' },
                 },
-              },
-            }
-          end
-          if not dap.adapters['node'] then
-            dap.adapters['node'] = function(cb, config)
-              if config.type == 'node' then config.type = 'pwa-node' end
-              local nativeAdapter = dap.adapters['pwa-node']
-              if type(nativeAdapter) == 'function' then
-                nativeAdapter(cb, config)
-              else
-                cb(nativeAdapter)
+              }
+            end
+
+            -- Define adapters without the "pwa-" prefix for VSCode compatibility
+            if not dap.adapters[adapterType] then
+              dap.adapters[adapterType] = function(cb, config)
+                local nativeAdapter = dap.adapters[pwaType]
+
+                config.type = pwaType
+
+                if type(nativeAdapter) == 'function' then
+                  nativeAdapter(cb, config)
+                else
+                  cb(nativeAdapter)
+                end
               end
             end
           end
@@ -209,6 +212,11 @@ return condition
 
           for _, filetype in ipairs(language.filetypes) do
             if not dap.configurations[filetype] then
+              local runtimeExecutable = nil
+              if filetype:find('typescript') then
+                runtimeExecutable = vim.fn.executable('tsx') == 1 and 'tsx'
+                  or 'ts-node'
+              end
               dap.configurations[filetype] = {
                 {
                   type = 'pwa-node',
@@ -216,6 +224,16 @@ return condition
                   name = 'Launch file',
                   program = '${file}',
                   cwd = '${workspaceFolder}',
+                  sourceMaps = true,
+                  runtimeExecutable = runtimeExecutable,
+                  skipFiles = {
+                    '<node_internals>/**',
+                    'node_modules/**',
+                  },
+                  resolveSourceMapLocations = {
+                    '${workspaceFolder}/**',
+                    '!**/node_modules/**',
+                  },
                 },
                 {
                   type = 'pwa-node',
@@ -223,6 +241,16 @@ return condition
                   name = 'Attach',
                   processId = require('dap.utils').pick_process,
                   cwd = '${workspaceFolder}',
+                  sourceMaps = true,
+                  runtimeExecutable = runtimeExecutable,
+                  skipFiles = {
+                    '<node_internals>/**',
+                    'node_modules/**',
+                  },
+                  resolveSourceMapLocations = {
+                    '${workspaceFolder}/**',
+                    '!**/node_modules/**',
+                  },
                 },
               }
             end
