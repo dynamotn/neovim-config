@@ -706,7 +706,7 @@ return {
   },
   gitrebase = {
     filetypes = { 'gitrebase' },
-    parsers = { 'girebase' },
+    parsers = { 'git_rebase' },
     null_ls = {
       {
         'gitrebase',
