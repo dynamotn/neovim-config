@@ -797,8 +797,8 @@ return {
     },
   },
   markdown = {
-    filetypes = { 'markdown', 'markdown.mdx' },
-    parsers = { 'markdown', 'markdown_inline' },
+    filetypes = { 'markdown', 'markdown.mdx', 'codecompanion' },
+    parsers = { 'markdown' },
     lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
     linters = { 'markdownlint-cli2', 'vale' },
     formatters = {
