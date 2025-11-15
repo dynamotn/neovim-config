@@ -143,7 +143,7 @@ return {
       })
 
       -- Setup predicates
-      for predicate, regex in pairs(opts.custom_predicates) do
+      for predicate, regex in pairs(opts.custom_predicates or {}) do
         require('vim.treesitter.query').add_predicate(
           predicate,
           function(_, _, bufnr, _)
