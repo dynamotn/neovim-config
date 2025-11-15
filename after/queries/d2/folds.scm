@@ -1,5 +1,6 @@
 [
+  (label_codeblock)
+  (label_array)
+  (block_comment)
   (block)
-  (class_block)
-  (text_block)
 ] @fold

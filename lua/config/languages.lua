@@ -670,7 +670,7 @@ return {
       {
         'd2',
         install_info = {
-          url = 'https://github.com/madmaxieee/tree-sitter-d2',
+          url = 'https://github.com/ravsii/tree-sitter-d2',
         },
       },
     },
