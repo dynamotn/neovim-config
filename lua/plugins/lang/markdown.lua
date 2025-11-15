@@ -84,5 +84,16 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
           },
         },
       },
+      {
+        -- Linter config
+        'mfussenegger/nvim-lint',
+        opts = function()
+          local lint = require('lint')
+          lint.linters['markdownlint-cli2'].args = {
+            '--config',
+            '~/.config/markdownlint/config.yaml',
+          }
+        end,
+      },
     }
   or {}
