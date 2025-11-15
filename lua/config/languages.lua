@@ -674,6 +674,7 @@ return {
         },
       },
     },
+    linter = { 'd2' },
     formatters = { 'd2' },
   },
   dbml = {
