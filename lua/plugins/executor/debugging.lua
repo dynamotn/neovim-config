@@ -23,7 +23,6 @@ return {
               pattern = language.filetypes,
               group = vim.api.nvim_create_augroup('mason_dap_' .. name, {}),
               callback = function()
-                local registry = require('mason-registry')
                 local dap_mapping = require('mason-nvim-dap.mappings.source')
                 for _, dap_server in ipairs(language.dap) do
                   local server_package =

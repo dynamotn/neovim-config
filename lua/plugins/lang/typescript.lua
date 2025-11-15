@@ -98,7 +98,7 @@ return condition
           },
           setup = {
             vtsls = function(_, opts)
-              Snacks.util.lsp.on({ name = 'vtsls' }, function(buffer, client)
+              Snacks.util.lsp.on({ name = 'vtsls' }, function(_, client)
                 client.commands['_typescript.moveToFileRefactoring'] = function(
                   command,
                   _

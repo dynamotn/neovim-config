@@ -173,7 +173,7 @@ return {
         completion = {
           list = { selection = { preselect = false } },
           menu = {
-            auto_show = function(ctx) return vim.fn.getcmdtype() == ':' end,
+            auto_show = function(_) return vim.fn.getcmdtype() == ':' end,
           },
           ghost_text = { enabled = true },
         },
