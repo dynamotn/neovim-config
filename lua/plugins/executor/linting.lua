@@ -23,12 +23,24 @@ return {
                 )
               end
             end
-            if vim.fn.executable(tool_command) == 1 or name == '*' then
+            if
+              (vim.fn.executable(tool_command) == 1 or name == '*')
+              and tool_name ~= 'vale'
+            then
               table.insert(opts.linters_by_ft[ft], tool_name)
             end
           end
         end
       end
+
+      vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+        callback = function()
+          require('lint').try_lint()
+          if vim.fn.filereadable('.vale.ini') > 0 then
+            require('lint').try_lint({ 'vale' })
+          end
+        end,
+      })
     end,
   },
   {

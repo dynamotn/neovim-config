@@ -70,7 +70,7 @@ return {
         mason = { enabled = false },
       },
     },
-    linters = { 'typos' },
+    linters = { 'typos', 'vale' },
     null_ls = {
       {
         'dictionary',
@@ -423,8 +423,7 @@ return {
   latex = {
     filetypes = { 'tex' },
     parsers = { 'latex' },
-    lsp_servers = { 'ltex', 'texlab', 'vale_ls' },
-    linters = { 'vale' },
+    lsp_servers = { 'ltex', 'texlab' },
     formatters = { 'tex-fmt' },
   },
   lua = {
@@ -800,8 +799,8 @@ return {
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx', 'codecompanion' },
     parsers = { 'markdown' },
-    lsp_servers = { 'marksman', 'vale_ls', 'harper_ls' },
-    linters = { 'markdownlint-cli2', 'vale' },
+    lsp_servers = { 'marksman', 'harper_ls' },
+    linters = { 'markdownlint-cli2' },
     formatters = {
       -- { 'injected', command = 'lua', mason = { enabled = false } },
       {
