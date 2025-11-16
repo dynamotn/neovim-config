@@ -14,7 +14,7 @@ return {
     'LSP',
   },
   source = {
-    id = 'pkg:github/ankitpokhrel/jira-cli@v1.6.0',
+    id = 'pkg:github/ankitpokhrel/jira-cli@v1.7.0',
     asset = {
       {
         target = 'darwin_arm64',

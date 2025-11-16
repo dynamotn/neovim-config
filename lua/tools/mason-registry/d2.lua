@@ -10,7 +10,7 @@ return {
     'Formatter',
   },
   source = {
-    id = 'pkg:github/terrastruct/d2@v0.7.0',
+    id = 'pkg:github/terrastruct/d2@v0.7.1',
     asset = {
       {
         target = 'darwin_x64',

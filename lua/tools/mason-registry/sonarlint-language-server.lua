@@ -31,9 +31,9 @@ return {
     'Linter',
   },
   source = {
-    id = 'pkg:github/SonarSource/sonarlint-vscode@4.22.0%2B77643',
+    id = 'pkg:github/SonarSource/sonarlint-vscode@4.35.1',
     asset = {
-      file = 'sonarlint-vscode-4.22.0.vsix',
+      file = 'sonarlint-vscode-4.35.1.vsix',
     },
   },
   schemas = {
