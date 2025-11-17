@@ -36,7 +36,10 @@ return {
       vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
         callback = function()
           require('lint').try_lint()
-          if vim.fn.filereadable('.vale.ini') > 0 then
+          if
+            vim.fn.filereadable('.vale.ini') > 0
+            or vim.fn.filereadable(vim.env.VALE_CONFIG_PATH) > 0
+          then
             require('lint').try_lint({ 'vale' })
           end
         end,
