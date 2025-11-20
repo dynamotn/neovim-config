@@ -385,7 +385,7 @@ return {
     parsers = { 'go' },
     lsp_servers = { 'gopls', 'harper_ls' },
     linters = {
-      { 'golangcilint', mason = { enabled = false } },
+      { 'golangcilint', mason = { package = 'golangci-lint' } },
     },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
