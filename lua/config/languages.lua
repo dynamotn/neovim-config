@@ -70,7 +70,7 @@ return {
         mason = { enabled = false },
       },
     },
-    linters = { 'typos', 'vale' },
+    linters = { 'vale' },
     null_ls = {
       {
         'dictionary',

@@ -2,7 +2,6 @@ local list_tools = {
   'jira',
   'ltcc',
   'js-beautify',
-  'typos',
   'promql-langserver',
   'termux-language-server',
   'sonarlint-language-server',
