@@ -1,5 +1,3 @@
-dynamo
-dynamotn
 plugin
 keymap
 config
@@ -13,13 +11,11 @@ todos
 popup
 vim
 nvim
-WhichKey
 TodoQuickFix
 TodoTrouble
 TodoTelescope
 ripgrep
 Api
-Noice
 cmdline
 statusline
 backends
@@ -30,12 +26,8 @@ noice
 github
 gitlab
 hl
-foo
 keymaps
 Treesitter
-dytoy
-kubernetes
-k8s
 submodule
 Submodules
 repo
@@ -48,9 +40,5 @@ rebase
 logics
 submodules
 dotfiles
-chezmoi
-Termux
-MacOS
 dotbot
-comtrya
 IaC

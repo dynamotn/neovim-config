@@ -16,6 +16,7 @@ opt.title = true -- Allow to change terminal's title
 opt.autoread = true -- Automatically read a file changed outside of vim
 opt.colorcolumn = '80,120' -- 80, 120 column chars line length
 opt.wrap = true -- Set wrap mode
+opt.spelllang = { 'en_us', 'vi', 'proper', 'technical' } -- My spell list
 
 -- Disable non-Lua provider
 g.loaded_python3_provider = 0
