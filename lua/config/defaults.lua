@@ -2,12 +2,6 @@
 return {
   colorscheme = 'catppuccin',
   icons = {
-    misc = {
-      dots = '󰇘',
-    },
-    ft = {
-      octo = '',
-    },
     treesitter = {
       core = ' ',
       schema = '󰏃 ',
