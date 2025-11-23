@@ -883,14 +883,16 @@ return {
     parsers = { 'hcl', 'terraform' },
     lsp_servers = { 'terraformls' },
     linters = { 'tflint', 'trivy' },
-    formatters = { 'terraform_fmt' },
+    formatters = {
+      { 'tofu_fmt', command = 'tofu', mason = { enabled = false } },
+    },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
       {
-        'terraform_validate',
+        'opentofu_validate',
         type = 'diagnostics',
-        command = 'terraform',
+        command = 'tofu',
         mason = { enabled = false },
       },
     },
@@ -899,7 +901,13 @@ return {
     filetypes = { 'terragrunt' },
     parsers = { 'hcl' },
     lsp_servers = { 'terraformls' },
-    formatters = { 'terraform_fmt' },
+    formatters = {
+      {
+        'terragrunt_hclfmt',
+        command = 'terragrunt',
+        mason = { enabled = false },
+      },
+    },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
       { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
@@ -908,6 +916,7 @@ return {
         type = 'diagnostics',
         command = 'terragrunt',
         mason = { enabled = false },
+        custom = true,
       },
     },
   },
