@@ -93,8 +93,6 @@ return {
       WhileStatement = '󰑖 ',
 
       cmdline = ' ',
-      codeium = ' ',
-      CodeCompanion = '󰚩 ',
       copilot = ' ',
       dictionary = ' ',
       calc = ' ',

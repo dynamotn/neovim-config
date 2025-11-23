@@ -5,8 +5,6 @@ _G.enabled_plugins.leetcode = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.firenvim = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.otter = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.chezmoi = true
-_G.enabled_plugins.codeium = {{ eq .kind "pc" "laptop" "vm" }}
-_G.enabled_plugins.copilot = {{ eq .kind "pc" "laptop" "vm" }}
 {{- if eq .kind "container" }}
 _G.enabled_languages = { 'gitcommit', 'gitrebase', 'bash', 'sql' }
 _G.bundle_languages = { 'gitcommit', 'bash', 'sql' }
@@ -70,11 +68,6 @@ _G.firenvim_site_settings = {
 }
 {{- if has "F1" .decryptEnterprise }}
 require('per_machine.F1')
-{{- end }}
-{{- if eq .company "F1" }}
-_G.enabled_plugins.codeium = false
-_G.enabled_plugins.copilot = true
-_G.companion_adapter = "copilot"
 {{- end }}
 {{- if eq .code "l30n4rd0d4v1nc1" }}
 _G.used_full_plugins = true

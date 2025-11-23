@@ -40,9 +40,6 @@ M.sources = function(filetype)
     sql = { 'dadbod', 'sql' },
   }
 
-  if _G.enabled_plugins.codeium then table.insert(common_sources, 'codeium') end
-  if _G.enabled_plugins.copilot then table.insert(common_sources, 'copilot') end
-
   if filetype == 'comment' then
     return { 'buffer', 'ripgrep', 'dictionary', 'emoji', 'nerdfont', 'dynamic' }
   elseif filetype == 'dap' then

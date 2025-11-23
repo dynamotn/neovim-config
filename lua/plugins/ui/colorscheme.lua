@@ -60,10 +60,6 @@ return {
             fg = util.lighten(colors.surface0, 0.9, colors.teal),
             bg = colors.teal,
           },
-          CmpItemKindCodeium = {
-            fg = util.lighten(colors.surface0, 0.9, colors.teal),
-            bg = colors.teal,
-          },
 
           CmpItemKindEvent = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),

@@ -60,6 +60,7 @@ return {
         'sonarlint',
         enabled = vim.fn.executable('java') == 1,
       },
+      'copilot',
     },
     formatters = {
       { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
@@ -797,7 +798,7 @@ return {
     },
   },
   markdown = {
-    filetypes = { 'markdown', 'markdown.mdx', 'codecompanion' },
+    filetypes = { 'markdown', 'markdown.mdx' },
     parsers = { 'markdown' },
     lsp_servers = { 'marksman', 'harper_ls' },
     linters = { 'markdownlint-cli2' },

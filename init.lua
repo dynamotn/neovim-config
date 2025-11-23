@@ -11,8 +11,6 @@ _G.enabled_plugins = {
   otter = false,
   firenvim = false,
   chezmoi = false,
-  codeium = false,
-  copilot = false,
 }
 --- List enable each language, useful for install only plugins for needed language. Default is all supported languages.
 _G.enabled_languages = vim.tbl_keys(require('config.languages'))
@@ -47,10 +45,8 @@ _G.obsidian.todo_path = function()
 end
 --- Firenvim setting
 _G.firenvim_site_settings = {}
---- AI settings
-_G.companion_adapter = 'ollama'
 
-if vim.fn.has('nvim-0.11.0') == 1 then
+if vim.fn.has('nvim-0.12.0') == 1 then
   -- Load specific configurations per machine
   require('per_machine')
   -- Load LazyVim

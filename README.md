@@ -44,7 +44,7 @@
     - [chezmoi](https://www.chezmoi.io/)
     - **Firefox** or **Chrome** browser with [embedded neovim](https://github.com/glacambre/firenvim)
     - [zellij](https://zellij.dev/)
-    - [Codeium](https://codeium.com/), an AI power tools
+    - [Various AI CLI tool](https://github.com/folke/sidekick.nvim#default-cli-tools)
 
 > [!CAUTION]
 >
