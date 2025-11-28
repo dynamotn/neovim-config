@@ -10,6 +10,14 @@ return vim.list_contains(_G.enabled_languages, 'terragrunt')
           servers = {
             terragruntls = {},
           },
+          setup = {
+            terragruntls = function(_, _)
+              Snacks.util.lsp.on({ name = 'terragruntls' }, function(_, client)
+                --HACK: disable terragruntls diagnostics due to false positives
+                client.handlers['textDocument/publishDiagnostics'] = function() end
+              end)
+            end,
+          },
         },
       },
     }
