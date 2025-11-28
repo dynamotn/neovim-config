@@ -63,6 +63,8 @@ return {
     },
     opts = {
       keymap = {
+        preset = 'enter',
+        ['<C-y>'] = { 'select_and_accept' },
         ['<Tab>'] = {
           LazyVim.cmp.map({ 'snippet_forward', 'ai_nes', 'ai_accept' }),
           'fallback',
