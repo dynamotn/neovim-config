@@ -900,7 +900,7 @@ return {
   terragrunt = {
     filetypes = { 'terragrunt' },
     parsers = { 'hcl' },
-    lsp_servers = { 'terraformls' },
+    lsp_servers = { 'terragruntls' },
     formatters = {
       {
         'terragrunt_hclfmt',

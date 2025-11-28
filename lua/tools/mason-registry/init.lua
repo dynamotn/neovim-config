@@ -1,17 +1,14 @@
-local list_tools = {
-  'jira',
-  'ltcc',
-  'js-beautify',
-  'promql-langserver',
-  'termux-language-server',
-  'sonarlint-language-server',
-  'd2',
-}
-
 local M = {}
+local scan_path = vim.fn.stdpath('config') .. '/lua/tools/mason-registry'
+local files = vim.fn.glob(scan_path .. '/*.lua', true, true)
 
-for _, tool in ipairs(list_tools) do
-  M = vim.tbl_extend('keep', M, { [tool] = 'tools.mason-registry.' .. tool })
+for _, file in ipairs(files) do
+  local tool_name = vim.fn.fnamemodify(file, ':t:r')
+  if tool_name ~= 'init' then
+    M = vim.tbl_extend('keep', M, {
+      [tool_name] = 'tools.mason-registry.' .. tool_name,
+    })
+  end
 end
 
 return M
