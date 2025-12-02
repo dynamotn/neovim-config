@@ -2,6 +2,7 @@ return {
   {
     -- I want to self-managed LSP by my way
     'neovim/nvim-lspconfig',
+    event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
     dependencies = {
       {
         -- Auto install LSP servers with needed
@@ -38,7 +39,7 @@ return {
       opts.setup = {}
     end,
     ---@param opts PluginLspOpts
-    config = vim.schedule_wrap(function(_, opts)
+    config = function(_, opts)
       -- setup auto format
       LazyVim.format.register(LazyVim.lsp.formatter())
 
@@ -204,6 +205,6 @@ return {
           LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
         ),
       })
-    end),
+    end,
   },
 }
