@@ -10,13 +10,8 @@ return {
     dependencies = {
       '3rd/image.nvim',
       ft = diagram_filetypes,
-      commit = '21909e3eb03bc738cce497f45602bf157b396672',
-      pin = true,
       opts = {
-        backend = vim.env.ZELLIJ ~= nil
-            and vim.fn.executable('ueberzug') == 1
-            and 'ueberzug'
-          or 'kitty',
+        backend = vim.env.ZELLIJ ~= nil and 'ueberzug' or 'kitty',
         max_height_window_percentage = 90,
         max_width_window_percentage = 90,
         integrations = {
@@ -61,7 +56,8 @@ return {
         },
       }, opts))
     end,
-    enabled = _G.used_full_plugins or vim.fn.executable('magick') == 1,
+    enabled = (_G.used_full_plugins or vim.fn.executable('magick') == 1),
+    cond = vim.env.ZELLIJ == nil or vim.fn.executable('ueberzug') == 1,
   },
   {
     -- Render images in a file
