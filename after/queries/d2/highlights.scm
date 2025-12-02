@@ -1,169 +1,61 @@
-([
-  (comment)
-  (block_comment)
-] @spell @comment)
+;-------------------------------------------------------------------------------
+
+(container_key) @string.special
+(shape_key) @variable
+(attr_key) @property
+(reserved) @error
+(class_name) @constant
 
 [
-  (label)
-  (label_codeblock)
-  (label_array)
-] @string
-
-((label) @keyword
-  (#any-of? @keyword
-    "null"
-    "Null"
-    "NULL"
-  )
-)
-
-((label) @string.special
-  (#any-of? @string.special
-    "suspend"
-    "unsuspend"
-    "top-left"
-    "top-center"
-    "top-right"
-    "center-left"
-    "center-right"
-    "bottom-left"
-    "bottom-center"
-    "bottom-right"
-    "outside-top-left"
-    "outside-top-center"
-    "outside-top-right"
-    "outside-left-center"
-    "outside-right-center"
-    "outside-bottom-left"
-    "outside-bottom-center"
-    "outside-bottom-right"
-  )
-)
-
-((label_array) @constant
-  (#any-of? @constant
-    "primary_key"
-    "PK"
-    "foreign_key"
-    "FK"
-    "unique"
-    "UNQ"
-    "NULL"
-    "NOT NULL"
-  )
-)
-
-(escape) @string.escape
-
-(identifier) @function
-((identifier) @function.builtin
-  (#any-of? @function.builtin
-    "3d"
-    "animated"
-    "bold"
-    "border-radius"
-    "class"
-    "classes"
-    "constraint"
-    "d2-config"
-    "d2-legend"
-    "direction"
-    "double-border"
-    "fill"
-    "fill-pattern"
-    "filled"
-    "font"
-    "font-color"
-    "font-size"
-    "height"
-    "italic"
-    "label"
-    "layers"
-    "level"
-    "link"
-    "multiple"
-    "near"
-    "opacity"
-    "scenarios"
-    "shadow"
-    "shape"
-    "source-arrowhead"
-    "steps"
-    "stroke"
-    "stroke-dash"
-    "stroke-width"
-    "style"
-    "target-arrowhead"
-    "text-transform"
-    "tooltip"
-    "underline"
-    "vars"
-    "width"
-  )
-)
-
-((identifier) @keyword
-  (#eq? @keyword "_")
-)
-
-[
- "$"
- "...$"
- "@"
- "...@"
+  (keyword_style)
+  (keyword_classes)
+  (keyword_class)
 ] @keyword
 
-[
- (glob_filter)
- (inverse_glob_filter)
- (visibility_mark)
-] @keyword.modifier
+(keyword_underscore) @keyword.return
 
-(import) @module
+; Literals
+;-------------------------------------------------------------------------------
 
-[(variable) (spread_variable)] @variable
-
-(variable (identifier) @variable.member)
-(variable (identifier_chain (identifier) @variable.member))
-
-(spread_variable (identifier) @variable.member)
-(spread_variable (identifier_chain (identifier) @variable.member))
-
-[
-  (glob)
-  (recursive_glob)
-  (global_glob)
-] @string.special
-
-(identifier
-  (glob) @string.special.symbol)
-
-(connection) @operator
-(connection_identifier) @property
+(string) @string
+(container_key (string (string_fragment) @string))
+(shape_key (string (string_fragment) @string))
+(escape_sequence) @string.escape
+(label) @text.title
+(attr_value) @string
 (integer) @number
-(float) @number.float
+(float) @float
 (boolean) @boolean
 
-(argument_name) @variable.parameter
-(argument_type) @type
+; Comments
+;-------------------------------------------------------------------------------
+
+[
+  (language)
+  (line_comment)
+  (block_comment)
+] @comment
+
+; Punctiation
+;-------------------------------------------------------------------------------
+
+(arrow) @operator
+
+[
+  (dot)
+  (colon)
+  ";"
+] @punctuation.delimiter
 
 [
   "["
   "]"
-  "("
-  ")"
   "{"
   "}"
   "|"
-  "||"
-  "|||"
-  "|`"
-  "`|"
 ] @punctuation.bracket
 
-[
-  "."
-  ","
-  ":"
-  ";"
-] @punctuation.delimiter
+; Special
+;-------------------------------------------------------------------------------
+
+(ERROR) @error
