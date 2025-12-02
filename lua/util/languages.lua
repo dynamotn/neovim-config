@@ -69,7 +69,11 @@ M.get_lsp_servers_by_filetype = function(filetype)
   for _, server in ipairs(lsp_servers) do
     local server_name = server --[[@as string]]
     if type(server) == 'table' then
-      if server.enabled ~= false then server_name = server[1] end
+      if server.enabled ~= false then
+        server_name = server[1]
+      else
+        goto continue
+      end
     end
     local lsp_config = vim.lsp.config[server_name]
     if lsp_config == nil or lsp_config.filetypes == nil then goto continue end
