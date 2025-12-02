@@ -443,6 +443,48 @@ return {
     parsers = { 'latex' },
     lsp_servers = { 'ltex', 'texlab' },
     formatters = { 'tex-fmt' },
+    autopairs = function(filetypes, rule, cond)
+      return {
+        -- Add pair text after \begin
+        -- e.g., \begin{environment} ... \end{environment}
+        rule('\\begin{', '\\end{', filetypes)
+          :replace_endpair(function(opts)
+            local line = opts.line
+            local col = opts.col
+            local from = col - 8
+            local to = line:find('}', from)
+            if to then
+              local env_name = line:sub(from, to)
+              return '\\end{' .. env_name .. '}'
+            end
+            return '\\end{'
+          end)
+          :set_end_pair_length(5),
+
+        -- Add pair text after \left
+        -- e.g., \left( ... \right)
+        rule('\\left', '\\right', filetypes):set_end_pair_length(6),
+
+        -- Add pair text after \frac
+        -- e.g., \frac{numerator}{denominator}
+        rule('\\frac{', '}{', filetypes)
+          :set_end_pair_length(2)
+          :with_move(function(opts) return opts.char == '}' end),
+
+        -- Add pair text after \start...
+        -- e.g., \start... ... \stop...
+        rule('\\start(%w*) $', filetypes)
+          :replace_endpair(function(opts)
+            local beforeText = string.sub(opts.line, 0, opts.col)
+            local _, _, match = beforeText:find('\\start(%w*)')
+            if match and #match > 0 then return ' \\stop' .. match end
+            return ''
+          end)
+          :with_move(cond.none())
+          :use_key('<space>')
+          :use_regex(true),
+      }
+    end,
   },
   lua = {
     filetypes = { 'lua' },
