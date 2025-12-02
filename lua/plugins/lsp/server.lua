@@ -37,6 +37,7 @@ return {
         filetypes = { '*' },
       }
       opts.setup = {}
+      opts.folds.enabled = false
     end,
     ---@param opts PluginLspOpts
     config = function(_, opts)
