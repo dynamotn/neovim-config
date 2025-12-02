@@ -18,7 +18,8 @@ return {
       local ts_cond = require('nvim-autopairs.ts-conds')
 
       -- Auto pair rules per filetype
-      for _, language in pairs(require('config.languages')) do
+      local languages = require('config.languages')
+      for _, language in pairs(languages) do
         if language.autopairs then
           autopairs.add_rules(
             language.autopairs(language.filetypes, rule, cond, ts_cond)

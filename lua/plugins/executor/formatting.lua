@@ -8,7 +8,8 @@ return {
         args = { ':a;N;$!ba;s/\\n\\n\\+/\\n\\n/g' },
       }
 
-      for name, language in pairs(require('config.languages')) do
+      local languages = require('config.languages')
+      for name, language in pairs(languages) do
         for _, ft in ipairs(language.filetypes) do
           opts.formatters_by_ft[ft] = {}
           for _, tool in ipairs(language.formatters or {}) do
@@ -44,7 +45,8 @@ return {
     -- Auto install formatters
     'mason-org/mason.nvim',
     opts = function(_, opts)
-      for name, language in pairs(require('config.languages')) do
+      local languages = require('config.languages')
+      for name, language in pairs(languages) do
         for _, tool in ipairs(language.formatters or {}) do
           local tool_package
           local is_mason_tool = true

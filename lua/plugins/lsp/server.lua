@@ -184,7 +184,8 @@ return {
       end
 
       -- get all the servers that are available through my config
-      for name, language in pairs(require('config.languages')) do
+      local languages = require('config.languages')
+      for name, language in pairs(languages) do
         for _, lsp_server in ipairs(language.lsp_servers or {}) do
           local server
           if type(lsp_server) == 'table' then

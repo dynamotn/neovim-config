@@ -25,8 +25,9 @@ g.loaded_ruby_provider = 0
 g.loaded_node_provider = 0
 
 -- Setup abbreviations
-for abbr, full_text in pairs(require('config.defaults').abbreviations) do
-  vim.cmd({ cmd = 'inoreabbrev', args = { abbr, full_text } })
+local abbreviations = require('config.defaults').abbreviations
+for abbr, full_text in pairs(abbreviations) do
+  vim.cmd.inoreabbrev(abbr, full_text)
 end
 
 -- Setup project config with `.nvim` folder in project root

@@ -111,10 +111,13 @@ return {
           buffer = {
             opts = {
               get_bufnrs = function()
-                return vim.tbl_filter(
-                  function(bufnr) return vim.bo[bufnr].buftype == '' end,
-                  vim.api.nvim_list_bufs()
-                )
+                local bufs = {}
+                for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+                  if vim.bo[bufnr].buftype == '' then
+                    table.insert(bufs, bufnr)
+                  end
+                end
+                return bufs
               end,
             },
             score_offset = 18,
@@ -204,6 +207,7 @@ return {
                 ellipsis = false,
                 text = function(ctx)
                   local icon = ctx.kind_icon
+                  local kind_icons = require('config.defaults').icons.kinds
                   -- Show icon of file when source is Path
                   if
                     vim.tbl_contains(
@@ -215,7 +219,6 @@ return {
                       require('nvim-web-devicons').get_icon(ctx.label)
                     if dev_icon then icon = dev_icon end
                   else
-                    local kind_icons = require('config.defaults').icons.kinds
                     if kind_icons[ctx.source_name] then
                       icon = kind_icons[ctx.source_name]
                     else

@@ -10,7 +10,8 @@ return {
       automatic_installation = false,
     },
     config = function(_, opts)
-      for name, language in pairs(require('config.languages')) do
+      local languages = require('config.languages')
+      for name, language in pairs(languages) do
         if language.dap then
           -- install server of language in bundle languages
           if vim.list_contains(_G.bundle_languages, name) then

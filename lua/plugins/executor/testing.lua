@@ -1,14 +1,17 @@
+local languages = require('config.languages')
 local not_supported_filetypes = {}
-local languages_list = vim.tbl_filter(function(config)
-  if type(config.test) ~= 'table' then return true end
-  local vim_test_supported = false
-  for _, adapter in ipairs(config.test) do
-    if adapter.test == 'vim-test' then vim_test_supported = true end
+for _, language in pairs(languages) do
+  if type(language.test) ~= 'table' then
+    vim.list_extend(not_supported_filetypes, language.filetypes)
+  else
+    local vim_test_supported = false
+    for _, adapter in ipairs(language.test) do
+      if adapter == 'vim-test' then vim_test_supported = true end
+    end
+    if not vim_test_supported then
+      vim.list_extend(not_supported_filetypes, language.filetypes)
+    end
   end
-  return not vim_test_supported
-end, require('config.languages'))
-for _, config in pairs(languages_list) do
-  vim.list_extend(not_supported_filetypes, config.filetypes)
 end
 return {
   -- Test integration

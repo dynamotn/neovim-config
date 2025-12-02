@@ -47,6 +47,31 @@
 ---@field enabled? boolean
 ---@field package string
 
+---@type table<string, {filetypes: string[]}>
+local reuse_filetypes = {
+  bash = {
+    filetypes = {
+      'sh',
+      'bats',
+      'sh.ebuild',
+      'sh.PKGBUILD',
+    },
+  },
+  yaml = {
+    filetypes = {
+      'yaml',
+      'yaml.gitlab',
+      'yaml.gh-action',
+      'yaml.az-pl',
+      'yaml.docker-compose',
+      'yaml.helm-values',
+    },
+  },
+  dockerfile = {
+    filetypes = { 'dockerfile' },
+  },
+}
+
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
 
@@ -179,17 +204,14 @@ return {
     end,
     -- See rules API: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
     autopairs = function(_, rule, cond, _)
-      local languages_list = require('config.languages')
-      local equal_rule_ignored_filetypes = function()
-        local result = vim.list_extend({}, languages_list.bash.filetypes)
-        result = vim.list_extend(result, languages_list.yaml.filetypes)
-        result = vim.list_extend(result, languages_list.dockerfile.filetypes)
-        result = vim.list_extend(result, { 'gitattributes' })
-        for i, filetype in ipairs(result) do
-          result[i] = '-' .. filetype
-        end
-        return result
-      end
+      local ignore_filetypes = { 'gitattributes' }
+      vim.list_extend(ignore_filetypes, reuse_filetypes.bash.filetypes)
+      vim.list_extend(ignore_filetypes, reuse_filetypes.yaml.filetypes)
+      vim.list_extend(ignore_filetypes, reuse_filetypes.dockerfile.filetypes)
+      local equal_rule_ignored_filetypes = vim.tbl_map(
+        function(ft) return '-' .. ft end,
+        ignore_filetypes
+      )
 
       return {
         -- Add spaces between parentheses
@@ -238,7 +260,7 @@ return {
           :set_end_pair_length(0),
 
         -- Add space on equal sign
-        rule('=', ' ', equal_rule_ignored_filetypes())
+        rule('=', ' ', equal_rule_ignored_filetypes)
           :with_pair(cond.not_inside_quote())
           :with_pair(function(opts)
             local last_char = opts.line:sub(opts.col - 1, opts.col - 1)
@@ -295,12 +317,7 @@ return {
     formatters = { 'clang-format' },
   },
   bash = {
-    filetypes = {
-      'sh',
-      'bats',
-      'sh.ebuild',
-      'sh.PKGBUILD',
-    },
+    filetypes = reuse_filetypes.bash.filetypes,
     parsers = { 'bash' },
     lsp_servers = { 'bashls', 'termuxls', 'harper_ls' },
     -- linters = { 'shellcheck' }, # bashls cover it
@@ -689,7 +706,7 @@ return {
     },
   },
   dockerfile = {
-    filetypes = { 'dockerfile' },
+    filetypes = reuse_filetypes.dockerfile.filetypes,
     parsers = { 'dockerfile' },
     lsp_servers = { 'dockerls' },
     linters = { 'hadolint' },
@@ -940,14 +957,7 @@ return {
     parsers = { 'xml' },
   },
   yaml = {
-    filetypes = {
-      'yaml',
-      'yaml.gitlab',
-      'yaml.gh-action',
-      'yaml.az-pl',
-      'yaml.docker-compose',
-      'yaml.helm-values',
-    },
+    filetypes = reuse_filetypes.yaml.filetypes,
     parsers = { 'yaml' },
     lsp_servers = {
       'yamlls',
