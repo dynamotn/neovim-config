@@ -79,9 +79,7 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
         },
         opts = {
           adapters = {
-            ['neotest-dotnet'] = {
-              dap = { justMyCode = false },
-            },
+            ['neotest-vstest'] = {},
           },
         },
       },

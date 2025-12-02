@@ -287,7 +287,11 @@ return {
     },
     formatters = {
       'biome',
-      { 'html_beautify', command = 'js-beautify' },
+      {
+        'html_beautify',
+        command = 'js-beautify',
+        mason = { package = 'js-beautify' },
+      },
     },
   },
   arduino = { -- See `cpp`
@@ -384,7 +388,11 @@ return {
     parsers = { 'go' },
     lsp_servers = { 'gopls', 'harper_ls' },
     linters = {
-      { 'golangcilint', mason = { package = 'golangci-lint' } },
+      {
+        'golangcilint',
+        command = 'golangci-lint',
+        mason = { package = 'golangci-lint' },
+      },
     },
     formatters = { 'goimports', 'gofumpt' },
     null_ls = {
@@ -488,7 +496,13 @@ return {
     parsers = { 'php' },
     lsp_servers = { 'intelephense', 'harper_ls' },
     linters = { 'phpcs' },
-    formatters = { 'php_cs_fixer' },
+    formatters = {
+      {
+        'php_cs_fixer',
+        command = 'php-cs-fixer',
+        mason = { package = 'php-cs-fixer' },
+      },
+    },
     dap = { 'php' },
     test = { 'neotest-phpunit' },
   },
@@ -525,8 +539,21 @@ return {
       },
     },
     lsp_servers = { 'ruby_lsp', 'tailwindcss', 'harper_ls' },
-    linters = { 'erb_lint', 'html_beautify' },
-    formatters = { 'erb_formatter' },
+    linters = {
+      { 'erb_lint', command = 'erb-lint', mason = { package = 'erb-lint' } },
+    },
+    formatters = {
+      {
+        'erb_formatter',
+        command = 'erb-formatter',
+        mason = { package = 'erb-formatter' },
+      },
+      {
+        'html_beautify',
+        command = 'js-beautify',
+        mason = { package = 'js-beautify' },
+      },
+    },
   },
   ruby = {
     filetypes = { 'ruby' },
@@ -541,7 +568,7 @@ return {
     filetypes = { 'rust' },
     parsers = { 'rust' },
     lsp_servers = { 'rust_analyzer', 'harper_ls' },
-    formatters = { 'rust_analyzer' },
+    formatters = { 'rustfmt' },
     dap = { 'codelldb' },
   },
   sass = {
@@ -561,7 +588,9 @@ return {
     filetypes = { 'solidity' },
     parsers = { 'solidity' },
     lsp_servers = { 'solang' },
-    formatters = { 'forge_fmt' },
+    formatters = {
+      { 'forge_fmt', command = 'forge', mason = { enabled = false } },
+    },
   },
   sql = {
     filetypes = { 'sql', 'mysql', 'plsql' },
@@ -656,6 +685,9 @@ return {
     filetypes = { 'zig' },
     parsers = { 'zig' },
     lsp_servers = { 'zls' },
+    formatters = {
+      { 'zigfmt', command = 'zig', mason = { enabled = false } },
+    },
   },
   ------------------------------------ {
 
@@ -665,6 +697,9 @@ return {
     parsers = { 'yaml' },
     lsp_servers = { 'ansiblels' },
     linters = { 'ansible-lint', 'yamllint' },
+    formatters = {
+      'yamlfmt',
+    },
   },
   awk = {
     filetypes = { 'awk' },
@@ -677,28 +712,46 @@ return {
       },
     },
     lsp_servers = { 'awk_ls' },
-    linters = { 'gawk' },
-    formatters = { 'gawk' },
+    linters = {
+      { 'gawk', mason = { enabled = false } },
+    },
+    formatters = {
+      { 'gawk', mason = { enabled = false } },
+    },
   },
   beancount = {
     filetypes = { 'beancount' },
     parsers = { 'beancount' },
     lsp_servers = { 'beancount' },
-    linters = { 'bean_check' },
-    formatters = { 'bean-format' },
+    linters = {
+      { 'bean_check', command = 'bean-check', mason = { enabled = false } },
+    },
+    formatters = {
+      { 'bean-format', mason = { enabled = false } },
+    },
   },
   bicep = {
     filetypes = { 'bicep' },
     parsers = { 'bicep' },
-    lsp_servers = { 'bicep' },
-    formatters = { 'bicep' },
+    lsp_servers = {
+      { 'bicep', mason = { enabled = false } },
+    },
+    formatters = {
+      { 'bicep', mason = { enabled = false } },
+    },
   },
   cmake = {
     filetypes = { 'cmake' },
     parsers = { 'cmake' },
     lsp_servers = { 'neocmake', 'harper_ls' },
     linters = { 'cmakelint' },
-    formatters = { 'cmake_format' },
+    formatters = {
+      {
+        'cmake_format',
+        command = 'cmake-format',
+        mason = { enabled = false },
+      },
+    },
   },
   csv = {
     filetypes = { 'csv' },
@@ -818,7 +871,7 @@ return {
     lsp_servers = { 'hyprls' },
   },
   ini = {
-    filetypes = { 'ini' },
+    filetypes = { 'ini', 'dosini' },
     parsers = { 'ini' },
   },
   json = {
@@ -888,13 +941,18 @@ return {
     filetypes = { 'nginx' },
     parsers = { 'nginx' },
     lsp_servers = { 'nginx_language_server' },
-    formatters = { 'nginxfmt' },
+    formatters = {
+      { 'nginxfmt', command = 'nginxfmt.py', mason = { enabled = false } },
+    },
   },
   nix = {
     filetypes = { 'nix' },
     parsers = { 'nix' },
     lsp_servers = { 'nil_ls', 'harper_ls' },
-    linters = { 'nix', 'statix' },
+    linters = {
+      { 'nix', command = 'nix', mason = { enabled = false } },
+      { 'statix', command = 'statix', mason = { enabled = false } },
+    },
     formatters = { 'nixfmt' },
     null_ls = {
       { 'statix', type = 'code_actions', command = 'statix' },
@@ -971,9 +1029,12 @@ return {
     otter = true,
   },
   treesitter = {
-    filetypes = { 'scheme' },
+    filetypes = { 'query' },
     parsers = { 'query' },
-    formatters = { 'format-queries' },
+    lsp_servers = { 'ts_query_ls' },
+    formatters = {
+      { 'format-queries', command = 'lua', mason = { enabled = false } },
+    },
   },
   xml = {
     filetypes = { 'xml' },
