@@ -141,20 +141,6 @@ return {
         cyclic = true,
       })
 
-      local weekdays = augend.constant.new({
-        elements = {
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday',
-          'Sunday',
-        },
-        word = true,
-        cyclic = true,
-      })
-
       local months = augend.constant.new({
         elements = {
           'January',
@@ -174,12 +160,6 @@ return {
         cyclic = true,
       })
 
-      local capitalized_boolean = augend.constant.new({
-        elements = { 'True', 'False' },
-        word = true,
-        cyclic = true,
-      })
-
       local log_level = augend.constant.new({
         elements = { 'trace', 'debug', 'info', 'warn', 'error', 'fatal' },
         word = true,
@@ -192,11 +172,12 @@ return {
         augend.integer.alias.hex, -- nonnegative hex number  (0x01, 0x1a1f, etc.)
         augend.date.alias['%Y/%m/%d'], -- date (2022/02/19, etc.)
         augend.date.alias['%d/%m/%Y'], -- date (19/02/2022, ...)
-        capitalized_boolean,
         augend.constant.alias.bool, -- boolean value (true <-> false)
+        augend.constant.alias.Bool, -- boolean value (True <-> False)
         augend.semver.alias.semver, -- semver
         ordinal_numbers,
-        weekdays,
+        augend.constant.alias.en_weekday, -- Mon, Tue, ..., Sat, Sun
+        augend.constant.alias.en_weekday_full, -- Monday, Tuesday, ..., Saturday, Sunday
         months,
         logical_alias,
         log_level,
