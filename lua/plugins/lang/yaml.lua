@@ -1,7 +1,6 @@
 local language = require('config.languages').yaml
 local condition = vim.list_contains(_G.enabled_languages, 'yaml')
   or vim.list_contains(_G.enabled_languages, 'ansible')
-  or vim.list_contains(_G.enabled_languages, 'openapi')
 local icons = require('config.defaults').icons
 
 return condition

@@ -19,6 +19,7 @@ vim.filetype.add({
     ['.git/ignore'] = 'gitignore',
     ['terragrunt.hcl'] = 'terragrunt',
     ['azure-pipelines.yml'] = 'yaml.az-pl',
+    ['docker-compose.yml'] = 'yaml.docker-compose',
     ['PKGBUILD'] = 'sh.PKGBUILD',
   },
   pattern = {

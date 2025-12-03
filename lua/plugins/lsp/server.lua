@@ -159,13 +159,21 @@ return {
                 'mason_lsp_' .. name .. '_' .. server,
                 {}
               ),
-              callback = function()
-                local server_package = mason_configs[server]
-                if
-                  server_package ~= nil
-                  and not require('mason-registry').is_installed(server_package)
-                then
-                  require('mason.api.command').MasonInstall({ server_package })
+              callback = function(args)
+                local lsp_config = vim.lsp.config[server]
+                if lsp_config == nil or lsp_config.filetypes == nil then
+                  return
+                end
+                if vim.tbl_contains(lsp_config.filetypes, args.match) then
+                  local server_package = mason_configs[server]
+                  if
+                    server_package ~= nil
+                    and not require('mason-registry').is_installed(
+                      server_package
+                    )
+                  then
+                    require('mason.api.command').MasonInstall({ server_package })
+                  end
                 end
               end,
             })
