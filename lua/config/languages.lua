@@ -951,6 +951,20 @@ return {
     parser = 'promql',
     lsp_servers = { 'promqlls' },
   },
+  rego = {
+    filetypes = { 'rego' },
+    parser = 'rego',
+    lsp_servers = { 'regal' },
+    linters = {
+      { 'opa_check', command = 'opa', mason = { package = 'opa' } },
+    },
+    formatters = {
+      { 'opa_fmt', command = 'opa', mason = { package = 'opa' } },
+    },
+    null_ls = {
+      { 'regal', type = 'code_actions', command = 'regal' },
+    },
+  },
   systemd = {
     filetypes = { 'systemd' },
     parser = nil,
