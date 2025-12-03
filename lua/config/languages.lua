@@ -951,6 +951,17 @@ return {
     parser = 'promql',
     lsp_servers = { 'promqlls' },
   },
+  proto = {
+    filetypes = { 'proto' },
+    parser = 'proto',
+    lsp_servers = { 'buf_ls' },
+    linters = {
+      { 'buf_lint', command = 'buf', mason = { package = 'buf' } },
+    },
+    formatters = {
+      { 'buf', mason = { package = 'buf' } },
+    },
+  },
   rego = {
     filetypes = { 'rego' },
     parser = 'rego',
