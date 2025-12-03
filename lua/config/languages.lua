@@ -74,6 +74,15 @@ local reuse_filetypes = {
 }
 local injected_formatter =
   { 'injected', command = 'lua', mason = { enabled = false } }
+local ltcc_code_action =
+  { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true }
+local ltcc_diagnostics =
+  { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true }
+local html_beautify_formatter = {
+  'html_beautify',
+  command = 'js-beautify',
+  mason = { package = 'js-beautify' },
+}
 
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
@@ -288,14 +297,7 @@ return {
         mason = { package = 'biome' },
       },
     },
-    formatters = {
-      'biome',
-      {
-        'html_beautify',
-        command = 'js-beautify',
-        mason = { package = 'js-beautify' },
-      },
-    },
+    formatters = { 'biome', html_beautify_formatter },
   },
   arduino = { -- See `cpp`
     filetypes = { 'arduino' },
@@ -355,8 +357,8 @@ return {
     linters = { 'stylelint' },
     formatters = { 'prettier' },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
     },
     dial = function(augend)
       return {
@@ -407,13 +409,7 @@ return {
     filetypes = { 'html' },
     parser = 'html',
     lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
-    formatters = {
-      {
-        'html_beautify',
-        command = 'js-beautify',
-        mason = { package = 'js-beautify' },
-      },
-    },
+    formatters = { html_beautify_formatter },
   },
   java = {
     filetypes = { 'java' },
@@ -550,11 +546,7 @@ return {
         command = 'erb-formatter',
         mason = { package = 'erb-formatter' },
       },
-      {
-        'html_beautify',
-        command = 'js-beautify',
-        mason = { package = 'js-beautify' },
-      },
+      html_beautify_formatter,
     },
   },
   ruby = {
@@ -602,8 +594,8 @@ return {
       { 'sqlfluff', opts = { args = { 'format', '--dialect=ansi', '-' } } },
     },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
     },
   },
   typescript = {
@@ -783,8 +775,8 @@ return {
     lsp_servers = { 'dockerls' },
     linters = { 'hadolint' },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
     },
   },
   gitcommit = {
@@ -882,8 +874,8 @@ return {
     parser = 'make',
     lsp_servers = { 'autotools_ls' },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
     },
   },
   markdown = {
@@ -973,8 +965,8 @@ return {
       { 'tofu_fmt', command = 'tofu', mason = { enabled = false } },
     },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
       {
         'opentofu_validate',
         type = 'diagnostics',
@@ -995,8 +987,8 @@ return {
       },
     },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
       {
         'terragrunt_validate',
         type = 'diagnostics',
@@ -1046,8 +1038,8 @@ return {
       injected_formatter,
     },
     null_ls = {
-      { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
-      { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true },
+      ltcc_code_action,
+      ltcc_diagnostics,
     },
   },
   yuck = {
