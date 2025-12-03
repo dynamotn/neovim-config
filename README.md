@@ -10,9 +10,9 @@
 
 - [Features](#features)
 - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
-  - [Languages](#languages)
-  - [Frameworks](#frameworks)
-  - [Tools & Markup](#tools--markup)
+  * [Languages](#languages)
+  * [Frameworks](#frameworks)
+  * [Tools & Markup](#tools--markup)
 - [Installation](#installation)
 - [Key bindings](#key-bindings)
 - [Benchmark](#benchmark)

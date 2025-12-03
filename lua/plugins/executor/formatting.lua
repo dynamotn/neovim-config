@@ -8,8 +8,16 @@ return {
         args = { ':a;N;$!ba;s/\\n\\n\\+/\\n\\n/g' },
       }
 
+      local lang_to_ft = {}
       local languages = require('config.languages')
       for name, language in pairs(languages) do
+        -- Map language to filetypes
+        if
+          languages.formatters and not vim.tbl_isempty(languages.formatters)
+        then
+          lang_to_ft[language.parser] = language.filetypes
+        end
+
         for _, ft in ipairs(language.filetypes) do
           opts.formatters_by_ft[ft] = {}
           for _, tool in ipairs(language.formatters or {}) do
@@ -39,6 +47,14 @@ return {
           end
         end
       end
+
+      require('conform').formatters.injected = {
+        options = {
+          ignore_errors = true,
+          lang_to_ft = lang_to_ft,
+          lang_to_ext = {},
+        },
+      }
     end,
   },
   {

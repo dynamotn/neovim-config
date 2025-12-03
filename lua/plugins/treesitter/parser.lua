@@ -24,9 +24,10 @@ return {
       -- Setup treesitter parser to work with defined filetypes
       local parsers = require('nvim-treesitter.parsers')
       for name, language in pairs(require('config.languages')) do
-        for _, parser in ipairs(language.parsers or {}) do
+        if language.parser then
           -- Get my config
           local parser_name = ''
+          local parser = language.parser
           if type(parser) == 'string' then
             parser_name = parser
           elseif type(parser) == 'table' then

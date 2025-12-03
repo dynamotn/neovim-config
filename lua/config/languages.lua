@@ -1,6 +1,6 @@
 ---@class DyLangSpec
 ---@field filetypes string[]
----@field parsers (string|DyParserSpec)[]
+---@field parser string|DyParserSpec
 ---@field lsp_servers? (string|DyLspSpec)[]
 ---@field linters? (string|DyLinterSpec)[]
 ---@field formatters? (string|DyFormatterSpec)[]
@@ -65,12 +65,15 @@ local reuse_filetypes = {
       'yaml.az-pl',
       'yaml.docker-compose',
       'yaml.helm-values',
+      'yaml.openapi',
     },
   },
   dockerfile = {
     filetypes = { 'dockerfile' },
   },
 }
+local injected_formatter =
+  { 'injected', command = 'lua', mason = { enabled = false } }
 
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
@@ -79,7 +82,7 @@ return {
   -- For all filetypes
   ['*'] = {
     filetypes = { '*' },
-    parsers = {},
+    parser = nil,
     lsp_servers = {
       {
         'sonarlint',
@@ -276,7 +279,7 @@ return {
   -- Programming language & Frameworks {
   angular = { -- See `html` and `typescript`
     filetypes = { 'htmlangular' },
-    parsers = { 'angular' },
+    parser = 'angular',
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = {
       {
@@ -296,14 +299,14 @@ return {
   },
   arduino = { -- See `cpp`
     filetypes = { 'arduino' },
-    parsers = { 'cpp' },
+    parser = 'cpp',
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
     linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
   },
   bash = {
     filetypes = reuse_filetypes.bash.filetypes,
-    parsers = { 'bash' },
+    parser = 'bash',
     lsp_servers = { 'bashls', 'termuxls', 'harper_ls' },
     -- linters = { 'shellcheck' }, # bashls cover it
     formatters = {
@@ -324,7 +327,7 @@ return {
   },
   cpp = {
     filetypes = { 'c', 'cpp' },
-    parsers = { 'cpp' },
+    parser = 'cpp',
     lsp_servers = { 'clangd', 'harper_ls' },
     linters = { { 'clang-tidy', mason = { enabled = false } } },
     formatters = { 'clang-format' },
@@ -333,7 +336,7 @@ return {
   },
   c_sharp = {
     filetypes = { 'cs' },
-    parsers = { 'c_sharp' },
+    parser = 'c_sharp',
     lsp_servers = { 'omnisharp', 'harper_ls' },
     formatters = {
       {
@@ -347,7 +350,7 @@ return {
   },
   css = {
     filetypes = { 'css', 'less' },
-    parsers = { 'css' },
+    parser = 'css',
     lsp_servers = { 'tailwindcss' },
     linters = { 'stylelint' },
     formatters = { 'prettier' },
@@ -364,19 +367,17 @@ return {
   },
   cucumber = {
     filetypes = { 'cucumber' },
-    parsers = {
-      {
-        'gherkin',
-        install_info = {
-          url = 'https://github.com/binhtran432k/tree-sitter-gherkin',
-        },
+    parser = {
+      'gherkin',
+      install_info = {
+        url = 'https://github.com/binhtran432k/tree-sitter-gherkin',
       },
     },
     lsp_servers = { 'cucumber_language_server' },
   },
   fish = {
     filetypes = { 'fish' },
-    parsers = { 'fish' },
+    parser = 'fish',
     lsp_servers = { 'fish_lsp' },
     linters = {
       { 'fish', mason = { enabled = false } },
@@ -385,7 +386,7 @@ return {
   },
   go = {
     filetypes = { 'go' },
-    parsers = { 'go' },
+    parser = 'go',
     lsp_servers = { 'gopls', 'harper_ls' },
     linters = {
       {
@@ -401,19 +402,22 @@ return {
     },
     dap = { 'delve' },
     test = { 'neotest-golang' },
-    linguist = { 'go' },
   },
   html = {
     filetypes = { 'html' },
-    parsers = { 'html' },
+    parser = 'html',
     lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
     formatters = {
-      { 'html_beautify', command = 'js-beautify' },
+      {
+        'html_beautify',
+        command = 'js-beautify',
+        mason = { package = 'js-beautify' },
+      },
     },
   },
   java = {
     filetypes = { 'java' },
-    parsers = { 'java' },
+    parser = 'java',
     lsp_servers = { 'jdtls', 'harper_ls' },
     dap = { 'javadbg' },
     test = { 'neotest-java' },
@@ -429,7 +433,7 @@ return {
   },
   latex = {
     filetypes = { 'tex' },
-    parsers = { 'latex' },
+    parser = 'latex',
     lsp_servers = { 'ltex', 'texlab' },
     formatters = { 'tex-fmt' },
     autopairs = function(filetypes, rule, cond)
@@ -477,7 +481,7 @@ return {
   },
   lua = {
     filetypes = { 'lua' },
-    parsers = { 'lua' },
+    parser = 'lua',
     lsp_servers = { 'lua_ls', 'harper_ls' },
     formatters = { 'stylua' },
     dial = function(augend)
@@ -493,7 +497,7 @@ return {
   },
   php = {
     filetypes = { 'php' },
-    parsers = { 'php' },
+    parser = 'php',
     lsp_servers = { 'intelephense', 'harper_ls' },
     linters = { 'phpcs' },
     formatters = {
@@ -508,7 +512,7 @@ return {
   },
   python = {
     filetypes = { 'python' },
-    parsers = { 'python' },
+    parser = 'python',
     lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
     linters = { 'ruff' },
     formatters = {
@@ -530,12 +534,10 @@ return {
   },
   rails = { -- See `ruby` and `html`
     filetypes = { 'eruby' },
-    parsers = {
-      {
-        'embedded_template',
-        install_info = {
-          url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
-        },
+    parser = {
+      'embedded_template',
+      install_info = {
+        url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
       },
     },
     lsp_servers = { 'ruby_lsp', 'tailwindcss', 'harper_ls' },
@@ -557,7 +559,7 @@ return {
   },
   ruby = {
     filetypes = { 'ruby' },
-    parsers = { 'ruby' },
+    parser = 'ruby',
     lsp_servers = { 'ruby_lsp', 'harper_ls' },
     linters = { 'rubocop' },
     formatters = { 'rubocop' },
@@ -566,14 +568,14 @@ return {
   },
   rust = {
     filetypes = { 'rust' },
-    parsers = { 'rust' },
+    parser = 'rust',
     lsp_servers = { 'rust_analyzer', 'harper_ls' },
     formatters = { 'rustfmt' },
     dap = { 'codelldb' },
   },
   sass = {
     filetypes = { 'scss', 'sass' },
-    parsers = { 'scss' },
+    parser = 'scss',
     lsp_servers = { 'tailwindcss' },
     linters = { 'stylelint' },
     formatters = { 'prettier' },
@@ -586,7 +588,7 @@ return {
   },
   solidity = {
     filetypes = { 'solidity' },
-    parsers = { 'solidity' },
+    parser = 'solidity',
     lsp_servers = { 'solang' },
     formatters = {
       { 'forge_fmt', command = 'forge', mason = { enabled = false } },
@@ -594,7 +596,7 @@ return {
   },
   sql = {
     filetypes = { 'sql', 'mysql', 'plsql' },
-    parsers = { 'sql' },
+    parser = 'sql',
     linters = { 'sqlfluff' },
     formatters = {
       { 'sqlfluff', opts = { args = { 'format', '--dialect=ansi', '-' } } },
@@ -613,7 +615,7 @@ return {
       'javascript.jsx',
       'typescript.tsx',
     },
-    parsers = { 'javascript' },
+    parser = 'javascript',
     lsp_servers = { 'vtsls', 'harper_ls' },
     linters = {
       {
@@ -657,13 +659,13 @@ return {
   },
   typst = {
     filetypes = { 'typst' },
-    parsers = { 'typst' },
+    parser = 'typst',
     lsp_servers = { 'tinymist' },
     formatters = { 'typstyle' },
   },
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
-    parsers = { 'vue' },
+    parser = 'vue',
     lsp_servers = { 'vue_ls', 'vtsls', 'tailwindcss', 'harper_ls' },
     dial = function(augend)
       return {
@@ -683,7 +685,7 @@ return {
   },
   zig = {
     filetypes = { 'zig' },
-    parsers = { 'zig' },
+    parser = 'zig',
     lsp_servers = { 'zls' },
     formatters = {
       { 'zigfmt', command = 'zig', mason = { enabled = false } },
@@ -694,7 +696,7 @@ return {
   -- Tools & Markup {
   ansible = { -- See `yaml`
     filetypes = { 'yaml.ansible' },
-    parsers = { 'yaml' },
+    parser = 'yaml',
     lsp_servers = { 'ansiblels' },
     linters = { 'ansible-lint', 'yamllint' },
     formatters = {
@@ -703,12 +705,10 @@ return {
   },
   awk = {
     filetypes = { 'awk' },
-    parsers = {
-      {
-        'awk',
-        install_info = {
-          url = 'https://github.com/Beaglefoot/tree-sitter-awk',
-        },
+    parser = {
+      'awk',
+      install_info = {
+        url = 'https://github.com/Beaglefoot/tree-sitter-awk',
       },
     },
     lsp_servers = { 'awk_ls' },
@@ -721,7 +721,7 @@ return {
   },
   beancount = {
     filetypes = { 'beancount' },
-    parsers = { 'beancount' },
+    parser = 'beancount',
     lsp_servers = { 'beancount' },
     linters = {
       { 'bean_check', command = 'bean-check', mason = { enabled = false } },
@@ -732,7 +732,7 @@ return {
   },
   bicep = {
     filetypes = { 'bicep' },
-    parsers = { 'bicep' },
+    parser = 'bicep',
     lsp_servers = {
       { 'bicep', mason = { enabled = false } },
     },
@@ -742,7 +742,7 @@ return {
   },
   cmake = {
     filetypes = { 'cmake' },
-    parsers = { 'cmake' },
+    parser = 'cmake',
     lsp_servers = { 'neocmake', 'harper_ls' },
     linters = { 'cmakelint' },
     formatters = {
@@ -755,16 +755,14 @@ return {
   },
   csv = {
     filetypes = { 'csv' },
-    parsers = { 'csv' },
+    parser = 'csv',
   },
   d2 = {
     filetypes = { 'd2' },
-    parsers = {
-      {
-        'd2',
-        install_info = {
-          url = 'https://github.com/madmaxieee/tree-sitter-d2',
-        },
+    parser = {
+      'd2',
+      install_info = {
+        url = 'https://github.com/madmaxieee/tree-sitter-d2',
       },
     },
     linter = { 'd2' },
@@ -772,18 +770,16 @@ return {
   },
   dbml = {
     filetypes = { 'dbml' },
-    parsers = {
-      {
-        'dbml',
-        install_info = {
-          url = 'https://github.com/dynamotn/tree-sitter-dbml',
-        },
+    parser = {
+      'dbml',
+      install_info = {
+        url = 'https://github.com/dynamotn/tree-sitter-dbml',
       },
     },
   },
   dockerfile = {
     filetypes = reuse_filetypes.dockerfile.filetypes,
-    parsers = { 'dockerfile' },
+    parser = 'dockerfile',
     lsp_servers = { 'dockerls' },
     linters = { 'hadolint' },
     null_ls = {
@@ -793,7 +789,7 @@ return {
   },
   gitcommit = {
     filetypes = { 'gitcommit' },
-    parsers = { 'gitcommit' },
+    parser = 'gitcommit',
     lsp_servers = { 'harper_ls' },
     linters = { 'gitlint' },
     null_ls = {
@@ -802,7 +798,7 @@ return {
   },
   gitrebase = {
     filetypes = { 'gitrebase' },
-    parsers = { 'git_rebase' },
+    parser = 'git_rebase',
     null_ls = {
       {
         'gitrebase',
@@ -814,17 +810,17 @@ return {
   },
   gomod = {
     filetypes = { 'gomod' },
-    parsers = { 'gomod' },
+    parser = 'gomod',
   },
   gosum = {
     filetypes = { 'gosum' },
-    parsers = { 'gosum' },
+    parser = 'gosum',
   },
   gotmpl = {
     filetypes = { 'gotmpl' },
-    parsers = { 'gotmpl' },
+    parser = 'gotmpl',
     formatters = {
-      -- { 'injected', command = 'lua', mason = { enabled = false } },
+      injected_formatter,
     },
     autopairs = function(filetypes, rule)
       return {
@@ -838,22 +834,22 @@ return {
   },
   gowork = {
     filetypes = { 'gowork' },
-    parsers = { 'gowork' },
+    parser = 'gowork',
   },
   groovy = {
     filetypes = { 'groovy' },
-    parsers = { 'groovy' },
+    parser = 'groovy',
     lsp_servers = { 'groovyls' },
     linters = { 'npm-groovy-lint' },
     formatters = { 'npm-groovy-lint' },
   },
   helm = { -- See `gotmpl`
-    filetypes = { 'helm', 'yaml.helm-values' },
-    parsers = { 'helm' },
+    filetypes = { 'helm' },
+    parser = 'helm',
     lsp_servers = { 'helm_ls' },
     linters = { 'trivy' },
     formatters = {
-      -- { 'injected', command = 'lua', mason = { enabled = false } },
+      injected_formatter,
     },
     autopairs = function(filetypes, rule)
       return {
@@ -867,23 +863,23 @@ return {
   },
   hyprlang = {
     filetypes = { 'hyprlang' },
-    parsers = { 'hyprlang' },
+    parser = 'hyprlang',
     lsp_servers = { 'hyprls' },
   },
   ini = {
     filetypes = { 'ini', 'dosini' },
-    parsers = { 'ini' },
+    parser = 'ini',
   },
   json = {
-    filetypes = { 'json', 'jsonc', 'json5' },
-    parsers = { 'json5' },
-    lsp_servers = { 'jsonls' },
+    filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },
+    parser = 'json5',
+    lsp_servers = { 'jsonls', 'vacuum' },
     linters = { 'jsonlint', 'trivy' },
     formatters = { 'jq' },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
-    parsers = { 'make' },
+    parser = 'make',
     lsp_servers = { 'autotools_ls' },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -892,11 +888,11 @@ return {
   },
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
-    parsers = { 'markdown' },
+    parser = 'markdown',
     lsp_servers = { 'marksman', 'harper_ls' },
     linters = { 'markdownlint-cli2' },
     formatters = {
-      -- { 'injected', command = 'lua', mason = { enabled = false } },
+      injected_formatter,
       {
         'markdown-toc',
         opts = {
@@ -939,7 +935,7 @@ return {
   },
   nginx = {
     filetypes = { 'nginx' },
-    parsers = { 'nginx' },
+    parser = 'nginx',
     lsp_servers = { 'nginx_language_server' },
     formatters = {
       { 'nginxfmt', command = 'nginxfmt.py', mason = { enabled = false } },
@@ -947,7 +943,7 @@ return {
   },
   nix = {
     filetypes = { 'nix' },
-    parsers = { 'nix' },
+    parser = 'nix',
     lsp_servers = { 'nil_ls', 'harper_ls' },
     linters = {
       { 'nix', command = 'nix', mason = { enabled = false } },
@@ -958,27 +954,19 @@ return {
       { 'statix', type = 'code_actions', command = 'statix' },
     },
   },
-  openapi = {
-    filetypes = { 'yaml.openapi', 'json.openapi' },
-    parsers = { 'yaml', 'json5' },
-    lsp_servers = { 'vacuum' },
-    linters = { 'yq' },
-    formatters = { 'yq' },
-  },
   promql = {
     filetypes = { 'promql' },
-    parsers = { 'promql' },
+    parser = 'promql',
     lsp_servers = { 'promqlls' },
-    linguist = { 'promql' },
   },
   systemd = {
     filetypes = { 'systemd' },
-    parsers = {},
+    parser = nil,
     lsp_servers = { 'systemd_ls' },
   },
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
-    parsers = { 'hcl', 'terraform' },
+    parser = 'terraform',
     lsp_servers = { 'terraformls' },
     linters = { 'tflint', 'trivy' },
     formatters = {
@@ -997,7 +985,7 @@ return {
   },
   terragrunt = {
     filetypes = { 'terragrunt' },
-    parsers = { 'hcl' },
+    parser = 'hcl',
     lsp_servers = { 'terragruntls' },
     formatters = {
       {
@@ -1020,17 +1008,17 @@ return {
   },
   toml = {
     filetypes = { 'toml' },
-    parsers = { 'toml' },
+    parser = 'toml',
     lsp_servers = { 'taplo', 'harper_ls' },
     formatters = {
       'taplo',
-      -- { 'injected', command = 'lua', mason = { enabled = false } },
+      injected_formatter,
     },
     otter = true,
   },
   treesitter = {
     filetypes = { 'query' },
-    parsers = { 'query' },
+    parser = 'query',
     lsp_servers = { 'ts_query_ls' },
     formatters = {
       { 'format-queries', command = 'lua', mason = { enabled = false } },
@@ -1038,22 +1026,24 @@ return {
   },
   xml = {
     filetypes = { 'xml' },
-    parsers = { 'xml' },
+    parser = 'xml',
   },
   yaml = {
     filetypes = reuse_filetypes.yaml.filetypes,
-    parsers = { 'yaml' },
+    parser = 'yaml',
     lsp_servers = {
       'yamlls',
       'gitlab_ci_ls',
       'gh_actions_ls',
       'azure_pipelines_ls',
       'docker_compose_language_service',
+      'helm_ls',
+      'vacuum',
     },
     linters = { 'yamllint', 'trivy' },
     formatters = {
       'yamlfmt',
-      -- { 'injected', command = 'lua', mason = { enabled = false } },
+      injected_formatter,
     },
     null_ls = {
       { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true },
@@ -1062,7 +1052,7 @@ return {
   },
   yuck = {
     filetypes = { 'yuck' },
-    parsers = { 'yuck' },
+    parser = 'yuck',
   },
   ----------------- }
 }

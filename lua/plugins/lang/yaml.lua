@@ -105,6 +105,12 @@ return condition
             docker_compose_language_service = {
               filetypes = { language.filetypes[5] },
             },
+            helm_ls = {
+              filetypes = { language.filetypes[6] },
+            },
+            vacuum = {
+              filetypes = { language.filetypes[7] },
+            },
           },
         },
       },

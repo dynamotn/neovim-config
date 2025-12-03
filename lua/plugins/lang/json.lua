@@ -30,6 +30,9 @@ return vim.list_contains(_G.enabled_languages, 'json')
                 },
               },
             },
+            vacuum = {
+              filetypes = { language.filetypes[4] },
+            },
           },
         },
       },
