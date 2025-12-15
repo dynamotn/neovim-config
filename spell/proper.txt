@@ -9,3 +9,4 @@ chezmoi
 Termux
 comtrya
 MacOS
+mise
