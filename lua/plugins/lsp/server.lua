@@ -33,10 +33,15 @@ return {
       },
     },
     opts = function(_, opts)
-      opts.servers.sonarlint = {
-        filetypes = { '*' },
-      }
-      opts.setup = {}
+      opts.servers = vim.tbl_deep_extend('force', opts.servers or {}, {
+        sonarlint = {
+          filetypes = { '*' },
+        },
+        copilot = {
+          filetypes = { '*' },
+        },
+      })
+      opts.setup = opts.setup or {}
       opts.folds.enabled = false
     end,
     ---@param opts PluginLspOpts
@@ -164,7 +169,10 @@ return {
                 if lsp_config == nil or lsp_config.filetypes == nil then
                   return
                 end
-                if vim.tbl_contains(lsp_config.filetypes, args.match) then
+                if
+                  vim.tbl_contains(lsp_config.filetypes, args.match)
+                  or vim.tbl_contains(lsp_config.filetypes, '*')
+                then
                   local server_package = mason_configs[server]
                   if
                     server_package ~= nil
