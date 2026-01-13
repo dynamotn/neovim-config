@@ -178,6 +178,12 @@ return {
         cyclic = true,
       })
 
+      local answer = augend.constant.new({
+        elements = { 'yes', 'no' },
+        word = true,
+        cyclic = true,
+      })
+
       return {
         augend.integer.alias.decimal, -- nonnegative decimal number (0, 1, 2, 3, ...)
         augend.integer.alias.decimal_int, -- nonnegative and negative decimal number
@@ -193,6 +199,7 @@ return {
         months,
         logical_alias,
         log_level,
+        answer,
       }
     end,
     -- See rules API: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
