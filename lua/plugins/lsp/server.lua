@@ -207,7 +207,7 @@ return {
           local server
           if type(lsp_server) == 'table' then
             server = lsp_server[1]
-            configure(server, lsp_server.enabled or false, name, language)
+            configure(server, lsp_server.enabled() or false, name, language)
           else
             server = lsp_server
             configure(server, true, name, language)

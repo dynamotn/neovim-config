@@ -22,7 +22,7 @@
 
 ---@class DyLspSpec
 ---@field [1] string
----@field enabled? boolean
+---@field enabled? fun(): boolean
 
 ---@class DyLinterSpec
 ---@field [1] string
@@ -95,7 +95,15 @@ return {
     lsp_servers = {
       {
         'sonarlint',
-        enabled = vim.fn.executable('java') == 1,
+        enabled = function()
+          return vim.fn.executable('java') == 1
+              and require('lazyvim.util.root').detect({
+                spec = { 'sonar-project.properties' },
+                all = false,
+              })[1]
+              and true
+            or false
+        end,
       },
       'copilot',
     },
@@ -732,9 +740,7 @@ return {
   bicep = {
     filetypes = { 'bicep' },
     parser = 'bicep',
-    lsp_servers = {
-      { 'bicep', mason = { enabled = false } },
-    },
+    lsp_servers = { 'bicep' },
     formatters = {
       { 'bicep', mason = { enabled = false } },
     },
