@@ -986,7 +986,7 @@ return {
   systemd = {
     filetypes = { 'systemd' },
     parser = nil,
-    lsp_servers = { 'systemd_ls' },
+    lsp_servers = { 'systemd_lsp' },
   },
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
