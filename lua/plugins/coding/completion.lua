@@ -222,9 +222,7 @@ return {
                     if kind_icons[ctx.source_name] then
                       icon = kind_icons[ctx.source_name]
                     else
-                      icon = require('lspkind').symbolic(ctx.kind, {
-                        mode = 'symbol',
-                      })
+                      icon = require('lspkind').symbol_map[ctx.kind] or ''
                     end
                   end
 
