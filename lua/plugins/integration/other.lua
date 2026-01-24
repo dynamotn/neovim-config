@@ -35,4 +35,21 @@ return {
       },
     },
   },
+  {
+    -- Input method switcher
+    'drop-stones/im-switch.nvim',
+    event = 'VeryLazy',
+    opts = {
+      macos = {
+        enabled = vim.loop.os_uname().sysname == 'Darwin',
+        default_im = 'com.apple.keylayout.USExtended',
+      },
+      linux = {
+        enabled = vim.loop.os_uname().sysname == 'Linux',
+        default_im = 'keyboard-us',
+        get_im_command = { 'fcitx5-remote', '-n' },
+        set_im_command = { 'fcitx5-remote', '-g', 'English' },
+      },
+    },
+  },
 }
