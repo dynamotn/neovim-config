@@ -43,6 +43,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         opts = {
           workspaces = _G.obsidian.vaults(),
           ui = { enable = false },
+          legacy_commands = false,
         },
         init = function()
           _G.completion_sources =
