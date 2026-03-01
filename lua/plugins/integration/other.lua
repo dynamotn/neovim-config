@@ -11,6 +11,14 @@ return {
     -- Translate
     'potamides/pantran.nvim',
     cmd = 'Pantran',
+    keys = {
+      {
+        '<leader>ct',
+        function() vim.api.nvim_command('Pantran') end,
+        desc = 'Translate',
+        mode = { 'n', 'x' },
+      },
+    },
     opts = {
       default_engine = 'google',
       engines = {
@@ -20,6 +28,9 @@ return {
             default_target = 'vi',
           },
         },
+      },
+      command = {
+        default_mode = 'hover',
       },
     },
   },
