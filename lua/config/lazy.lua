@@ -54,6 +54,7 @@ require('lazy').setup({
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
+    concurrency = 1,
   },
   performance = {
     cache = {
