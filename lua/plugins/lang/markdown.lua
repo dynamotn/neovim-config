@@ -39,7 +39,8 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         -- Obsidian
         'obsidian-nvim/obsidian.nvim',
         ft = language.filetypes,
-        enabled = _G.used_full_plugins or _G.enabled_plugins.obsidian,
+        enabled = #_G.obsidian.vaults() > 0
+          and (_G.used_full_plugins or _G.enabled_plugins.obsidian),
         opts = {
           workspaces = _G.obsidian.vaults(),
           ui = { enable = false },
