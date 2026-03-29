@@ -101,6 +101,7 @@ return {
       dap = ' ',
       fish = '󰈺 ',
       tmux = ' ',
+      zellij = ' ',
       kitty = ' ',
       git = ' ',
       emoji = '󰞅 ',

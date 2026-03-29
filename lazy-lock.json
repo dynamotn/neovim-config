@@ -5,6 +5,7 @@
   "SchemaStore.nvim": { "branch": "main", "commit": "24eeb97da8d605c480dc68bb6276248702e31d2a" },
   "blink-cmp-dictionary": { "branch": "master", "commit": "35142bba869b869715e91a99d2f46bcf93fca4ae" },
   "blink-cmp-tmux": { "branch": "main", "commit": "1ef35d8e388475ab8eaeecfc12e196c78bd5de04" },
+  "blink-cmp-zellij": { "branch": "main", "commit": "32d768868e7bc45b1270ebd92f009030eb59e2dd" },
   "blink-emoji.nvim": { "branch": "master", "commit": "066013e4c98a9318408ee3f1ca2dbcb6fa3e4c06" },
   "blink-nerdfont.nvim": { "branch": "main", "commit": "e5034457a0a3f3444c0a48af8f5d7db0ad02a204" },
   "blink-ripgrep.nvim": { "branch": "main", "commit": "e95d5fec4bbbba50dee95b3cd91a508db8721d04" },
