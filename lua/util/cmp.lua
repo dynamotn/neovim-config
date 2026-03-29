@@ -38,6 +38,7 @@ M.sources = function(filetype)
     typst = { 'nerdfont' },
     fish = { 'fish' },
     sql = { 'dadbod', 'sql' },
+    lua = { 'lazydev' },
   }
 
   if filetype == 'comment' then

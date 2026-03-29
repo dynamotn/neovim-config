@@ -117,7 +117,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         opts = {
           sources = {
             per_filetype = {
-              lua = cmp_util.sources('lazydev'),
+              lua = cmp_util.sources('lua'),
             },
             providers = {
               lazydev = {
