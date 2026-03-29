@@ -26,6 +26,7 @@ return {
       'nvim-treesitter',
       'ravitemer/mcphub.nvim', -- MCP Hub
       'ravitemer/codecompanion-history.nvim', -- History
+      'Davidyz/VectorCode', -- Indexing
     },
     init = function()
       _G.completion_sources =
@@ -166,6 +167,13 @@ return {
             dir_to_save = vim.fn.stdpath('data') .. '/codecompanion_chats.json',
           },
         },
+        vectorcode = {
+          opts = {
+            add_tool = true,
+            add_slash_command = true,
+          },
+          tool_opts = nil,
+        },
       },
     },
     keys = {
@@ -227,6 +235,17 @@ return {
         '<cmd>MCPHub<CR>',
         desc = 'MCPHub',
       },
+    },
+  },
+  {
+    -- Repository indexing tool for LLMs
+    'Davidyz/VectorCode',
+    version = '*',
+    enabled = vim.fn.executable('vectorcode') == 1,
+    build = 'uv tool upgrade vectorcode',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {
+      async_backend = 'lsp',
     },
   },
 }
