@@ -178,7 +178,7 @@ return {
         completion = {
           list = { selection = { preselect = false } },
           menu = {
-            auto_show = function(_) return vim.fn.getcmdtype() == ':' end,
+            auto_show = true,
           },
           ghost_text = { enabled = true },
         },
