@@ -72,6 +72,7 @@ return {
         help = 'Help Guide',
         terminal = 'Terminal',
         snacks_picker_list = 'Explorer',
+        codecompanion = 'Code Companion',
       }
     end,
     config = function(_, opts)

@@ -1,5 +1,5 @@
 local languages_list = require('config.languages')
-local markview_filetypes = {}
+local markview_filetypes = { 'codecompanion' }
 vim.list_extend(markview_filetypes, languages_list.markdown.filetypes)
 vim.list_extend(markview_filetypes, languages_list.html.filetypes)
 vim.list_extend(markview_filetypes, languages_list.typst.filetypes)
@@ -33,6 +33,7 @@ return {
     lazy = false,
     opts = {
       preview = {
+        filetypes = markview_filetypes,
         icon_provider = 'devicons',
         enable = true,
       },

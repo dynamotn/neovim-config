@@ -2,6 +2,7 @@
 return {
   colorscheme = 'catppuccin',
   icons = {
+    me = ' ',
     treesitter = {
       core = ' ',
       schema = '󰏃 ',
@@ -94,6 +95,7 @@ return {
 
       cmdline = ' ',
       copilot = ' ',
+      CodeCompanion = '󰚩 ',
       dictionary = ' ',
       calc = ' ',
       sql = ' ',
@@ -114,5 +116,6 @@ return {
     gl = 'https://gitlab.com/',
     dy = 'dynamo',
     tklt = 'takalinhtinh',
+    cc = 'CodeCompanion',
   },
 }
