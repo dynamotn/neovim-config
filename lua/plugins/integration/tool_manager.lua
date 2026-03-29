@@ -14,5 +14,12 @@ return {
         'github:mason-org/mason-registry',
       },
     },
+    keys = {
+      {
+        '<leader>m',
+        '<cmd>Mason<cr>',
+        desc = 'Mason',
+      },
+    },
   },
 }
