@@ -14,7 +14,8 @@ return {
   'mikavilpas/blink-ripgrep.nvim', -- Ripgrep
   'Kaiser-Yang/blink-cmp-dictionary', -- Dictionary source
   'hrsh7th/cmp-calc', -- Math calculation
-  'andersevenrud/cmp-tmux', -- Tmux buffer source
+  'mgalliou/blink-cmp-tmux', -- Tmux buffer source
+  'garyhurtz/blink_cmp_kitty', -- Kitty source
   'moyiz/blink-emoji.nvim', -- Emoji source
   'MahanRahmati/blink-nerdfont.nvim', -- Nerdfont source
   {
@@ -55,7 +56,8 @@ return {
       'cmp-fuzzy-path',
       'blink-cmp-dictionary',
       'cmp-calc',
-      'cmp-tmux',
+      'mgalliou/blink-cmp-tmux',
+      'blink_cmp_kitty',
       'cmp-dynamic',
       'blink-ripgrep.nvim',
       'blink-emoji.nvim',
@@ -72,7 +74,7 @@ return {
       },
       sources = {
         -- compatible sources from nvim-cmp
-        compat = { 'fuzzy_path', 'calc', 'tmux', 'dynamic' },
+        compat = { 'fuzzy_path', 'calc', 'dynamic' },
         providers = {
           path = {
             -- Path sources triggered by "/" interfere with CopilotChat commands
@@ -89,6 +91,21 @@ return {
                 vim.fn.expand('~/.config/dictionaries'),
               },
             },
+          },
+          -- tmux panes
+          tmux = {
+            module = 'blink-cmp-tmux',
+            name = 'tmux',
+            opts = {
+              panes = 'session',
+              capture_history = false,
+              triggered_only = false,
+            },
+          },
+          -- kitty windows
+          kitty = {
+            module = 'blink_cmp_kitty',
+            name = 'kitty',
           },
           -- ripgrep all files in folder
           ripgrep = {
@@ -277,6 +294,7 @@ return {
         dictionary = '「DICT」',
         calc = '「CALC」',
         tmux = '「MUX」',
+        kitty = '「TERM」',
         dynamic = '「MISC」',
         Cmdline = '「CMD」',
         emoji = '「EMOJI」',

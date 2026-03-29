@@ -100,6 +100,8 @@ return {
       dadbod = ' ',
       dap = ' ',
       fish = '󰈺 ',
+      tmux = ' ',
+      kitty = ' ',
       git = ' ',
       emoji = '󰞅 ',
       nerdfont = '󰀺 ',
