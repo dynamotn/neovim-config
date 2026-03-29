@@ -206,4 +206,27 @@ return {
       return opts
     end,
   },
+  {
+    -- MCP Hub integration for AI tools
+    'ravitemer/mcphub.nvim',
+    enabled = vim.fn.executable('npm') == 1,
+    build = vim.fn.executable('mise') == 1 and 'mise use -g npm:mcp-hub@latest'
+      or 'npm install -g mcp-hub@latest',
+    opts = {
+      auto_approve = true,
+      auto_toggle_mcp_servers = false,
+      ui = {
+        window = {
+          border = vim.o.winborder,
+        },
+      },
+    },
+    keys = {
+      {
+        '<leader>M',
+        '<cmd>MCPHub<CR>',
+        desc = 'MCPHub',
+      },
+    },
+  },
 }
