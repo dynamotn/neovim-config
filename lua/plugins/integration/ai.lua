@@ -23,7 +23,8 @@ return {
       'CodeCompanionSummaries',
     },
     dependencies = {
-      'nvim-treesitter',
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
       'ravitemer/mcphub.nvim', -- MCP Hub
       'ravitemer/codecompanion-history.nvim', -- History
       'Davidyz/VectorCode', -- Indexing

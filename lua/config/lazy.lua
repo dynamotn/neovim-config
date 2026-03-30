@@ -80,4 +80,7 @@ require('lazy').setup({
     },
   },
   debug = false,
+  rocks = {
+    enabled = false,
+  },
 })
