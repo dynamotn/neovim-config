@@ -2,7 +2,7 @@
 
 > My customization configuration for neovim
 
-[![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.11-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
+[![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.12-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -48,7 +48,7 @@
 
 > [!CAUTION]
 >
-> - Not used for neovim < 0.11 or vim (any version)
+> - Not used for neovim < 0.12 or vim (any version)
 > - Used for Linux only or Mac (not sure)
 
 ## Languages, Frameworks, or Tools support
