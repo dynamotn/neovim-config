@@ -56,6 +56,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
             { path = 'LazyVim', words = { 'LazyVim' } },
             { path = 'snacks.nvim', words = { 'Snacks' } },
             { path = 'lazy.nvim', words = { 'LazyVim' } },
+            { path = 'nvim-lspconfig', words = { 'lspconfig.settings' } },
             { path = 'dial.nvim' },
             { path = 'nvim-autopairs' },
             { path = 'nvim-treesitter' },
