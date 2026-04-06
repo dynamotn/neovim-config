@@ -1,6 +1,6 @@
 return {
   -- Project setting
-  { import = 'lazyvim.plugins.extras.lsp.neoconf' },
+  { 'mrjones2014/codesettings.nvim', lazy = false },
   {
     -- Integrate project management with which-key
     'folke/which-key.nvim',

@@ -7,11 +7,7 @@ return {
     config = function(_, opts)
       local null_ls = require('null-ls')
       opts.root_dir = opts.root_dir
-        or require('null-ls.utils').root_pattern(
-          '.neoconf.json',
-          'Makefile',
-          '.git'
-        )
+        or require('null-ls.utils').root_pattern('Makefile', '.git')
       opts.sources = {}
 
       -- Unified null_ls source configs

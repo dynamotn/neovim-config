@@ -35,6 +35,10 @@ return {
     opts = function(_, opts)
       opts.setup = opts.setup or {}
       opts.folds.enabled = false
+      opts.servers['*'].before_init = function(_, config)
+        local codesettings = require('codesettings')
+        codesettings.with_local_settings(config.name, config)
+      end
     end,
     ---@param opts PluginLspOpts
     config = function(_, opts)

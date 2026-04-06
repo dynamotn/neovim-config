@@ -60,7 +60,6 @@ return vim.list_contains(_G.enabled_languages, 'lua')
             { path = 'dial.nvim' },
             { path = 'nvim-autopairs' },
             { path = 'nvim-treesitter' },
-            { path = 'neoconf' },
           },
         },
       },
