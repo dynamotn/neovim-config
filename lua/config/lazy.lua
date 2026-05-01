@@ -38,6 +38,12 @@ require('lazy').setup({
         icons = defaults.icons,
       },
     },
+    {
+      -- Use the latest version of LazyVim
+      'LazyVim/LazyVim',
+      branch = 'main',
+      version = false,
+    },
     { import = 'plugins.ui' },
     { import = 'plugins.coding' },
     { import = 'plugins.treesitter' },
@@ -49,12 +55,12 @@ require('lazy').setup({
   },
   defaults = {
     lazy = true, -- Lazy loading all plugins
+    version = false, -- Prefer git commits over tagged releases
   },
   install = { colorscheme = { defaults.colorscheme } },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
-    concurrency = 1,
   },
   performance = {
     cache = {

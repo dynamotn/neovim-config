@@ -1,16 +1,4 @@
 return {
-  {
-    -- Fuzzy path source for cmdline
-    'tzachar/cmp-fuzzy-path',
-    dependencies = {
-      'tzachar/fuzzy.nvim',
-      dependencies = {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'make',
-        enabled = _G.used_full_plugins or vim.fn.executable('make') == 1,
-      },
-    },
-  },
   'mikavilpas/blink-ripgrep.nvim', -- Ripgrep
   'Kaiser-Yang/blink-cmp-dictionary', -- Dictionary source
   'hrsh7th/cmp-calc', -- Math calculation
@@ -54,7 +42,6 @@ return {
     dependencies = {
       'saghen/blink.compat',
       'onsails/lspkind.nvim', -- pictograms
-      'cmp-fuzzy-path',
       'blink-cmp-dictionary',
       'cmp-calc',
       'blink-cmp-tmux',
@@ -76,7 +63,7 @@ return {
       },
       sources = {
         -- compatible sources from nvim-cmp
-        compat = { 'fuzzy_path', 'calc', 'dynamic' },
+        compat = { 'calc', 'dynamic' },
         providers = {
           path = {
             -- Path sources triggered by "/" interfere with CopilotChat commands
@@ -167,10 +154,6 @@ return {
           cmdline = {
             score_offset = 20,
           },
-          fuzzy_path = {
-            min_keyword_length = 3,
-            score_offset = -20,
-          },
         },
         default = function() return require('util.cmp').setup_default_sources() end,
         per_filetype = {},
@@ -216,7 +199,7 @@ return {
           if type == '/' or type == '?' then return { 'buffer' } end
           -- Commands
           if type == ':' or type == '@' then
-            return { 'cmdline', 'path', 'fuzzy_path', 'buffer' }
+            return { 'cmdline', 'path', 'buffer' }
           end
           return {}
         end,
@@ -239,7 +222,7 @@ return {
                   -- Show icon of file when source is Path
                   if
                     vim.tbl_contains(
-                      { 'Path', 'fuzzy_path', 'project_path' },
+                      { 'Path', 'project_path' },
                       ctx.source_name
                     )
                   then
@@ -267,7 +250,7 @@ return {
                     )
                   if
                     vim.tbl_contains(
-                      { 'Path', 'fuzzy_path', 'project_path' },
+                      { 'Path', 'project_path' },
                       ctx.source_name
                     )
                   then
