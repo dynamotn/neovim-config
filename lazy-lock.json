@@ -6,6 +6,7 @@
   "VectorCode": { "branch": "main", "commit": "56f21eb1371c10e720e31b5621f8c9448da78748" },
   "async.nvim": { "branch": "main", "commit": "7a1d7d49933fbe902b84b55f352a3b10fd587331" },
   "blink-cmp-dictionary": { "branch": "master", "commit": "35142bba869b869715e91a99d2f46bcf93fca4ae" },
+  "blink-cmp-fuzzy-path": { "branch": "main", "commit": "e5ff41cf49531b3554ff0adab3dc4073e71d2016" },
   "blink-cmp-tmux": { "branch": "main", "commit": "1ef35d8e388475ab8eaeecfc12e196c78bd5de04" },
   "blink-cmp-zellij": { "branch": "main", "commit": "5c2a20cc170ba9320f9cd59f9b39a4b16012e019" },
   "blink-emoji.nvim": { "branch": "master", "commit": "dff709139ad5389fb55ebab026e75278a12b325a" },

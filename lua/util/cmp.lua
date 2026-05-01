@@ -24,6 +24,7 @@ M.sources = function(filetype)
     'lsp',
     'path',
     'project_path',
+    'fuzzy_path',
     'snippets',
     'buffer',
     'calc',

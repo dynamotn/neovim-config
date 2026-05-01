@@ -1,4 +1,5 @@
 return {
+  'dynamotn/blink-cmp-fuzzy-path', -- Fuzzy path source
   'mikavilpas/blink-ripgrep.nvim', -- Ripgrep
   'Kaiser-Yang/blink-cmp-dictionary', -- Dictionary source
   'hrsh7th/cmp-calc', -- Math calculation
@@ -42,6 +43,7 @@ return {
     dependencies = {
       'saghen/blink.compat',
       'onsails/lspkind.nvim', -- pictograms
+      'blink-cmp-fuzzy-path',
       'blink-cmp-dictionary',
       'cmp-calc',
       'blink-cmp-tmux',
@@ -145,6 +147,12 @@ return {
               get_cwd = function(_) return require('lazyvim.util.root').get() end,
             },
           },
+          fuzzy_path = {
+            module = 'blink-cmp-fuzzy-path',
+            name = 'fuzzy_path',
+            score_offset = 0,
+            min_keyword_length = 1,
+          },
           lsp = {
             score_offset = 20,
           },
@@ -199,7 +207,7 @@ return {
           if type == '/' or type == '?' then return { 'buffer' } end
           -- Commands
           if type == ':' or type == '@' then
-            return { 'cmdline', 'path', 'buffer' }
+            return { 'cmdline', 'fuzzy_path', 'path', 'buffer' }
           end
           return {}
         end,
@@ -222,7 +230,7 @@ return {
                   -- Show icon of file when source is Path
                   if
                     vim.tbl_contains(
-                      { 'Path', 'project_path' },
+                      { 'Path', 'project_path', 'fuzzy_path' },
                       ctx.source_name
                     )
                   then
@@ -250,7 +258,7 @@ return {
                     )
                   if
                     vim.tbl_contains(
-                      { 'Path', 'project_path' },
+                      { 'Path', 'project_path', 'fuzzy_path' },
                       ctx.source_name
                     )
                   then
