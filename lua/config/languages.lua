@@ -834,6 +834,9 @@ return {
         rule('{-', '{-  }', filetypes)
           :replace_endpair(function(_) return '<BS><BS>{{-  }' end)
           :set_end_pair_length(2),
+        rule('{/', '{/  }', filetypes)
+          :replace_endpair(function(_) return '<BS><BS>{{- /*  */ }' end)
+          :set_end_pair_length(5),
       }
     end,
   },

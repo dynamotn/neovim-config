@@ -104,5 +104,14 @@ return vim.list_contains(_G.enabled_languages, 'gotmpl')
           },
         },
       },
+      {
+        -- Comment
+        'folke/ts-comments.nvim',
+        opts = {
+          lang = {
+            gotmpl = { '{{- /* %s */ }}' },
+          },
+        },
+      },
     }
   or {}
