@@ -46,13 +46,14 @@ end
 --- Firenvim setting
 _G.firenvim_site_settings = {}
 
-if vim.fn.has('nvim-0.12.0') == 1 then
+local version = '0.13.0'
+if vim.fn.has('nvim-' .. version) == 1 then
   -- Load specific configurations per machine
   require('per_machine')
   -- Load LazyVim
   require('config.lazy')
 else
   vim.api.nvim_err_writeln(
-    'Neovim 0.12.0 or higher is required. Please update Neovim.'
+    'Neovim ' .. version .. ' or higher is required. Please update Neovim.'
   )
 end
