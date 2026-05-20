@@ -11,6 +11,10 @@ return {
     import = 'lazyvim.plugins.extras.ai.sidekick',
   },
   {
+    -- Claude Code
+    import = 'lazyvim.plugins.extras.ai.claudecode',
+  },
+  {
     -- LLMs & Agents
     'olimorris/codecompanion.nvim',
     cmd = {
