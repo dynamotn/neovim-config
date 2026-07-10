@@ -13,6 +13,11 @@ return {
         'git_config', -- for git config
         'gitignore', -- for git ignore
         'gitattributes', -- for git attributes
+
+        -- for latest build of neovim-git on Arch
+        'c',
+        'lua',
+        'markdown',
       }
     end,
     config = function(_, opts)
