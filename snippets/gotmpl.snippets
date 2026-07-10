@@ -3,7 +3,20 @@ snippet dytoy_binary
   method: binary
   github:
     repo: ${2:repo}
-    release_asset: ${3:asset}
+    {{- $$os := "" }}
+    {{- if eq .chezmoi.os "linux" "android" }}
+    {{-   $$os = "${3:linux}" }}
+    {{- else if eq .chezmoi.os "darwin" }}
+    {{-   $$os = "${4:mac}" }}
+    {{- end }}
+    {{- $$arch := "" }}
+    {{- if eq .chezmoi.arch "amd64" }}
+    {{-   $$arch = "${5:amd64}" }}
+    {{- else if eq .chezmoi.arch "arm64" }}
+    {{-   $$arch = "${6:arm64}" }}
+    {{- end }}
+    release_asset: ${1}${7}{{ $$os }}{{ $$arch }}.tar.gz
+  archive:
 
 snippet dytoy_os
   name: ${1:name}
