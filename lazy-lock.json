@@ -118,6 +118,7 @@
   "rustaceanvim": { "branch": "main", "commit": "818d3565d7b9f86546d0ddf5d16a5e12eb70ef4f" },
   "sidekick.nvim": { "branch": "main", "commit": "208e1c5b8170c01fd1d07df0139322a76479b235" },
   "snacks.nvim": { "branch": "main", "commit": "882c996cf28183f4d63640de0b4c02ec886d01f2" },
+  "swapson.nvim": { "branch": "main", "commit": "692a91846d4d9921c4e4ac59e3f0a2c9ac95d987" },
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
   "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "6264451f14119d63a52580e5198d6baf8518b0b2" },
   "todo-comments.nvim": { "branch": "main", "commit": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668" },
