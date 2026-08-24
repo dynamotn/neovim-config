@@ -31,5 +31,29 @@ local enable_cursorline = function()
   })
 end
 
+local auto_relative_number = function()
+  local group =
+    vim.api.nvim_create_augroup('auto_relative_number', { clear = false })
+  local function set_relnum_back(win)
+    vim.api.nvim_create_autocmd('CmdlineLeave', {
+      group = group,
+      once = true,
+      callback = function() vim.wo[win].relativenumber = true end,
+    })
+  end
+  vim.api.nvim_create_autocmd('CmdlineEnter', {
+    group = group,
+    callback = function()
+      local win = vim.api.nvim_get_current_win()
+      if vim.wo[win].relativenumber then
+        vim.wo[win].relativenumber = false
+        vim.cmd('redraw')
+        set_relnum_back(win)
+      end
+    end,
+  })
+end
+
 enable_cursorline()
 set_ft_terminal()
+auto_relative_number()
