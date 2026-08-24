@@ -885,6 +885,11 @@ return {
     linters = { 'jsonlint', 'trivy' },
     formatters = { 'jq' },
   },
+  jupyter = {
+    filetypes = { 'ipynb' },
+    parser = 'json',
+    formatters = { 'jupytext' },
+  },
   make = {
     filetypes = { 'config', 'automake', 'make' },
     parser = 'make',

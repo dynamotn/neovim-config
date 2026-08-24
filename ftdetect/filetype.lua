@@ -58,5 +58,7 @@ vim.filetype.add({
     ['.*/hypr/.*%.conf'] = 'hyprlang',
 
     ['Dockerfile-.*'] = 'dockerfile',
+
+    ['.*%.ipynb'] = 'ipynb',
   },
 })
