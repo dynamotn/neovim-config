@@ -57,3 +57,72 @@ for number = 1, 9 do
     { desc = 'Go to Tab ' .. number }
   )
 end
+
+-- Copy path of current file
+local copy_path = require('util.copy_path')
+vim.keymap.set(
+  'n',
+  '<leader>fyy',
+  copy_path.copy_relative,
+  { desc = 'Path (relative)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyY',
+  copy_path.copy_absolute,
+  { desc = 'Path (absolute)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyl',
+  copy_path.copy_relative_with_line,
+  { desc = 'Path (relative, :line)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyL',
+  copy_path.copy_absolute_with_line,
+  { desc = 'Path (absolute, :line)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyc',
+  copy_path.copy_relative_with_line_column,
+  { desc = 'Path (relative, :line:col)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyC',
+  copy_path.copy_absolute_with_line_column,
+  { desc = 'Path (absolute, :line:col)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyd',
+  copy_path.copy_relative_directory,
+  { desc = 'Directory (relative)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyD',
+  copy_path.copy_absolute_directory,
+  { desc = 'Directory (absolute)' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyP',
+  copy_path.copy_project,
+  { desc = 'Project Root' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyn',
+  copy_path.copy_filename,
+  { desc = 'Filename' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>fyN',
+  copy_path.copy_filename_no_ext,
+  { desc = 'Filename (no ext)' }
+)
