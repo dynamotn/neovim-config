@@ -85,6 +85,11 @@ require('lazy').setup({
       ['<localleader>d'] = function(plugin) dd(plugin) end,
     },
   },
+  dev = {
+    path = "~/Working/community/nvim",
+    patterns = {},
+    fallback = false,
+  },
   debug = false,
   rocks = {
     enabled = false,
