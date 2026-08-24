@@ -14,6 +14,9 @@ vim.filetype.add({
     promql = 'promql',
     bean = 'beancount',
     snippets = 'snippets',
+    dbml = 'dbml',
+    d2 = 'd2',
+    ipynb = 'ipynb',
   },
   filename = {
     ['.git/ignore'] = 'gitignore',
@@ -53,12 +56,8 @@ vim.filetype.add({
     ['helmfile.*%.ya?ml'] = 'helm',
     ['values.*%.yaml'] = 'yaml.helm-values',
 
-    ['.*%.dbml'] = 'dbml',
-    ['.*%.d2'] = 'd2',
     ['.*/hypr/.*%.conf'] = 'hyprlang',
 
     ['Dockerfile-.*'] = 'dockerfile',
-
-    ['.*%.ipynb'] = 'ipynb',
   },
 })
