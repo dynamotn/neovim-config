@@ -126,3 +126,8 @@ vim.keymap.set(
   copy_path.copy_filename_no_ext,
   { desc = 'Filename (no ext)' }
 )
+
+-- Fast search and replace
+vim.keymap.set('x', '/', '<Esc>/\\%V', { desc = 'Search in visual region' })
+vim.keymap.set('v', '<C-f>', 'y/<C-r>"', { desc = 'Search selected text' })
+vim.keymap.set('v', '<C-r>', 'y:%s#<C-r>"#', { desc = 'Replace selected text' })
