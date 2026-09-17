@@ -36,7 +36,7 @@ M.sources = function(filetype)
     'dictionary',
   }
   local unique_sources = {
-    markdown = { 'obsidian', 'nerdfont' },
+    markdown = { 'nerdfont' },
     typst = { 'nerdfont' },
     fish = { 'fish' },
     sql = { 'dadbod', 'sql' },
