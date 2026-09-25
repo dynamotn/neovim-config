@@ -325,7 +325,7 @@ return {
     filetypes = reuse_filetypes.bash.filetypes,
     parser = 'bash',
     lsp_servers = { 'bashls', 'termuxls', 'harper_ls' },
-    -- linters = { 'shellcheck' }, # bashls cover it
+    linters = { 'dyshellint' },
     formatters = {
       'shellcheck',
       { 'shfmt', opts = { prepend_args = { '-i', '2', '-ci', '-bn', '-sr' } } },
