@@ -150,7 +150,9 @@ return {
       -- language entry naming a server is the only place that says the server
       -- belongs to those filetypes, so without this a bare `harper_ls = {}` in
       -- a language's plugin spec attaches nothing, and the one spec that does
-      -- set `filetypes` narrows the server down to its own language.
+      -- set `filetypes` narrows the server down to its own language. An entry
+      -- with its own `filetypes` claims only those, so a server for one
+      -- dialect of YAML is not widened to every other.
       local declared_filetypes = {} ---@type table<string, string[]>
       for _, language in pairs(languages) do
         -- '*' and '_' are pseudo filetypes, not something a server attaches to
@@ -163,7 +165,8 @@ return {
               or lsp_server--[[@as string]]
             declared_filetypes[server] = vim.list_extend(
               declared_filetypes[server] or {},
-              language.filetypes
+              type(lsp_server) == 'table' and lsp_server.filetypes
+                or language.filetypes
             )
           end
         end

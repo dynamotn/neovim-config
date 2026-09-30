@@ -29,6 +29,9 @@
 ---@field enabled? fun(bufnr: integer): boolean Asked for each buffer the
 --- server would attach to, so the answer can depend on where that buffer
 --- lives rather than on the directory Neovim happened to start in.
+---@field filetypes? string[] The filetypes of the language the server is
+--- for, when it only suits some of them, as a server for one dialect of YAML
+--- does. Every filetype of the language otherwise.
 
 --- A tool answers to three names and they often disagree: `[1]` is the one
 --- conform or nvim-lint knows it by, `command` is the binary on `$PATH`, and
@@ -1463,7 +1466,10 @@ return {
   json = {
     filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },
     parser = 'json5',
-    lsp_servers = { 'jsonls', 'vacuum' },
+    lsp_servers = {
+      'jsonls',
+      { 'vacuum', filetypes = { 'json.openapi' } },
+    },
     linters = { 'jsonlint', 'trivy' },
     formatters = { 'jq' },
   },
@@ -1726,12 +1732,15 @@ return {
     parser = 'yaml',
     lsp_servers = {
       'yamlls',
-      'gitlab_ci_ls',
-      'gh_actions_ls',
-      'azure_pipelines_ls',
-      'docker_compose_language_service',
-      'helm_ls',
-      'vacuum',
+      { 'gitlab_ci_ls', filetypes = { 'yaml.gitlab' } },
+      { 'gh_actions_ls', filetypes = { 'yaml.gh-action' } },
+      { 'azure_pipelines_ls', filetypes = { 'yaml.az-pl' } },
+      {
+        'docker_compose_language_service',
+        filetypes = { 'yaml.docker-compose' },
+      },
+      { 'helm_ls', filetypes = { 'yaml.helm-values' } },
+      { 'vacuum', filetypes = { 'yaml.openapi' } },
     },
     linters = { 'yamllint', 'trivy' },
     formatters = {
