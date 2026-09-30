@@ -268,7 +268,8 @@ return {
       'vale',
       -- Reads the buffer from stdin and reports only which rule matched,
       -- never the secret itself, so a leak is flagged before it is saved.
-      'gitleaks',
+      -- Mason has no package; `tools.mason-registry.betterleaks` adds one.
+      'betterleaks',
       -- Reads the file from disk against the rules that apply to it, and
       -- has nothing to check against outside a project with `.editorconfig`.
       -- `condition` is LazyVim's, asked before every `*` linter runs.
