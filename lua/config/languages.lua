@@ -1087,6 +1087,7 @@ return {
           :set_end_pair_length(5),
       }
     end,
+    endwise = true,
   },
   gowork = {
     filetypes = { 'gowork' },
@@ -1116,6 +1117,7 @@ return {
           :set_end_pair_length(2),
       }
     end,
+    endwise = true,
   },
   hyprlang = {
     filetypes = { 'hyprlang' },
