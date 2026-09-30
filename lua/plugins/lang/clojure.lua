@@ -36,6 +36,12 @@ return vim.list_contains(_G.enabled_languages, 'clojure')
         dependencies = { 'baleia.nvim' },
         config = function(_, _) require('conjure.main').main() end,
         init = function()
+          -- Conjure ships a client for a score of languages and, once loaded
+          -- by a Clojure buffer, takes every later JavaScript, Python, Lua or
+          -- Rust buffer too: it starts a REPL for it and maps the local
+          -- leader over it. It is here for Clojure only.
+          vim.g['conjure#filetypes'] = language.filetypes
+
           -- baleia paints the escape sequences, so leave them in the log
           vim.g['conjure#log#strip_ansi_escape_sequences_line_limit'] = 0
 
