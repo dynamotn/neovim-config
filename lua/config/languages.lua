@@ -1283,6 +1283,14 @@ return {
     -- `just --fmt` is the tool itself
     formatters = { { 'just', mason = { enabled = false } } },
   },
+  kdl = {
+    filetypes = { 'kdl' },
+    parser = 'kdl',
+    -- what zellij's configuration is written in; Mason has the formatter but
+    -- no package for the server
+    lsp_servers = { 'kdl_lsp' },
+    formatters = { 'kdlfmt' },
+  },
   make = {
     filetypes = { 'config', 'automake', 'make' },
     parser = 'make',
