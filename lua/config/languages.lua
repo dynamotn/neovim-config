@@ -1133,6 +1133,12 @@ return {
     linters = { 'jsonlint', 'trivy' },
     formatters = { 'jq' },
   },
+  jsonnet = {
+    filetypes = { 'jsonnet' },
+    parser = 'jsonnet',
+    lsp_servers = { 'jsonnet_ls' },
+    formatters = { 'jsonnetfmt' },
+  },
   jupyter = {
     filetypes = { 'ipynb' },
     parser = 'json',
