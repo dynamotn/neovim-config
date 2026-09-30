@@ -1,6 +1,10 @@
 ---@class DyLangSpec
 ---@field filetypes string[]
 ---@field parser string|DyParserSpec
+---@field ext? string File extension of the parser's language, when the two
+--- differ. `injected` names the scratch file it hands a formatter after the
+--- language, and a formatter that switches on the file name (`prettier`,
+--- `terraform fmt`, ...) needs the extension it would see on disk.
 ---@field lsp_servers? (string|DyLspSpec)[]
 ---@field linters? (string|DyLinterSpec)[]
 ---@field formatters? (string|DyFormatterSpec)[]
@@ -304,6 +308,7 @@ return {
   angular = { -- See `html` and `typescript`
     filetypes = { 'htmlangular' },
     parser = 'angular',
+    ext = 'html',
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = {
       {
@@ -324,6 +329,7 @@ return {
   bash = {
     filetypes = reuse_filetypes.bash.filetypes,
     parser = 'bash',
+    ext = 'sh',
     lsp_servers = { 'bashls', 'termuxls', 'harper_ls' },
     linters = { 'dyshellint' },
     formatters = {
@@ -354,6 +360,7 @@ return {
   c_sharp = {
     filetypes = { 'cs' },
     parser = 'c_sharp',
+    ext = 'cs',
     lsp_servers = { 'omnisharp', 'harper_ls' },
     formatters = {
       {
@@ -445,6 +452,7 @@ return {
   latex = {
     filetypes = { 'tex' },
     parser = 'latex',
+    ext = 'tex',
     lsp_servers = { 'ltex', 'texlab' },
     formatters = { 'tex-fmt' },
     autopairs = function(filetypes, rule, cond)
@@ -524,6 +532,7 @@ return {
   python = {
     filetypes = { 'python' },
     parser = 'python',
+    ext = 'py',
     lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
     linters = { 'ruff' },
     formatters = {
@@ -551,6 +560,7 @@ return {
         url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
       },
     },
+    ext = 'erb',
     lsp_servers = { 'ruby_lsp', 'tailwindcss', 'harper_ls' },
     linters = {
       { 'erb_lint', command = 'erb-lint', mason = { package = 'erb-lint' } },
@@ -567,6 +577,7 @@ return {
   ruby = {
     filetypes = { 'ruby' },
     parser = 'ruby',
+    ext = 'rb',
     lsp_servers = { 'ruby_lsp', 'harper_ls' },
     linters = { 'rubocop' },
     formatters = { 'rubocop' },
@@ -576,6 +587,7 @@ return {
   rust = {
     filetypes = { 'rust' },
     parser = 'rust',
+    ext = 'rs',
     lsp_servers = { 'rust_analyzer', 'harper_ls' },
     formatters = { 'rustfmt' },
     dap = { 'codelldb' },
@@ -596,6 +608,7 @@ return {
   solidity = {
     filetypes = { 'solidity' },
     parser = 'solidity',
+    ext = 'sol',
     lsp_servers = { 'solang' },
     formatters = {
       { 'forge_fmt', command = 'forge', mason = { enabled = false } },
@@ -623,6 +636,7 @@ return {
       'typescript.tsx',
     },
     parser = 'javascript',
+    ext = 'js',
     lsp_servers = { 'vtsls', 'harper_ls' },
     linters = {
       {
@@ -667,6 +681,7 @@ return {
   typst = {
     filetypes = { 'typst' },
     parser = 'typst',
+    ext = 'typ',
     lsp_servers = { 'tinymist' },
     formatters = { 'typstyle' },
   },
@@ -902,6 +917,7 @@ return {
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
     parser = 'markdown',
+    ext = 'md',
     lsp_servers = { 'marksman', 'harper_ls' },
     linters = { 'markdownlint-cli2' },
     formatters = {
@@ -1005,6 +1021,7 @@ return {
   terraform = {
     filetypes = { 'tf', 'terraform', 'terraform-vars' },
     parser = 'terraform',
+    ext = 'tf',
     lsp_servers = { 'terraformls' },
     linters = { 'tflint', 'trivy' },
     formatters = {
@@ -1057,6 +1074,7 @@ return {
   treesitter = {
     filetypes = { 'query' },
     parser = 'query',
+    ext = 'scm',
     lsp_servers = { 'ts_query_ls' },
     formatters = {
       { 'format-queries', command = 'lua', mason = { enabled = false } },
