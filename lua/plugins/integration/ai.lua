@@ -222,7 +222,11 @@ return {
         mcphub = {
           callback = 'mcphub.extensions.codecompanion',
           opts = {
-            make_vars = true,
+            -- mcphub still registers its variables under
+            -- `interactions.chat.variables`, which CodeCompanion renamed to
+            -- `editor_context`: every chat raised an error and no variable
+            -- appeared. Back on once mcphub follows the rename.
+            make_vars = false,
             make_slash_commands = true,
             show_result_in_chat = true,
           },
