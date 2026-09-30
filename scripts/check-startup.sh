@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Load this configuration in a throwaway Neovim, open a file of each common
-# filetype in it (see check-startup.lua), and fail on any error.
+# Load this configuration in a throwaway Neovim, open a file of each language
+# in it (see check-startup.lua), and fail on any error.
+#
+# By default a spread of languages is opened, to keep the pre-commit hook
+# quick; `CHECK_STARTUP_ALL=1` opens every one of them, as CI does.
 #
 # The repository has no test suite, so a syntax error or a bad `require` is
 # only found by opening the editor -- and in a chezmoi `mode: symlink` setup
@@ -17,21 +20,27 @@ if ! command -v nvim > /dev/null 2>&1; then
 fi
 
 workdir="$(mktemp -d)"
-trap 'rm -rf "$workdir"' EXIT
-mkdir -p "$workdir/config"
-ln -s "$repo" "$workdir/config/nvim"
+trap 'rm -rf "${workdir}"' EXIT
+mkdir -p "${workdir}/config"
+ln -s "${repo}" "${workdir}/config/nvim"
 
-output="$workdir/output.txt"
+output="${workdir}/output.txt"
 set +e
-XDG_CONFIG_HOME="$workdir/config" nvim --headless -i NONE \
-  -c "luafile ${repo}/scripts/check-startup.lua" > "$output" 2>&1
+# The Lua file quits on its own once it is done. `cquit` is only reached when
+# it failed before that, which would otherwise leave Neovim waiting for input
+# that never comes; stdin is closed for the same reason.
+XDG_CONFIG_HOME="${workdir}/config" CHECK_STARTUP_WORKDIR="${workdir}" nvim --headless -i NONE \
+  -c "luafile ${repo}/scripts/check-startup.lua" -c 'cquit' \
+  < /dev/null > "${output}" 2>&1
 status=$?
 set -e
 
 # Neovim reports a broken configuration on stderr and still exits 0, so the
 # output has to be looked at as well as the exit code.
-if [[ ${status} -ne 0 ]] || grep -qE '^(E[0-9]+:|Error)' "$output"; then
+if [[ ${status} -ne 0 ]] || grep -qE '^(E[0-9]+:|Error)' "${output}"; then
   echo "check-startup: the configuration failed to load" >&2
-  cat "$output" >&2
+  cat "${output}" >&2
   exit 1
 fi
+# What was opened and what would have been installed, for a log to show.
+grep '^check-startup:' "${output}" || true

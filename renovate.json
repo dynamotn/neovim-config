@@ -1,11 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": [
-    "Every pinned version in this configuration lives in one of two places: the pre-commit hooks, and the purls of the configuration's own Mason registry.",
+    "Every pinned version in this configuration lives in one of three places: the pre-commit hooks, the actions of the CI workflow, and the purls of the configuration's own Mason registry.",
+    "The workflow runs the StyLua version it reads off the pre-commit hook, so that one bump covers both.",
     "Plugin versions are deliberately left out. `lazy-lock.json` is lazy.nvim's own lockfile and is rewritten by `:Lazy update`, so a bot editing it would only fight the plugin manager."
   ],
   "extends": ["config:recommended", ":dependencyDashboard"],
-  "enabledManagers": ["pre-commit", "custom.regex"],
+  "enabledManagers": ["pre-commit", "github-actions", "custom.regex"],
   "pre-commit": {
     "enabled": true
   },
