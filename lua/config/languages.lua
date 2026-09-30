@@ -499,7 +499,11 @@ return {
     filetypes = reuse_filetypes.bash.filetypes,
     parser = 'bash',
     ext = 'sh',
-    lsp_servers = { 'bashls', 'termuxls', 'harper_ls' },
+    lsp_servers = {
+      'bashls',
+      { 'termuxls', filetypes = { 'sh.ebuild', 'sh.install', 'sh.PKGBUILD' } },
+      'harper_ls',
+    },
     linters = { 'dyshellint' },
     formatters = {
       'shellcheck',
@@ -1467,7 +1471,9 @@ return {
     filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },
     parser = 'json5',
     lsp_servers = {
-      'jsonls',
+      -- JSON and JSONC only: it flags comments, trailing commas and bare keys
+      -- in JSON5 as errors.
+      { 'jsonls', filetypes = { 'json', 'jsonc', 'json.openapi' } },
       { 'vacuum', filetypes = { 'json.openapi' } },
     },
     linters = { 'jsonlint', 'trivy' },
