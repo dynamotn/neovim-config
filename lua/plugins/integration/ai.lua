@@ -6,6 +6,27 @@ return {
     import = 'lazyvim.plugins.extras.ai.copilot-native',
   },
   {
+    -- Keep Copilot out of files holding credentials
+    'neovim/nvim-lspconfig',
+    opts = {
+      servers = {
+        copilot = {
+          -- Copilot attaches to every filetype, and attaching alone sends the
+          -- buffer's text to GitHub. A `root_dir` function that never calls
+          -- `on_dir` is how a buffer is declined before the client starts,
+          -- and with no client attached neither inline completion nor
+          -- sidekick's next edit suggestions have anything to send to.
+          -- `on_dir()` without a root leaves `root_markers` to find it.
+          root_dir = function(bufnr, on_dir)
+            if not require('util.sensitive').is_sensitive(bufnr) then
+              on_dir()
+            end
+          end,
+        },
+      },
+    },
+  },
+  {
     -- AI CLI
     import = 'lazyvim.plugins.extras.ai.sidekick',
   },
