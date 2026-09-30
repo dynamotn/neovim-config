@@ -180,13 +180,16 @@ return {
         end
       end
 
+      ---@param server string
+      ---@param enabled? fun(bufnr: integer): boolean
+      ---@param name string
+      ---@param language DyLangSpec
       local function configure(server, enabled, name, language)
         if server == '*' then return end
         local server_opts = opts.servers[server] or {}
         server_opts = server_opts == true and {}
           or (not server_opts) and { enabled = false }
           or server_opts--[[@as vim.lsp.Config]]
-        if enabled == false then return end
 
         -- Widen the server to every filetype that declares it, starting from
         -- whatever its plugin spec asked for, or its shipped default when the
@@ -205,6 +208,32 @@ return {
           })
         end
 
+        -- A server that only suits some buffers is still configured up front,
+        -- and decides per buffer instead: `vim.lsp` only attaches once
+        -- `root_dir` hands a directory to `on_dir`, so withholding the call is
+        -- how a buffer is turned down. Deciding once at startup would pin the
+        -- answer to whatever directory Neovim was launched from.
+        if enabled then
+          local base = vim.lsp.config[server] or {}
+          local root_dir = server_opts.root_dir or base.root_dir
+          local root_markers = server_opts.root_markers or base.root_markers
+          server_opts = vim.tbl_extend('force', server_opts, {
+            root_dir = function(bufnr, on_dir)
+              if not enabled(bufnr) then return end
+              if type(root_dir) == 'function' then
+                return root_dir(bufnr, on_dir)
+              end
+              -- A custom `root_dir` makes `vim.lsp` skip `root_markers`, so
+              -- they are resolved here in its place.
+              on_dir(
+                root_dir
+                  or (root_markers and vim.fs.root(bufnr, root_markers))
+                  or nil
+              )
+            end,
+          })
+        end
+
         -- automatic install lsp servers
         if mason_configs[server] then
           -- install server of language in bundle languages
@@ -218,6 +247,7 @@ return {
               function(args)
                 local lsp_config = vim.lsp.config[server]
                 if lsp_config == nil then return end
+                if enabled and not enabled(args.buf) then return end
                 if
                   lsp_config.filetypes == nil
                   or vim.tbl_contains(lsp_config.filetypes, args.match)
@@ -254,10 +284,10 @@ return {
           local server
           if type(lsp_server) == 'table' then
             server = lsp_server[1]
-            configure(server, lsp_server.enabled() or false, name, language)
+            configure(server, lsp_server.enabled, name, language)
           else
             server = lsp_server
-            configure(server, true, name, language)
+            configure(server, nil, name, language)
           end
         end
       end

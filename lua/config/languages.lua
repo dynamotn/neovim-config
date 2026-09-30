@@ -26,7 +26,9 @@
 
 ---@class DyLspSpec
 ---@field [1] string
----@field enabled? fun(): boolean
+---@field enabled? fun(bufnr: integer): boolean Asked for each buffer the
+--- server would attach to, so the answer can depend on where that buffer
+--- lives rather than on the directory Neovim happened to start in.
 
 --- A tool answers to three names and they often disagree: `[1]` is the one
 --- conform or nvim-lint knows it by, `command` is the binary on `$PATH`, and
@@ -227,14 +229,9 @@ return {
     lsp_servers = {
       {
         'sonarlint',
-        enabled = function()
+        enabled = function(bufnr)
           return vim.fn.executable('java') == 1
-              and require('lazyvim.util.root').detect({
-                spec = { 'sonar-project.properties' },
-                all = false,
-              })[1]
-              and true
-            or false
+            and vim.fs.root(bufnr, { 'sonar-project.properties' }) ~= nil
         end,
       },
       'copilot',
