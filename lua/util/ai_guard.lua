@@ -145,6 +145,29 @@ M.guard_sidekick = function()
     if sensitive.is_sensitive(0) then return refuse('sidekick') end
     return send(...)
   end)
+
+  -- The statusline icon asks for the Copilot client of the buffer, and a
+  -- sensitive buffer has none: the icon vanished, as if Copilot were not
+  -- running at all. Reported as `Inactive` instead, while Copilot runs for
+  -- other buffers, so a buffer turned down on purpose shows as such.
+  local ok_status, status = pcall(require, 'sidekick.status')
+  wrap(
+    ok_status and status or nil,
+    'get',
+    'sidekick status',
+    function(get, buf, ...)
+      local result = get(buf, ...)
+      if result or not sensitive.is_sensitive(buf) then return result end
+      local ok_config, config = pcall(require, 'sidekick.config')
+      if
+        ok_config
+        and config.copilot.status.enabled
+        and #config.get_clients() > 0
+      then
+        return { busy = false, kind = 'Inactive', message = 'sensitive file' }
+      end
+    end
+  )
 end
 
 --- Keep Claude Code's view of the editor off sensitive buffers

@@ -30,7 +30,10 @@ return {
               attached[client.name] = true
             end
 
-            local expected, optional =
+            -- Servers of any filetype (Copilot) are left out: sidekick's icon
+            -- already shows whether Copilot is on, busy, or turned down by a
+            -- sensitive buffer.
+            local expected =
               require('util.languages').get_lsp_servers_by_filetype(
                 vim.bo.filetype
               )
@@ -38,12 +41,6 @@ return {
               msg = msg
                 .. server_name
                 .. (attached[server_name] and ' ' or '! ')
-            end
-            -- Not flagged when missing: a server of any filetype may decline
-            -- a buffer on purpose, as Copilot does with credential files.
-            -- Its sign-in and busy state already show in sidekick's icon.
-            for _, server_name in ipairs(optional) do
-              if attached[server_name] then msg = msg .. server_name .. ' ' end
             end
             return vim.trim(msg)
           end,
