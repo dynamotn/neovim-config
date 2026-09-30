@@ -67,6 +67,10 @@ _G.bundle_languages = {}
 ---@type string[] Name of completion sources, display when show completion menu
 _G.completion_sources = {}
 
+---@type string[] Directories of JSON and YAML schemas on this machine, offered
+--- by the YAML schema picker next to those it finds in the project
+_G.yaml_schema_dirs = {}
+
 ---@type string Test strategy for vim-test
 _G.test_strategy = 'toggleterm'
 if vim.env.ZELLIJ ~= nil then _G.test_strategy = 'zellij' end

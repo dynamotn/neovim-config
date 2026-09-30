@@ -8,6 +8,8 @@
 -- On top of that, buffers the server finds no schema for are matched on their
 -- content (Kubernetes manifests, cloud-init), and a picker sets a schema for
 -- the buffer or writes it as a `# yaml-language-server: $schema=` modeline.
+-- Besides the catalogs, it offers the schema files of the project and of
+-- `_G.yaml_schema_dirs`, and any other file of this machine by its path.
 local M = {}
 
 local CRDS_CATALOG =
@@ -336,6 +338,137 @@ function M.detect(bufnr)
   )
 end
 
+-- Local schemas --------------------------------------------------------------
+
+local LOCAL_EXTENSIONS = { json = true, yaml = true, yml = true }
+
+local function is_local(uri)
+  return uri:sub(1, 1) == '/' or vim.startswith(uri, 'file://')
+end
+
+--- A schema URI as a path when it is a local file, as is otherwise
+local function to_path(uri)
+  return vim.startswith(uri, 'file://') and vim.uri_to_fname(uri) or uri
+end
+
+--- Project of the buffer, where local schemas are looked for
+local function get_root(bufnr)
+  local client = get_client(bufnr)
+  return client and client.root_dir
+    or vim.fs.root(bufnr, '.git')
+    or assert(vim.uv.cwd())
+end
+
+--- Whether a file of the project looks like a schema: named after one, or
+--- kept in a `schema`/`schemas` directory
+local function looks_like_schema(path)
+  local name = vim.fs.basename(path):lower()
+  return name:match('schema%.json$') ~= nil
+    or name:match('schema%.ya?ml$') ~= nil
+    or path:lower():match('/%.?schemas?/') ~= nil
+end
+
+--- A path to show: relative to the project when inside it
+local function display_path(path, root)
+  if vim.startswith(path, root .. '/') then return path:sub(#root + 2) end
+  return vim.fn.fnamemodify(path, ':~')
+end
+
+--- Path to `path` from the directory `from`, `./` or `../` prefixed
+local function relative_path(from, path)
+  local a = vim.split(from, '/', { trimempty = true })
+  local b = vim.split(path, '/', { trimempty = true })
+  local i = 1
+  while a[i] and b[i] and a[i] == b[i] do
+    i = i + 1
+  end
+  local parts = {}
+  for _ = i, #a do
+    table.insert(parts, '..')
+  end
+  for j = i, #b do
+    table.insert(parts, b[j])
+  end
+  local rel = table.concat(parts, '/')
+  return vim.startswith(rel, '..') and rel or './' .. rel
+end
+
+--- Schema files on this machine: those of the project of the buffer, and
+--- every JSON or YAML file under the directories of `_G.yaml_schema_dirs`
+---@param bufnr integer
+---@param callback fun(paths: string[], root: string)
+local function find_local(bufnr, callback)
+  local root = get_root(bufnr)
+  local dirs = vim.tbl_filter(
+    function(dir) return vim.fn.isdirectory(dir) == 1 end,
+    vim.tbl_map(
+      function(dir) return vim.fs.normalize(dir) end,
+      _G.yaml_schema_dirs or {}
+    )
+  )
+  local function finish(paths)
+    local found, seen = {}, {}
+    for _, path in ipairs(paths) do
+      path = vim.fs.normalize(path)
+      local ext = (path:match('%.(%w+)$') or ''):lower()
+      local in_dirs = vim.iter(dirs):any(
+        function(dir) return vim.startswith(path, dir .. '/') end
+      )
+      if
+        not seen[path]
+        and LOCAL_EXTENSIONS[ext]
+        and (in_dirs or looks_like_schema(path))
+      then
+        seen[path] = true
+        table.insert(found, path)
+      end
+    end
+    table.sort(found)
+    callback(found, root)
+  end
+  local fd = vim.fn.executable('fd') == 1 and 'fd'
+    or vim.fn.executable('fdfind') == 1 and 'fdfind'
+  if fd then
+    local cmd = {
+      fd,
+      '--type=f',
+      '--absolute-path',
+      '--hidden',
+      '--exclude=.git',
+      '--exclude=node_modules',
+      '--extension=json',
+      '--extension=yaml',
+      '--extension=yml',
+      '.',
+      root,
+    }
+    vim.list_extend(cmd, dirs)
+    -- A project as large as `$HOME` must not hold the picker back
+    vim.system(
+      cmd,
+      { text = true, timeout = 3000 },
+      vim.schedule_wrap(
+        function(out)
+          finish(vim.split(out.stdout or '', '\n', { trimempty = true }))
+        end
+      )
+    )
+    return
+  end
+  local paths = {}
+  for _, dir in ipairs(vim.list_extend({ root }, dirs)) do
+    for name, type in
+      vim.fs.dir(dir, {
+        depth = 8,
+        skip = function(n) return n ~= '.git' and n ~= 'node_modules' end,
+      })
+    do
+      if type == 'file' then table.insert(paths, dir .. '/' .. name) end
+    end
+  end
+  finish(paths)
+end
+
 -- Modeline -------------------------------------------------------------------
 
 --- Write `schema` as a modeline at the top of the YAML document under the
@@ -356,6 +489,19 @@ function M.insert_modeline(bufnr, schema)
       )
     end
     uri = kubernetes_uri(client, gvk)
+  elseif is_local(uri) then
+    -- yamlls resolves a relative path from the directory of the file, so
+    -- a schema of the same project keeps working wherever it is cloned
+    local path = to_path(uri)
+    local file = vim.api.nvim_buf_get_name(bufnr)
+    local root = get_root(bufnr)
+    if
+      vim.startswith(path, root .. '/') and vim.startswith(file, root .. '/')
+    then
+      uri = relative_path(vim.fs.dirname(file), path)
+    else
+      uri = path
+    end
   end
   local lines = get_lines(bufnr)
   local first = 1
@@ -376,6 +522,35 @@ function M.insert_modeline(bufnr, schema)
   vim.api.nvim_buf_set_lines(bufnr, first - 1, first - 1, false, {
     MODELINE .. uri,
   })
+end
+
+--- Use a schema file of this machine for the buffer, or with `modeline`,
+--- write it as a modeline
+---@param bufnr integer
+---@param path string
+---@param modeline? boolean
+function M.use_file(bufnr, path, modeline)
+  bufnr = bufnr == 0 and vim.api.nvim_get_current_buf() or bufnr
+  path = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ':p'))
+  if vim.fn.filereadable(path) == 0 then
+    return notify('Cannot read ' .. path, vim.log.levels.WARN)
+  end
+  local schema = { uri = path, name = vim.fs.basename(path) }
+  if modeline then return M.insert_modeline(bufnr, schema) end
+  M.set(bufnr, schema)
+end
+
+--- Ask for the path of a schema file, anywhere on this machine
+---@param bufnr integer
+---@param modeline? boolean
+function M.browse(bufnr, modeline)
+  vim.ui.input({
+    prompt = 'Schema file: ',
+    default = get_root(bufnr) .. '/',
+    completion = 'file',
+  }, function(input)
+    if input and input ~= '' then M.use_file(bufnr, input, modeline) end
+  end)
 end
 
 -- Picker ---------------------------------------------------------------------
@@ -399,10 +574,19 @@ end
 --- Every schema to choose from, the ones in use first
 ---@param in_use {uri: string, name?: string, description?: string}[]
 ---@param known {uri: string, name?: string, description?: string}[]
+---@param locals string[] schema files of this machine
+---@param root string project of the buffer
 ---@return util.yaml_schema.Schema[]
-local function collect(in_use, known)
+local function collect(in_use, known, locals, root)
   local schemas, seen = {}, {}
   local function add(schema)
+    -- The server hands local schemas back as `file://` URIs
+    if is_local(schema.uri) then
+      schema.uri = to_path(schema.uri)
+      schema.name = schema.name or display_path(schema.uri, root)
+      schema.file = schema.uri
+      schema.preview = 'file'
+    end
     if seen[schema.uri] then return end
     seen[schema.uri] = true
     schema.name = schema.name or M.get_name(schema.uri)
@@ -416,6 +600,19 @@ local function collect(in_use, known)
       source = 'in use',
     })
   end
+  for _, path in ipairs(locals) do
+    add({ uri = path, name = display_path(path, root), source = 'local' })
+  end
+  add({
+    uri = '',
+    name = 'Browse for a local file…',
+    source = 'local',
+    browse = true,
+    preview = {
+      text = 'Type the path of a JSON or YAML schema anywhere on this machine',
+      ft = 'markdown',
+    },
+  })
   add({
     uri = KUBERNETES,
     name = 'Kubernetes',
@@ -462,6 +659,7 @@ local function open(bufnr, schemas, modeline)
   local function apply(schema)
     if not schema then return end
     if schema.reset then return M.reset(bufnr) end
+    if schema.browse then return M.browse(bufnr, modeline) end
     if modeline then return M.insert_modeline(bufnr, schema) end
     M.set(bufnr, schema)
   end
@@ -520,7 +718,9 @@ local function open(bufnr, schemas, modeline)
     actions = {
       yaml_modeline = function(picker, item)
         picker:close()
-        if item and not item.reset then M.insert_modeline(bufnr, item) end
+        if not item or item.reset then return end
+        if item.browse then return M.browse(bufnr, true) end
+        M.insert_modeline(bufnr, item)
       end,
     },
     win = {
@@ -542,27 +742,28 @@ end
 ---@param bufnr? integer
 ---@param modeline? boolean
 function M.select(bufnr, modeline)
-  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
-    or bufnr
+  if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   local client = get_client(bufnr)
   if not client then
     return notify('No yamlls attached to this buffer', vim.log.levels.WARN)
   end
   local uri = vim.uri_from_bufnr(bufnr)
   load_crds(function()
-    client:request(
-      ---@diagnostic disable-next-line: param-type-mismatch
-      'yaml/get/all/jsonSchemas',
-      { uri },
-      function(_, result)
-        local in_use, known = {}, {}
-        for _, s in ipairs(result or {}) do
-          table.insert(s.usedForCurrentFile and in_use or known, s)
-        end
-        open(bufnr, collect(in_use, known), modeline)
-      end,
-      bufnr
-    )
+    find_local(bufnr, function(locals, root)
+      client:request(
+        ---@diagnostic disable-next-line: param-type-mismatch
+        'yaml/get/all/jsonSchemas',
+        { uri },
+        function(_, result)
+          local in_use, known = {}, {}
+          for _, s in ipairs(result or {}) do
+            table.insert(s.usedForCurrentFile and in_use or known, s)
+          end
+          open(bufnr, collect(in_use, known, locals, root), modeline)
+        end,
+        bufnr
+      )
+    end)
   end)
 end
 
@@ -575,6 +776,7 @@ end
 function M.get_name(uri, title)
   if uri == KUBERNETES then return 'Kubernetes' end
   if uri == CLOUD_INIT then return 'cloud-init' end
+  if is_local(uri) then return vim.fs.basename(to_path(uri)) end
   if not names then
     names = {}
     for _, schema in ipairs(schemastore()) do
@@ -628,12 +830,32 @@ function M.on_init(client)
     callback = function(ev)
       local attached = vim.lsp.get_client_by_id(ev.data.client_id)
       if not attached or attached.name ~= 'yamlls' then return end
+      -- :YamlSchema [modeline] [path], or :YamlSchema reset
       vim.api.nvim_buf_create_user_command(ev.buf, 'YamlSchema', function(cmd)
-        if cmd.args == 'reset' then return M.reset(ev.buf) end
-        M.select(ev.buf, cmd.args == 'modeline')
+        local args = vim.deepcopy(cmd.fargs)
+        if args[1] == 'reset' then return M.reset(ev.buf) end
+        local modeline = args[1] == 'modeline'
+        if modeline then table.remove(args, 1) end
+        if #args > 0 then
+          return M.use_file(ev.buf, table.concat(args, ' '), modeline)
+        end
+        M.select(ev.buf, modeline)
       end, {
-        nargs = '?',
-        complete = function() return { 'modeline', 'reset' } end,
+        nargs = '*',
+        complete = function(lead, line)
+          local words = vim.split(line, '%s+', { trimempty = true })
+          local first = #words == 1 or (#words == 2 and lead ~= '')
+          local subcommands = first
+              and vim.tbl_filter(
+                function(s) return vim.startswith(s, lead) end,
+                { 'modeline', 'reset' }
+              )
+            or {}
+          return vim.list_extend(
+            subcommands,
+            vim.fn.getcompletion(lead, 'file')
+          )
+        end,
         desc = 'Pick a YAML schema for the buffer',
       })
       M.detect(ev.buf)
