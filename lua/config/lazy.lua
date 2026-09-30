@@ -49,7 +49,6 @@ local stale_releases = {
   'marilari88/neotest-vitest',
   'mfussenegger/nvim-jdtls',
   'nvim-lua/plenary.nvim',
-  'rcarriga/nvim-dap-ui',
   'tpope/vim-dadbod',
   'esensar/nvim-dev-container',
 }

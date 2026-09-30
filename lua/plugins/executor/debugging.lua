@@ -3,6 +3,46 @@ local cmp_util = require('util.cmp')
 return {
   -- Debug Adapter implementation
   { import = 'lazyvim.plugins.extras.dap.core' },
+  { 'rcarriga/nvim-dap-ui', enabled = false }, -- Replaced by nvim-dap-view
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = { 'igorlfs/nvim-dap-view' },
+  },
+  {
+    -- Debugger UI sharing one window between its views
+    'igorlfs/nvim-dap-view',
+    keys = {
+      {
+        '<leader>du',
+        function() require('dap-view').toggle() end,
+        desc = 'Dap View',
+      },
+      {
+        '<leader>de',
+        function()
+          local expr
+          local mode = vim.fn.mode()
+          if mode:find('^[vV\22]') then
+            expr = table.concat(
+              vim.fn.getregion(
+                vim.fn.getpos('v'),
+                vim.fn.getpos('.'),
+                { type = mode }
+              ),
+              '\n'
+            )
+          end
+          require('dap-view').hover(expr)
+        end,
+        desc = 'Eval',
+        mode = { 'n', 'x' },
+      },
+    },
+    opts = {
+      -- Open with a session and close after it, as nvim-dap-ui did
+      auto_toggle = true,
+    },
+  },
   {
     -- Disable auto install debugger
     'jay-babu/mason-nvim-dap.nvim',
@@ -66,12 +106,9 @@ return {
     'lualine.nvim',
     opts = {
       special_filetypes = {
-        dapui_scopes = 'Scopes',
-        dapui_breakpoints = 'Breakpoints',
-        dapui_stacks = 'Stacks',
-        dapui_watches = 'Watches',
+        ['dap-view'] = 'Debug',
         ['dap-repl'] = 'REPL',
-        dapui_console = 'Console',
+        ['dap-view-term'] = 'Console',
       },
     },
   },
@@ -94,8 +131,6 @@ return {
         compat = { 'dap' },
         per_filetype = {
           ['dap-repl'] = cmp_util.sources('dap'),
-          dapui_watches = cmp_util.sources('dap'),
-          dapui_hover = cmp_util.sources('dap'),
         },
       },
     },
