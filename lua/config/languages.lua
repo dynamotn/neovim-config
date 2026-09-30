@@ -87,6 +87,50 @@ local html_beautify_formatter = {
   command = 'js-beautify',
   mason = { package = 'js-beautify' },
 }
+-- `javascript`, `typescript` and `tsx` are one toolchain over three grammars.
+-- They need an entry each so that a filetype reaches the parser that actually
+-- understands it -- and so an injected ```typescript block is not handed to
+-- the formatter under a `.js` name -- but nothing else about them differs.
+local js_lsp_servers = { 'vtsls', 'harper_ls' }
+local js_linters = {
+  {
+    'biomejs',
+    command = 'biome',
+    mason = { package = 'biome' },
+  },
+}
+local js_formatters = { 'biome' }
+local js_dap = { 'js', 'firefox' }
+local js_test = {
+  'neotest-jest',
+  'neotest-vitest',
+  'neotest-playwright',
+  'vim-test',
+}
+local js_dial = function(augend)
+  return {
+    augend.constant.new({
+      elements = { 'let', 'const' },
+      word = true,
+      cyclic = true,
+    }),
+  }
+end
+local js_autopairs = function(filetypes, rule)
+  return {
+    -- Add parentheses in arrow function
+    rule('=>', ' {  }', filetypes)
+      :replace_endpair(function(opts)
+        local prev_3char = opts.line:sub(opts.col - 3, opts.col - 2)
+        local next_char = opts.line:sub(opts.col, opts.col)
+        if prev_3char:match('%)$') then
+          return '<BS><BS> => {  }' .. next_char
+        end
+        return ' {  }'
+      end)
+      :set_end_pair_length(2),
+  }
+end
 
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
@@ -449,6 +493,18 @@ return {
       }
     end,
   },
+  javascript = { -- See `typescript`
+    filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx' },
+    parser = 'javascript',
+    ext = 'js',
+    lsp_servers = js_lsp_servers,
+    linters = js_linters,
+    formatters = js_formatters,
+    dap = js_dap,
+    test = js_test,
+    dial = js_dial,
+    autopairs = js_autopairs,
+  },
   latex = {
     filetypes = { 'tex' },
     parser = 'latex',
@@ -626,57 +682,28 @@ return {
       ltcc_diagnostics,
     },
   },
+  tsx = { -- See `typescript`
+    filetypes = { 'typescriptreact', 'typescript.tsx' },
+    parser = 'tsx',
+    lsp_servers = js_lsp_servers,
+    linters = js_linters,
+    formatters = js_formatters,
+    dap = js_dap,
+    test = js_test,
+    dial = js_dial,
+    autopairs = js_autopairs,
+  },
   typescript = {
-    filetypes = {
-      'javascript',
-      'typescript',
-      'javascriptreact',
-      'typescriptreact',
-      'javascript.jsx',
-      'typescript.tsx',
-    },
-    parser = 'javascript',
-    ext = 'js',
-    lsp_servers = { 'vtsls', 'harper_ls' },
-    linters = {
-      {
-        'biomejs',
-        command = 'biome',
-        mason = { package = 'biome' },
-      },
-    },
-    formatters = { 'biome' },
-    dap = { 'js', 'firefox' },
-    test = {
-      'neotest-jest',
-      'neotest-vitest',
-      'neotest-playwright',
-      'vim-test',
-    },
-    dial = function(augend)
-      return {
-        augend.constant.new({
-          elements = { 'let', 'const' },
-          word = true,
-          cyclic = true,
-        }),
-      }
-    end,
-    autopairs = function(filetypes, rule)
-      return {
-        -- Add parentheses in arrow function
-        rule('=>', ' {  }', filetypes)
-          :replace_endpair(function(opts)
-            local prev_3char = opts.line:sub(opts.col - 3, opts.col - 2)
-            local next_char = opts.line:sub(opts.col, opts.col)
-            if prev_3char:match('%)$') then
-              return '<BS><BS> => {  }' .. next_char
-            end
-            return ' {  }'
-          end)
-          :set_end_pair_length(2),
-      }
-    end,
+    filetypes = { 'typescript' },
+    parser = 'typescript',
+    ext = 'ts',
+    lsp_servers = js_lsp_servers,
+    linters = js_linters,
+    formatters = js_formatters,
+    dap = js_dap,
+    test = js_test,
+    dial = js_dial,
+    autopairs = js_autopairs,
   },
   typst = {
     filetypes = { 'typst' },
