@@ -465,6 +465,15 @@ return {
       { 'dart_format', command = 'dart', mason = { enabled = false } },
     },
   },
+  elixir = {
+    filetypes = { 'elixir' },
+    parser = 'elixir',
+    ext = 'exs',
+    lsp_servers = { 'elixirls' },
+    -- `mix credo` and `mix format` are tasks of the project's own toolchain.
+    linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
+    formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+  },
   fish = {
     filetypes = { 'fish' },
     parser = 'fish',

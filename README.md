@@ -67,6 +67,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - CSS/Less
 - Cucumber
 - Dart
+- Elixir
 - Fish
 - Go
 - HTML
