@@ -38,3 +38,10 @@ repos:
         language: system
         files: \.lua$
         pass_filenames: false
+      - id: bench
+        name: Startup benchmark
+        description: Times the startup of this configuration and rewrites the Benchmark section of README.md when a median moved by more than 20%.
+        entry: nvim --clean --headless -l scripts/bench.lua
+        language: system
+        files: (\.lua|^lazy-lock\.json)$
+        pass_filenames: false
