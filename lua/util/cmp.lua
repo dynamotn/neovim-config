@@ -40,6 +40,7 @@ M.sources = function(filetype)
     typst = { 'nerdfont' },
     clojure = { 'conjure' },
     fish = { 'fish' },
+    julia = { 'latex_symbols' },
     sql = { 'dadbod', 'sql' },
     lua = { 'lazydev' },
   }
