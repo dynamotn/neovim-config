@@ -42,6 +42,14 @@ M.dirs = {
   ['secrets'] = true,
 }
 
+--- Directories sensitive by where they are, checked by full path so they stay
+--- covered whatever becomes of the name rules above. `secrets/data` is the
+--- Dotfiles submodule of live credentials, and a clone of it (a worktree, a
+--- checkout elsewhere) is caught by the name rules instead.
+M.paths = {
+  vim.fs.joinpath(vim.env.HOME, 'Dotfiles', 'secrets', 'data'),
+}
+
 --- Filetypes sensitive by content rather than by path. A commit message
 --- buffer carries the staged diff as well under `git commit --verbose`, and
 --- that diff can be the very secret being committed.
@@ -58,6 +66,10 @@ local function path_is_sensitive(path)
   end
   for dir in vim.fs.parents(path) do
     if M.dirs[vim.fs.basename(dir)] then return true end
+  end
+  for _, root in ipairs(M.paths) do
+    root = vim.fs.normalize(root)
+    if path == root or vim.startswith(path, root .. '/') then return true end
   end
   return false
 end
