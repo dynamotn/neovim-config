@@ -672,6 +672,13 @@ return {
     end,
     endwise = true,
   },
+  nu = {
+    filetypes = { 'nu' },
+    parser = 'nu',
+    -- both ship with nushell itself
+    lsp_servers = { 'nushell' },
+    formatters = { { 'nufmt', mason = { enabled = false } } },
+  },
   perl = {
     filetypes = { 'perl' },
     parser = 'perl',
