@@ -2,6 +2,18 @@ return {
   {
     -- Status line
     'nvim-lualine/lualine.nvim',
+    keys = {
+      {
+        '<leader>cL',
+        function() require('util.statusline').pick_lsp() end,
+        desc = 'Language servers of buffer',
+      },
+      {
+        '<leader>cT',
+        function() require('util.statusline').pick_tools() end,
+        desc = 'Formatters and linters of buffer',
+      },
+    },
     opts = function(_, opts)
       local icons = require('config.defaults').icons
 
@@ -21,48 +33,16 @@ return {
           color = { fg = Snacks.util.color('String') },
         },
         {
-          function()
-            local msg = icons.lsp
-            local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
-            if next(buf_clients) == nil then return msg end
-            local attached = {}
-            for _, client in ipairs(buf_clients) do
-              attached[client.name] = true
-            end
-
-            -- Servers of any filetype (Copilot) are left out: sidekick's icon
-            -- already shows whether Copilot is on, busy, or turned down by a
-            -- sensitive buffer.
-            local expected =
-              require('util.languages').get_lsp_servers_by_filetype(
-                vim.bo.filetype
-              )
-            for _, server_name in ipairs(expected) do
-              msg = msg
-                .. server_name
-                .. (attached[server_name] and ' ' or '! ')
-            end
-            return vim.trim(msg)
-          end,
+          -- Counts only; a click lists every server with its state
+          function() return require('util.statusline').lsp_status(icons.lsp) end,
+          on_click = function() require('util.statusline').pick_lsp() end,
           color = { fg = Snacks.util.color('Label'), gui = 'bold' },
         },
         {
           function()
-            local msg = icons.null_ls
-            for _, tool in
-              ipairs(
-                require('util.languages').get_tools_by_filetype(vim.bo.filetype)
-              )
-            do
-              if vim.list_contains({ 'lua', 'git', 'curl', 'sed' }, tool) then
-              elseif vim.fn.executable(tool) == 1 then
-                msg = msg .. tool .. ' '
-              else
-                msg = msg .. tool .. '! '
-              end
-            end
-            return vim.trim(msg)
+            return require('util.statusline').tools_status(icons.null_ls)
           end,
+          on_click = function() require('util.statusline').pick_tools() end,
           color = { fg = Snacks.util.color('Statement'), gui = 'bold' },
         },
       }
