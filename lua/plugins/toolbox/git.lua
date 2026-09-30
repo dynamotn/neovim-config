@@ -19,4 +19,16 @@ return {
     },
     opts = {},
   },
+  {
+    -- CI checks and job logs of GitHub, GitLab and Forgejo
+    -- It leaves GitHub on 2026-10-31 and warns when installed from there.
+    url = 'https://forge.barrettruth.com/barrettruth/ci.nvim',
+    name = 'ci.nvim',
+    -- Needs Neovim 0.13, above what the `stable` channel asks for
+    cond = vim.fn.has('nvim-0.13') == 1,
+    cmd = 'CI',
+    keys = {
+      { '<leader>gC', '<cmd>CI<cr>', desc = 'CI Checks' },
+    },
+  },
 }
