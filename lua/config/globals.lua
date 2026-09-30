@@ -6,8 +6,22 @@
 --- `init.lua` with nothing to say what any of them holds. `per_machine` is
 --- loaded afterwards and is free to override every one of them.
 
----@type boolean Flag to set background
+---@type boolean Flag to set background. Read as the manual choice whenever
+--- `_G.day_night.enabled` is off, and overwritten by the clock when it is on.
 _G.dark_mode = true
+
+---@class DyDayNight
+---@field enabled boolean Let the clock decide `_G.dark_mode`
+---@field day_start integer Hour the light half begins, 0-23
+---@field night_start integer Hour the dark half begins, 0-23
+
+---@type DyDayNight When to be light and when to be dark. Turn `enabled` off
+--- on a machine that should stay on whatever `_G.dark_mode` says.
+_G.day_night = {
+  enabled = true,
+  day_start = 6,
+  night_start = 18,
+}
 
 ---@type boolean Flag to install Gentoo syntax
 _G.is_gentoo = false

@@ -18,6 +18,10 @@ opt.colorcolumn = '80,120' -- 80, 120 column chars line length
 opt.wrap = true -- Set wrap mode
 opt.spelllang = { 'en_us', 'vi', 'proper', 'technical' } -- My spell list
 
+-- Resolve the background before any plugin loads, so the colorscheme comes up
+-- in the right half of the day rather than flipping once it is on screen.
+require('util.day_night').init()
+
 -- Disable non-Lua provider
 g.loaded_python3_provider = 0
 g.loaded_perl_provider = 0

@@ -57,3 +57,5 @@ end
 enable_cursorline()
 set_ft_terminal()
 auto_relative_number()
+-- Watch the clock and swap the colorscheme when the day turns
+require('util.day_night').setup()

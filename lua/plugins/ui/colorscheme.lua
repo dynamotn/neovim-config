@@ -6,7 +6,10 @@ return {
     name = 'catppuccin',
     event = 'UIEnter',
     opts = {
-      flavour = _G.dark_mode and 'macchiato' or 'latte',
+      -- `auto` drops the fixed flavour and reads `background` instead, so
+      -- the pair below is what actually decides. `util.day_night` owns that
+      -- option, and re-running `:colorscheme` is all a switch takes.
+      flavour = 'auto',
       background = {
         light = 'latte',
         dark = 'macchiato',
