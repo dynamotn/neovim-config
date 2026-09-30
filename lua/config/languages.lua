@@ -629,6 +629,15 @@ return {
     end,
     endwise = true,
   },
+  perl = {
+    filetypes = { 'perl' },
+    parser = 'perl',
+    ext = 'pl',
+    lsp_servers = { 'perlnavigator' },
+    -- both come from CPAN, Mason carries neither
+    linters = { { 'perlcritic', mason = { enabled = false } } },
+    formatters = { { 'perltidy', mason = { enabled = false } } },
+  },
   php = {
     filetypes = { 'php' },
     parser = 'php',
