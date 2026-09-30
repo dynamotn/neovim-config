@@ -524,6 +524,7 @@ return {
     lsp_servers = { 'laravel_ls', 'tailwindcss', 'harper_ls' },
     formatters = { 'blade-formatter' },
     autopairs = mustache_autopairs,
+    endwise = true,
   },
   clojure = {
     filetypes = { 'clojure' },
@@ -581,6 +582,7 @@ return {
     -- `mix credo` and `mix format` are tasks of the project's own toolchain.
     linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
     formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+    endwise = true,
   },
   erlang = { -- See `elixir`
     filetypes = { 'erlang' },
@@ -597,6 +599,7 @@ return {
         rule('<<', '>>', filetypes),
       }
     end,
+    endwise = true,
   },
   fish = {
     filetypes = { 'fish' },
@@ -671,6 +674,7 @@ return {
     ext = 'hbs',
     lsp_servers = { 'ember', 'tailwindcss', 'harper_ls' },
     autopairs = mustache_autopairs,
+    endwise = true,
   },
   haskell = {
     filetypes = { 'haskell' },
@@ -705,6 +709,7 @@ return {
         rule('<%', '  %>', filetypes):set_end_pair_length(3),
       }
     end,
+    endwise = true,
   },
   html = {
     filetypes = { 'html' },
@@ -752,6 +757,7 @@ return {
     -- No formatter here: `JuliaFormatter` is a Julia package, run from
     -- inside a project's own environment rather than as a binary.
     lsp_servers = { 'julials' },
+    endwise = true,
   },
   kotlin = {
     filetypes = { 'kotlin' },
@@ -865,6 +871,7 @@ return {
           :set_end_pair_length(2),
       }
     end,
+    endwise = true,
   },
   perl = {
     filetypes = { 'perl' },
@@ -962,6 +969,7 @@ return {
         rule('<%', '  %>', filetypes):set_end_pair_length(3),
       }
     end,
+    endwise = true,
   },
   ruby = {
     filetypes = { 'ruby' },
@@ -1033,6 +1041,7 @@ return {
       ltcc_code_action,
       ltcc_diagnostics,
     },
+    endwise = true,
   },
   svelte = { -- See `typescript`
     filetypes = { 'svelte' },
@@ -1084,6 +1093,7 @@ return {
     linters = { 'twigcs' },
     formatters = { 'twig-cs-fixer' },
     autopairs = jinja_autopairs,
+    endwise = true,
   },
   typescript = {
     filetypes = { 'typescript' },
@@ -1116,6 +1126,7 @@ return {
     parser = 'vim',
     lsp_servers = { 'vimls' },
     linters = { 'vint' },
+    endwise = true,
   },
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
@@ -1158,6 +1169,7 @@ return {
     -- the linter is `zsh -n` and `beautysh` is what knows the syntax.
     linters = { { 'zsh', mason = { enabled = false } } },
     formatters = { 'beautysh' },
+    endwise = true,
   },
   ------------------------------------ {
 
@@ -1233,6 +1245,7 @@ return {
         mason = { enabled = false },
       },
     },
+    endwise = true,
   },
   csv = {
     filetypes = { 'csv' },
@@ -1371,6 +1384,7 @@ return {
         html_comment_autopairs(filetypes, rule)
       )
     end,
+    endwise = true,
   },
   http = {
     filetypes = { 'http' },
@@ -1407,6 +1421,7 @@ return {
     lsp_servers = { 'jinja_lsp', 'harper_ls' },
     formatters = { djlint_formatter },
     autopairs = jinja_autopairs,
+    endwise = true,
   },
   jq = {
     filetypes = { 'jq' },
@@ -1480,6 +1495,7 @@ return {
       ltcc_code_action,
       ltcc_diagnostics,
     },
+    endwise = true,
   },
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
@@ -1534,6 +1550,7 @@ return {
     -- diagram readable, in its own file and inside a markdown fence.
     filetypes = { 'mermaid' },
     parser = 'mermaid',
+    endwise = true,
   },
   nginx = {
     filetypes = { 'nginx' },
