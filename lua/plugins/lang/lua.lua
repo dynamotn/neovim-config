@@ -62,9 +62,8 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         },
       },
       {
-        -- Debug adapters & configurations
+        -- Debug adapter
         'jbyuki/one-small-step-for-vimkind',
-        ft = language.filetypes,
         keys = {
           {
             '<leader>dn',
@@ -73,7 +72,16 @@ return vim.list_contains(_G.enabled_languages, 'lua')
             desc = 'Launch debug Neovim',
           },
         },
-        config = function()
+      },
+      {
+        -- Debug configurations
+        --
+        -- Registered when nvim-dap loads rather than when a Lua file opens:
+        -- loading on `ft` pulled in nvim-dap and every adapter hanging off it
+        -- on each Lua buffer, a debugger that is rarely used. `osv` itself is
+        -- only required once a session starts.
+        'mfussenegger/nvim-dap',
+        opts = function()
           local dap = require('dap')
           dap.adapters.nlua = function(callback, conf)
             local adapter = {

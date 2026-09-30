@@ -53,7 +53,10 @@ return {
   {
     -- Convert text case
     'johmsalas/text-case.nvim',
-    event = { 'BufWinEnter' },
+    -- Only its commands and `ga` mappings are needed, and nothing can reach
+    -- them before the first screen is drawn: loading on `BufWinEnter` put the
+    -- plugin, and which-key with it, in front of every file being opened.
+    event = 'VeryLazy',
     keys = {
       'ga',
     },

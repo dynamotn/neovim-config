@@ -94,13 +94,30 @@ return {
         enable = true,
       },
     },
-    config = function(opts)
+    config = function(_, opts)
       local presets = require('markview.presets')
       require('markview').setup(vim.tbl_deep_extend('force', opts, {
         markdown = {
           headings = presets.headings.glow,
         },
       }))
+
+      -- Parsers are installed the first time their filetype opens, so on that
+      -- first open there is none yet, and markview fails to start treesitter
+      -- on the buffer. `preview.condition` cannot say no: markview turns a
+      -- `false` from it into `nil`. So the buffer is left alone here instead,
+      -- and markview attaches when it is reloaded once the parser lands.
+      local actions = require('markview.actions')
+      local attach = actions.attach
+      actions.attach = function(buffer, ...)
+        local buf = (buffer == nil or buffer == 0)
+            and vim.api.nvim_get_current_buf()
+          or buffer
+        local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
+        local ok, added = pcall(vim.treesitter.language.add, lang or '')
+        if not (lang and ok and added) then return end
+        return attach(buffer, ...)
+      end
     end,
   },
 }

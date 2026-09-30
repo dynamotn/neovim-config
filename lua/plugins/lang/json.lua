@@ -4,8 +4,12 @@ return vim.list_contains(_G.enabled_languages, 'json')
     and {
       {
         -- Schema
+        --
+        -- A library and nothing else: `before_init` below requires it when
+        -- the server starts, and that is what loads it. Loading it on `ft`
+        -- instead made lazy.nvim replay `FileType` for the buffer, running
+        -- every handler of the filetype a second time.
         'b0o/SchemaStore.nvim',
-        ft = language.filetypes,
       },
       {
         -- LSP config

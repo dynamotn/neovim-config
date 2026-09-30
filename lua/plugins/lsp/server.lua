@@ -169,6 +169,29 @@ return {
         end
       end
 
+      -- Reading `vim.lsp.config[server]` is not a table lookup: for a server
+      -- nothing has enabled yet, every read searches the runtimepath for
+      -- `lsp/<server>.lua`, runs what it finds and merges the result again.
+      -- With a server named by several languages that cost is paid on each
+      -- of them, so the widened filetypes are worked out once per server.
+      local widened_filetypes = {} ---@type table<string, string[]>
+      ---@param server string
+      ---@param server_opts vim.lsp.Config
+      ---@return string[]
+      local function widen_filetypes(server, server_opts)
+        if not widened_filetypes[server] then
+          local filetypes = vim.deepcopy(
+            server_opts.filetypes
+              or (vim.lsp.config[server] or {}).filetypes
+              or {}
+          )
+          widened_filetypes[server] = LazyVim.dedup(
+            vim.list_extend(filetypes, declared_filetypes[server])
+          )
+        end
+        return widened_filetypes[server]
+      end
+
       ---@param server string
       ---@param enabled? fun(bufnr: integer): boolean
       ---@param name string
@@ -185,15 +208,8 @@ return {
         -- spec is silent. Copied, because `opts.servers` is shared between the
         -- calls this function gets for each language.
         if declared_filetypes[server] then
-          local filetypes = vim.deepcopy(
-            server_opts.filetypes
-              or (vim.lsp.config[server] or {}).filetypes
-              or {}
-          )
           server_opts = vim.tbl_extend('force', server_opts, {
-            filetypes = LazyVim.dedup(
-              vim.list_extend(filetypes, declared_filetypes[server])
-            ),
+            filetypes = vim.deepcopy(widen_filetypes(server, server_opts)),
           })
         end
 
@@ -234,6 +250,14 @@ return {
             require('util.lazy_install').on_filetype(
               language.filetypes,
               function(args)
+                -- Whether the package is there is asked first: that is one
+                -- `stat`, where resolving the config searches the runtimepath,
+                -- and this runs for every buffer of these filetypes although
+                -- the server is nearly always installed already.
+                local server_package = mason_configs[server]
+                if require('mason-registry').is_installed(server_package) then
+                  return
+                end
                 local lsp_config = vim.lsp.config[server]
                 if lsp_config == nil then return end
                 if enabled and not enabled(args.buf) then return end
@@ -241,15 +265,7 @@ return {
                   lsp_config.filetypes == nil
                   or vim.tbl_contains(lsp_config.filetypes, args.match)
                 then
-                  local server_package = mason_configs[server]
-                  if
-                    server_package ~= nil
-                    and not require('mason-registry').is_installed(
-                      server_package
-                    )
-                  then
-                    require('mason.api.command').MasonInstall({ server_package })
-                  end
+                  require('mason.api.command').MasonInstall({ server_package })
                 end
               end
             )
@@ -258,8 +274,11 @@ return {
 
         local setup = opts.setup[server] or opts.setup['*']
         if setup and setup(server, server_opts) then return end
-        vim.lsp.config[server] =
-          vim.tbl_deep_extend('force', vim.lsp.config[server], server_opts)
+        -- Merged into what was set for the server so far, not into its
+        -- resolved config: resolving it here would search the runtimepath
+        -- once more, and `vim.lsp` lays `lsp/<server>.lua` and `*` underneath
+        -- on its own when the server starts.
+        vim.lsp.config(server, server_opts)
 
         -- manually enable if this is a server that cannot be installed with mason-lspconfig
         if not mason_configs[server] then

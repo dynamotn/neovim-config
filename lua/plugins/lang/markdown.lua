@@ -19,8 +19,11 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
       },
       {
         -- Preview markdown
+        -- No `ft`: the key below is already limited to these filetypes and
+        -- loads the plugin, which has nothing else to set up. Loading on `ft`
+        -- made lazy.nvim replay `FileType` on every Markdown buffer, sourcing
+        -- its ftplugins and syntax files and starting its servers twice.
         'toppair/peek.nvim',
-        ft = language.filetypes,
         build = 'deno task --quiet build:fast',
         enabled = _G.used_full_plugins or vim.fn.executable('deno') == 1,
         keys = {

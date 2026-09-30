@@ -2,7 +2,9 @@ return {
   {
     -- Yank history
     'gbprod/yanky.nvim',
-    event = 'LazyFile',
+    -- The ring only has to be listening by the time a key can be pressed,
+    -- which is after the first screen, not before the file is shown.
+    event = 'VeryLazy',
     opts = {
       system_clipboard = {
         sync_with_ring = not vim.env.SSH_CONNECTION,
