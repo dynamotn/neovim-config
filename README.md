@@ -28,8 +28,8 @@
   - Supported many languages, frameworks and tools (see [here](#languages-frameworks-or-tools-support))
   - Load per machine configurations via `lua/per_machine/init.lua` if exists (see [my config](./lua/per_machine/config.lua.tmpl), managed by [chezmoi](https://www.chezmoi.io/))
   - Lazy install treesitter parsers, LSP servers, formatters, linters, debug adapters... if needed when open file
-  - Bundle languages/tools when containerize or builtin development environments by `_G.bundle_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
-  - Enable/disable languages/tools by `_G.enabled_languages` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
+  - Bundle languages/tools when containerize or builtin development environments by `_G.bundle_languages` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
+  - Enable/disable languages/tools by `_G.enabled_languages` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
   - Easy to show which tools are installed in lualine
   - Trigger linters/formatters if installed only
   - Add bunch of missing features of the different tools:
@@ -40,7 +40,7 @@
     - Render diagram on kitty terminal (also support `zellij`)
     - etc
   - Integrate with various tools:
-    - [Obsidian](https://obsidian.md/) by `_G.obsidian_vaults` in [init.lua](./init.lua) (see [my config](./lua/per_machine.lua.tmpl))
+    - [Obsidian](https://obsidian.md/) by `_G.obsidian.paths` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
     - [chezmoi](https://www.chezmoi.io/)
     - **Firefox** or **Chrome** browser with [embedded neovim](https://github.com/glacambre/firenvim)
     - [zellij](https://zellij.dev/)
@@ -50,7 +50,7 @@
 >
 > - Not used for neovim < 0.13 or vim (any version)
 > - Always used latest neovim (currently 0.13) to get the best experience and performance
-> - Used for Linux only or Mac (not sure)
+> - Used on Linux and macOS
 
 ## Languages, Frameworks, or Tools support
 
@@ -171,7 +171,12 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 
 ## Key bindings
 
-My habit key is `Space`. You can explore it :)
+The leader key is `Space`. Press it and wait: [which-key](https://github.com/folke/which-key.nvim)
+lists every mapping under it, and `<Space>sk` searches all of them.
+
+- Custom mappings live in [lua/config/keymaps.lua](./lua/config/keymaps.lua),
+  and plugin-specific ones in the `keys` of each spec under [lua/plugins](./lua/plugins).
+- Everything else follows [LazyVim's defaults](https://www.lazyvim.org/keymaps).
 
 ## Benchmark
 
