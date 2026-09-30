@@ -10,35 +10,51 @@ return {
       automatic_installation = false,
     },
     config = function(_, opts)
+      local dap_util = require('util.dap')
+      local registry = require('mason-registry')
+      opts.ensure_installed = opts.ensure_installed or {}
+
+      ---@param spec string|DyDapSpec
+      ---@param install fun(package: string)
+      local function install_missing(spec, install)
+        local package = dap_util.package(spec)
+        if package and not registry.is_installed(package) then
+          install(package)
+        end
+      end
+
       local languages = require('config.languages')
       for name, language in pairs(languages) do
         if language.dap then
-          -- install server of language in bundle languages
+          -- install server of language in bundle languages: mason-nvim-dap
+          -- takes the adapters it knows by name, the rest are installed here
           if vim.list_contains(_G.bundle_languages, name) then
-            opts.ensure_installed =
-              vim.list_extend(opts.ensure_installed, language.dap)
+            for _, spec in ipairs(language.dap) do
+              if dap_util.is_mapped(spec) then
+                table.insert(opts.ensure_installed, spec)
+              else
+                install_missing(spec, function(package)
+                  local ok, pkg = pcall(registry.get_package, package)
+                  if ok then pkg:install() end
+                end)
+              end
+            end
           end
           -- lazy install server of language not in bundle languages
           if vim.list_contains(_G.enabled_languages, name) then
-            vim.api.nvim_create_autocmd({ 'FileType' }, {
-              pattern = language.filetypes,
-              group = vim.api.nvim_create_augroup('mason_dap_' .. name, {}),
-              callback = function()
-                local dap_mapping = require('mason-nvim-dap.mappings.source')
-                for _, dap_server in ipairs(language.dap) do
-                  local server_package =
-                    dap_mapping.nvim_dap_to_package[dap_server]
-                  if
-                    server_package ~= nil
-                    and not require('mason-registry').is_installed(
-                      server_package
-                    )
-                  then
-                    require('mason.api.command').MasonInstall({ server_package })
-                  end
+            require('util.lazy_install').on_filetype(
+              language.filetypes,
+              function()
+                for _, spec in ipairs(language.dap) do
+                  install_missing(
+                    spec,
+                    function(package)
+                      require('mason.api.command').MasonInstall({ package })
+                    end
+                  )
                 end
-              end,
-            })
+              end
+            )
           end
         end
       end

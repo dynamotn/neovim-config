@@ -16,6 +16,9 @@ vim.opt.runtimepath:prepend(root)
 vim.opt.runtimepath:append(data .. '/lazy/conform.nvim')
 vim.opt.runtimepath:append(data .. '/lazy/nvim-lint')
 vim.opt.runtimepath:append(data .. '/lazy/nvim-lspconfig')
+-- mason-nvim-dap's name-to-package table leans on mason's own library
+vim.opt.runtimepath:append(data .. '/lazy/mason.nvim')
+vim.opt.runtimepath:append(data .. '/lazy/mason-nvim-dap.nvim')
 
 local registry = data
   .. '/mason/registries/github/mason-org/mason-registry/registry.json'
@@ -29,6 +32,8 @@ local checkable = {
   formatters = vim.fn.isdirectory(data .. '/lazy/conform.nvim') == 1,
   linters = vim.fn.isdirectory(data .. '/lazy/nvim-lint') == 1,
   lsp = vim.fn.isdirectory(data .. '/lazy/nvim-lspconfig') == 1,
+  dap = vim.fn.isdirectory(data .. '/lazy/mason-nvim-dap.nvim') == 1
+    and vim.fn.isdirectory(data .. '/lazy/mason.nvim') == 1,
   mason = vim.fn.filereadable(registry) == 1,
 }
 
@@ -37,6 +42,7 @@ local needs = {
   formatters = 'conform.nvim',
   linters = 'nvim-lint',
   lsp = 'nvim-lspconfig',
+  dap = 'mason-nvim-dap.nvim and mason.nvim',
   mason = 'the Mason registry',
 }
 
@@ -72,6 +78,7 @@ end
 
 local packages = mason_packages()
 local languages = require('config.languages')
+local dap_util = require('util.dap')
 local names = vim.tbl_keys(languages)
 table.sort(names)
 
@@ -154,6 +161,25 @@ for _, name in ipairs(names) do
         == 0
     then
       report(name, 'lsp', server_name, 'no such server config')
+    end
+  end
+
+  -- an adapter is installed through the package mason-nvim-dap maps its name
+  -- to, or through the one the entry names when there is no such mapping
+  for _, spec in ipairs(language.dap or {}) do
+    local adapter = dap_util.name(spec)
+    local package = dap_util.package(spec)
+    if not package then
+      if checkable.dap then
+        report(name, 'dap', adapter, 'not mapped to a Mason package')
+      end
+    elseif checkable.mason and not packages[package] then
+      report(
+        name,
+        'dap',
+        adapter,
+        string.format('no Mason package `%s`', package)
+      )
     end
   end
 end

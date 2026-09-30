@@ -9,7 +9,7 @@
 ---@field linters? (string|DyLinterSpec)[]
 ---@field formatters? (string|DyFormatterSpec)[]
 ---@field null_ls? DyNullLsSpec[]
----@field dap? string[]
+---@field dap? (string|DyDapSpec)[]
 ---@field test? string[]
 ---@field dial? fun(augend: Augend): Augend[]
 ---@field autopairs? fun(filetypes: string[], rule: Rule, cond: CondOpts, ts_cond: table): Rule[]
@@ -71,6 +71,11 @@
 ---@field command string
 ---@field custom? boolean
 ---@field mason? DyMasonSpec
+
+--- A debug adapter mason-nvim-dap does not map to a package, see `util.dap`
+---@class DyDapSpec
+---@field [1] string
+---@field mason DyMasonSpec
 
 ---@class DyMasonSpec
 ---@field enabled? boolean
@@ -916,6 +921,8 @@ return {
     -- both come from CPAN, Mason carries neither
     linters = { { 'perlcritic', mason = { enabled = false } } },
     formatters = { { 'perltidy', mason = { enabled = false } } },
+    dap = { { 'perl', mason = { package = 'perl-debug-adapter' } } },
+    test = { 'vim-test' },
   },
   php = {
     filetypes = { 'php' },
@@ -1024,6 +1031,8 @@ return {
     -- `rustfmt` comes with the toolchain, Mason has no package for it.
     formatters = { { 'rustfmt', mason = { enabled = false } } },
     dap = { 'codelldb' },
+    -- `rustaceanvim` serves the neotest adapter, from `cargo test` or nextest
+    test = { 'rustaceanvim.neotest' },
     autopairs = function(filetypes, rule)
       return vim.list_extend(block_comment_autopairs(filetypes, rule), {
         -- Close a raw string literal, which the plain quote rule cannot see
@@ -1194,6 +1203,8 @@ return {
     formatters = {
       { 'zigfmt', command = 'zig', mason = { enabled = false } },
     },
+    dap = { 'codelldb' },
+    test = { 'neotest-zig' },
     autopairs = block_comment_autopairs,
   },
   zsh = { -- See `bash`

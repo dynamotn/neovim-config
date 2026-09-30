@@ -12,6 +12,18 @@ return vim.list_contains(_G.enabled_languages, 'zig')
         },
       },
       {
+        -- Debug adapters & configurations: what `zig build` leaves in
+        -- `zig-out/bin`, through the same `codelldb` the C family uses
+        'mfussenegger/nvim-dap',
+        optional = true,
+        opts = function()
+          local dap_util = require('util.dap')
+          dap_util.codelldb_adapter()
+          require('dap').configurations.zig =
+            dap_util.codelldb_configurations('zig-out/bin/')
+        end,
+      },
+      {
         -- Test adapter
         'nvim-neotest/neotest',
         dependencies = {

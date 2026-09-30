@@ -20,6 +20,18 @@ return vim.list_contains(_G.enabled_languages, 'swift')
         },
       },
       {
+        -- Debug adapters & configurations: a SwiftPM or `swiftc` binary,
+        -- through the same `codelldb` the C family uses
+        'mfussenegger/nvim-dap',
+        optional = true,
+        opts = function()
+          local dap_util = require('util.dap')
+          dap_util.codelldb_adapter()
+          require('dap').configurations.swift =
+            dap_util.codelldb_configurations('.build/debug/')
+        end,
+      },
+      {
         -- Build, run and test an Xcode project without leaving the editor
         'wojciech-kulik/xcodebuild.nvim',
         ft = language.filetypes,
