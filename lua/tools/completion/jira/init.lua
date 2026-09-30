@@ -151,7 +151,9 @@ return h.make_builtin({
           for row_kind, list in pairs(rows) do
             for _, row in ipairs(list) do
               local candidate, key = candidate_of(row_kind, row)
-              if candidate then
+              -- The two come and go together, but saying so keeps the key a
+              -- `string` rather than a `string?` for whoever reads it next
+              if candidate and key then
                 table.insert(items, candidate)
                 by_key[key] = by_key[key] or {}
                 table.insert(by_key[key], candidate)
