@@ -235,17 +235,6 @@ return vim.list_contains(_G.enabled_languages, 'bash')
         },
       },
       {
-        -- Extend LSP config of harper_ls by plugin for Bash
-        'neovim/nvim-lspconfig',
-        opts = function(_, opts)
-          LazyVim.extend(
-            opts.servers.harper_ls,
-            'filetypes',
-            language.filetypes
-          )
-        end,
-      },
-      {
         -- Custom neogen with my Shell style guide
         'neogen',
         opts = {

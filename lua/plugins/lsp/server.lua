@@ -153,6 +153,33 @@ return {
       local mason_configs =
         require('mason-lspconfig').get_mappings().lspconfig_to_package
       local ensure_installed = {} ---@type string[]
+
+      -- get all the servers that are available through my config
+      local languages = require('config.languages')
+
+      -- Every filetype whose language declares a server, keyed by server. A
+      -- language entry naming a server is the only place that says the server
+      -- belongs to those filetypes, so without this a bare `harper_ls = {}` in
+      -- a language's plugin spec attaches nothing, and the one spec that does
+      -- set `filetypes` narrows the server down to its own language.
+      local declared_filetypes = {} ---@type table<string, string[]>
+      for _, language in pairs(languages) do
+        -- '*' and '_' are pseudo filetypes, not something a server attaches to
+        if
+          not vim.list_contains(language.filetypes, '*')
+          and not vim.list_contains(language.filetypes, '_')
+        then
+          for _, lsp_server in ipairs(language.lsp_servers or {}) do
+            local server = type(lsp_server) == 'table' and lsp_server[1]
+              or lsp_server--[[@as string]]
+            declared_filetypes[server] = vim.list_extend(
+              declared_filetypes[server] or {},
+              language.filetypes
+            )
+          end
+        end
+      end
+
       local function configure(server, enabled, name, language)
         if server == '*' then return end
         local server_opts = opts.servers[server] or {}
@@ -160,6 +187,23 @@ return {
           or (not server_opts) and { enabled = false }
           or server_opts--[[@as vim.lsp.Config]]
         if enabled == false then return end
+
+        -- Widen the server to every filetype that declares it, starting from
+        -- whatever its plugin spec asked for, or its shipped default when the
+        -- spec is silent. Copied, because `opts.servers` is shared between the
+        -- calls this function gets for each language.
+        if declared_filetypes[server] then
+          local filetypes = vim.deepcopy(
+            server_opts.filetypes
+              or (vim.lsp.config[server] or {}).filetypes
+              or {}
+          )
+          server_opts = vim.tbl_extend('force', server_opts, {
+            filetypes = LazyVim.dedup(
+              vim.list_extend(filetypes, declared_filetypes[server])
+            ),
+          })
+        end
 
         -- automatic install lsp servers
         if mason_configs[server] then
@@ -205,8 +249,6 @@ return {
         end
       end
 
-      -- get all the servers that are available through my config
-      local languages = require('config.languages')
       for name, language in pairs(languages) do
         for _, lsp_server in ipairs(language.lsp_servers or {}) do
           local server
