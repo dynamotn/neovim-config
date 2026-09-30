@@ -2,57 +2,89 @@ local languages_list = require('config.languages')
 
 local M = {}
 
+--- Filetype to the enabled language that claims it, and each language's
+--- tools, worked out once. The statusline asks on every redraw, and walking
+--- every filetype of every language each time adds up. Built on first use
+--- rather than on `require`, so `per_machine` has had its say over
+--- `_G.enabled_languages` by then.
+---@type table<string, string>?
+local language_of
+---@type table<string, string[]>
+local tools_of = {}
+--- Answers of the `enabled` checks, per buffer and keyed by the buffer's name
+--- when asked: a check may walk up the file system, and a rename or `:saveas`
+--- is the only thing that can change its answer.
+---@type table<integer, { name: string, answers: table<string, boolean> }>
+local enabled_of = {}
+
+--- Return whether `server` would attach to `bufnr`, as its spec decides
+---@param server DyLspSpec
+---@param bufnr integer
+---@return boolean
+local function is_enabled(server, bufnr)
+  if not server.enabled then return true end
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  local cached = enabled_of[bufnr]
+  if not cached or cached.name ~= name then
+    cached = { name = name, answers = {} }
+    enabled_of[bufnr] = cached
+  end
+  if cached.answers[server[1]] == nil then
+    cached.answers[server[1]] = server.enabled(bufnr) and true or false
+  end
+  return cached.answers[server[1]]
+end
+
 --- Return language from filetype
 ---@param filetype string Filetype of buffer
+---@return string?
 M.get_language_from_filetype = function(filetype)
-  for name, language in pairs(languages_list) do
-    for _, ft in pairs(language.filetypes) do
-      if filetype == ft and vim.list_contains(_G.enabled_languages, name) then
-        return name
+  if not language_of then
+    language_of = {}
+    for _, name in ipairs(_G.enabled_languages) do
+      for _, ft in ipairs((languages_list[name] or {}).filetypes or {}) do
+        language_of[ft] = name
       end
     end
   end
+  return language_of[filetype]
+end
+
+--- Return the entries of `field` for `language_name`, after the ones every
+--- filetype gets from `*`
+---@param language_name string
+---@param field string
+---@return table
+local function with_common(language_name, field)
+  return vim.list_extend(
+    vim.deepcopy(languages_list['*'][field] or {}),
+    languages_list[language_name][field] or {}
+  )
 end
 
 --- Return list command of tools for formatters, linters and other actions
 ---@param filetype string Filetype of buffer
 ---@return string[]
 M.get_tools_by_filetype = function(filetype)
-  local result = {}
   local language_name = M.get_language_from_filetype(filetype) or '_'
-  local formatters = vim.list_extend(
-    vim.deepcopy(languages_list['*'].formatters or {}),
-    languages_list[language_name].formatters or {}
-  )
-  local linters = vim.list_extend(
-    vim.deepcopy(languages_list['*'].linters or {}),
-    languages_list[language_name].linters or {}
-  )
-  local null_ls = vim.list_extend(
-    vim.deepcopy(languages_list['*'].null_ls or {}),
-    languages_list[language_name].null_ls or {}
-  )
+  if tools_of[language_name] then return tools_of[language_name] end
 
-  for _, tool in ipairs(formatters or {}) do
-    if type(tool) == 'string' then
-      table.insert(result, tool)
-    elseif type(formatters) == 'table' then
-      table.insert(result, tool.command or tool[1])
+  local result = {}
+  for _, field in ipairs({ 'formatters', 'linters' }) do
+    for _, tool in ipairs(with_common(language_name, field)) do
+      if type(tool) == 'string' then
+        table.insert(result, tool)
+      else
+        table.insert(result, tool.command or tool[1])
+      end
     end
   end
-
-  for _, tool in ipairs(linters or {}) do
-    if type(tool) == 'string' then
-      table.insert(result, tool)
-    elseif type(linters) == 'table' then
-      table.insert(result, tool.command or tool[1])
-    end
-  end
-
-  for _, tool in ipairs(null_ls or {}) do
+  for _, tool in ipairs(with_common(language_name, 'null_ls')) do
     table.insert(result, tool.command)
   end
-  return LazyVim.dedup(result)
+
+  tools_of[language_name] = LazyVim.dedup(result)
+  return tools_of[language_name]
 end
 
 --- Return the Mason package name of a tool spec
@@ -80,15 +112,11 @@ M.get_lsp_servers_by_filetype = function(filetype, bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local result = {}
   local language_name = M.get_language_from_filetype(filetype) or '_'
-  local lsp_servers = vim.list_extend(
-    vim.deepcopy(languages_list['*'].lsp_servers or {}),
-    languages_list[language_name].lsp_servers or {}
-  )
 
-  for _, server in ipairs(lsp_servers) do
+  for _, server in ipairs(with_common(language_name, 'lsp_servers')) do
     local server_name = server --[[@as string]]
     if type(server) == 'table' then
-      if server.enabled and not server.enabled(bufnr) then goto continue end
+      if not is_enabled(server, bufnr) then goto continue end
       server_name = server[1]
     end
     local lsp_config = vim.lsp.config[server_name]
