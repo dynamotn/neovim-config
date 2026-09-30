@@ -59,6 +59,23 @@ end
 --- A path turned into a glob that only matches itself
 local function to_pattern(path) return (path:gsub('[%[%]{}()*?!+@\\]', '\\%0')) end
 
+local function redraw_status()
+  local ok, lualine = pcall(require, 'lualine')
+  if ok then
+    lualine.refresh({ place = { 'statusline' } })
+  else
+    vim.cmd.redrawstatus()
+  end
+end
+
+--- Refresh `b:yaml_schema_name` once the server has had time to apply a new
+--- configuration, in case no `DiagnosticChanged` comes to do it
+local function refresh_name_later(bufnr)
+  vim.defer_fn(function()
+    if vim.api.nvim_buf_is_valid(bufnr) then M.refresh_name(bufnr) end
+  end, 1500)
+end
+
 local function notify(msg, level)
   vim.notify(msg, level or vim.log.levels.INFO, { title = 'YAML schema' })
 end
@@ -254,6 +271,11 @@ function M.set(bufnr, schema, auto)
     'workspace/didChangeConfiguration',
     { settings = client.settings }
   )
+  -- Show the choice right away; the server confirms it once it has
+  -- revalidated the buffer, which `DiagnosticChanged` catches
+  vim.b[bufnr].yaml_schema_name = M.get_name(schema.uri, schema.name)
+  redraw_status()
+  refresh_name_later(bufnr)
 end
 
 --- Drop the schema set for this buffer, and let detection run again
@@ -283,6 +305,11 @@ function M.reset(bufnr, silent)
         { settings = client.settings }
       )
     end
+  end
+  if not silent and vim.api.nvim_buf_is_loaded(bufnr) then
+    vim.b[bufnr].yaml_schema_name = nil
+    redraw_status()
+    refresh_name_later(bufnr)
   end
 end
 
@@ -543,8 +570,9 @@ end
 
 --- Human name of a schema URI
 ---@param uri string
+---@param title? string title of the schema, when nothing better is known
 ---@return string
-function M.get_name(uri)
+function M.get_name(uri, title)
   if uri == KUBERNETES then return 'Kubernetes' end
   if uri == CLOUD_INIT then return 'cloud-init' end
   if not names then
@@ -561,7 +589,30 @@ function M.get_name(uri)
   local group, kind, version =
     uri:match('/CRDs%-catalog/[^/]+/([^/]+)/([^_/]+)_([^/]+)%.json$')
   if group then return ('%s (%s/%s)'):format(kind, group, version) end
-  return 'Custom'
+  return title or 'Custom'
+end
+
+--- Ask the server which schema the buffer uses, and keep its name in
+--- `b:yaml_schema_name` for the statusline. Asking on every redraw instead
+--- either blocks, or times out while the server loads a schema just chosen.
+---@param bufnr integer
+function M.refresh_name(bufnr)
+  local client = get_client(bufnr)
+  if not client then return end
+  client:request(
+    ---@diagnostic disable-next-line: param-type-mismatch
+    'yaml/get/jsonSchema',
+    { vim.uri_from_bufnr(bufnr) },
+    function(err, result)
+      if err or not vim.api.nvim_buf_is_valid(bufnr) then return end
+      local schema = result and result[1]
+      local name = schema and schema.uri and M.get_name(schema.uri, schema.name)
+      if vim.b[bufnr].yaml_schema_name == name then return end
+      vim.b[bufnr].yaml_schema_name = name
+      redraw_status()
+    end,
+    bufnr
+  )
 end
 
 local group = vim.api.nvim_create_augroup('util.yaml_schema', { clear = true })
@@ -586,7 +637,14 @@ function M.on_init(client)
         desc = 'Pick a YAML schema for the buffer',
       })
       M.detect(ev.buf)
+      M.refresh_name(ev.buf)
     end,
+  })
+  -- The server revalidates a buffer whenever its schema may have changed: a
+  -- new configuration, a modeline typed in, a schema finished loading
+  vim.api.nvim_create_autocmd('DiagnosticChanged', {
+    group = group,
+    callback = function(ev) M.refresh_name(ev.buf) end,
   })
   vim.api.nvim_create_autocmd('BufWritePost', {
     group = group,

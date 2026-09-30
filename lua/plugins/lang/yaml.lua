@@ -134,32 +134,9 @@ return condition
         'nvim-lualine/lualine.nvim',
         opts = function(_, opts)
           table.insert(opts.sections.lualine_y, 1, {
-            function(msg)
-              msg = icons.treesitter.schema
-              local bufnr = vim.api.nvim_get_current_buf()
-              local clients = vim.lsp.get_clients({
-                bufnr = bufnr,
-                name = 'yamlls',
-              })
-              for _, client in pairs(clients) do
-                local response, _ = client:request_sync(
-                  ---@diagnostic disable-next-line: param-type-mismatch
-                  'yaml/get/jsonSchema',
-                  { vim.uri_from_bufnr(bufnr) },
-                  20,
-                  bufnr
-                )
-                if response and response.result and response.result[1] then
-                  local schema = response.result[1]
-                  if schema.uri then
-                    return msg
-                      .. require('util.yaml_schema').get_name(schema.uri)
-                  else
-                    return msg .. 'N/A'
-                  end
-                end
-              end
-              return msg
+            -- Kept up to date by `util.yaml_schema`, asynchronously
+            function()
+              return icons.treesitter.schema .. (vim.b.yaml_schema_name or '')
             end,
             cond = function()
               return vim.list_contains(language.filetypes, vim.bo.filetype)
