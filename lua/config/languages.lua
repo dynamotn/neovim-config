@@ -1171,6 +1171,8 @@ return {
     lsp_servers = { 'vimls' },
     linters = { 'vint' },
     endwise = true,
+    -- `lua << EOF` blocks
+    otter = true,
   },
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
@@ -1528,6 +1530,8 @@ return {
     lsp_servers = { 'just' },
     -- `just --fmt` is the tool itself
     formatters = { { 'just', mason = { enabled = false } } },
+    -- Recipe bodies
+    otter = true,
   },
   kdl = {
     filetypes = { 'kdl' },
@@ -1768,6 +1772,8 @@ return {
       ltcc_code_action,
       ltcc_diagnostics,
     },
+    -- CI and Taskfile scripts: `run`, `script`, `cmds`, ...
+    otter = true,
   },
   yuck = {
     filetypes = { 'yuck' },
