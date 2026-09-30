@@ -954,7 +954,28 @@ return {
   jupyter = {
     filetypes = { 'ipynb' },
     parser = 'json',
-    formatters = { 'jupytext' },
+    formatters = {
+      {
+        -- `jupytext` converts, it does not format, so conform ships no
+        -- definition for it. `--pipe` is what makes it useful here: it runs a
+        -- real formatter over the code cells and writes the notebook back
+        -- with its outputs, execution counts and markdown cells untouched. A
+        -- notebook then gets the same `ruff format` a `.py` buffer does.
+        'jupytext',
+        opts = {
+          command = 'jupytext',
+          args = {
+            '--from',
+            'ipynb',
+            '--to',
+            'ipynb',
+            '--pipe',
+            'ruff format -',
+            '-',
+          },
+        },
+      },
+    },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
