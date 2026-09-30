@@ -70,9 +70,14 @@ M.get_mason_package = function(tool)
 end
 
 --- Return list of LSP servers for filetype
+---
+--- A server whose spec carries an `enabled` check is left out of a buffer it
+--- turns down, the same way `plugins.lsp.server` keeps it from attaching.
 ---@param filetype string Filetype of buffer
+---@param bufnr? integer Buffer the check is asked about, current by default
 ---@return string[]
-M.get_lsp_servers_by_filetype = function(filetype)
+M.get_lsp_servers_by_filetype = function(filetype, bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
   local result = {}
   local language_name = M.get_language_from_filetype(filetype) or '_'
   local lsp_servers = vim.list_extend(
@@ -83,11 +88,8 @@ M.get_lsp_servers_by_filetype = function(filetype)
   for _, server in ipairs(lsp_servers) do
     local server_name = server --[[@as string]]
     if type(server) == 'table' then
-      if server.enabled ~= false then
-        server_name = server[1]
-      else
-        goto continue
-      end
+      if server.enabled and not server.enabled(bufnr) then goto continue end
+      server_name = server[1]
     end
     local lsp_config = vim.lsp.config[server_name]
     if lsp_config == nil or lsp_config.filetypes == nil then goto continue end
