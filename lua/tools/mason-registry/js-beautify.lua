@@ -14,7 +14,7 @@ return {
     'Formatter',
   },
   source = {
-    id = 'pkg:npm/js-beautify@1.15.4',
+    id = 'pkg:npm/js-beautify@2.0.3',
   },
   bin = {
     ['js-beautify'] = 'npm:js-beautify',

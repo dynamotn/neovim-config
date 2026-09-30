@@ -12,7 +12,7 @@ return {
     'LSP',
   },
   source = {
-    id = 'pkg:pypi/termux-language-server@0.0.31',
+    id = 'pkg:pypi/termux-language-server@0.1.12',
   },
   bin = {
     ['termux-language-server'] = 'pypi:termux-language-server',

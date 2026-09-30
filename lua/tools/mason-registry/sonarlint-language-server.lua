@@ -1,3 +1,10 @@
+-- The release is tagged with a build number that the .vsix file it ships
+-- leaves out, so both spellings are derived from one declaration instead of
+-- drifting apart on the next bump.
+-- renovate: datasource=github-releases depName=SonarSource/sonarlint-vscode
+local version = '6.0.0+91043'
+local release = version:match('^[^+]+')
+
 return {
   name = 'sonarlint-language-server',
   description = 'SonarLint Language Server.',
@@ -31,9 +38,9 @@ return {
     'Linter',
   },
   source = {
-    id = 'pkg:github/SonarSource/sonarlint-vscode@5.0.0+80072',
+    id = 'pkg:github/SonarSource/sonarlint-vscode@' .. version,
     asset = {
-      file = 'sonarlint-vscode-5.0.0.vsix',
+      file = 'sonarlint-vscode-' .. release .. '.vsix',
     },
   },
   schemas = {
