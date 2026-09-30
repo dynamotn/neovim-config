@@ -915,6 +915,13 @@ return {
     linters = { 'swiftlint' },
     formatters = { 'swiftformat' },
   },
+  templ = { -- See `go` and `html`
+    filetypes = { 'templ' },
+    parser = 'templ',
+    -- one `templ` binary again: `templ lsp` and `templ fmt`
+    lsp_servers = { 'templ', 'tailwindcss', 'harper_ls' },
+    formatters = { 'templ' },
+  },
   tsx = { -- See `typescript`
     filetypes = { 'typescriptreact', 'typescript.tsx' },
     parser = 'tsx',
