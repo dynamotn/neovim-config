@@ -11,14 +11,27 @@ return {
       },
       {
         -- Workspace diagnostics
-        -- NOTE: will be removed in neovim v0.12.0
+        --
+        -- Neovim's own `vim.lsp.buf.workspace_diagnostics()` only reaches a
+        -- server that answers `workspace/diagnostic`, and few do yet. The
+        -- plugin works with any server by opening every tracked file in it,
+        -- so it stays as the fallback until each server has caught up.
         'artemave/workspace-diagnostics.nvim',
         keys = {
           {
             '<leader>xw',
             function()
-              for _, client in ipairs(vim.lsp.get_clients()) do
-                if vim.tbl_get(client.config, 'filetypes') then
+              -- Not a language server's diagnostics: running these over the
+              -- whole repository only buries the real errors, or sends every
+              -- file to a remote service.
+              local skipped = { 'null-ls', 'harper_ls', 'copilot' }
+              -- Only the servers of this buffer: one serving another project
+              -- would be handed the files of this one.
+              for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+                if vim.list_contains(skipped, client.name) then
+                elseif client:supports_method('workspace/diagnostic') then
+                  vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
+                elseif vim.tbl_get(client.config, 'filetypes') then
                   require('workspace-diagnostics').populate_workspace_diagnostics(
                     client,
                     0
