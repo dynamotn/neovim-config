@@ -61,11 +61,11 @@ return {
     event = 'VeryLazy',
     opts = {
       macos = {
-        enabled = vim.loop.os_uname().sysname == 'Darwin',
+        enabled = vim.uv.os_uname().sysname == 'Darwin',
         default_im = 'com.apple.keylayout.USExtended',
       },
       linux = {
-        enabled = vim.loop.os_uname().sysname == 'Linux',
+        enabled = vim.uv.os_uname().sysname == 'Linux',
         default_im = 'keyboard-us',
         get_im_command = { 'fcitx5-remote', '-n' },
         set_im_command = { 'fcitx5-remote', '-g', 'English' },

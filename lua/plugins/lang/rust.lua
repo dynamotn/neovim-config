@@ -72,7 +72,9 @@ return vim.list_contains(_G.enabled_languages, 'rust')
         config = function(_, opts)
           if LazyVim.has('mason.nvim') then
             local codelldb = vim.fn.exepath('codelldb')
-            local codelldb_lib_ext = io.popen('uname'):read('*l') == 'Linux'
+            -- `io.popen('uname')` forked a shell, never closed the handle
+            -- and blew up whenever the call itself failed
+            local codelldb_lib_ext = vim.uv.os_uname().sysname == 'Linux'
                 and '.so'
               or '.dylib'
             local library_path =
