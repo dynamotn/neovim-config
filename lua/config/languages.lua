@@ -516,6 +516,15 @@ return {
     linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
     formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
   },
+  erlang = { -- See `elixir`
+    filetypes = { 'erlang' },
+    parser = 'erlang',
+    ext = 'erl',
+    -- `elp` is the Erlang Language Platform; `erlang_ls` is the older one and
+    -- is not in lspconfig.
+    lsp_servers = { 'elp' },
+    formatters = { { 'erlfmt', mason = { enabled = false } } },
+  },
   fish = {
     filetypes = { 'fish' },
     parser = 'fish',
