@@ -1165,6 +1165,13 @@ return {
       },
     },
   },
+  just = {
+    filetypes = { 'just' },
+    parser = 'just',
+    lsp_servers = { 'just' },
+    -- `just --fmt` is the tool itself
+    formatters = { { 'just', mason = { enabled = false } } },
+  },
   make = {
     filetypes = { 'config', 'automake', 'make' },
     parser = 'make',

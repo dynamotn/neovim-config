@@ -130,6 +130,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Hyprlang
 - JSON
 - Jsonnet
+- Just
 - Make tools (autoconf, automake, make)
 - Markdown
 - Nginx
