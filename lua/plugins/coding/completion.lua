@@ -305,4 +305,13 @@ return {
       })
     end,
   },
+  {
+    -- Name the group of `plugin/spell.lua` adding words to my word lists
+    'folke/which-key.nvim',
+    opts = {
+      spec = {
+        { '<leader>z', group = 'dictionary', mode = { 'n', 'x' } },
+      },
+    },
+  },
 }
