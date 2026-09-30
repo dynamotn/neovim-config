@@ -21,10 +21,10 @@
 (container_key (string (string_fragment) @string))
 (shape_key (string (string_fragment) @string))
 (escape_sequence) @string.escape
-(label) @text.title
+(label) @markup.heading
 (attr_value) @string
 (integer) @number
-(float) @float
+(float) @number.float
 (boolean) @boolean
 
 ; Comments

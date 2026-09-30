@@ -16,40 +16,39 @@
 ; `@php`, `@auth` and the rest end on their own `directive_start`, which is
 ; plain Blade, so they work. The parser leaves them in an ERROR -- it pairs
 ; only the directives it can see an argument list for -- which is why these
-; patterns carry no `@endable`.
+; patterns carry no `@endable`. That ERROR also swallows any markup before the
+; directive, so the patterns are not anchored to its first child.
+;
+; Once enter is pressed the `directive_start` grows to take the newline in, so
+; its text is `@php\n` rather than `@php` and an exact `#eq?` never matches.
 
 ((ERROR
-  .
   (directive_start) @indent @_d @cursor)
-  (#eq? @_d "@php")
+  (#lua-match? @_d "^@php%s*$")
   (#endwise! "@endphp"))
 
 ((ERROR
-  .
   (directive_start) @indent @_d @cursor)
-  (#eq? @_d "@auth")
+  (#lua-match? @_d "^@auth%s*$")
   (#endwise! "@endauth"))
 
 ((ERROR
-  .
   (directive_start) @indent @_d @cursor)
-  (#eq? @_d "@guest")
+  (#lua-match? @_d "^@guest%s*$")
   (#endwise! "@endguest"))
 
 ((ERROR
-  .
   (directive_start) @indent @_d @cursor)
-  (#eq? @_d "@verbatim")
+  (#lua-match? @_d "^@verbatim%s*$")
   (#endwise! "@endverbatim"))
 
 ((ERROR
-  .
   (directive_start) @indent @_d @cursor)
-  (#eq? @_d "@once")
+  (#lua-match? @_d "^@once%s*$")
   (#endwise! "@endonce"))
 
 ((_
   .
   (directive_start) @indent @_d @cursor) @endable
-  (#eq? @_d "@production")
+  (#lua-match? @_d "^@production%s*$")
   (#endwise! "@endproduction" "" "directive_end"))

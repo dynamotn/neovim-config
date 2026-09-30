@@ -1,5 +1,7 @@
 ; Deliberately no `; extends`: this replaces the upstream query instead of
-; adding to it.
+; adding to it. Neovim takes the first file without `extends` it finds on the
+; runtimepath as the base query, and the plugin's own file comes before
+; anything under `after/`, so the override has to live here, in `queries/`.
 ;
 ; Upstream ends a function through the suffix argument of `#endwise!`, which
 ; hands the directive a capture and pastes that capture's text after the end
