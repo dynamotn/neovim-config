@@ -67,6 +67,22 @@ return {
         end)
       end)
 
+      --- Is `vale` configured for this buffer
+      ---@param buffer integer
+      ---@return boolean
+      local function has_vale_config(buffer)
+        local config = vim.env.VALE_CONFIG_PATH
+        if config ~= nil and vim.fn.filereadable(config) == 1 then
+          return true
+        end
+        local name = vim.api.nvim_buf_get_name(buffer)
+        if name == '' then return false end
+        return vim.fs.find('.vale.ini', {
+          path = vim.fs.dirname(name),
+          upward = true,
+        })[1] ~= nil
+      end
+
       -- `:wq` quits in the same breath as the write, and a linter job started
       -- in that window dies mid-write, taking Neovim down with it (`git commit`
       -- then reports a problem with the editor). So the lint waits for the event
@@ -99,10 +115,10 @@ return {
             if not vim.api.nvim_buf_is_valid(args.buf) then return end
             vim.api.nvim_buf_call(args.buf, function()
               require('lint').try_lint()
-              if
-                vim.fn.filereadable('.vale.ini') > 0
-                or vim.fn.filereadable(vim.env.VALE_CONFIG_PATH) > 0
-              then
+              -- `vale` looks for its config next to the file and upwards from
+              -- there, so asking the working directory answers the wrong
+              -- question the moment a buffer lives outside it.
+              if has_vale_config(args.buf) then
                 require('lint').try_lint({ 'vale' })
               end
             end)
