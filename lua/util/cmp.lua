@@ -38,6 +38,7 @@ M.sources = function(filetype)
   local unique_sources = {
     markdown = { 'nerdfont' },
     typst = { 'nerdfont' },
+    blade = { 'blade-nav', 'laravel' },
     clojure = { 'conjure' },
     fish = { 'fish' },
     julia = { 'latex_symbols' },
