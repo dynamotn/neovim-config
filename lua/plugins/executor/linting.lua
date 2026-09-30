@@ -34,15 +34,30 @@ return {
         end
       end
 
+      -- `:wq` quits in the same breath as the write, and a linter job started
+      -- in that window dies mid-write, taking Neovim down with it (`git commit`
+      -- then reports a problem with the editor). So the lint waits for the event
+      -- loop, and skips altogether once the editor is on its way out.
+      local leaving = false
+      vim.api.nvim_create_autocmd({ 'QuitPre', 'VimLeavePre' }, {
+        callback = function() leaving = true end,
+      })
+
       vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
-        callback = function()
-          require('lint').try_lint()
-          if
-            vim.fn.filereadable('.vale.ini') > 0
-            or vim.fn.filereadable(vim.env.VALE_CONFIG_PATH) > 0
-          then
-            require('lint').try_lint({ 'vale' })
-          end
+        callback = function(args)
+          vim.defer_fn(function()
+            if leaving or vim.v.exiting ~= vim.NIL then return end
+            if not vim.api.nvim_buf_is_valid(args.buf) then return end
+            vim.api.nvim_buf_call(args.buf, function()
+              require('lint').try_lint()
+              if
+                vim.fn.filereadable('.vale.ini') > 0
+                or vim.fn.filereadable(vim.env.VALE_CONFIG_PATH) > 0
+              then
+                require('lint').try_lint({ 'vale' })
+              end
+            end)
+          end, 100)
         end,
       })
     end,
