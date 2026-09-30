@@ -119,6 +119,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Bicep
 - CMake
 - CSV
+- CUE
 - D2
 - DBML
 - Dockerfile

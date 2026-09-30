@@ -1013,6 +1013,13 @@ return {
     linter = { 'd2' },
     formatters = { 'd2' },
   },
+  cue = {
+    filetypes = { 'cue' },
+    parser = 'cue',
+    lsp_servers = { 'cue' },
+    linters = { 'cue' },
+    formatters = { { 'cue_fmt', command = 'cue', mason = { package = 'cue' } } },
+  },
   dbml = {
     filetypes = { 'dbml' },
     parser = {
