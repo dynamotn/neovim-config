@@ -133,6 +133,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Just
 - Make tools (autoconf, automake, make)
 - Markdown
+- Mermaid
 - Nginx
 - Nix
 - PromQL (Prometheus)

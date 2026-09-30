@@ -1229,6 +1229,12 @@ return {
     end,
     otter = true,
   },
+  mermaid = {
+    -- No server and no formatter exist for it; the parser is what makes a
+    -- diagram readable, in its own file and inside a markdown fence.
+    filetypes = { 'mermaid' },
+    parser = 'mermaid',
+  },
   nginx = {
     filetypes = { 'nginx' },
     parser = 'nginx',
