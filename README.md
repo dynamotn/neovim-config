@@ -96,6 +96,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Angular
 - Rails
 - Rust
+- Svelte
 - Vue
 
 ### Tools & Markup

@@ -768,6 +768,14 @@ return {
       ltcc_diagnostics,
     },
   },
+  svelte = { -- See `typescript`
+    filetypes = { 'svelte' },
+    parser = 'svelte',
+    -- `prettier` needs `prettier-plugin-svelte` for a single-file component,
+    -- so formatting is left to the language server.
+    lsp_servers = { 'svelte', 'tailwindcss', 'harper_ls' },
+    linters = js_linters,
+  },
   tsx = { -- See `typescript`
     filetypes = { 'typescriptreact', 'typescript.tsx' },
     parser = 'tsx',
