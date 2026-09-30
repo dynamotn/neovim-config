@@ -14,7 +14,8 @@ local spell_files = {
 
 --- Build the spell file of one language from its dictionaries
 ---@param lang string Key of `spell_files`
-local make_spell = function(lang)
+---@param silent? boolean Keep `mkspell` from reporting its progress
+local make_spell = function(lang, silent)
   -- `lang` is the argument as typed, a plain string. Reaching for a field on
   -- it turned the complaint about a wrong name into a crash of its own.
   if spell_files[lang] == nil then
@@ -25,12 +26,75 @@ local make_spell = function(lang)
     return
   end
   vim.cmd(
-    'mkspell! '
+    (silent and 'silent ' or '')
+      .. 'mkspell! '
       .. vim.fn.fnameescape(vim.fs.joinpath(spell_dir, lang))
       .. ' '
       .. table.concat(spell_files[lang], ' ')
   )
 end
+
+--- The word to add: the selection in Visual mode, else the one under the
+--- cursor. `<cword>` stops at an apostrophe or a dot, so a word like
+--- `LazyVim's` has to be selected.
+---@return string
+local target_word = function()
+  local mode = vim.fn.mode()
+  if mode:match('^[vV\22]') then
+    local text =
+      vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = mode })
+    vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'nx', false)
+    return vim.trim(table.concat(text, ' '))
+  end
+  return vim.fn.expand('<cword>')
+end
+
+--- Add a word to one of my own word lists, rebuild its spell file, and hand
+--- it to every running Harper too, which otherwise would only see it on the
+--- next start, when `lsp/harper_ls.lua` merges the lists again
+---@param lang string A key of `spell_files` whose list lives in `spell/`
+local add_word = function(lang)
+  local word = target_word()
+  if word == '' or word:find('%s') then
+    vim.notify(
+      "[spell] not a single word: '" .. word .. "'",
+      vim.log.levels.WARN
+    )
+    return
+  end
+
+  local list = spell_files[lang][1]
+  local words = vim.uv.fs_stat(list) and vim.fn.readfile(list) or {}
+  if vim.list_contains(words, word) then
+    vim.notify("[spell] '" .. word .. "' is already in " .. lang)
+  else
+    vim.fn.writefile({ word }, list, 'a')
+    make_spell(lang, true)
+    vim.notify("[spell] added '" .. word .. "' to " .. lang)
+  end
+
+  local uri = vim.uri_from_bufnr(0)
+  for _, client in ipairs(vim.lsp.get_clients({ name = 'harper_ls' })) do
+    client:exec_cmd({
+      title = 'Add to user dictionary',
+      command = 'HarperAddToUserDict',
+      arguments = { word, uri },
+    })
+  end
+end
+
+vim.keymap.set(
+  { 'n', 'x' },
+  '<leader>zt',
+  function() add_word('technical') end,
+  { desc = 'Add word to technical' }
+)
+vim.keymap.set(
+  { 'n', 'x' },
+  '<leader>zp',
+  function() add_word('proper') end,
+  { desc = 'Add word to proper nouns' }
+)
 
 vim.api.nvim_create_user_command(
   'DySpell',
