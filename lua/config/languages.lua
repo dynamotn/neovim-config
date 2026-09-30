@@ -851,6 +851,14 @@ return {
       { 'zigfmt', command = 'zig', mason = { enabled = false } },
     },
   },
+  zsh = { -- See `bash`
+    filetypes = { 'zsh' },
+    parser = 'zsh',
+    -- `shellcheck` and `shfmt` are for POSIX shells and bash, not for zsh;
+    -- the linter is `zsh -n` and `beautysh` is what knows the syntax.
+    linters = { { 'zsh', mason = { enabled = false } } },
+    formatters = { 'beautysh' },
+  },
   ------------------------------------ {
 
   -- Tools & Markup {
