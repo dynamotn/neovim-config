@@ -272,23 +272,23 @@ Measured with `nvim --startuptime` over 10 runs on Apple M4 Pro (Darwin arm64), 
 
 | Command | Median | Mean ± σ | Min | Max | Wall clock |
 | ------- | -----: | -------: | --: | --: | ---------: |
-| `nvim --headless +q` | 43.7 ms | 43.3 ± 2.1 ms | 39.6 ms | 46.2 ms | 50.1 ms |
-| `nvim --headless README.md +q` | 276.2 ms | 274.4 ± 4.2 ms | 267.2 ms | 278.5 ms | 312.9 ms |
-| `nvim --headless init.lua +q` | 170.7 ms | 169.2 ± 4.4 ms | 162.3 ms | 175.0 ms | 219.4 ms |
+| `nvim --headless +q` | 53.0 ms | 53.2 ± 1.5 ms | 51.6 ms | 56.1 ms | 61.3 ms |
+| `nvim --headless README.md +q` | 268.4 ms | 268.6 ± 4.2 ms | 262.0 ms | 273.9 ms | 311.4 ms |
+| `nvim --headless init.lua +q` | 175.3 ms | 174.5 ± 5.9 ms | 166.5 ms | 181.2 ms | 228.2 ms |
 
 Slowest steps of `nvim --headless +q` (self + sourced, mean):
 
 ```
 step                            time percent  plot
-init.lua                       39.42   91.03  ███████████████████████▋
-config.lazy                    38.55   89.02  ███████████████████████▏
-catppuccin.vim                  2.09    4.82  █▎
-catppuccin                      1.65    3.80  █
-other-nvim                      1.53    3.53  ▉
-r.config                        1.39    3.21  ▉
-neogen.configurations.sh        1.21    2.79  ▊
-r.utils                         1.18    2.72  ▊
-expanding arguments             1.16    2.67  ▊
-other-nvim.builtin.mappings     0.98    2.25  ▋
+init.lua                       48.70   91.51  ███████████████████████▊
+config.lazy                    47.71   89.65  ███████████████████████▎
+catppuccin.vim                  7.97   14.97  ███▉
+catppuccin                      7.26   13.65  ███▌
+catppuccin.lib.detect_integr    5.23    9.82  ██▌
+other-nvim                      2.09    3.93  █
+expanding arguments             1.43    2.68  ▊
+other-nvim.builtin.mappings     1.38    2.60  ▋
+neogen.configurations.sh        1.27    2.38  ▋
+vim.pack                        0.86    1.62  ▍
 ```
 <!-- bench:end -->
