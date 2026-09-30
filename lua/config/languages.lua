@@ -270,20 +270,6 @@ return {
       -- never the secret itself, so a leak is flagged before it is saved.
       -- Mason has no package; `tools.mason-registry.betterleaks` adds one.
       'betterleaks',
-      -- Reads the file from disk against the rules that apply to it, and
-      -- has nothing to check against outside a project with `.editorconfig`.
-      -- `condition` is LazyVim's, asked before every `*` linter runs.
-      {
-        'editorconfig-checker',
-        opts = {
-          condition = function(ctx)
-            return vim.fs.find('.editorconfig', {
-              path = ctx.dirname,
-              upward = true,
-            })[1] ~= nil
-          end,
-        },
-      },
     },
     null_ls = {
       {
