@@ -209,6 +209,9 @@ return {
       },
       opts = {
         log_level = 'DEBUG',
+        send_code = function()
+          return require('util.ai_guard').codecompanion_send_code()
+        end,
       },
       extensions = {
         mcphub = {

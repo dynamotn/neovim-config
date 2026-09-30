@@ -74,26 +74,32 @@ local function path_is_sensitive(path)
   return false
 end
 
---- Whether a buffer holds a file whose content must not leave the machine
+--- Whether a file's content must not leave the machine
 ---
---- Both the path as opened and the path it resolves to are checked: in a
+--- Both the path as given and the path it resolves to are checked: in a
 --- chezmoi `mode: symlink` home, `~/.config/foo` may be a link into the
 --- repository's `secrets/`, and either name alone would miss one of the two.
----@param bufnr? integer Buffer number, the current one when nil or 0
+---@param path string File path, relative to the working directory or absolute
 ---@return boolean
-M.is_sensitive = function(bufnr)
-  if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
-  if vim.list_contains(M.filetypes, vim.bo[bufnr].filetype) then return true end
-
-  local name = vim.api.nvim_buf_get_name(bufnr)
-  if name == '' then return false end
-  local path = vim.fs.normalize(vim.fn.fnamemodify(name, ':p'))
+M.is_sensitive_path = function(path)
+  if path == '' then return false end
+  path = vim.fs.normalize(vim.fn.fnamemodify(path, ':p'))
   if path_is_sensitive(path) then return true end
 
   local real = vim.uv.fs_realpath(path)
   return real ~= nil
     and real ~= path
     and path_is_sensitive(vim.fs.normalize(real))
+end
+
+--- Whether a buffer holds a file whose content must not leave the machine
+---@param bufnr? integer Buffer number, the current one when nil or 0
+---@return boolean
+M.is_sensitive = function(bufnr)
+  if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
+  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
+  if vim.list_contains(M.filetypes, vim.bo[bufnr].filetype) then return true end
+  return M.is_sensitive_path(vim.api.nvim_buf_get_name(bufnr))
 end
 
 return M
