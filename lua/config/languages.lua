@@ -509,6 +509,14 @@ return {
     lsp_servers = { 'gdscript' },
     formatters = { 'gdscript-formatter' },
   },
+  gleam = {
+    filetypes = { 'gleam' },
+    parser = 'gleam',
+    -- the `gleam` binary is both the server and the formatter, and Mason has
+    -- no package for it
+    lsp_servers = { 'gleam' },
+    formatters = { { 'gleam', mason = { enabled = false } } },
+  },
   go = {
     filetypes = { 'go' },
     parser = 'go',

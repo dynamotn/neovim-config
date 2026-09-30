@@ -70,6 +70,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Elixir
 - Fish
 - GDScript (Godot)
+- Gleam
 - Go
 - GraphQL
 - Haskell
