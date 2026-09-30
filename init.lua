@@ -8,7 +8,8 @@ if vim.fn.has('nvim-' .. version) == 1 then
   -- Load LazyVim
   require('config.lazy')
 else
-  vim.api.nvim_err_writeln(
-    'Neovim ' .. version .. ' or higher is required. Please update Neovim.'
+  vim.notify(
+    'Neovim ' .. version .. ' or higher is required. Please update Neovim.',
+    vim.log.levels.ERROR
   )
 end

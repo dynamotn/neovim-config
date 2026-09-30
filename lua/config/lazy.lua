@@ -39,7 +39,11 @@ require('lazy').setup({
       },
     },
     {
-      -- Use the latest version of LazyVim
+      -- Use the latest version of LazyVim.
+      --
+      -- This cannot be folded into the entry above: LazyVim's own spec sets
+      -- `version = '*'`, so an override only sticks if it comes after the
+      -- import that pulls that spec in.
       'LazyVim/LazyVim',
       branch = 'main',
       version = false,
@@ -86,7 +90,7 @@ require('lazy').setup({
     },
   },
   dev = {
-    path = "~/Working/community/nvim",
+    path = _G.dev_plugins_path,
     patterns = {},
     fallback = false,
   },

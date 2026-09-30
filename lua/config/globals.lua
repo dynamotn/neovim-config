@@ -89,3 +89,6 @@ _G.obsidian = {
 
 ---@type table<string, { priority: integer, takeover: string }> Firenvim setting
 _G.firenvim_site_settings = {}
+
+---@type string Where locally developed plugins are checked out, for `dev` specs
+_G.dev_plugins_path = '~/Working/community/nvim'

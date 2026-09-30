@@ -10,12 +10,24 @@ repos:
       - id: check-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
+        # LazyVim rewrites this one itself, without a final newline, so the
+        # hook would keep undoing it and keep handing back a dirty tree.
+        exclude: ^lazyvim\.json$
       - id: mixed-line-ending
         args:
           - --fix=lf
         description: Forces to replace line ending by the UNIX 'lf' character.
       - id: trailing-whitespace
   - repo: https://github.com/JohnnyMorganz/StyLua
-    rev: v0.12.3
+    rev: v2.5.2
     hooks:
       - id: stylua-system
+  - repo: local
+    hooks:
+      - id: check-startup
+        name: Neovim startup
+        description: Loads this configuration in a throwaway Neovim and fails on any error.
+        entry: scripts/check-startup.sh
+        language: script
+        files: \.lua$
+        pass_filenames: false
