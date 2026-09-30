@@ -814,6 +814,12 @@ return {
     lsp_servers = { 'tinymist' },
     formatters = { 'typstyle' },
   },
+  vim = {
+    filetypes = { 'vim' },
+    parser = 'vim',
+    lsp_servers = { 'vimls' },
+    linters = { 'vint' },
+  },
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
     parser = 'vue',
