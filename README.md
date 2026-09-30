@@ -101,6 +101,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Astro
 - Ember (Handlebars)
 - Laravel (Blade)
+- Phoenix (HEEx)
 - Rails
 - Rust
 - Svelte

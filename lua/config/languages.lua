@@ -548,6 +548,14 @@ return {
     linters = { 'hlint' },
     formatters = { 'fourmolu' },
   },
+  heex = { -- See `elixir`
+    filetypes = { 'heex' },
+    parser = 'heex',
+    -- A Phoenix template is part of an Elixir project: the same server reads
+    -- it and the same `mix format` writes it back.
+    lsp_servers = { 'elixirls', 'tailwindcss', 'harper_ls' },
+    formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+  },
   html = {
     filetypes = { 'html' },
     parser = 'html',
