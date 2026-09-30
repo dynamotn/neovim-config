@@ -88,6 +88,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Scala
 - Solidity
 - SQL
+- Swift
 - Typst
 - Zig
 

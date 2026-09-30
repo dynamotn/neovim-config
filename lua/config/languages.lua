@@ -776,6 +776,14 @@ return {
     lsp_servers = { 'svelte', 'tailwindcss', 'harper_ls' },
     linters = js_linters,
   },
+  swift = {
+    filetypes = { 'swift' },
+    parser = 'swift',
+    -- `sourcekit-lsp` ships with the Swift toolchain, Mason has no package.
+    lsp_servers = { 'sourcekit' },
+    linters = { 'swiftlint' },
+    formatters = { 'swiftformat' },
+  },
   tsx = { -- See `typescript`
     filetypes = { 'typescriptreact', 'typescript.tsx' },
     parser = 'tsx',
