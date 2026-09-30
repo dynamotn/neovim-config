@@ -30,7 +30,9 @@ local language_ids = {
   handlebars = 'html',
   heex = 'html',
   htmlangular = 'html',
+  htmldjango = 'html',
   svelte = 'html',
+  templ = 'html',
   twig = 'html',
   vue = 'html',
 }

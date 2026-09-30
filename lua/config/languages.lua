@@ -1043,6 +1043,12 @@ return {
     formatters = {
       'yamlfmt',
     },
+    -- A playbook is YAML on disk, so `ltcc` reads it the same way it reads
+    -- the rest of them.
+    null_ls = {
+      ltcc_code_action,
+      ltcc_diagnostics,
+    },
   },
   awk = {
     filetypes = { 'awk' },
