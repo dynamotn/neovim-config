@@ -505,6 +505,12 @@ return {
     dap = { 'delve' },
     test = { 'neotest-golang' },
   },
+  graphql = {
+    filetypes = { 'graphql' },
+    parser = 'graphql',
+    lsp_servers = { 'graphql' },
+    formatters = { 'prettier' },
+  },
   html = {
     filetypes = { 'html' },
     parser = 'html',
