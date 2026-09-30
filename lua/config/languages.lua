@@ -500,6 +500,15 @@ return {
     },
     endwise = true,
   },
+  gdscript = {
+    filetypes = { 'gdscript' },
+    parser = 'gdscript',
+    ext = 'gd',
+    -- Godot serves the language server itself, over a port; Mason has no
+    -- package for it.
+    lsp_servers = { 'gdscript' },
+    formatters = { 'gdscript-formatter' },
+  },
   go = {
     filetypes = { 'go' },
     parser = 'go',
