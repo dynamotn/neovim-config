@@ -369,6 +369,8 @@ return {
     parser = 'cpp',
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
     linters = {
+      -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
+      -- comes with the system's clang rather than from Mason.
       { 'clangtidy', command = 'clang-tidy', mason = { enabled = false } },
     },
     formatters = { 'clang-format' },
@@ -408,6 +410,8 @@ return {
     parser = 'cpp',
     lsp_servers = { 'clangd', 'harper_ls' },
     linters = {
+      -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
+      -- comes with the system's clang rather than from Mason.
       { 'clangtidy', command = 'clang-tidy', mason = { enabled = false } },
     },
     formatters = { 'clang-format' },
@@ -441,6 +445,8 @@ return {
     ext = 'clj',
     lsp_servers = { 'clojure_lsp' },
     linters = { 'clj-kondo' },
+    -- `cljstyle` and `zprint` would do as well; `cljfmt` is the one
+    -- `clojure_lsp` itself runs, so the server and the formatter agree.
     formatters = { 'cljfmt' },
   },
   css = {
@@ -492,6 +498,7 @@ return {
     filetypes = { 'fish' },
     parser = 'fish',
     lsp_servers = { 'fish_lsp' },
+    -- `fish -n` and `fish_indent` are the shell's own, already on `$PATH`
     linters = {
       { 'fish', mason = { enabled = false } },
     },
@@ -540,6 +547,9 @@ return {
     filetypes = { 'graphql' },
     parser = 'graphql',
     lsp_servers = { 'graphql' },
+    -- `biome` is this config's JS/TS formatter, but a `.graphql` file is not
+    -- part of that toolchain; `prettier` reads it without a plugin, the way
+    -- it already does the stylesheets.
     formatters = { 'prettier' },
   },
   handlebars = { -- See `html`
@@ -554,6 +564,8 @@ return {
     ext = 'hs',
     lsp_servers = { 'hls' },
     linters = { 'hlint' },
+    -- `fourmolu` over `ormolu`: same formatter, but it reads a project's
+    -- `fourmolu.yaml` instead of imposing one style.
     formatters = { 'fourmolu' },
   },
   heex = { -- See `elixir`
@@ -575,6 +587,8 @@ return {
     filetypes = { 'java' },
     parser = 'java',
     lsp_servers = { 'jdtls', 'harper_ls' },
+    -- `jdtls` can format, but only after a project is imported and its
+    -- settings resolved; a formatter works on the buffer from the start.
     formatters = { 'google-java-format' },
     dap = { 'javadbg' },
     test = { 'neotest-java' },
@@ -604,6 +618,8 @@ return {
     filetypes = { 'julia' },
     parser = 'julia',
     ext = 'jl',
+    -- No formatter here: `JuliaFormatter` is a Julia package, run from
+    -- inside a project's own environment rather than as a binary.
     lsp_servers = { 'julials' },
   },
   kotlin = {
@@ -611,6 +627,8 @@ return {
     parser = 'kotlin',
     ext = 'kt',
     lsp_servers = { 'kotlin_language_server' },
+    -- `ktlint` can format too, but it only knows its own style; `ktfmt`
+    -- takes the formatting and `ktlint` is left to report.
     linters = { 'ktlint' },
     formatters = { 'ktfmt' },
     dap = { 'kotlin' },
@@ -754,6 +772,8 @@ return {
     parser = 'r',
     ext = 'R',
     lsp_servers = { 'r_language_server' },
+    -- `styler` is an R package and needs an R session to run; `air` is a
+    -- standalone binary, so Mason can install it like any other tool.
     formatters = { 'air' },
   },
   rails = { -- See `ruby` and `html`
@@ -872,6 +892,8 @@ return {
     filetypes = { 'twig' },
     parser = 'twig',
     lsp_servers = { 'twiggy_language_server', 'harper_ls' },
+    -- Two tools with one purpose between them: `twigcs` only reports and
+    -- `twig-cs-fixer` only rewrites.
     linters = { 'twigcs' },
     formatters = { 'twig-cs-fixer' },
   },
@@ -948,6 +970,8 @@ return {
     lsp_servers = { 'ansiblels' },
     linters = {
       {
+        -- nvim-lint spells the linter with an underscore while the binary
+        -- and the package keep the dash.
         'ansible_lint',
         command = 'ansible-lint',
         mason = { package = 'ansible-lint' },
@@ -1024,6 +1048,8 @@ return {
   cue = {
     filetypes = { 'cue' },
     parser = 'cue',
+    -- One binary wearing three hats: `cue lsp`, `cue vet`, `cue fmt`. The
+    -- Mason package is the binary, hence the same name three times.
     lsp_servers = { 'cue' },
     linters = { 'cue' },
     formatters = { { 'cue_fmt', command = 'cue', mason = { package = 'cue' } } },
@@ -1389,6 +1415,8 @@ return {
     lsp_servers = { 'lemminx' },
     formatters = {
       {
+        -- The package is `xmlformatter`, the binary it installs is
+        -- `xmlformat`, and conform knows it by the package's name again.
         'xmlformatter',
         command = 'xmlformat',
         mason = { package = 'xmlformatter' },
