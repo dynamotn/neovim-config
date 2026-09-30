@@ -179,12 +179,35 @@ M.guard_claudecode = function()
   )
 end
 
+--- Run `fn` once lazy.nvim has loaded `name`, or now if it already has
+---
+--- Asked of lazy.nvim itself rather than of the `LazyVim` global: this runs
+--- from `plugin/`, which a `--clean` Neovim with this repository on its
+--- runtimepath sources too, and there neither is set up. Without lazy.nvim
+--- none of the guarded plugins can load, so there is nothing to guard.
+---@param name string
+---@param fn fun()
+local function on_load(name, fn)
+  local ok, config = pcall(require, 'lazy.core.config')
+  if not ok or not config.plugins then return end
+  local plugin = config.plugins[name]
+  if plugin and plugin._.loaded then return fn() end
+  vim.api.nvim_create_autocmd('User', {
+    pattern = 'LazyLoad',
+    callback = function(event)
+      if event.data ~= name then return end
+      fn()
+      return true
+    end,
+  })
+end
+
 --- Install every guard: Copilot's now, the others as their plugin loads
 M.setup = function()
   M.watch_copilot()
-  LazyVim.on_load('codecompanion.nvim', M.guard_codecompanion)
-  LazyVim.on_load('sidekick.nvim', M.guard_sidekick)
-  LazyVim.on_load('claudecode.nvim', M.guard_claudecode)
+  on_load('codecompanion.nvim', M.guard_codecompanion)
+  on_load('sidekick.nvim', M.guard_sidekick)
+  on_load('claudecode.nvim', M.guard_claudecode)
 end
 
 return M
