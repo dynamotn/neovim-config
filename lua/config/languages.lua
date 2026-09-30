@@ -155,8 +155,53 @@ local js_dial = function(augend)
     }),
   }
 end
-local js_autopairs = function(filetypes, rule)
+-- `/* ... */` is one block comment shared by every C-descended syntax, so the
+-- rule is written once here and handed to each language that takes it.
+local block_comment_autopairs = function(filetypes, rule)
   return {
+    -- Add spaces inside a block comment
+    -- e.g., /* | */
+    rule('/*', '  */', filetypes):set_end_pair_length(3),
+  }
+end
+-- `<!-- ... -->`, which the built-in rule hands to HTML and Markdown only.
+local html_comment_autopairs = function(filetypes, rule)
+  return {
+    -- Add spaces in a comment
+    -- e.g., <!-- | -->
+    rule('<!--', '  -->', filetypes):set_end_pair_length(4),
+  }
+end
+-- `{{ ... }}` interpolation, borrowed by every template dialect below. The
+-- closing `}` is the one the bracket rule has already inserted, so only the
+-- inner half of the pair is added here -- the same trick every rule that
+-- starts with `{` uses, and the reason they ask for a `}` ahead of the cursor.
+local mustache_autopairs = function(filetypes, rule)
+  return {
+    -- Add spaces in an interpolation
+    -- e.g., {{ | }}
+    rule('{{', '  }', filetypes):set_end_pair_length(2),
+  }
+end
+-- Jinja, and the dialects that copy its syntax, add statements and comments
+-- to that interpolation.
+local jinja_autopairs = function(filetypes, rule, cond)
+  return vim.list_extend(mustache_autopairs(filetypes, rule), {
+    -- Add spaces in a statement
+    -- e.g., {% | %}
+    rule('{%', '  %', filetypes)
+      :with_pair(cond.after_text('}'))
+      :set_end_pair_length(2),
+
+    -- Add spaces in a comment
+    -- e.g., {# | #}
+    rule('{#', '  #', filetypes)
+      :with_pair(cond.after_text('}'))
+      :set_end_pair_length(2),
+  })
+end
+local js_autopairs = function(filetypes, rule)
+  return vim.list_extend(block_comment_autopairs(filetypes, rule), {
     -- Add parentheses in arrow function
     rule('=>', ' {  }', filetypes)
       :replace_endpair(function(opts)
@@ -168,7 +213,7 @@ local js_autopairs = function(filetypes, rule)
         return ' {  }'
       end)
       :set_end_pair_length(2),
-  }
+  })
 end
 
 ---@alias DyLangRootSpec table<string,DyLangSpec>
@@ -455,6 +500,7 @@ return {
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
     test = { 'neotest-gtest', 'vim-test' },
+    autopairs = block_comment_autopairs,
   },
   c_sharp = {
     filetypes = { 'cs' },
@@ -470,12 +516,14 @@ return {
     },
     dap = { 'coreclr' },
     test = { 'neotest-dotnet' },
+    autopairs = block_comment_autopairs,
   },
   blade = { -- See `php` and `html`
     filetypes = { 'blade' },
     parser = 'blade',
     lsp_servers = { 'laravel_ls', 'tailwindcss', 'harper_ls' },
     formatters = { 'blade-formatter' },
+    autopairs = mustache_autopairs,
   },
   clojure = {
     filetypes = { 'clojure' },
@@ -503,6 +551,7 @@ return {
         augend.hexcolor.new({ case = 'upper' }),
       }
     end,
+    autopairs = block_comment_autopairs,
   },
   cucumber = {
     filetypes = { 'cucumber' },
@@ -522,6 +571,7 @@ return {
     formatters = {
       { 'dart_format', command = 'dart', mason = { enabled = false } },
     },
+    autopairs = block_comment_autopairs,
   },
   elixir = {
     filetypes = { 'elixir' },
@@ -540,6 +590,13 @@ return {
     -- is not in lspconfig.
     lsp_servers = { 'elp' },
     formatters = { { 'erlfmt', mason = { enabled = false } } },
+    autopairs = function(filetypes, rule)
+      return {
+        -- Close a binary
+        -- e.g., <<|>>
+        rule('<<', '>>', filetypes),
+      }
+    end,
   },
   fish = {
     filetypes = { 'fish' },
@@ -569,6 +626,7 @@ return {
     -- No formatter exists; the server is a standalone binary Mason has no
     -- package for.
     lsp_servers = { 'gdshader_lsp' },
+    autopairs = block_comment_autopairs,
   },
   gleam = {
     filetypes = { 'gleam' },
@@ -596,6 +654,7 @@ return {
     },
     dap = { 'delve' },
     test = { 'neotest-golang' },
+    autopairs = block_comment_autopairs,
   },
   graphql = {
     filetypes = { 'graphql' },
@@ -611,6 +670,7 @@ return {
     parser = 'glimmer',
     ext = 'hbs',
     lsp_servers = { 'ember', 'tailwindcss', 'harper_ls' },
+    autopairs = mustache_autopairs,
   },
   haskell = {
     filetypes = { 'haskell' },
@@ -621,6 +681,15 @@ return {
     -- `fourmolu` over `ormolu`: same formatter, but it reads a project's
     -- `fourmolu.yaml` instead of imposing one style.
     formatters = { 'fourmolu' },
+    autopairs = function(filetypes, rule, cond)
+      return {
+        -- Add spaces in a block comment
+        -- e.g., {- | -}
+        rule('{-', '  -', filetypes)
+          :with_pair(cond.after_text('}'))
+          :set_end_pair_length(2),
+      }
+    end,
   },
   heex = { -- See `elixir`
     filetypes = { 'heex' },
@@ -629,6 +698,13 @@ return {
     -- it and the same `mix format` writes it back.
     lsp_servers = { 'elixirls', 'tailwindcss', 'harper_ls' },
     formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+    autopairs = function(filetypes, rule)
+      return {
+        -- Add spaces in an embedded tag
+        -- e.g., <% | %>
+        rule('<%', '  %>', filetypes):set_end_pair_length(3),
+      }
+    end,
   },
   html = {
     filetypes = { 'html' },
@@ -655,6 +731,7 @@ return {
         }),
       }
     end,
+    autopairs = block_comment_autopairs,
   },
   javascript = { -- See `typescript`
     filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx' },
@@ -686,6 +763,7 @@ return {
     linters = { 'ktlint' },
     formatters = { 'ktfmt' },
     dap = { 'kotlin' },
+    autopairs = block_comment_autopairs,
   },
   latex = {
     filetypes = { 'tex' },
@@ -721,6 +799,10 @@ return {
           :set_end_pair_length(2)
           :with_move(function(opts) return opts.char == '}' end),
 
+        -- Close inline math
+        -- e.g., $|$
+        rule('$', '$', filetypes),
+
         -- Add pair text after \start...
         -- e.g., \start... ... \stop...
         rule('\\start(%w*) $', filetypes)
@@ -750,6 +832,15 @@ return {
         }),
       }
     end,
+    autopairs = function(filetypes, rule, cond)
+      return {
+        -- Add spaces in a long bracket, for both strings and `--[[` comments
+        -- e.g., --[[ | ]]
+        rule('[[', '  ]', filetypes)
+          :with_pair(cond.after_text(']'))
+          :set_end_pair_length(2),
+      }
+    end,
     endwise = true,
   },
   nu = {
@@ -765,6 +856,15 @@ return {
     ext = 'ml',
     lsp_servers = { 'ocamllsp' },
     formatters = { 'ocamlformat' },
+    autopairs = function(filetypes, rule, cond)
+      return {
+        -- Add spaces in a block comment
+        -- e.g., (* | *)
+        rule('(*', '  *', filetypes)
+          :with_pair(cond.after_text(')'))
+          :set_end_pair_length(2),
+      }
+    end,
   },
   perl = {
     filetypes = { 'perl' },
@@ -789,6 +889,7 @@ return {
     },
     dap = { 'php' },
     test = { 'neotest-phpunit' },
+    autopairs = block_comment_autopairs,
   },
   python = {
     filetypes = { 'python' },
@@ -820,6 +921,7 @@ return {
     lsp_servers = { 'qmlls' },
     -- `qmlformat` comes with the Qt tooling
     formatters = { { 'qmlformat', mason = { enabled = false } } },
+    autopairs = block_comment_autopairs,
   },
   r = {
     filetypes = { 'r' },
@@ -853,6 +955,13 @@ return {
       },
       html_beautify_formatter,
     },
+    autopairs = function(filetypes, rule)
+      return {
+        -- Add spaces in an embedded tag
+        -- e.g., <% | %>
+        rule('<%', '  %>', filetypes):set_end_pair_length(3),
+      }
+    end,
   },
   ruby = {
     filetypes = { 'ruby' },
@@ -872,6 +981,13 @@ return {
     -- `rustfmt` comes with the toolchain, Mason has no package for it.
     formatters = { { 'rustfmt', mason = { enabled = false } } },
     dap = { 'codelldb' },
+    autopairs = function(filetypes, rule)
+      return vim.list_extend(block_comment_autopairs(filetypes, rule), {
+        -- Close a raw string literal, which the plain quote rule cannot see
+        -- e.g., r#"|"#
+        rule('r#"', '"#', filetypes),
+      })
+    end,
   },
   sass = {
     filetypes = { 'scss', 'sass' },
@@ -885,6 +1001,7 @@ return {
         augend.hexcolor.new({ case = 'upper' }),
       }
     end,
+    autopairs = block_comment_autopairs,
   },
   scala = {
     filetypes = { 'scala' },
@@ -893,6 +1010,7 @@ return {
     -- Mason carries neither.
     lsp_servers = { 'metals', 'harper_ls' },
     formatters = { { 'scalafmt', mason = { enabled = false } } },
+    autopairs = block_comment_autopairs,
   },
   solidity = {
     filetypes = { 'solidity' },
@@ -902,6 +1020,7 @@ return {
     formatters = {
       { 'forge_fmt', command = 'forge', mason = { enabled = false } },
     },
+    autopairs = block_comment_autopairs,
   },
   sql = {
     filetypes = { 'sql', 'mysql', 'plsql' },
@@ -930,6 +1049,7 @@ return {
     lsp_servers = { 'sourcekit', 'harper_ls' },
     linters = { 'swiftlint' },
     formatters = { 'swiftformat' },
+    autopairs = block_comment_autopairs,
   },
   templ = { -- See `go` and `html`
     filetypes = { 'templ' },
@@ -937,6 +1057,12 @@ return {
     -- one `templ` binary again: `templ lsp` and `templ fmt`
     lsp_servers = { 'templ', 'tailwindcss', 'harper_ls' },
     formatters = { 'templ' },
+    autopairs = function(filetypes, rule)
+      return vim.list_extend(
+        block_comment_autopairs(filetypes, rule),
+        html_comment_autopairs(filetypes, rule)
+      )
+    end,
   },
   tsx = { -- See `typescript`
     filetypes = { 'typescriptreact', 'typescript.tsx' },
@@ -957,6 +1083,7 @@ return {
     -- `twig-cs-fixer` only rewrites.
     linters = { 'twigcs' },
     formatters = { 'twig-cs-fixer' },
+    autopairs = jinja_autopairs,
   },
   typescript = {
     filetypes = { 'typescript' },
@@ -976,6 +1103,13 @@ return {
     ext = 'typ',
     lsp_servers = { 'tinymist', 'harper_ls' },
     formatters = { 'typstyle' },
+    autopairs = function(filetypes, rule)
+      return vim.list_extend(block_comment_autopairs(filetypes, rule), {
+        -- Close inline math
+        -- e.g., $|$
+        rule('$', '$', filetypes),
+      })
+    end,
   },
   vim = {
     filetypes = { 'vim' },
@@ -1005,6 +1139,7 @@ return {
         }),
       }
     end,
+    autopairs = mustache_autopairs,
   },
   zig = {
     filetypes = { 'zig' },
@@ -1013,6 +1148,7 @@ return {
     formatters = {
       { 'zigfmt', command = 'zig', mason = { enabled = false } },
     },
+    autopairs = block_comment_autopairs,
   },
   zsh = { -- See `bash`
     filetypes = { 'zsh' },
@@ -1229,6 +1365,12 @@ return {
     parser = 'htmldjango',
     lsp_servers = { 'djlsp', 'tailwindcss', 'harper_ls' },
     formatters = { djlint_formatter },
+    autopairs = function(filetypes, rule, cond)
+      return vim.list_extend(
+        jinja_autopairs(filetypes, rule, cond),
+        html_comment_autopairs(filetypes, rule)
+      )
+    end,
   },
   http = {
     filetypes = { 'http' },
@@ -1238,12 +1380,14 @@ return {
     parser = nil,
     lsp_servers = { 'kulala_ls' },
     formatters = { 'kulala-fmt' },
+    autopairs = mustache_autopairs,
   },
   hurl = { -- See `http`
     filetypes = { 'hurl' },
     parser = 'hurl',
     -- `hurlfmt` is part of the `hurl` release, Mason has no package
     formatters = { { 'hurlfmt', mason = { enabled = false } } },
+    autopairs = mustache_autopairs,
   },
   hyprlang = {
     filetypes = { 'hyprlang' },
@@ -1262,6 +1406,7 @@ return {
     ext = 'j2',
     lsp_servers = { 'jinja_lsp', 'harper_ls' },
     formatters = { djlint_formatter },
+    autopairs = jinja_autopairs,
   },
   jq = {
     filetypes = { 'jq' },
@@ -1325,6 +1470,7 @@ return {
     -- no package for the server
     lsp_servers = { 'kdl_lsp' },
     formatters = { 'kdlfmt' },
+    autopairs = block_comment_autopairs,
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },
@@ -1432,6 +1578,7 @@ return {
     formatters = {
       { 'buf', mason = { package = 'buf' } },
     },
+    autopairs = block_comment_autopairs,
   },
   rego = {
     filetypes = { 'rego' },
@@ -1527,6 +1674,7 @@ return {
         mason = { package = 'xmlformatter' },
       },
     },
+    autopairs = html_comment_autopairs,
   },
   yaml = {
     filetypes = reuse_filetypes.yaml.filetypes,
