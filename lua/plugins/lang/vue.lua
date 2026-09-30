@@ -1,5 +1,3 @@
-local language = require('config.languages').vue
-
 return vim.list_contains(_G.enabled_languages, 'vue')
     and {
       {
@@ -19,17 +17,6 @@ return vim.list_contains(_G.enabled_languages, 'vue')
             harper_ls = {},
           },
         },
-      },
-      {
-        -- Extend LSP config for HTML
-        'neovim/nvim-lspconfig',
-        opts = function(_, opts)
-          LazyVim.extend(
-            opts.servers.harper_ls,
-            'filetypes',
-            language.filetypes
-          )
-        end,
       },
       {
         -- Extend LSP config of vtsls by plugin for Vue

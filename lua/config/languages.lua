@@ -481,7 +481,7 @@ return {
     filetypes = { 'clojure' },
     parser = 'clojure',
     ext = 'clj',
-    lsp_servers = { 'clojure_lsp' },
+    lsp_servers = { 'clojure_lsp', 'harper_ls' },
     linters = { 'clj-kondo' },
     -- `cljstyle` and `zprint` would do as well; `cljfmt` is the one
     -- `clojure_lsp` itself runs, so the server and the formatter agree.
@@ -518,7 +518,7 @@ return {
     filetypes = { 'dart' },
     parser = 'dart',
     -- `dartls` and `dart format` both ship with the SDK, Mason has neither.
-    lsp_servers = { 'dartls' },
+    lsp_servers = { 'dartls', 'harper_ls' },
     formatters = {
       { 'dart_format', command = 'dart', mason = { enabled = false } },
     },
@@ -527,7 +527,7 @@ return {
     filetypes = { 'elixir' },
     parser = 'elixir',
     ext = 'exs',
-    lsp_servers = { 'elixirls' },
+    lsp_servers = { 'elixirls', 'harper_ls' },
     -- `mix credo` and `mix format` are tasks of the project's own toolchain.
     linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
     formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
@@ -575,7 +575,7 @@ return {
     parser = 'gleam',
     -- the `gleam` binary is both the server and the formatter, and Mason has
     -- no package for it
-    lsp_servers = { 'gleam' },
+    lsp_servers = { 'gleam', 'harper_ls' },
     formatters = { { 'gleam', mason = { enabled = false } } },
   },
   go = {
@@ -616,7 +616,7 @@ return {
     filetypes = { 'haskell' },
     parser = 'haskell',
     ext = 'hs',
-    lsp_servers = { 'hls' },
+    lsp_servers = { 'hls', 'harper_ls' },
     linters = { 'hlint' },
     -- `fourmolu` over `ormolu`: same formatter, but it reads a project's
     -- `fourmolu.yaml` instead of imposing one style.
@@ -680,7 +680,7 @@ return {
     filetypes = { 'kotlin' },
     parser = 'kotlin',
     ext = 'kt',
-    lsp_servers = { 'kotlin_language_server' },
+    lsp_servers = { 'kotlin_language_server', 'harper_ls' },
     -- `ktlint` can format too, but it only knows its own style; `ktfmt`
     -- takes the formatting and `ktlint` is left to report.
     linters = { 'ktlint' },
@@ -891,14 +891,14 @@ return {
     parser = 'scala',
     -- `metals` bootstraps itself and `scalafmt` comes from the build tool,
     -- Mason carries neither.
-    lsp_servers = { 'metals' },
+    lsp_servers = { 'metals', 'harper_ls' },
     formatters = { { 'scalafmt', mason = { enabled = false } } },
   },
   solidity = {
     filetypes = { 'solidity' },
     parser = 'solidity',
     ext = 'sol',
-    lsp_servers = { 'solang' },
+    lsp_servers = { 'solang', 'harper_ls' },
     formatters = {
       { 'forge_fmt', command = 'forge', mason = { enabled = false } },
     },
@@ -927,7 +927,7 @@ return {
     filetypes = { 'swift' },
     parser = 'swift',
     -- `sourcekit-lsp` ships with the Swift toolchain, Mason has no package.
-    lsp_servers = { 'sourcekit' },
+    lsp_servers = { 'sourcekit', 'harper_ls' },
     linters = { 'swiftlint' },
     formatters = { 'swiftformat' },
   },
@@ -974,7 +974,7 @@ return {
     filetypes = { 'typst' },
     parser = 'typst',
     ext = 'typ',
-    lsp_servers = { 'tinymist' },
+    lsp_servers = { 'tinymist', 'harper_ls' },
     formatters = { 'typstyle' },
   },
   vim = {
@@ -1009,7 +1009,7 @@ return {
   zig = {
     filetypes = { 'zig' },
     parser = 'zig',
-    lsp_servers = { 'zls' },
+    lsp_servers = { 'zls', 'harper_ls' },
     formatters = {
       { 'zigfmt', command = 'zig', mason = { enabled = false } },
     },
@@ -1017,6 +1017,7 @@ return {
   zsh = { -- See `bash`
     filetypes = { 'zsh' },
     parser = 'zsh',
+    lsp_servers = { 'harper_ls' },
     -- `shellcheck` and `shfmt` are for POSIX shells and bash, not for zsh;
     -- the linter is `zsh -n` and `beautysh` is what knows the syntax.
     linters = { { 'zsh', mason = { enabled = false } } },
@@ -1041,6 +1042,12 @@ return {
     },
     formatters = {
       'yamlfmt',
+    },
+    -- A playbook is YAML on disk, so `ltcc` reads it the same way it reads
+    -- the rest of them.
+    null_ls = {
+      ltcc_code_action,
+      ltcc_diagnostics,
     },
   },
   awk = {
@@ -1191,7 +1198,7 @@ return {
   groovy = {
     filetypes = { 'groovy' },
     parser = 'groovy',
-    lsp_servers = { 'groovyls' },
+    lsp_servers = { 'groovyls', 'harper_ls' },
     linters = { 'npm-groovy-lint' },
     formatters = { 'npm-groovy-lint' },
   },
