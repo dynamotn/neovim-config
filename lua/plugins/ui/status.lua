@@ -21,28 +21,29 @@ return {
           color = { fg = Snacks.util.color('String') },
         },
         {
-          function(msg)
-            msg = icons.lsp
+          function()
+            local msg = icons.lsp
             local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
             if next(buf_clients) == nil then return msg end
-            local buf_client_names = {}
-
-            for _, client in pairs(buf_clients) do
-              table.insert(buf_client_names, client.name)
+            local attached = {}
+            for _, client in ipairs(buf_clients) do
+              attached[client.name] = true
             end
 
-            for _, server_name in
-              ipairs(
-                require('util.languages').get_lsp_servers_by_filetype(
-                  vim.bo.filetype
-                )
+            local expected, optional =
+              require('util.languages').get_lsp_servers_by_filetype(
+                vim.bo.filetype
               )
-            do
-              if vim.list_contains(buf_client_names, server_name) then
-                msg = msg .. server_name .. ' '
-              else
-                msg = msg .. server_name .. '! '
-              end
+            for _, server_name in ipairs(expected) do
+              msg = msg
+                .. server_name
+                .. (attached[server_name] and ' ' or '! ')
+            end
+            -- Not flagged when missing: a server of any filetype may decline
+            -- a buffer on purpose, as Copilot does with credential files.
+            -- Its sign-in and busy state already show in sidekick's icon.
+            for _, server_name in ipairs(optional) do
+              if attached[server_name] then msg = msg .. server_name .. ' ' end
             end
             return vim.trim(msg)
           end,

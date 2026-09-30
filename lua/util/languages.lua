@@ -105,12 +105,19 @@ end
 ---
 --- A server whose spec carries an `enabled` check is left out of a buffer it
 --- turns down, the same way `plugins.lsp.server` keeps it from attaching.
+---
+--- A server configured without `filetypes` (Copilot) starts for any buffer
+--- and decides for itself, in its `root_dir`, whether to attach. Its absence
+--- is then no sign of trouble, so it comes back in the second list: shown
+--- when attached, not expected otherwise.
 ---@param filetype string Filetype of buffer
 ---@param bufnr? integer Buffer the check is asked about, current by default
----@return string[]
+---@return string[] expected Servers that should attach to the buffer
+---@return string[] optional Servers that attach to any filetype if they choose
 M.get_lsp_servers_by_filetype = function(filetype, bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local result = {}
+  local optional = {}
   local language_name = M.get_language_from_filetype(filetype) or '_'
 
   for _, server in ipairs(with_common(language_name, 'lsp_servers')) do
@@ -120,8 +127,10 @@ M.get_lsp_servers_by_filetype = function(filetype, bufnr)
       server_name = server[1]
     end
     local lsp_config = vim.lsp.config[server_name]
-    if lsp_config == nil or lsp_config.filetypes == nil then goto continue end
-    if
+    if lsp_config == nil then goto continue end
+    if lsp_config.filetypes == nil then
+      table.insert(optional, server_name)
+    elseif
       lsp_config.filetypes == '*'
       or vim.list_contains(lsp_config.filetypes, filetype)
     then
@@ -130,7 +139,7 @@ M.get_lsp_servers_by_filetype = function(filetype, bufnr)
     ::continue::
   end
 
-  return LazyVim.dedup(result)
+  return LazyVim.dedup(result), LazyVim.dedup(optional)
 end
 
 return M
