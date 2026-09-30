@@ -511,6 +511,14 @@ return {
     lsp_servers = { 'graphql' },
     formatters = { 'prettier' },
   },
+  haskell = {
+    filetypes = { 'haskell' },
+    parser = 'haskell',
+    ext = 'hs',
+    lsp_servers = { 'hls' },
+    linters = { 'hlint' },
+    formatters = { 'fourmolu' },
+  },
   html = {
     filetypes = { 'html' },
     parser = 'html',
