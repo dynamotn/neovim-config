@@ -75,17 +75,39 @@ jobs:
         run: printf "_G.plugin_channel = '%s'\n" "$CHANNEL" > lua/per_machine/config.lua
         env:
           CHANNEL: ${{ matrix.channel }}
-      - name: Cache plugins
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # Restored and saved as two steps: `actions/cache` alone only saves when
+      # the whole job passes, so a job failing in a later check never filled
+      # it, and every run cloned all plugins again from every host they live
+      # on -- one of them down was enough to fail the run.
+      - name: Restore plugins
+        id: cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.local/share/nvim/lazy
           key: lazy-${{ runner.os }}-${{ matrix.channel }}-${{ hashFiles(matrix.lockfile) }}
           restore-keys: lazy-${{ runner.os }}-${{ matrix.channel }}-
       # The first start bootstraps lazy.nvim and installs what is missing;
       # `restore` then puts every plugin on the commit the lockfile names,
-      # which also winds back whatever a stale cache brought in.
+      # which also winds back whatever a stale cache brought in. It exits 0
+      # when a clone fails, so each round is followed by a check that every
+      # plugin is there, and a failed host gets two more tries.
       - name: Install plugins
-        run: nvim --headless '+Lazy! restore' +qa
+        id: install
+        run: |
+          for attempt in 1 2 3; do
+            nvim --headless '+Lazy! restore' +qa
+            if nvim --headless -c 'luafile scripts/check-plugins.lua'; then
+              exit 0
+            fi
+            [[ ${attempt} -lt 3 ]] && sleep $((attempt * 30))
+          done
+          exit 1
+      - name: Save plugins
+        if: always() && steps.install.outcome == 'success' && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.local/share/nvim/lazy
+          key: ${{ steps.cache.outputs.cache-primary-key }}
       # Only the registry index, no package: `validate-tools.lua` checks Mason
       # names against it, and so does the check of the installs it skipped.
       # Loaded with `--clean` so that nothing else of the configuration -- and

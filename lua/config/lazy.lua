@@ -51,7 +51,7 @@ local stale_releases = {
   'nvim-lua/plenary.nvim',
   'rcarriga/nvim-dap-ui',
   'tpope/vim-dadbod',
-  'https://codeberg.org/esensar/nvim-dev-container',
+  'esensar/nvim-dev-container',
 }
 local stale_specs = vim.tbl_map(
   function(repo) return { repo, optional = true, version = false } end,
