@@ -592,6 +592,12 @@ return {
     dial = js_dial,
     autopairs = js_autopairs,
   },
+  julia = {
+    filetypes = { 'julia' },
+    parser = 'julia',
+    ext = 'jl',
+    lsp_servers = { 'julials' },
+  },
   kotlin = {
     filetypes = { 'kotlin' },
     parser = 'kotlin',
