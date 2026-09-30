@@ -1,0 +1,64 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Every pinned version in this configuration lives in one of two places: the pre-commit hooks, and the purls of the configuration's own Mason registry.",
+    "Plugin versions are deliberately left out. `lazy-lock.json` is lazy.nvim's own lockfile and is rewritten by `:Lazy update`, so a bot editing it would only fight the plugin manager."
+  ],
+  "extends": ["config:recommended", ":dependencyDashboard"],
+  "enabledManagers": ["pre-commit", "custom.regex"],
+  "pre-commit": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Tools the own Mason registry installs from a GitHub release",
+      "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
+      "matchStrings": [
+        "'pkg:github/(?<depName>[^@']+)@(?<currentValue>v?\\d[^']*)'"
+      ],
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "description": "Tools the own Mason registry installs with `go install`",
+      "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
+      "matchStrings": [
+        "'pkg:golang/(?<depName>[^@']+)@(?<currentValue>v\\d[^']*)'"
+      ],
+      "datasourceTemplate": "go"
+    },
+    {
+      "customType": "regex",
+      "description": "Tools the own Mason registry installs from npm",
+      "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
+      "matchStrings": ["'pkg:npm/(?<depName>[^@']+)@(?<currentValue>\\d[^']*)'"],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "Tools the own Mason registry installs from PyPI",
+      "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
+      "matchStrings": [
+        "'pkg:pypi/(?<depName>[^@']+)@(?<currentValue>\\d[^']*)'"
+      ],
+      "datasourceTemplate": "pypi"
+    },
+    {
+      "customType": "regex",
+      "description": "Entries that build their purl from a version variable, and say so in a `-- renovate:` comment",
+      "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
+      "matchStrings": [
+        "--\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\s*\\nlocal version = '(?<currentValue>[^']+)'"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "A Mason bump is only picked up once the package is reinstalled by hand, so they arrive together in one pull request rather than one each.",
+      "matchManagers": ["custom.regex"],
+      "groupName": "mason registry",
+      "schedule": ["before 9am on monday"]
+    }
+  ]
+}
