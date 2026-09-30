@@ -599,6 +599,7 @@ return {
         rule('<<', '>>', filetypes),
       }
     end,
+    endwise = true,
   },
   fish = {
     filetypes = { 'fish' },
@@ -1382,6 +1383,7 @@ return {
         html_comment_autopairs(filetypes, rule)
       )
     end,
+    endwise = true,
   },
   http = {
     filetypes = { 'http' },
