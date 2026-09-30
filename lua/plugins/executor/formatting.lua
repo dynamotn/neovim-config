@@ -115,20 +115,16 @@ return {
             end
             -- lazy install server of language not in bundle languages
             if vim.list_contains(_G.enabled_languages, name) then
-              vim.api.nvim_create_autocmd({ 'FileType' }, {
-                pattern = language.filetypes,
-                group = vim.api.nvim_create_augroup(
-                  'mason_formatter_' .. name .. '_' .. tool_package,
-                  {}
-                ),
-                callback = function()
+              require('util.lazy_install').on_filetype(
+                language.filetypes,
+                function()
                   if
                     not require('mason-registry').is_installed(tool_package)
                   then
                     require('mason.api.command').MasonInstall({ tool_package })
                   end
-                end,
-              })
+                end
+              )
             end
           end
         end

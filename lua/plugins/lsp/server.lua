@@ -169,13 +169,9 @@ return {
           end
           -- lazy install server of language not in bundle languages
           if vim.list_contains(_G.enabled_languages, name) then
-            vim.api.nvim_create_autocmd({ 'FileType' }, {
-              pattern = language.filetypes,
-              group = vim.api.nvim_create_augroup(
-                'mason_lsp_' .. name .. '_' .. server,
-                {}
-              ),
-              callback = function(args)
+            require('util.lazy_install').on_filetype(
+              language.filetypes,
+              function(args)
                 local lsp_config = vim.lsp.config[server]
                 if lsp_config == nil then return end
                 if
@@ -192,8 +188,8 @@ return {
                     require('mason.api.command').MasonInstall({ server_package })
                   end
                 end
-              end,
-            })
+              end
+            )
           end
         end
 

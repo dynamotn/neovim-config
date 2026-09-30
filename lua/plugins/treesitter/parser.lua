@@ -66,13 +66,9 @@ return {
           end
           -- lazy install parser of language not in bundle languages
           if vim.list_contains(_G.enabled_languages, name) then
-            vim.api.nvim_create_autocmd({ 'FileType' }, {
-              pattern = language.filetypes,
-              group = vim.api.nvim_create_augroup(
-                'ts_parser_' .. parser_name,
-                {}
-              ),
-              callback = function(ev)
+            require('util.lazy_install').on_filetype(
+              language.filetypes,
+              function(ev)
                 if not LazyVim.treesitter.get_installed()[parser_name] then
                   treesitter
                     .install({ parser_name }, { summary = true })
@@ -82,8 +78,8 @@ return {
                       vim.cmd('e!')
                     end)
                 end
-              end,
-            })
+              end
+            )
           end
         end
       end
