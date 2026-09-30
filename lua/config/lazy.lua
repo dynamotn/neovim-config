@@ -31,7 +31,12 @@ local stable = _G.plugin_channel == 'stable'
 -- that release -- `vim-snippets` to 2014 -- so on `stable` they stay on their
 -- branch, the way LazyVim itself treats `nvim-treesitter` and `nvim-cmp`.
 -- `optional` keeps a plugin out when nothing else in the spec asks for it.
+--
+-- `conform.nvim` is here for another reason: its release is younger, but
+-- `config.languages` names formatters added since (`gdscript-formatter`), and
+-- `scripts/validate-tools.lua` fails on a formatter conform does not know.
 local stale_releases = {
+  'stevearc/conform.nvim',
   'folke/edgy.nvim',
   'folke/flash.nvim',
   'folke/persistence.nvim',

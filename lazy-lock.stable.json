@@ -36,7 +36,7 @@
   "codecompanion-history.nvim": { "branch": "main", "commit": "bc1b4fe06eaaf0aa2399be742e843c22f7f1652a" },
   "codecompanion.nvim": { "branch": "main", "commit": "56f5b5237ad69c0eb7558a6b6058cba862e4e876" },
   "codesettings.nvim": { "branch": "master", "commit": "5905da9862835867637ad15068697e3b7bd8b55e" },
-  "conform.nvim": { "branch": "master", "commit": "3543d000dafbc41cc7761d860cfdb24e82154f75" },
+  "conform.nvim": { "branch": "master", "commit": "016802de402556da54c36bd7359b441266b01cdd" },
   "conjure": { "branch": "main", "commit": "7ba01d793543c52ce7180eabaeb08b6ad9130ad6" },
   "crates.nvim": { "branch": "main", "commit": "afcd1cc3eeceb5783676fc8464389b9216a29d05" },
   "csvview.nvim": { "branch": "main", "commit": "a4c45eadb03a462a80dd1a545d0f9cb636b73664" },
