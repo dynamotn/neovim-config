@@ -739,6 +739,14 @@ return {
       }
     end,
   },
+  scala = {
+    filetypes = { 'scala' },
+    parser = 'scala',
+    -- `metals` bootstraps itself and `scalafmt` comes from the build tool,
+    -- Mason carries neither.
+    lsp_servers = { 'metals' },
+    formatters = { { 'scalafmt', mason = { enabled = false } } },
+  },
   solidity = {
     filetypes = { 'solidity' },
     parser = 'solidity',
