@@ -105,6 +105,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 
 - Angular
 - Astro
+- Django (templates)
 - Ember (Handlebars)
 - Laravel (Blade)
 - Phoenix (HEEx)

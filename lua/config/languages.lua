@@ -110,6 +110,22 @@ local html_beautify_formatter = {
   command = 'js-beautify',
   mason = { package = 'js-beautify' },
 }
+-- djLint speaks several template dialects and has to be told which one it is
+-- looking at; left alone it reformats everything as plain HTML. `conform`
+-- keys a tool's options by its name, so the two entries that use it share one
+-- definition and read the dialect off the buffer instead of overwriting each
+-- other's profile.
+local djlint_formatter = {
+  'djlint',
+  opts = {
+    prepend_args = function(_, ctx)
+      return {
+        '--profile',
+        vim.bo[ctx.buf].filetype == 'htmldjango' and 'django' or 'jinja',
+      }
+    end,
+  },
+}
 -- `javascript`, `typescript` and `tsx` are one toolchain over three grammars.
 -- They need an entry each so that a filetype reaches the parser that actually
 -- understands it -- and so an injected ```typescript block is not handed to
@@ -1198,6 +1214,15 @@ return {
     end,
     endwise = true,
   },
+  htmldjango = { -- See `python` and `html`
+    -- Neovim leaves a Django template as `html`, so the extension and the
+    -- conventional `templates/` directory are registered in
+    -- `ftdetect/filetype.lua`.
+    filetypes = { 'htmldjango' },
+    parser = 'htmldjango',
+    lsp_servers = { 'djlsp', 'tailwindcss', 'harper_ls' },
+    formatters = { djlint_formatter },
+  },
   http = {
     filetypes = { 'http' },
     -- No parser here on purpose: `kulala.nvim` ships its own `kulala_http`
@@ -1229,11 +1254,7 @@ return {
     parser = 'jinja',
     ext = 'j2',
     lsp_servers = { 'jinja_lsp' },
-    formatters = {
-      -- djLint speaks several template dialects; without the profile it
-      -- reformats a Jinja file as if it were plain HTML.
-      { 'djlint', opts = { prepend_args = { '--profile', 'jinja' } } },
-    },
+    formatters = { djlint_formatter },
   },
   jq = {
     filetypes = { 'jq' },

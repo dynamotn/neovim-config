@@ -20,6 +20,7 @@ vim.filetype.add({
     j2 = 'jinja',
     jinja = 'jinja',
     jinja2 = 'jinja',
+    djhtml = 'htmldjango',
   },
   filename = {
     ['.git/ignore'] = 'gitignore',
@@ -53,6 +54,10 @@ vim.filetype.add({
     ['.*%.container%.html'] = 'htmlangular',
 
     ['.*%.tmpl'] = 'gotmpl',
+
+    -- where Django keeps its templates; a plain HTML file elsewhere in the
+    -- project is untouched
+    ['.*/templates/.*%.html'] = 'htmldjango',
 
     ['.*/templates/.*%.tpl'] = 'helm',
     ['.*/templates/.*%.ya?ml'] = 'helm',
