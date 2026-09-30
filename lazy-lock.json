@@ -153,7 +153,6 @@
   "vim-startuptime": { "branch": "master", "commit": "5f33e50f1e2e2a80370c9094e4c303ea54cd2aea" },
   "vim-test": { "branch": "master", "commit": "0ea8ee90e056118343d843a4406644de5e6b37ea" },
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
-  "workspace-diagnostics.nvim": { "branch": "main", "commit": "ea93521c0344fa2530c6f6da8b059d1b944ca550" },
   "xcodebuild.nvim": { "branch": "main", "commit": "45cd4a8daabcc1c4716388fadc036e06732756bd" },
   "yanky.nvim": { "branch": "main", "commit": "4b4ddd196526fd3d6fd091d931810f9743e936d3" }
 }
