@@ -1228,6 +1228,15 @@ return {
       { 'djlint', opts = { prepend_args = { '--profile', 'jinja' } } },
     },
   },
+  jq = {
+    filetypes = { 'jq' },
+    parser = 'jq',
+    -- The same `jq` binary that formats JSON elsewhere in this file also
+    -- formats and checks a `.jq` filter.
+    lsp_servers = { 'jqls' },
+    linters = { 'jq' },
+    formatters = { 'jq' },
+  },
   json = {
     filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },
     parser = 'json5',
