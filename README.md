@@ -63,6 +63,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Bash (include some filetypes for build package on Arch, Gentoo)
 - C/C++
 - C#
+- Clojure
 - CSS/Less
 - Cucumber
 - Fish

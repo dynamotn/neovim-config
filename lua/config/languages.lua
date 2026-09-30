@@ -421,6 +421,14 @@ return {
     dap = { 'coreclr' },
     test = { 'neotest-dotnet' },
   },
+  clojure = {
+    filetypes = { 'clojure' },
+    parser = 'clojure',
+    ext = 'clj',
+    lsp_servers = { 'clojure_lsp' },
+    linters = { 'clj-kondo' },
+    formatters = { 'cljfmt' },
+  },
   css = {
     filetypes = { 'css', 'less' },
     parser = 'css',
