@@ -128,6 +128,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Groovy (also for Jenkinsfile)
 - HTTP Rest file
 - Hyprlang
+- Jinja
 - JSON
 - Jsonnet
 - Just

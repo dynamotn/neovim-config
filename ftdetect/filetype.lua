@@ -17,6 +17,9 @@ vim.filetype.add({
     dbml = 'dbml',
     d2 = 'd2',
     ipynb = 'ipynb',
+    j2 = 'jinja',
+    jinja = 'jinja',
+    jinja2 = 'jinja',
   },
   filename = {
     ['.git/ignore'] = 'gitignore',

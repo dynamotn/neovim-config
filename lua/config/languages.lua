@@ -1126,6 +1126,19 @@ return {
     filetypes = { 'ini', 'dosini' },
     parser = 'ini',
   },
+  jinja = {
+    -- Neovim detects none of the Jinja extensions, and `jinja-lsp` says so
+    -- itself: they are registered in `ftdetect/filetype.lua`.
+    filetypes = { 'jinja' },
+    parser = 'jinja',
+    ext = 'j2',
+    lsp_servers = { 'jinja_lsp' },
+    formatters = {
+      -- djLint speaks several template dialects; without the profile it
+      -- reformats a Jinja file as if it were plain HTML.
+      { 'djlint', opts = { prepend_args = { '--profile', 'jinja' } } },
+    },
+  },
   json = {
     filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },
     parser = 'json5',
