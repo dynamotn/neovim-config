@@ -2,6 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
   "completion.autoRequire": false,
   "runtime.version": "LuaJIT",
+  "workspace.ignoreDir": [
+    ".worktrees"
+  ],
   "hint.enable": true,
   "diagnostics": {
     "globals": [
