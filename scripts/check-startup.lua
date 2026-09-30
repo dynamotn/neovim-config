@@ -180,6 +180,16 @@ local function skip_installs()
       if callback then callback() end
     end
   end)
+  -- Clones its `kulala_http` grammar and builds it with the tree-sitter CLI
+  -- on setup, which throws from a scheduled callback where there is no CLI.
+  before_config('kulala.nvim', function()
+    local parser = require('kulala.config.parser')
+    parser.setup = function()
+      if not parser.is_up_to_date() then
+        table.insert(installs.download, 'kulala_http')
+      end
+    end
+  end)
 end
 
 --- Report the recorded installs no real install could carry out
