@@ -581,6 +581,7 @@ return {
     -- `mix credo` and `mix format` are tasks of the project's own toolchain.
     linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
     formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+    endwise = true,
   },
   erlang = { -- See `elixir`
     filetypes = { 'erlang' },
@@ -752,6 +753,7 @@ return {
     -- No formatter here: `JuliaFormatter` is a Julia package, run from
     -- inside a project's own environment rather than as a binary.
     lsp_servers = { 'julials' },
+    endwise = true,
   },
   kotlin = {
     filetypes = { 'kotlin' },
