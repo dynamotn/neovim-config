@@ -557,6 +557,8 @@ return {
       'gherkin',
       install_info = {
         url = 'https://github.com/binhtran432k/tree-sitter-gherkin',
+        -- nvim-treesitter has no queries for it, so take the grammar's own
+        queries = 'queries/gherkin',
       },
     },
     lsp_servers = { 'cucumber_language_server' },
@@ -769,7 +771,7 @@ return {
     autopairs = block_comment_autopairs,
   },
   latex = {
-    filetypes = { 'tex' },
+    filetypes = { 'tex', 'plaintex' },
     parser = 'latex',
     ext = 'tex',
     lsp_servers = { 'ltex', 'texlab' },
@@ -1676,7 +1678,7 @@ return {
     },
   },
   xml = {
-    filetypes = { 'xml' },
+    filetypes = { 'xml', 'svg', 'xsd', 'xslt' },
     parser = 'xml',
     lsp_servers = { 'lemminx' },
     formatters = {
