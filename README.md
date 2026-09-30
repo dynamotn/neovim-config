@@ -14,6 +14,7 @@
   * [Frameworks](#frameworks)
   * [Tools & Markup](#tools--markup)
 - [Installation](#installation)
+  * [Updating plugins](#updating-plugins)
 - [Key bindings](#key-bindings)
 - [Benchmark](#benchmark)
 
@@ -30,6 +31,9 @@
   - Lazy install treesitter parsers, LSP servers, formatters, linters, debug adapters... if needed when open file
   - Bundle languages/tools when containerize or builtin development environments by `_G.bundle_languages` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
   - Enable/disable languages/tools by `_G.enabled_languages` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
+  - Choose how far ahead plugins run by `_G.plugin_channel` in [lua/config/globals.lua](./lua/config/globals.lua), per machine:
+    - `latest` (default): LazyVim `main` and every plugin at its newest commit, on a Neovim nightly
+    - `stable`: LazyVim and every plugin that tags releases on its newest release, on Neovim 0.12 or newer. Plugins without releases, or whose last one is years old, stay on their branch
   - Easy to show which tools are installed in lualine
   - Trigger linters/formatters if installed only
   - Add bunch of missing features of the different tools:
@@ -48,8 +52,8 @@
 
 > [!CAUTION]
 >
-> - Not used for neovim < 0.13 or vim (any version)
-> - Always used latest neovim (currently 0.13) to get the best experience and performance
+> - Not used for vim (any version), or for neovim < 0.13 on the default `latest` channel (< 0.12 on `stable`)
+> - The default `latest` channel follows the newest neovim (currently 0.13 nightly) and plugin commits, so an upstream break can land with any `:Lazy update`. Set `_G.plugin_channel = 'stable'` on a machine that should not ride along
 > - Used on Linux and macOS
 
 ## Languages, Frameworks, or Tools support
@@ -231,6 +235,21 @@ _G.image_dirs = { '~/Pictures' }
 Locally developed plugins (specs with `dev = true`) are looked for under
 `_G.dev_plugins_path`, which the `NVIM_DEV_PLUGINS` environment variable
 overrides. A plugin missing from there is cloned from its git remote instead.
+
+### Updating plugins
+
+The lockfile is the snapshot to roll back to: `lazy-lock.json` on `latest`,
+`lazy-lock.stable.json` on `stable`. Both live in this repository, so:
+
+1. Commit the lockfile before `:Lazy update`, so the working pins are in git.
+2. Update, then commit the new lockfile once everything still works.
+3. If an update breaks something, put the previous lockfile back and check it out again:
+
+   ```sh
+   git restore lazy-lock.json   # or: git checkout <commit> -- lazy-lock.json
+   ```
+
+   then run `:Lazy restore` in Neovim. A single plugin can be restored from its line in `:Lazy`.
 
 ## Key bindings
 

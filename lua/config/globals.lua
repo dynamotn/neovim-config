@@ -29,6 +29,17 @@ _G.is_gentoo = false
 ---@type boolean Flag to install all plugins, useful for update `lazy-lock.json`
 _G.used_full_plugins = false
 
+---@alias DyPluginChannel
+---| 'latest' # LazyVim `main` and every plugin at its newest commit; needs a Neovim nightly
+---| 'stable' # LazyVim and every plugin that tags releases on its newest release
+
+---@type DyPluginChannel What `:Lazy update` moves plugins to. `latest` gets
+--- fixes the day they land and breakage with them; `stable` trades that for
+--- releases the plugin authors vouched for, and a released Neovim. Each keeps
+--- its own lockfile, so machines on different channels never rewrite each
+--- other's pins.
+_G.plugin_channel = 'latest'
+
 ---@class DyEnabledPlugins
 ---@field obsidian boolean
 ---@field leetcode boolean

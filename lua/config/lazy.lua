@@ -24,6 +24,34 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local defaults = require('config.defaults')
+local stable = _G.plugin_channel == 'stable'
+
+-- Plugins still developed on their branch but whose newest release is more
+-- than two years old (as of 2026-10). `version = '*'` would take them back to
+-- that release -- `vim-snippets` to 2014 -- so on `stable` they stay on their
+-- branch, the way LazyVim itself treats `nvim-treesitter` and `nvim-cmp`.
+-- `optional` keeps a plugin out when nothing else in the spec asks for it.
+local stale_releases = {
+  'folke/edgy.nvim',
+  'folke/flash.nvim',
+  'folke/persistence.nvim',
+  'folke/ts-comments.nvim',
+  'gbprod/yanky.nvim',
+  'gpanders/nvim-parinfer',
+  'honza/vim-snippets',
+  'johmsalas/text-case.nvim',
+  'm00qek/baleia.nvim',
+  'marilari88/neotest-vitest',
+  'mfussenegger/nvim-jdtls',
+  'nvim-lua/plenary.nvim',
+  'rcarriga/nvim-dap-ui',
+  'tpope/vim-dadbod',
+  'https://codeberg.org/esensar/nvim-dev-container',
+}
+local stale_specs = vim.tbl_map(
+  function(repo) return { repo, optional = true, version = false } end,
+  stable and stale_releases or {}
+)
 -- Setup lazy
 require('lazy').setup({
   spec = {
@@ -39,14 +67,16 @@ require('lazy').setup({
       },
     },
     {
-      -- Use the latest version of LazyVim.
+      -- On `latest`, follow LazyVim's `main` instead of its releases. On
+      -- `stable`, repeat LazyVim's own `version = '*'`, so it stays on its
+      -- releases.
       --
       -- This cannot be folded into the entry above: LazyVim's own spec sets
       -- `version = '*'`, so an override only sticks if it comes after the
       -- import that pulls that spec in.
       'LazyVim/LazyVim',
-      branch = 'main',
-      version = false,
+      branch = not stable and 'main' or nil,
+      version = stable and '*' or false,
     },
     { import = 'plugins.ui' },
     { import = 'plugins.coding' },
@@ -56,15 +86,26 @@ require('lazy').setup({
     { import = 'plugins.executor' },
     { import = 'plugins.toolbox' },
     { import = 'plugins.lang' },
+    stale_specs,
   },
   defaults = {
     lazy = true, -- Lazy loading all plugins
-    version = false, -- Prefer git commits over tagged releases
+    -- `latest` prefers git commits over tagged releases. With `*`, a plugin
+    -- that tags releases follows the newest one, and one that has never
+    -- tagged any falls back to its branch, so nothing is left behind. A spec
+    -- setting its own `version` or `branch` wins over this either way.
+    version = stable and '*' or false,
   },
+  -- The channels resolve to different commits, so sharing one lockfile would
+  -- have every `:Lazy update` on one channel undo the other's pins.
+  lockfile = vim.fn.stdpath('config')
+    .. (stable and '/lazy-lock.stable.json' or '/lazy-lock.json'),
   install = { colorscheme = { defaults.colorscheme } },
   checker = {
     enabled = true, -- check for plugin updates periodically
-    notify = false, -- notify on update
+    -- `latest` sees new commits every hour, so a notification would be
+    -- noise. A new release on `stable` is rare and worth being told about.
+    notify = stable,
   },
   performance = {
     cache = {
