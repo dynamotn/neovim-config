@@ -28,6 +28,26 @@
 ---@field [1] string
 ---@field enabled? fun(): boolean
 
+--- A tool answers to three names and they often disagree: `[1]` is the one
+--- conform or nvim-lint knows it by, `command` is the binary on `$PATH`, and
+--- `mason.package` is what installs it. Only `[1]` is required; the other two
+--- are written down whenever they differ, which is why `clang-tidy` appears
+--- as `clangtidy` and `erb-formatter` as `erb_format`.
+---
+--- `command` doubles as the availability probe: a filetype is only given a
+--- tool whose command is executable. A formatter that is really a subcommand
+--- of a larger binary (`ruff_format` -> `ruff`, `tofu_fmt` -> `tofu`) names
+--- that binary, and one that runs inside Neovim itself names `lua`, which is
+--- always there.
+---
+--- `mason.enabled = false` says the tool does not come from Mason, almost
+--- always because no package exists for it: it ships with the language's
+--- toolchain (`mix`, `zig`, `dart`), with the system (`clang-tidy`, `sed`),
+--- or from a package manager Mason does not speak (CPAN, CRAN).
+---
+--- `scripts/validate-tools.lua` checks the module and the package of every
+--- tool named below, so a name that drifts is caught before it goes silent.
+
 ---@class DyLinterSpec
 ---@field [1] string
 ---@field opts? table
@@ -77,6 +97,8 @@ local reuse_filetypes = {
     filetypes = { 'dockerfile' },
   },
 }
+-- Conform's own formatter for treesitter code blocks: it runs inside Neovim,
+-- so `lua` stands in for a binary that does not exist.
 local injected_formatter =
   { 'injected', command = 'lua', mason = { enabled = false } }
 local ltcc_code_action =
