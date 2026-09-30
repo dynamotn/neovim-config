@@ -1,0 +1,87 @@
+local language = require('config.languages').scala
+
+-- metals reads the build definition and the Java sources of the same project
+local filetypes = vim.list_extend(vim.deepcopy(language.filetypes), {
+  'sbt',
+  'java',
+})
+
+return vim.list_contains(_G.enabled_languages, 'scala')
+    and {
+      {
+        -- metals, driven by its own plugin rather than by lspconfig
+        'scalameta/nvim-metals',
+        ft = filetypes,
+        dependencies = { 'nvim-lua/plenary.nvim' },
+        keys = {
+          {
+            '<localleader>mc',
+            function() require('metals').compile_cascade() end,
+            ft = language.filetypes,
+            desc = 'Metals compile cascade',
+          },
+          {
+            '<localleader>mh',
+            function() require('metals').hover_worksheet() end,
+            ft = language.filetypes,
+            desc = 'Metals hover worksheet',
+          },
+        },
+        opts = function()
+          local metals_config = require('metals').bare_config()
+          metals_config.init_options.statusBarProvider = 'off'
+          metals_config.settings = {
+            verboseCompilation = true,
+            showImplicitArguments = true,
+            showImplicitConversionsAndClasses = true,
+            showInferredType = true,
+            superMethodLensesEnabled = true,
+            testUserInterface = 'Test Explorer',
+          }
+          metals_config.on_attach = function(_, _) require('metals').setup_dap() end
+          return metals_config
+        end,
+        config = function(self, metals_config)
+          vim.api.nvim_create_autocmd('FileType', {
+            group = vim.api.nvim_create_augroup('dy_metals', { clear = true }),
+            pattern = self.ft,
+            callback = function()
+              require('metals').initialize_or_attach(metals_config)
+            end,
+          })
+        end,
+      },
+      {
+        -- `nvim-metals` attaches the server itself, so keep lspconfig from
+        -- starting a second one; the entry in `config.languages` is what
+        -- documents it.
+        'neovim/nvim-lspconfig',
+        opts = {
+          setup = {
+            metals = function() return true end,
+          },
+        },
+      },
+      {
+        -- Debug through metals rather than a standalone adapter
+        'mfussenegger/nvim-dap',
+        optional = true,
+        opts = function()
+          require('dap').configurations.scala = {
+            {
+              type = 'scala',
+              request = 'launch',
+              name = 'RunOrTest',
+              metals = { runType = 'runOrTestFile' },
+            },
+            {
+              type = 'scala',
+              request = 'launch',
+              name = 'Test Target',
+              metals = { runType = 'testTarget' },
+            },
+          }
+        end,
+      },
+    }
+  or {}
