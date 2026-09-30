@@ -1,17 +1,23 @@
---- Create command abbreviation
+--- Create command abbreviation that only fires as a whole command
+---
+--- A plain `cnoreabbrev` expands wherever its word turns up, so `:e foo/W `
+--- came out as `:e foo/w `. Checking the command line as a whole keeps the
+--- shorthand and drops the surprise.
 ---@param input string key sequence
 ---@param replace string key sequence
 local function cabbrev(input, replace)
-  vim.cmd({ cmd = 'cnoreabbrev', args = { input, replace } })
+  vim.keymap.set('ca', input, function()
+    if vim.fn.getcmdtype() == ':' and vim.fn.getcmdline() == input then
+      return replace
+    end
+    return input
+  end, { expr = true })
 end
 
--- Save with root permission
-vim.keymap.set(
-  'c',
-  'ww',
-  'w ! sudo tee % > /dev/null',
-  { desc = 'Save with root permission' }
-)
+-- Save with root permission. This used to be a `c` mapping, which fires on
+-- `ww` typed anywhere including a `/` search, so `:e foo/ww` turned itself
+-- into a `sudo tee`.
+cabbrev('ww', 'w ! sudo tee % > /dev/null')
 
 -- No one is really happy until you have this shortcuts
 cabbrev('W!', 'w!')
@@ -35,7 +41,9 @@ local smart_delete = function(key)
   return (line:match('^%s*$') and '"_' or '') .. key
 end
 
-local keys = { 'd', 'dd', 'x', 'c', 's', 'C', 'S', 'X' }
+-- `dd` needs no entry of its own: the `d` mapping already returns `"_d`, and
+-- the second `d` doubles that operator, which is the same thing
+local keys = { 'd', 'x', 'c', 's', 'C', 'S', 'X' }
 for _, key in pairs(keys) do
   vim.keymap.set(
     { 'n', 'v' },
