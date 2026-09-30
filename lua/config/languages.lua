@@ -1301,7 +1301,7 @@ return {
         url = 'https://github.com/madmaxieee/tree-sitter-d2',
       },
     },
-    linter = { 'd2' },
+    linters = { 'd2' },
     formatters = { 'd2' },
   },
   cue = {

@@ -8,6 +8,7 @@ return {
   languages = {},
   categories = {
     'Formatter',
+    'Linter',
   },
   source = {
     id = 'pkg:github/terrastruct/d2@v0.9.0',
