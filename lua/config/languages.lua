@@ -58,6 +58,7 @@ local reuse_filetypes = {
       'sh',
       'bats',
       'sh.ebuild',
+      'sh.install',
       'sh.PKGBUILD',
     },
   },
@@ -367,7 +368,9 @@ return {
     filetypes = { 'arduino' },
     parser = 'cpp',
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
-    linters = { { 'clang-tidy', mason = { enabled = false } } },
+    linters = {
+      { 'clangtidy', command = 'clang-tidy', mason = { enabled = false } },
+    },
     formatters = { 'clang-format' },
   },
   bash = {
@@ -396,7 +399,9 @@ return {
     filetypes = { 'c', 'cpp' },
     parser = 'cpp',
     lsp_servers = { 'clangd', 'harper_ls' },
-    linters = { { 'clang-tidy', mason = { enabled = false } } },
+    linters = {
+      { 'clangtidy', command = 'clang-tidy', mason = { enabled = false } },
+    },
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
     test = { 'neotest-gtest', 'vim-test' },
@@ -450,6 +455,9 @@ return {
     linters = {
       { 'fish', mason = { enabled = false } },
     },
+    formatters = {
+      { 'fish_indent', mason = { enabled = false } },
+    },
     endwise = true,
   },
   go = {
@@ -475,12 +483,14 @@ return {
     filetypes = { 'html' },
     parser = 'html',
     lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
+    linters = { 'htmlhint' },
     formatters = { html_beautify_formatter },
   },
   java = {
     filetypes = { 'java' },
     parser = 'java',
     lsp_servers = { 'jdtls', 'harper_ls' },
+    formatters = { 'google-java-format' },
     dap = { 'javadbg' },
     test = { 'neotest-java' },
     dial = function(augend)
@@ -623,8 +633,10 @@ return {
     },
     formatters = {
       {
-        'erb_formatter',
-        command = 'erb-formatter',
+        -- `erb-formatter` the package installs `erb-format` the binary, and
+        -- conform knows it under that second name again.
+        'erb_format',
+        command = 'erb-format',
         mason = { package = 'erb-formatter' },
       },
       html_beautify_formatter,
@@ -645,7 +657,8 @@ return {
     parser = 'rust',
     ext = 'rs',
     lsp_servers = { 'rust_analyzer', 'harper_ls' },
-    formatters = { 'rustfmt' },
+    -- `rustfmt` comes with the toolchain, Mason has no package for it.
+    formatters = { { 'rustfmt', mason = { enabled = false } } },
     dap = { 'codelldb' },
   },
   sass = {
@@ -716,6 +729,9 @@ return {
     filetypes = { 'vue' },
     parser = 'vue',
     lsp_servers = { 'vue_ls', 'vtsls', 'tailwindcss', 'harper_ls' },
+    -- `biome` cannot read a single-file component, so a Vue file goes to
+    -- `prettier` the way the stylesheets already do.
+    formatters = { 'prettier' },
     dial = function(augend)
       return {
         augend.constant.new({
@@ -747,7 +763,14 @@ return {
     filetypes = { 'yaml.ansible' },
     parser = 'yaml',
     lsp_servers = { 'ansiblels' },
-    linters = { 'ansible-lint', 'yamllint' },
+    linters = {
+      {
+        'ansible_lint',
+        command = 'ansible-lint',
+        mason = { package = 'ansible-lint' },
+      },
+      'yamllint',
+    },
     formatters = {
       'yamlfmt',
     },
@@ -829,6 +852,7 @@ return {
     parser = 'dockerfile',
     lsp_servers = { 'dockerls' },
     linters = { 'hadolint' },
+    formatters = { 'dockerfmt' },
     null_ls = {
       ltcc_code_action,
       ltcc_diagnostics,
@@ -1110,6 +1134,14 @@ return {
   xml = {
     filetypes = { 'xml' },
     parser = 'xml',
+    lsp_servers = { 'lemminx' },
+    formatters = {
+      {
+        'xmlformatter',
+        command = 'xmlformat',
+        mason = { package = 'xmlformatter' },
+      },
+    },
   },
   yaml = {
     filetypes = reuse_filetypes.yaml.filetypes,
