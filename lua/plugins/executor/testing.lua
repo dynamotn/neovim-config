@@ -56,4 +56,22 @@ return {
       },
     },
   },
+  {
+    -- Coverage from LCOV, Cobertura, Go, tarpaulin and LLVM reports
+    'mr-u0b0dy/crazy-coverage.nvim',
+    cmd = {
+      'CoverageToggle',
+      'CoverageLoad',
+      'CoverageSummary',
+      'CoverageNextUncovered',
+      'CoveragePrevUncovered',
+    },
+    keys = {
+      { '<leader>tc', '<cmd>CoverageToggle<cr>', desc = 'Toggle Coverage' },
+      { '<leader>tC', '<cmd>CoverageSummary<cr>', desc = 'Coverage Summary' },
+      { ']u', '<cmd>CoverageNextUncovered<cr>', desc = 'Next Uncovered Line' },
+      { '[u', '<cmd>CoveragePrevUncovered<cr>', desc = 'Prev Uncovered Line' },
+    },
+    opts = {},
+  },
 }
