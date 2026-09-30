@@ -4,35 +4,68 @@ return {
     'mfussenegger/nvim-lint',
     opts = function(_, opts)
       local languages = require('config.languages')
-      for name, language in pairs(languages) do
-        for _, ft in ipairs(language.filetypes) do
-          opts.linters_by_ft[ft] = {}
+
+      -- Add each linter's own config to the list of tools if exist
+      for _, language in pairs(languages) do
+        for _, tool in ipairs(language.linters or {}) do
+          if type(tool) == 'table' and tool.opts then
+            opts.linters[tool[1]] =
+              vim.tbl_extend('force', opts.linters[tool[1]] or {}, tool.opts)
+          end
+        end
+      end
+
+      -- `config.languages` owns the linters of a filetype, so a filetype it
+      -- names is always assigned, empty list included. But more than one entry
+      -- may name the same filetype and `pairs` walks them in whatever order it
+      -- likes, so the lists are built whole and assigned once instead of each
+      -- entry resetting the key it happens to touch.
+      ---@return table<string, string[]>
+      local function build_linters_by_ft()
+        local by_ft = {}
+        for name, language in pairs(languages) do
+          for _, ft in ipairs(language.filetypes) do
+            by_ft[ft] = by_ft[ft] or {}
+          end
           for _, tool in ipairs(language.linters or {}) do
             local tool_name, tool_command
-            -- Add linter's config to list of tools if exist
             if type(tool) == 'string' then
               tool_name = tool
               tool_command = tool
-            elseif type(tool) == 'table' then
+            else
               tool_name = tool[1]
               tool_command = tool.command or tool_name
-              if tool.opts then
-                opts.linters[tool_name] = vim.tbl_extend(
-                  'force',
-                  opts.linters[tool_name] or {},
-                  tool.opts
-                )
-              end
             end
             if
               (vim.fn.executable(tool_command) == 1 or name == '*')
               and tool_name ~= 'vale'
             then
-              table.insert(opts.linters_by_ft[ft], tool_name)
+              for _, ft in ipairs(language.filetypes) do
+                table.insert(by_ft[ft], tool_name)
+              end
             end
           end
         end
+        return by_ft
       end
+
+      for ft, tools in pairs(build_linters_by_ft()) do
+        opts.linters_by_ft[ft] = tools
+      end
+
+      -- A linter Mason installs during the session was not on `$PATH` when the
+      -- lists above were built, so it would sit unused until the next restart.
+      -- Rebuilding once an install lands closes that gap.
+      require('lazyvim.util').on_load('mason.nvim', function()
+        require('mason-registry'):on('package:install:success', function()
+          vim.schedule(function()
+            local linters_by_ft = require('lint').linters_by_ft
+            for ft, tools in pairs(build_linters_by_ft()) do
+              linters_by_ft[ft] = tools
+            end
+          end)
+        end)
+      end)
 
       -- `:wq` quits in the same breath as the write, and a linter job started
       -- in that window dies mid-write, taking Neovim down with it (`git commit`
@@ -85,14 +118,11 @@ return {
       local languages = require('config.languages')
       for name, language in pairs(languages) do
         for _, tool in ipairs(language.linters or {}) do
-          local tool_package
           local is_mason_tool = true
-          if type(tool) == 'string' then
-            tool_package = tool
-          elseif type(tool) == 'table' then
-            if tool.mason then is_mason_tool = tool.mason.enabled ~= false end
-            tool_package = tool.mason and tool.mason.package or tool[1]
+          if type(tool) == 'table' and tool.mason then
+            is_mason_tool = tool.mason.enabled ~= false
           end
+          local tool_package = require('util.languages').get_mason_package(tool)
           if is_mason_tool then
             -- install server of language in bundle languages
             if

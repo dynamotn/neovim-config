@@ -55,6 +55,20 @@ M.get_tools_by_filetype = function(filetype)
   return LazyVim.dedup(result)
 end
 
+--- Return the Mason package name of a tool spec
+---
+--- A tool's Mason package, the executable it runs and the name it carries
+--- inside `conform`/`nvim-lint` are three different things. An explicit
+--- `mason.package` is the only one that is always the package, so it wins;
+--- `command` comes next, for the tools that expose several entries out of one
+--- binary (`ruff_fix`, `ruff_format`, ...).
+---@param tool string|table Tool spec from `config.languages`
+---@return string
+M.get_mason_package = function(tool)
+  if type(tool) == 'string' then return tool end
+  return (tool.mason and tool.mason.package) or tool.command or tool[1]
+end
+
 --- Return list of LSP servers for filetype
 ---@param filetype string Filetype of buffer
 ---@return string[]
