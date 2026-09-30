@@ -860,6 +860,13 @@ return {
     dial = js_dial,
     autopairs = js_autopairs,
   },
+  twig = { -- Symfony
+    filetypes = { 'twig' },
+    parser = 'twig',
+    lsp_servers = { 'twiggy_language_server', 'harper_ls' },
+    linters = { 'twigcs' },
+    formatters = { 'twig-cs-fixer' },
+  },
   typescript = {
     filetypes = { 'typescript' },
     parser = 'typescript',
