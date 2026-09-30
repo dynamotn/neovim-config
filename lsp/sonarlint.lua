@@ -1,7 +1,12 @@
+-- The jar paths below all start with `/analyzers`, so this stops at the
+-- extension itself. Pointing it one level deeper built
+-- `extension/analyzers/analyzers/...` and the server found no analyzer at all.
 local extension_dir = vim.fn.stdpath('data')
-  .. '/mason/packages/sonarlint-language-server/extension/analyzers'
+  .. '/mason/packages/sonarlint-language-server/extension'
+-- Tokens live here, so neither the folder nor the files in it are anyone
+-- else's business
 local token_path = vim.fn.stdpath('data') .. '/sonarlint/tokens'
-vim.fn.mkdir(token_path, 'p')
+vim.fn.mkdir(token_path, 'p', '0700')
 
 local did_change_configuration = function(client, settings)
   if not client then return end
@@ -20,14 +25,19 @@ local get_token = function(token_name)
 end
 
 local input_token = function(token_name)
-  local token = vim.fn.input(
+  -- `inputsecret` rather than `input`: the token is a credential and has no
+  -- business being echoed onto the screen or into the command line history.
+  local token = vim.fn.inputsecret(
     'Enter your Sonarlint token for ' .. token_name .. ' organization'
   )
   if token == nil or #token == 0 then
     vim.notify('Token not found.', vim.log.levels.ERROR)
     return
   end
-  vim.fn.writefile({ token }, token_path .. '/' .. token_name)
+  local path = token_path .. '/' .. token_name
+  vim.fn.writefile({ token }, path)
+  -- `writefile` leaves the file world-readable, which a token should not be
+  vim.uv.fs_chmod(path, tonumber('600', 8))
 end
 
 local cmd = {
@@ -133,16 +143,19 @@ return {
     end,
     ['sonarlint/isOpenInEditor'] = function(_, _, _) return true end,
     ['sonarlint/isIgnoredByScm'] = function(_, file_uri, _)
-      local output =
-        vim.fn.system('git check-ignore ' .. vim.uri_from_fname(file_uri))
-      if
-        vim.v.shell_error == 128
-        or (vim.v.shell_error ~= 128 and output == '')
-      then
-        return false
-      else
-        return true
-      end
+      -- The handler is handed a URI, so it is turned into a path rather than
+      -- run through `uri_from_fname` a second time. `git check-ignore` answers
+      -- through its exit status -- 0 ignored, 1 not ignored, 128 no repository
+      -- -- and it is run from the file's own folder, so the answer follows the
+      -- file instead of wherever Neovim happens to be.
+      local path = vim.uri_to_fname(file_uri)
+      local git = vim
+        .system(
+          { 'git', 'check-ignore', '--quiet', path },
+          { cwd = vim.fs.dirname(path) }
+        )
+        :wait()
+      return git.code == 0
     end,
     ['sonarlint/listFilesInFolder'] = function(_, params, _, _)
       local folder = vim.uri_to_fname(params.folderUri)
@@ -252,11 +265,11 @@ return {
     vim.api.nvim_buf_create_user_command(
       bufnr,
       'SonarlintDeactivateRule',
-      function(rule)
+      function(opts)
         did_change_configuration(client, {
           sonarlint = {
             rules = {
-              [rule] = { level = 'off' },
+              [opts.args] = { level = 'off' },
             },
           },
         })
