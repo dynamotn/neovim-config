@@ -33,7 +33,7 @@ return {
       },
       {
         -- Route npm and pip through bun and uv
-        'Senal-D-A-Gunaratna/swapson.nvim',
+        'dynamotn/swapson.nvim',
         opts = {
           npm = {
             enabled = true,
