@@ -1191,6 +1191,15 @@ return {
     end,
     endwise = true,
   },
+  http = {
+    filetypes = { 'http' },
+    -- No parser here on purpose: `kulala.nvim` ships its own `kulala_http`
+    -- grammar and registers it for this filetype, so claiming the filetype
+    -- again would leave the winner up to load order.
+    parser = nil,
+    lsp_servers = { 'kulala_ls' },
+    formatters = { 'kulala-fmt' },
+  },
   hyprlang = {
     filetypes = { 'hyprlang' },
     parser = 'hyprlang',
