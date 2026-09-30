@@ -42,8 +42,9 @@ local smart_delete = function(key)
 end
 
 -- `dd` needs no entry of its own: the `d` mapping already returns `"_d`, and
--- the second `d` doubles that operator, which is the same thing
-local keys = { 'd', 'x', 'c', 's', 'C', 'S', 'X' }
+-- the second `d` doubles that operator, which is the same thing.
+-- `s` and `S` are left alone, they belong to `flash.nvim`.
+local keys = { 'd', 'x', 'c', 'C', 'X' }
 for _, key in pairs(keys) do
   vim.keymap.set(
     { 'n', 'v' },
