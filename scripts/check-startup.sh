@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Load this configuration in a throwaway Neovim and fail on any error.
+# Load this configuration in a throwaway Neovim, open a file of each common
+# filetype in it (see check-startup.lua), and fail on any error.
 #
 # The repository has no test suite, so a syntax error or a bad `require` is
 # only found by opening the editor -- and in a chezmoi `mode: symlink` setup
@@ -23,7 +24,7 @@ ln -s "$repo" "$workdir/config/nvim"
 output="$workdir/output.txt"
 set +e
 XDG_CONFIG_HOME="$workdir/config" nvim --headless -i NONE \
-  -c 'lua vim.cmd("qa!")' > "$output" 2>&1
+  -c "luafile ${repo}/scripts/check-startup.lua" > "$output" 2>&1
 status=$?
 set -e
 
