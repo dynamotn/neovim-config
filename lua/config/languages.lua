@@ -429,6 +429,12 @@ return {
     dap = { 'coreclr' },
     test = { 'neotest-dotnet' },
   },
+  blade = { -- See `php` and `html`
+    filetypes = { 'blade' },
+    parser = 'blade',
+    lsp_servers = { 'laravel_ls', 'tailwindcss', 'harper_ls' },
+    formatters = { 'blade-formatter' },
+  },
   clojure = {
     filetypes = { 'clojure' },
     parser = 'clojure',
