@@ -114,7 +114,13 @@ return {
             if leaving or vim.v.exiting ~= vim.NIL then return end
             if not vim.api.nvim_buf_is_valid(args.buf) then return end
             vim.api.nvim_buf_call(args.buf, function()
-              require('lint').try_lint()
+              local lint = require('lint')
+              -- The same fallback LazyVim's own lint applies: a filetype
+              -- left with no linter of its own gets the `_` ones. A run
+              -- still in flight from LazyVim is cancelled, not doubled.
+              local names = lint._resolve_linter_by_ft(vim.bo.filetype)
+              if #names == 0 then names = lint.linters_by_ft['_'] or {} end
+              if #names > 0 then lint.try_lint(names) end
               -- `vale` looks for its config next to the file and upwards from
               -- there, so asking the working directory answers the wrong
               -- question the moment a buffer lives outside it.
