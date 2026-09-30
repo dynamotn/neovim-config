@@ -4,7 +4,6 @@ return {
   {
     -- Copilot with native LSP
     import = 'lazyvim.plugins.extras.ai.copilot-native',
-    enabled = vim.fn.has('nvim-0.12.0') == 1,
   },
   {
     -- AI CLI
