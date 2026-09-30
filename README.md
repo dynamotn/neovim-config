@@ -75,6 +75,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - HTML
 - Javascript/Typescript
 - Java
+- Kotlin
 - LaTeX
 - Lua (of course)
 - PHP

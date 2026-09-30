@@ -555,6 +555,15 @@ return {
     dial = js_dial,
     autopairs = js_autopairs,
   },
+  kotlin = {
+    filetypes = { 'kotlin' },
+    parser = 'kotlin',
+    ext = 'kt',
+    lsp_servers = { 'kotlin_language_server' },
+    linters = { 'ktlint' },
+    formatters = { 'ktfmt' },
+    dap = { 'kotlin' },
+  },
   latex = {
     filetypes = { 'tex' },
     parser = 'latex',
