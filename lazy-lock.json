@@ -36,6 +36,7 @@
   "cmp-sql": { "branch": "master", "commit": "54193ac99e3855c6ffaa36f83a7c50213df03157" },
   "codecompanion-history.nvim": { "branch": "main", "commit": "bc1b4fe06eaaf0aa2399be742e843c22f7f1652a" },
   "codecompanion.nvim": { "branch": "main", "commit": "9af12c15d0604f429e034ea7542f6cd038ff909a" },
+  "codediff.nvim": { "branch": "main", "commit": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e" },
   "codesettings.nvim": { "branch": "master", "commit": "030b0d99df95011d0408a684f0b819e7e12b7e9d" },
   "conform.nvim": { "branch": "master", "commit": "016802de402556da54c36bd7359b441266b01cdd" },
   "conjure": { "branch": "main", "commit": "9842bf38464df071f72546f65fa6ec44942ca7b2" },
