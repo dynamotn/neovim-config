@@ -733,6 +733,14 @@ return {
       }
     end,
   },
+  qml = { -- Qt
+    filetypes = { 'qml' },
+    parser = 'qmljs',
+    ext = 'qml',
+    lsp_servers = { 'qmlls' },
+    -- `qmlformat` comes with the Qt tooling
+    formatters = { { 'qmlformat', mason = { enabled = false } } },
+  },
   r = {
     filetypes = { 'r' },
     parser = 'r',
