@@ -29,12 +29,15 @@ return vim.list_contains(_G.enabled_languages, 'vue')
             {
               {
                 name = '@vue/typescript-plugin',
-                location = function()
-                  return LazyVim.get_pkg_path(
-                    'vue-language-server',
-                    '/node_modules/@vue/language-server'
-                  )
-                end,
+                -- A path, not a function: settings are sent to the server
+                -- as JSON, and a function cannot be encoded. The package is
+                -- only installed with the first Vue file, so a missing one
+                -- is expected and not warned about.
+                location = LazyVim.get_pkg_path(
+                  'vue-language-server',
+                  '/node_modules/@vue/language-server',
+                  { warn = false }
+                ),
                 languages = { 'vue' },
                 configNamespace = 'typescript',
                 enableForWorkspaceTypeScriptVersions = true,

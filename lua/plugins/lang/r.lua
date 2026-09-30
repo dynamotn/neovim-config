@@ -8,6 +8,9 @@ return vim.list_contains(_G.enabled_languages, 'r')
         'R-nvim/R.nvim',
         -- the plugin sets its own filetype hooks up, so it loads eagerly
         lazy = false,
+        -- Every R buffer asks R for its `nvimcom` version, and fails when
+        -- there is no R to ask.
+        cond = function() return vim.fn.executable('R') == 1 end,
         opts = {
           R_args = { '--quiet', '--no-save' },
           pdfviewer = '',

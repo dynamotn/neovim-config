@@ -1,0 +1,106 @@
+---
+# The same checks as the pre-commit hooks, on a machine that has never run
+# this configuration: what a fresh clone gets is what is tested.
+name: Check
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  # The configuration needs a Neovim nightly, which moves under it without a
+  # commit here to notice.
+  schedule:
+    - cron: '17 3 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  stylua:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The version is read off the pre-commit hook, so the one Renovate bumps
+      # there is the one used here too.
+      - name: Read StyLua version
+        id: version
+        run: |
+          rev="$(yq '.repos[] | select(.repo == "https://github.com/JohnnyMorganz/StyLua") | .rev' .pre-commit-config.yaml)"
+          echo "stylua=${rev#v}" >> "$GITHUB_OUTPUT"
+      - uses: JohnnyMorganz/stylua-action@76fd70c03e6340ceaf673366712db9b20560b402 # v5.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ steps.version.outputs.stylua }}
+          args: --check .
+  neovim:
+    # Each channel on the Neovim it is meant for: `latest` follows nightly,
+    # `stable` promises to run on a released one.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - channel: latest
+            neovim: nightly
+            lockfile: lazy-lock.json
+          - channel: stable
+            neovim: stable
+            lockfile: lazy-lock.stable.json
+    name: neovim (${{ matrix.channel }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: rhysd/action-setup-vim@febef33995d6649302e9d88dda81e071b68f16a7 # v1.6.1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim }}
+      # lazy.nvim reads its lockfile from `stdpath('config')`, so the
+      # checkout has to be the configuration Neovim finds on its own.
+      # `per_machine/config.lua` is rendered by chezmoi and is not in the
+      # repository; one is written here only to pick the channel, the way a
+      # machine on it would, and everything else stays at its default.
+      - name: Link configuration
+        run: |
+          mkdir -p "$HOME/.config"
+          ln -s "$GITHUB_WORKSPACE" "$HOME/.config/nvim"
+      - name: Choose channel
+        if: matrix.channel != 'latest'
+        run: printf "_G.plugin_channel = '%s'\n" "$CHANNEL" > lua/per_machine/config.lua
+        env:
+          CHANNEL: ${{ matrix.channel }}
+      - name: Cache plugins
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.local/share/nvim/lazy
+          key: lazy-${{ runner.os }}-${{ matrix.channel }}-${{ hashFiles(matrix.lockfile) }}
+          restore-keys: lazy-${{ runner.os }}-${{ matrix.channel }}-
+      # The first start bootstraps lazy.nvim and installs what is missing;
+      # `restore` then puts every plugin on the commit the lockfile names,
+      # which also winds back whatever a stale cache brought in.
+      - name: Install plugins
+        run: nvim --headless '+Lazy! restore' +qa
+      # Only the registry index, no package: `validate-tools.lua` checks Mason
+      # names against it, and so does the check of the installs it skipped.
+      # Loaded with `--clean` so that nothing else of the configuration -- and
+      # none of its `ensure_installed` -- comes along. The registries are the
+      # ones `plugins.integration.tool_manager` sets: mason keys the fetched
+      # index on the list, and would fetch again for a different one.
+      - name: Fetch Mason registry
+        run: |
+          nvim --clean --headless \
+            --cmd "set runtimepath^=$GITHUB_WORKSPACE,$HOME/.local/share/nvim/lazy/mason.nvim" \
+            -c "lua require('mason').setup({ registries = { 'lua:tools.mason-registry', 'github:mason-org/mason-registry' } })" \
+            -c "lua require('mason-registry').refresh(vim.schedule_wrap(function(ok) vim.cmd(ok and 'qa' or 'cq') end))"
+      - name: Validate tool names
+        run: nvim --clean --headless -l scripts/validate-tools.lua
+      - name: Check startup
+        run: ./scripts/check-startup.sh
+        env:
+          CHECK_STARTUP_ALL: '1'

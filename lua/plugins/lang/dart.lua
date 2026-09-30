@@ -6,6 +6,12 @@ return vim.list_contains(_G.enabled_languages, 'dart')
         -- Flutter toolbox: runner, devices, outline, and the Dart LSP
         'akinsho/flutter-tools.nvim',
         ft = language.filetypes,
+        -- Without an SDK it hands its debugger setup no paths and fails on
+        -- the first Dart file, and there is no `dartls` for it to start.
+        cond = function()
+          return vim.fn.executable('flutter') == 1
+            or vim.fn.executable('dart') == 1
+        end,
         dependencies = { 'nvim-lua/plenary.nvim' },
         opts = {},
       },
