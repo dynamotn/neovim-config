@@ -71,6 +71,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Erlang
 - Fish
 - GDScript (Godot)
+- GDShader (Godot)
 - Gleam
 - Go
 - GraphQL

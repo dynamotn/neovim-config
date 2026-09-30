@@ -547,6 +547,13 @@ return {
     lsp_servers = { 'gdscript' },
     formatters = { 'gdscript-formatter' },
   },
+  gdshader = { -- See `gdscript`
+    filetypes = { 'gdshader' },
+    parser = 'gdshader',
+    -- No formatter exists; the server is a standalone binary Mason has no
+    -- package for.
+    lsp_servers = { 'gdshader_lsp' },
+  },
   gleam = {
     filetypes = { 'gleam' },
     parser = 'gleam',
