@@ -38,12 +38,28 @@ return {
       -- in that window dies mid-write, taking Neovim down with it (`git commit`
       -- then reports a problem with the editor). So the lint waits for the event
       -- loop, and skips altogether once the editor is on its way out.
+      --
+      -- `QuitPre` also fires for a plain window close, which leaves the editor
+      -- running, so the flag is lifted again on the next `SafeState`: that event
+      -- only arrives once Neovim is back to waiting for input, and never when it
+      -- is really on its way out.
+      local group = vim.api.nvim_create_augroup('dy_lint', { clear = true })
       local leaving = false
       vim.api.nvim_create_autocmd({ 'QuitPre', 'VimLeavePre' }, {
-        callback = function() leaving = true end,
+        group = group,
+        callback = function()
+          if leaving then return end
+          leaving = true
+          vim.api.nvim_create_autocmd('SafeState', {
+            group = group,
+            once = true,
+            callback = function() leaving = false end,
+          })
+        end,
       })
 
       vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+        group = group,
         callback = function(args)
           vim.defer_fn(function()
             if leaving or vim.v.exiting ~= vim.NIL then return end
