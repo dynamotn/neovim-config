@@ -34,6 +34,23 @@ return {
     opts = { completion = { accept = { auto_brackets = { enabled = true } } } },
   },
   {
+    -- Align text on a delimiter
+    --
+    -- `ga` is already the text-case operator, so the pair moves to `gl`,
+    -- which nothing else claims.
+    'nvim-mini/mini.align',
+    keys = {
+      { 'gl', mode = { 'n', 'x' }, desc = 'Align' },
+      { 'gL', mode = { 'n', 'x' }, desc = 'Align with preview' },
+    },
+    opts = {
+      mappings = {
+        start = 'gl',
+        start_with_preview = 'gL',
+      },
+    },
+  },
+  {
     -- Convert text case
     'johmsalas/text-case.nvim',
     event = { 'BufWinEnter' },
