@@ -59,17 +59,25 @@ return {
     -- Input method switcher
     'drop-stones/im-switch.nvim',
     event = 'VeryLazy',
-    opts = {
-      macos = {
-        enabled = vim.uv.os_uname().sysname == 'Darwin',
-        default_im = 'com.apple.keylayout.USExtended',
-      },
-      linux = {
-        enabled = vim.uv.os_uname().sysname == 'Linux',
-        default_im = 'keyboard-us',
-        get_im_command = { 'fcitx5-remote', '-n' },
-        set_im_command = { 'fcitx5-remote', '-g', 'English' },
-      },
-    },
+    -- im-switch turns a platform on by the mere presence of its table (an
+    -- `enabled` field is ignored), and on Linux it then runs the command on
+    -- every `InsertLeave`. Without fcitx5 -- Termux, a container, an IBus
+    -- desktop -- `vim.system` throws each time, so that table is only handed
+    -- over when the command is there.
+    opts = function()
+      local opts = {
+        macos = {
+          default_im = 'com.apple.keylayout.USExtended',
+        },
+      }
+      if vim.fn.executable('fcitx5-remote') == 1 then
+        opts.linux = {
+          default_im = 'keyboard-us',
+          get_im_command = { 'fcitx5-remote', '-n' },
+          set_im_command = { 'fcitx5-remote', '-g', 'English' },
+        }
+      end
+      return opts
+    end,
   },
 }

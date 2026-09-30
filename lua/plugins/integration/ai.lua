@@ -124,9 +124,14 @@ return {
           slash_commands = {
             image = {
               opts = {
-                dirs = {
-                  '~/Multimedia/Pictures/',
-                },
+                -- Folders that do not exist are left out: the picker would
+                -- otherwise complain about each on every `/image`
+                dirs = vim.tbl_filter(
+                  function(dir)
+                    return vim.fn.isdirectory(vim.fn.expand(dir)) == 1
+                  end,
+                  _G.image_dirs
+                ),
               },
             },
           },

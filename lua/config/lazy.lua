@@ -92,7 +92,11 @@ require('lazy').setup({
   dev = {
     path = _G.dev_plugins_path,
     patterns = {},
-    fallback = false,
+    -- Without a fallback, a `dev = true` plugin with no checkout under `path`
+    -- is treated as a local plugin that is never cloned, so it fails to load
+    -- on every machine but the one holding the checkouts. The Lazy UI still
+    -- marks the plugins that do come from `path`.
+    fallback = true,
   },
   debug = false,
   rocks = {

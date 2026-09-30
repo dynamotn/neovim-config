@@ -79,7 +79,7 @@ return {
             score_offset = -20,
             opts = {
               dictionary_directories = {
-                vim.fn.expand('~/.config/dictionaries'),
+                vim.fn.expand(_G.dictionaries_path),
               },
             },
           },

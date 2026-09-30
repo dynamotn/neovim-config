@@ -160,14 +160,77 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 
 ## Installation
 
-- Clone this repository to ~/.config/nvim.
+### Requirements
+
+- **Neovim 0.13+** (nightly). Older versions stop at an error message.
+- **git**, to bootstrap [lazy.nvim](https://github.com/folke/lazy.nvim) and
+  clone the plugins on the first start.
+- A [Nerd Font](https://www.nerdfonts.com/) in the terminal, for the icons.
+- **curl**, **tar**, **unzip** and **gzip**, which Mason uses to download
+  tools.
+- A **C compiler** and the
+  [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/tree/master/crates/cli),
+  which `nvim-treesitter` needs to build parsers.
+- **ripgrep** and **fd**, for the pickers and the ripgrep completion source.
+
+Everything else is installed lazily: the first time a file of a language is
+opened, its Treesitter parser, LSP servers, linters, formatters and debug
+adapters are installed by Mason. Many of those packages are built by a
+language toolchain, so what Mason can install depends on what is on `PATH`:
+**node**/**npm** (or **bun**), **python3**/**pip** (or **uv**), **go**,
+**cargo**, **java**, and so on. `bun` and `uv` are used in place of `npm` and
+`pip` when they are installed.
+
+Some tools are never installed by Mason and must come from the system (or the
+language's own toolchain) to be used: `bean-check`/`bean-format` (Beancount),
+`bicep`, `clang-tidy` (C/C++, Arduino), `cmake-format`, `dart`, `erlfmt`,
+`fish`/`fish_indent`, `forge` (Solidity), `gawk`, `gleam`, `hurlfmt`, `just`,
+`mix` (Elixir, HEEx), `nginxfmt.py`, `nix`, `statix`, `nufmt`, `perlcritic`,
+`perltidy`, `prisma-lint`, `qmlformat`, `rustfmt`, `scalafmt`, `terragrunt`,
+`tofu` (Terraform), `zig`, `zsh`, plus `curl`, `sed` and `git` for the generic
+sources. They are the entries marked `mason = { enabled = false }` in
+[lua/config/languages.lua](./lua/config/languages.lua); a missing one is
+skipped, not reported as an error.
+
+Optional extras:
+
+- Pasting images: `pngpaste` on macOS, `wl-paste` or `xclip` on Linux.
+- Input method switching on Linux: `fcitx5-remote` (skipped without it).
+- D2 diagrams: `d2`, plus one of `rsvg-convert`, `resvg` or `magick`, and a
+  kitty-graphics terminal.
+
+### Install
+
+- Back up and clone this repository to `~/.config/nvim`:
 
 ```sh
-  rm -rf ~/.config/nvim
+  mv ~/.config/nvim ~/.config/nvim.bak
   git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch --depth 1
 ```
 
-- After that, open Neovim. That's all! Hope you enjoy with neovim :smile:!
+- Open Neovim. The plugins are cloned on the first start, the language tools
+  when their files are first opened.
+
+### Per machine settings
+
+[chezmoi](https://www.chezmoi.io/) is not needed. It renders
+[lua/per_machine/config.lua.tmpl](./lua/per_machine/config.lua.tmpl) into
+`lua/per_machine/config.lua` on my machines; in a plain clone that file does
+not exist and the defaults in [lua/config/globals.lua](./lua/config/globals.lua)
+are used. To change them, write `lua/per_machine/config.lua` by hand and
+assign the globals there, e.g.:
+
+```lua
+_G.dark_mode = false
+_G.enabled_languages = { 'lua', 'bash', 'markdown' }
+_G.obsidian.paths.personal = vim.fn.expand('~/Notes')
+_G.dictionaries_path = vim.fn.expand('~/.local/share/dictionaries')
+_G.image_dirs = { '~/Pictures' }
+```
+
+Locally developed plugins (specs with `dev = true`) are looked for under
+`_G.dev_plugins_path`, which the `NVIM_DEV_PLUGINS` environment variable
+overrides. A plugin missing from there is cloned from its git remote instead.
 
 ## Key bindings
 

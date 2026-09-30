@@ -1,9 +1,15 @@
-local spell_files = {
-  vi = { '~/.config/dictionaries/vietnamese.txt' },
-  zh = { '~/.config/dictionaries/chinese/*.txt' },
+-- Paths come from `stdpath` and `_G.dictionaries_path` rather than
+-- `~/.config/...`, so `:DySpell` writes into the configuration actually in use
+-- under a different `XDG_CONFIG_HOME` or `NVIM_APPNAME`.
+local spell_dir = vim.fs.joinpath(vim.fn.stdpath('config'), 'spell')
+local dictionaries = vim.fn.expand(_G.dictionaries_path)
 
-  proper = { '~/.config/nvim/spell/proper.txt' },
-  technical = { '~/.config/nvim/spell/technical.txt' },
+local spell_files = {
+  vi = { vim.fs.joinpath(dictionaries, 'vietnamese.txt') },
+  zh = { vim.fs.joinpath(dictionaries, 'chinese', '*.txt') },
+
+  proper = { vim.fs.joinpath(spell_dir, 'proper.txt') },
+  technical = { vim.fs.joinpath(spell_dir, 'technical.txt') },
 }
 
 --- Build the spell file of one language from its dictionaries
@@ -19,8 +25,8 @@ local make_spell = function(lang)
     return
   end
   vim.cmd(
-    'mkspell! ~/.config/nvim/spell/'
-      .. lang
+    'mkspell! '
+      .. vim.fn.fnameescape(vim.fs.joinpath(spell_dir, lang))
       .. ' '
       .. table.concat(spell_files[lang], ' ')
   )

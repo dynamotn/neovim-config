@@ -118,5 +118,20 @@ _G.obsidian = {
 ---@type table<string, { priority: integer, takeover: string }> Firenvim setting
 _G.firenvim_site_settings = {}
 
----@type string Where locally developed plugins are checked out, for `dev` specs
-_G.dev_plugins_path = '~/Working/community/nvim'
+---@type string Folder of word lists (`*.txt`), fed to the dictionary
+--- completion source and to `:DySpell`. Nothing breaks when it is missing:
+--- completion just has no dictionary words.
+_G.dictionaries_path = vim.fs.joinpath(
+  vim.env.XDG_CONFIG_HOME or vim.fn.expand('~/.config'),
+  'dictionaries'
+)
+
+---@type string[] Folders the AI chat `/image` command picks images from, on
+--- top of the working directory. Missing ones are skipped.
+_G.image_dirs = { '~/Multimedia/Pictures' }
+
+---@type string Where locally developed plugins are checked out, for `dev` specs.
+--- `NVIM_DEV_PLUGINS` points it elsewhere without editing any file, and
+--- `per_machine` may still override it. The folder need not exist: lazy.nvim
+--- falls back to the git remote for any plugin missing from it.
+_G.dev_plugins_path = vim.env.NVIM_DEV_PLUGINS or '~/Working/community/nvim'

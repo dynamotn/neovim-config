@@ -91,10 +91,19 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         'mfussenegger/nvim-lint',
         opts = function()
           local lint = require('lint')
-          lint.linters['markdownlint-cli2'].args = {
-            '--config',
-            '~/.config/markdownlint/config.yaml',
-          }
+          -- nvim-lint runs the linter without a shell, so a `~` would reach
+          -- it verbatim, and a `--config` naming a missing file is fatal to
+          -- markdownlint-cli2. The shared config is only passed when present.
+          local config = vim.fs.joinpath(
+            vim.env.XDG_CONFIG_HOME or vim.fn.expand('~/.config'),
+            'markdownlint',
+            'config.yaml'
+          )
+          if vim.fn.filereadable(config) == 1 then
+            -- `-` is the default argument being replaced: without it the
+            -- buffer sent on stdin is never linted and only the usage prints
+            lint.linters['markdownlint-cli2'].args = { '--config', config, '-' }
+          end
         end,
       },
     }
