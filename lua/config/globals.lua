@@ -53,9 +53,23 @@ _G.dd = function(...) require('snacks.debug').inspect(...) end
 -- expect their arguments handed straight back. Snacks' notifier also wants a
 -- UI to draw on, so the built-in keeps the job wherever there is none, such as
 -- `--headless` and `nvim -l`.
+--
+-- Whether a UI is attached is remembered rather than asked on every call:
+-- `nvim_list_uis` throws in a fast event context, and `print` reaches here
+-- from libuv callbacks -- a Mason install is one of them. The built-in copes
+-- with a fast event, the notifier does not, so that case goes to it as well.
 local builtin_print = vim.print
+local has_ui = #vim.api.nvim_list_uis() > 0
+vim.api.nvim_create_autocmd({ 'UIEnter', 'UILeave' }, {
+  group = vim.api.nvim_create_augroup('dy_print_ui', { clear = true }),
+  -- Counted once the event is over: a UI on its way out is still listed while
+  -- `UILeave` runs.
+  callback = function()
+    vim.schedule(function() has_ui = #vim.api.nvim_list_uis() > 0 end)
+  end,
+})
 vim.print = function(...)
-  if #vim.api.nvim_list_uis() == 0 then return builtin_print(...) end
+  if not has_ui or vim.in_fast_event() then return builtin_print(...) end
   _G.dd(...)
   return ...
 end
