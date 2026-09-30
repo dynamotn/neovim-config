@@ -66,6 +66,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Clojure
 - CSS/Less
 - Cucumber
+- Dart
 - Fish
 - Go
 - HTML

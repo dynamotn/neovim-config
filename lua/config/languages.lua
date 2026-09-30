@@ -456,6 +456,15 @@ return {
     },
     lsp_servers = { 'cucumber_language_server' },
   },
+  dart = {
+    filetypes = { 'dart' },
+    parser = 'dart',
+    -- `dartls` and `dart format` both ship with the SDK, Mason has neither.
+    lsp_servers = { 'dartls' },
+    formatters = {
+      { 'dart_format', command = 'dart', mason = { enabled = false } },
+    },
+  },
   fish = {
     filetypes = { 'fish' },
     parser = 'fish',
