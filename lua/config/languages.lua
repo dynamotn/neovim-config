@@ -110,6 +110,22 @@ local html_beautify_formatter = {
   command = 'js-beautify',
   mason = { package = 'js-beautify' },
 }
+-- djLint speaks several template dialects and has to be told which one it is
+-- looking at; left alone it reformats everything as plain HTML. `conform`
+-- keys a tool's options by its name, so the two entries that use it share one
+-- definition and read the dialect off the buffer instead of overwriting each
+-- other's profile.
+local djlint_formatter = {
+  'djlint',
+  opts = {
+    prepend_args = function(_, ctx)
+      return {
+        '--profile',
+        vim.bo[ctx.buf].filetype == 'htmldjango' and 'django' or 'jinja',
+      }
+    end,
+  },
+}
 -- `javascript`, `typescript` and `tsx` are one toolchain over three grammars.
 -- They need an entry each so that a filetype reaches the parser that actually
 -- understands it -- and so an injected ```typescript block is not handed to
@@ -516,6 +532,15 @@ return {
     linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
     formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
   },
+  erlang = { -- See `elixir`
+    filetypes = { 'erlang' },
+    parser = 'erlang',
+    ext = 'erl',
+    -- `elp` is the Erlang Language Platform; `erlang_ls` is the older one and
+    -- is not in lspconfig.
+    lsp_servers = { 'elp' },
+    formatters = { { 'erlfmt', mason = { enabled = false } } },
+  },
   fish = {
     filetypes = { 'fish' },
     parser = 'fish',
@@ -537,6 +562,13 @@ return {
     -- package for it.
     lsp_servers = { 'gdscript' },
     formatters = { 'gdscript-formatter' },
+  },
+  gdshader = { -- See `gdscript`
+    filetypes = { 'gdshader' },
+    parser = 'gdshader',
+    -- No formatter exists; the server is a standalone binary Mason has no
+    -- package for.
+    lsp_servers = { 'gdshader_lsp' },
   },
   gleam = {
     filetypes = { 'gleam' },
@@ -899,6 +931,13 @@ return {
     linters = { 'swiftlint' },
     formatters = { 'swiftformat' },
   },
+  templ = { -- See `go` and `html`
+    filetypes = { 'templ' },
+    parser = 'templ',
+    -- one `templ` binary again: `templ lsp` and `templ fmt`
+    lsp_servers = { 'templ', 'tailwindcss', 'harper_ls' },
+    formatters = { 'templ' },
+  },
   tsx = { -- See `typescript`
     filetypes = { 'typescriptreact', 'typescript.tsx' },
     parser = 'tsx',
@@ -1175,6 +1214,30 @@ return {
     end,
     endwise = true,
   },
+  htmldjango = { -- See `python` and `html`
+    -- Neovim leaves a Django template as `html`, so the extension and the
+    -- conventional `templates/` directory are registered in
+    -- `ftdetect/filetype.lua`.
+    filetypes = { 'htmldjango' },
+    parser = 'htmldjango',
+    lsp_servers = { 'djlsp', 'tailwindcss', 'harper_ls' },
+    formatters = { djlint_formatter },
+  },
+  http = {
+    filetypes = { 'http' },
+    -- No parser here on purpose: `kulala.nvim` ships its own `kulala_http`
+    -- grammar and registers it for this filetype, so claiming the filetype
+    -- again would leave the winner up to load order.
+    parser = nil,
+    lsp_servers = { 'kulala_ls' },
+    formatters = { 'kulala-fmt' },
+  },
+  hurl = { -- See `http`
+    filetypes = { 'hurl' },
+    parser = 'hurl',
+    -- `hurlfmt` is part of the `hurl` release, Mason has no package
+    formatters = { { 'hurlfmt', mason = { enabled = false } } },
+  },
   hyprlang = {
     filetypes = { 'hyprlang' },
     parser = 'hyprlang',
@@ -1191,11 +1254,16 @@ return {
     parser = 'jinja',
     ext = 'j2',
     lsp_servers = { 'jinja_lsp' },
-    formatters = {
-      -- djLint speaks several template dialects; without the profile it
-      -- reformats a Jinja file as if it were plain HTML.
-      { 'djlint', opts = { prepend_args = { '--profile', 'jinja' } } },
-    },
+    formatters = { djlint_formatter },
+  },
+  jq = {
+    filetypes = { 'jq' },
+    parser = 'jq',
+    -- The same `jq` binary that formats JSON elsewhere in this file also
+    -- formats and checks a `.jq` filter.
+    lsp_servers = { 'jqls' },
+    linters = { 'jq' },
+    formatters = { 'jq' },
   },
   json = {
     filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },
@@ -1242,6 +1310,14 @@ return {
     lsp_servers = { 'just' },
     -- `just --fmt` is the tool itself
     formatters = { { 'just', mason = { enabled = false } } },
+  },
+  kdl = {
+    filetypes = { 'kdl' },
+    parser = 'kdl',
+    -- what zellij's configuration is written in; Mason has the formatter but
+    -- no package for the server
+    lsp_servers = { 'kdl_lsp' },
+    formatters = { 'kdlfmt' },
   },
   make = {
     filetypes = { 'config', 'automake', 'make' },

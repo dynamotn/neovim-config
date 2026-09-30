@@ -68,8 +68,10 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Cucumber
 - Dart
 - Elixir
+- Erlang
 - Fish
 - GDScript (Godot)
+- GDShader (Godot)
 - Gleam
 - Go
 - GraphQL
@@ -103,6 +105,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 
 - Angular
 - Astro
+- Django (templates)
 - Ember (Handlebars)
 - Laravel (Blade)
 - Phoenix (HEEx)
@@ -111,6 +114,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Rust
 - Svelte
 - Symfony (Twig)
+- Templ (Go)
 - Vue
 
 ### Tools & Markup
@@ -128,11 +132,14 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - GoTemplate (Helm template...)
 - Groovy (also for Jenkinsfile)
 - HTTP Rest file
+- Hurl
 - Hyprlang
 - Jinja
+- jq
 - JSON
 - Jsonnet
 - Just
+- KDL (zellij)
 - Make tools (autoconf, automake, make)
 - Markdown
 - Mermaid

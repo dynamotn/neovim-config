@@ -38,6 +38,7 @@ M.sources = function(filetype)
   local unique_sources = {
     markdown = { 'nerdfont' },
     typst = { 'nerdfont' },
+    clojure = { 'conjure' },
     fish = { 'fish' },
     sql = { 'dadbod', 'sql' },
     lua = { 'lazydev' },
