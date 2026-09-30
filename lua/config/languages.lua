@@ -235,6 +235,25 @@ return {
         end,
       },
       'copilot',
+      -- Both are handed every buffer, so they are kept to the projects that
+      -- asked for them: `typos_lsp` would otherwise take any `Cargo.toml` or
+      -- `pyproject.toml` for its root, and `ast_grep` has no rules to report
+      -- without an `sgconfig.yml`.
+      {
+        'typos_lsp',
+        enabled = function(bufnr)
+          return vim.fs.root(
+            bufnr,
+            { 'typos.toml', '_typos.toml', '.typos.toml' }
+          ) ~= nil
+        end,
+      },
+      {
+        'ast_grep',
+        enabled = function(bufnr)
+          return vim.fs.root(bufnr, { 'sgconfig.yml', 'sgconfig.yaml' }) ~= nil
+        end,
+      },
     },
     formatters = {
       { 'trim_whitespace', command = 'lua', mason = { enabled = false } },
@@ -245,7 +264,26 @@ return {
         mason = { enabled = false },
       },
     },
-    linters = { 'vale' },
+    linters = {
+      'vale',
+      -- Reads the buffer from stdin and reports only which rule matched,
+      -- never the secret itself, so a leak is flagged before it is saved.
+      'gitleaks',
+      -- Reads the file from disk against the rules that apply to it, and
+      -- has nothing to check against outside a project with `.editorconfig`.
+      -- `condition` is LazyVim's, asked before every `*` linter runs.
+      {
+        'editorconfig-checker',
+        opts = {
+          condition = function(ctx)
+            return vim.fs.find('.editorconfig', {
+              path = ctx.dirname,
+              upward = true,
+            })[1] ~= nil
+          end,
+        },
+      },
+    },
     null_ls = {
       {
         'dictionary',
