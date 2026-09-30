@@ -1256,6 +1256,13 @@ return {
       { 'statix', type = 'code_actions', command = 'statix' },
     },
   },
+  prisma = {
+    filetypes = { 'prisma' },
+    parser = 'prisma',
+    -- the server formats; `prisma-lint` is an npm tool Mason does not carry
+    lsp_servers = { 'prismals' },
+    linters = { { 'prisma-lint', mason = { enabled = false } } },
+  },
   promql = {
     filetypes = { 'promql' },
     parser = 'promql',

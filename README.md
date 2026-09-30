@@ -136,6 +136,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - Mermaid
 - Nginx
 - Nix
+- Prisma
 - PromQL (Prometheus)
 - Protobuf
 - Rego
