@@ -969,6 +969,7 @@ return {
         rule('<%', '  %>', filetypes):set_end_pair_length(3),
       }
     end,
+    endwise = true,
   },
   ruby = {
     filetypes = { 'ruby' },
