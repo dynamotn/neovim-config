@@ -63,11 +63,8 @@ return vim.list_contains(_G.enabled_languages, 'blade')
         -- `gf` on a view name, a route or a component
         'ricardoramirezr/blade-nav.nvim',
         ft = filetypes,
-      },
-      {
-        -- Completion for view names and Laravel's own symbols
-        'blink.cmp',
-        dependencies = { 'laravel.nvim', 'blade-nav.nvim' },
+        -- Kept off the `blink.cmp` spec: lazy.nvim keeps a single `init` per
+        -- plugin, and this one would replace the labels set in completion.lua
         init = function()
           _G.completion_sources =
             vim.tbl_extend('force', _G.completion_sources, {
@@ -75,6 +72,11 @@ return vim.list_contains(_G.enabled_languages, 'blade')
               laravel = '「LARAVEL」',
             })
         end,
+      },
+      {
+        -- Completion for view names and Laravel's own symbols
+        'blink.cmp',
+        dependencies = { 'laravel.nvim', 'blade-nav.nvim' },
         opts = {
           sources = {
             compat = { 'laravel' },
