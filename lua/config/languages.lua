@@ -676,6 +676,13 @@ return {
       }
     end,
   },
+  r = {
+    filetypes = { 'r' },
+    parser = 'r',
+    ext = 'R',
+    lsp_servers = { 'r_language_server' },
+    formatters = { 'air' },
+  },
   rails = { -- See `ruby` and `html`
     filetypes = { 'eruby' },
     parser = {
