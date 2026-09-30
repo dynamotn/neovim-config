@@ -1260,7 +1260,7 @@ return {
     filetypes = { 'jinja' },
     parser = 'jinja',
     ext = 'j2',
-    lsp_servers = { 'jinja_lsp' },
+    lsp_servers = { 'jinja_lsp', 'harper_ls' },
     formatters = { djlint_formatter },
   },
   jq = {

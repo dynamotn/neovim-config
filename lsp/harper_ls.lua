@@ -31,6 +31,7 @@ local language_ids = {
   heex = 'html',
   htmlangular = 'html',
   htmldjango = 'html',
+  jinja = 'html',
   svelte = 'html',
   templ = 'html',
   twig = 'html',
