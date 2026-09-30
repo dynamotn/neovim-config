@@ -33,4 +33,42 @@ return {
       vim.g.matchup_transmute_enabled = 0
     end,
   },
+  {
+    -- w/e/b/ge by subword, over insignificant punctuation
+    'chrisgrieser/nvim-spider',
+    -- Ex commands rather than functions, or `.` cannot repeat them
+    keys = {
+      {
+        'w',
+        "<cmd>lua require('spider').motion('w')<cr>",
+        mode = { 'n', 'o', 'x' },
+        desc = 'Next subword',
+      },
+      {
+        'e',
+        "<cmd>lua require('spider').motion('e')<cr>",
+        mode = { 'n', 'o', 'x' },
+        desc = 'End of subword',
+      },
+      {
+        'b',
+        "<cmd>lua require('spider').motion('b')<cr>",
+        mode = { 'n', 'o', 'x' },
+        desc = 'Previous subword',
+      },
+      {
+        'ge',
+        "<cmd>lua require('spider').motion('ge')<cr>",
+        mode = { 'n', 'o', 'x' },
+        desc = 'End of previous subword',
+      },
+      -- Its `cw` changes up to the next word, as `dw` deletes; keep Vim's
+      -- change to the end of the word instead.
+      {
+        'cw',
+        "c<cmd>lua require('spider').motion('e')<cr>",
+        desc = 'Change to end of subword',
+      },
+    },
+  },
 }
