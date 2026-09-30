@@ -679,6 +679,13 @@ return {
     lsp_servers = { 'nushell' },
     formatters = { { 'nufmt', mason = { enabled = false } } },
   },
+  ocaml = {
+    filetypes = { 'ocaml' },
+    parser = 'ocaml',
+    ext = 'ml',
+    lsp_servers = { 'ocamllsp' },
+    formatters = { 'ocamlformat' },
+  },
   perl = {
     filetypes = { 'perl' },
     parser = 'perl',

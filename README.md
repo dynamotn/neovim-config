@@ -81,6 +81,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - LaTeX
 - Lua (of course)
 - Nushell
+- OCaml
 - Perl
 - PHP
 - Python
