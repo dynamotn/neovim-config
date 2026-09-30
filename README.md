@@ -130,6 +130,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 - GoTemplate (Helm template...)
 - Groovy (also for Jenkinsfile)
 - HTTP Rest file
+- Hurl
 - Hyprlang
 - Jinja
 - JSON

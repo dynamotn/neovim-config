@@ -1200,6 +1200,12 @@ return {
     lsp_servers = { 'kulala_ls' },
     formatters = { 'kulala-fmt' },
   },
+  hurl = { -- See `http`
+    filetypes = { 'hurl' },
+    parser = 'hurl',
+    -- `hurlfmt` is part of the `hurl` release, Mason has no package
+    formatters = { { 'hurlfmt', mason = { enabled = false } } },
+  },
   hyprlang = {
     filetypes = { 'hyprlang' },
     parser = 'hyprlang',
