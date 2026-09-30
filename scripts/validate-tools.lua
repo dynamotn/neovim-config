@@ -17,21 +17,55 @@ vim.opt.runtimepath:append(data .. '/lazy/conform.nvim')
 vim.opt.runtimepath:append(data .. '/lazy/nvim-lint')
 vim.opt.runtimepath:append(data .. '/lazy/nvim-lspconfig')
 
+local registry = data
+  .. '/mason/registries/github/mason-org/mason-registry/registry.json'
+
+-- Every check reads its answer out of `stdpath('data')`. On a machine that has
+-- never run this configuration -- a fresh clone, a container, CI -- none of it
+-- is there, and a tool that cannot be looked up is not the same thing as a
+-- tool that is named wrong. So each group runs only when what it reads from is
+-- present, and whatever had to be passed over is said out loud at the end.
+local checkable = {
+  formatters = vim.fn.isdirectory(data .. '/lazy/conform.nvim') == 1,
+  linters = vim.fn.isdirectory(data .. '/lazy/nvim-lint') == 1,
+  lsp = vim.fn.isdirectory(data .. '/lazy/nvim-lspconfig') == 1,
+  mason = vim.fn.filereadable(registry) == 1,
+}
+
+---@type table<string, string> What each group needs, for the message
+local needs = {
+  formatters = 'conform.nvim',
+  linters = 'nvim-lint',
+  lsp = 'nvim-lspconfig',
+  mason = 'the Mason registry',
+}
+
+--- Tool names the repo's own Mason registry adds
+---
+--- Read straight off this tree instead of through `require`: the module picks
+--- its folder with `stdpath('config')`, which is the configuration in use and
+--- not necessarily the one being checked.
+---@return table<string, true>
+local function own_registry()
+  local names = {}
+  local files =
+    vim.fn.glob(root .. '/lua/tools/mason-registry/*.lua', true, true)
+  for _, file in ipairs(files) do
+    local tool = vim.fn.fnamemodify(file, ':t:r')
+    if tool ~= 'init' then names[tool] = true end
+  end
+  return names
+end
+
 ---@return table<string, true>
 local function mason_packages()
-  local packages = {}
-  local registry = data
-    .. '/mason/registries/github/mason-org/mason-registry/registry.json'
-  if vim.fn.filereadable(registry) == 1 then
+  local packages = own_registry()
+  if checkable.mason then
     for _, package in
       ipairs(vim.json.decode(table.concat(vim.fn.readfile(registry), '\n')))
     do
       packages[package.name] = true
     end
-  end
-  -- the repo's own `lua:tools.mason-registry`, wired up in tool_manager.lua
-  for name in pairs(require('tools.mason-registry')) do
-    packages[name] = true
   end
   return packages
 end
@@ -85,12 +119,13 @@ for _, name in ipairs(names) do
       local tool_name = type(tool) == 'string' and tool or tool[1]
       local mason = type(tool) == 'table' and tool.mason or nil
       if
-        not local_formatters[tool_name]
+        checkable[kind]
+        and not local_formatters[tool_name]
         and not pcall(require, module .. tool_name)
       then
         report(name, kind, tool_name, 'no such ' .. kind:sub(1, -2))
       end
-      if not (mason and mason.enabled == false) then
+      if checkable.mason and not (mason and mason.enabled == false) then
         local package = (mason and mason.package)
           or (type(tool) == 'table' and tool.command)
           or tool_name
@@ -110,8 +145,8 @@ for _, name in ipairs(names) do
     local server_name = type(server) == 'string' and server or server[1]
     -- a server the repo configures itself lives in `lsp/`
     if
-      vim.fn.filereadable(string.format('%s/lsp/%s.lua', root, server_name))
-        == 0
+      checkable.lsp
+      and vim.fn.filereadable(string.format('%s/lsp/%s.lua', root, server_name)) == 0
       and #vim.api.nvim_get_runtime_file(
           'lsp/' .. server_name .. '.lua',
           false
@@ -123,12 +158,27 @@ for _, name in ipairs(names) do
   end
 end
 
-if vim.tbl_isempty(problems) then
-  print('config.languages: every tool resolves')
-  os.exit(0)
+local skipped = {}
+for group, ok in pairs(checkable) do
+  if not ok then table.insert(skipped, needs[group]) end
 end
+table.sort(skipped)
 
 for _, problem in ipairs(problems) do
   print(problem)
 end
-os.exit(1)
+
+if #skipped > 0 then
+  print(
+    string.format(
+      'config.languages: %s, so nothing that needs %s was checked',
+      #skipped == vim.tbl_count(checkable) and 'nothing to check against'
+        or 'partial check',
+      table.concat(skipped, ', ')
+    )
+  )
+elseif vim.tbl_isempty(problems) then
+  print('config.languages: every tool resolves')
+end
+
+os.exit(vim.tbl_isempty(problems) and 0 or 1)

@@ -31,3 +31,10 @@ repos:
         language: script
         files: \.lua$
         pass_filenames: false
+      - id: validate-tools
+        name: Tool names
+        description: Checks every tool named in config.languages against conform, nvim-lint, lspconfig and Mason.
+        entry: nvim --clean --headless -l scripts/validate-tools.lua
+        language: system
+        files: \.lua$
+        pass_filenames: false
