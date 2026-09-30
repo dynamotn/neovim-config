@@ -35,8 +35,11 @@ local stable = _G.plugin_channel == 'stable'
 -- `conform.nvim` is here for another reason: its release is younger, but
 -- `config.languages` names formatters added since (`gdscript-formatter`), and
 -- `scripts/validate-tools.lua` fails on a formatter conform does not know.
+-- `nvim-origami` too: its one tag, `v1.9`, is where to pin to keep options
+-- it has since dropped, not a release to follow.
 local stale_releases = {
   'stevearc/conform.nvim',
+  'chrisgrieser/nvim-origami',
   'folke/edgy.nvim',
   'folke/flash.nvim',
   'folke/persistence.nvim',
