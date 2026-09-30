@@ -534,6 +534,12 @@ return {
     lsp_servers = { 'graphql' },
     formatters = { 'prettier' },
   },
+  handlebars = { -- See `html`
+    filetypes = { 'handlebars' },
+    parser = 'glimmer',
+    ext = 'hbs',
+    lsp_servers = { 'ember', 'tailwindcss', 'harper_ls' },
+  },
   haskell = {
     filetypes = { 'haskell' },
     parser = 'haskell',
