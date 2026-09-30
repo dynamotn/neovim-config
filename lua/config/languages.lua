@@ -373,6 +373,14 @@ return {
     },
     formatters = { 'clang-format' },
   },
+  astro = { -- See `html` and `typescript`
+    filetypes = { 'astro' },
+    parser = 'astro',
+    -- `prettier` needs `prettier-plugin-astro` for a component file, so
+    -- formatting is left to the language server.
+    lsp_servers = { 'astro', 'tailwindcss', 'harper_ls' },
+    linters = js_linters,
+  },
   bash = {
     filetypes = reuse_filetypes.bash.filetypes,
     parser = 'bash',

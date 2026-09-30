@@ -97,6 +97,7 @@ See the list of supported things in [lua/config/languages.lua](./lua/config/lang
 ### Frameworks
 
 - Angular
+- Astro
 - Rails
 - Rust
 - Svelte
