@@ -43,6 +43,7 @@
     - `jira`
     - `shellcheck`
     - `sonarlint` (with connected mode for both SonarQube and SonarCloud)
+    - YAML schemas detected from content (Kubernetes, CRDs, cloud-init), and a picker (`<leader>cy`, `:YamlSchema`) to set one per buffer or insert it as a modeline
     - Spell check for comments
     - Render diagram on kitty terminal (also support `zellij`)
     - etc

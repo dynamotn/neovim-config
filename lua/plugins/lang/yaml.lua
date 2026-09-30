@@ -8,7 +8,7 @@ return condition
       {
         -- Schema
         --
-        -- A library and nothing else: `before_init` below requires it when
+        -- A library and nothing else: `on_init` below requires it when
         -- the server starts, and that is what loads it. Loading it on `ft`
         -- instead made lazy.nvim replay `FileType` for the buffer, running
         -- every handler of the filetype a second time.
@@ -29,14 +29,23 @@ return condition
                   },
                 },
               },
-              -- lazy-load schemastore when needed
-              before_init = function(_, new_config)
-                new_config.settings.yaml.schemas = vim.tbl_deep_extend(
-                  'force',
-                  new_config.settings.yaml.schemas or {},
-                  require('schemastore').yaml.schemas()
-                )
+              -- Hands SchemaStore to the server, lazy-loading it, and detects
+              -- Kubernetes and cloud-init files the server has no schema for
+              on_init = function(client)
+                require('util.yaml_schema').on_init(client)
               end,
+              keys = {
+                {
+                  '<leader>cy',
+                  function() require('util.yaml_schema').select() end,
+                  desc = 'Select YAML Schema',
+                },
+                {
+                  '<leader>cY',
+                  function() require('util.yaml_schema').select(0, true) end,
+                  desc = 'Insert YAML Schema Modeline',
+                },
+              },
               settings = {
                 redhat = { telemetry = { enabled = false } },
                 yaml = {
@@ -45,6 +54,9 @@ return condition
                     enable = true,
                   },
                   validate = { enable = true },
+                  -- Narrow the `kubernetes` schema down to the CRD of the
+                  -- document, from the datreeio CRDs catalog
+                  kubernetesCRDStore = { enable = true },
                   schemaStore = {
                     -- Must disable built-in schemaStore support to use
                     -- schemas from SchemaStore.nvim plugin
@@ -140,11 +152,8 @@ return condition
                 if response and response.result and response.result[1] then
                   local schema = response.result[1]
                   if schema.uri then
-                    return package.loaded['schemastore']
-                      and msg
-                        .. require('util.schemastore').get_yaml_schema_name(
-                          schema.uri
-                        )
+                    return msg
+                      .. require('util.yaml_schema').get_name(schema.uri)
                   else
                     return msg .. 'N/A'
                   end
