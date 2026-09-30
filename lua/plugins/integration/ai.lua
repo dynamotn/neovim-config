@@ -11,6 +11,12 @@ return {
     opts = {
       servers = {
         copilot = {
+          -- nvim-lspconfig ships Copilot with `telemetryLevel = 'all'`.
+          settings = {
+            telemetry = {
+              telemetryLevel = 'off',
+            },
+          },
           -- Copilot attaches to every filetype, and attaching alone sends the
           -- buffer's text to GitHub. A `root_dir` function that never calls
           -- `on_dir` is how a buffer is declined before the client starts,
