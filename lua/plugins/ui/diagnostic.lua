@@ -37,6 +37,24 @@ return {
         desc = 'Suppress Formatter',
       },
     },
-    opts = {},
+    opts = function()
+      -- `dyshellint` reads one directive for every code it reports, its own
+      -- `BSG###` rules and shfmt's `FMT001` alike. The reason for the
+      -- exception is typed after the codes by hand: anything trailing the
+      -- comment would stop rulebook from merging a second code into it.
+      local dyshellint = {
+        comment = '# dyshellint disable=%s',
+        location = 'prevLine',
+        multiRuleIgnore = true,
+        multiRuleSeparator = ',',
+        docs = 'https://github.com/dynamotn/dyshellint#silence-a-finding-in-place',
+      }
+      return {
+        ignoreComments = {
+          dyshellint = dyshellint,
+          shfmt = dyshellint,
+        },
+      }
+    end,
   },
 }
