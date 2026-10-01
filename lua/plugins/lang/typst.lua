@@ -1,4 +1,5 @@
 local language = require('config.languages').typst
+local cmp_util = require('util.cmp')
 
 return vim.list_contains(_G.enabled_languages, 'typst')
     and {
@@ -55,6 +56,17 @@ return vim.list_contains(_G.enabled_languages, 'typst')
         opts = {
           lang = {
             typst = { '// %s', '/* %s */' },
+          },
+        },
+      },
+      {
+        -- Completion
+        'blink.cmp',
+        opts = {
+          sources = {
+            per_filetype = {
+              typst = cmp_util.sources('typst'),
+            },
           },
         },
       },

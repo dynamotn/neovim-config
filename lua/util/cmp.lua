@@ -51,24 +51,13 @@ M.sources = function(filetype)
     return { 'buffer', 'ripgrep', 'dictionary', 'emoji', 'nerdfont', 'dynamic' }
   elseif filetype == 'dap' then
     return { 'dap', 'buffer', 'ripgrep' }
-  elseif vim.list_contains({ 'gitcommit', 'gitrebase' }, filetype) then
+  elseif vim.list_contains({ 'gitcommit', 'gitrebase', 'octo' }, filetype) then
     return {
+      'git',
       'lsp',
       'snippets',
       'buffer',
       'emoji',
-      'nerdfont',
-      'dynamic',
-      'dictionary',
-    }
-  elseif filetype == 'octo' then
-    -- Comments of pull requests and issues: users, issues and emoji first
-    return {
-      'git',
-      'emoji',
-      'buffer',
-      'snippets',
-      'path',
       'nerdfont',
       'dynamic',
       'dictionary',
