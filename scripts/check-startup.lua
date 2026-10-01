@@ -199,7 +199,8 @@ local function skip_installs()
     local on_status = status.on_status
     status.on_status = function(err, res, ctx)
       if res and res.message and res.message:find('not signed') then
-        res = vim.tbl_extend('force', res, { message = nil })
+        res = vim.deepcopy(res)
+        res.message = nil
       end
       return on_status(err, res, ctx)
     end
