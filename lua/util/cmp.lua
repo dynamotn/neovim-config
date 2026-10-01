@@ -61,6 +61,18 @@ M.sources = function(filetype)
       'dynamic',
       'dictionary',
     }
+  elseif filetype == 'octo' then
+    -- Comments of pull requests and issues: users, issues and emoji first
+    return {
+      'git',
+      'emoji',
+      'buffer',
+      'snippets',
+      'path',
+      'nerdfont',
+      'dynamic',
+      'dictionary',
+    }
   elseif vim.list_contains(vim.tbl_keys(unique_sources), filetype) then
     local result = {}
     vim.list_extend(result, unique_sources[filetype])
