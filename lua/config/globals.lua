@@ -18,7 +18,7 @@ _G.dark_mode = true
 ---@type DyDayNight When to be light and when to be dark. Turn `enabled` off
 --- on a machine that should stay on whatever `_G.dark_mode` says.
 _G.day_night = {
-  enabled = true,
+  enabled = false,
   day_start = 6,
   night_start = 18,
 }
