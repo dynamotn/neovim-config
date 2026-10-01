@@ -59,6 +59,7 @@
   "harpoon": { "branch": "harpoon2", "commit": "87b1a3506211538f460786c23f98ec63ad9af4e5" },
   "haskell-snippets.nvim": { "branch": "main", "commit": "5be33b79f0320ad9ef7f558507f2e365deebef4f" },
   "haskell-tools.nvim": { "branch": "main", "commit": "705f7cd1108d5fb626a3660d6d1177953adef57f" },
+  "helpview.nvim": { "branch": "main", "commit": "06006b471890f19efeb199ffab5da49a2d624619" },
   "im-switch.nvim": { "branch": "main", "commit": "f6484ac510c4f82676e76f0cdc4e457ece8e7620" },
   "img-clip.nvim": { "branch": "main", "commit": "99848daf801789dbebe2192b475eb887d375002c" },
   "jupynvim": { "branch": "main", "commit": "17117a2cc86d9a86119e392cb9963404087ef311" },
