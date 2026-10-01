@@ -102,6 +102,40 @@ return {
     end,
   },
   {
+    -- Print debugging: insert, comment out and delete tagged print lines
+    --
+    -- Its own `g?` keys add the lines, `[g`/`]g` move between them. It loads
+    -- with the first file rather than with the first key, or the lines left
+    -- from a previous session go unhighlighted until then.
+    'andrewferrier/debugprint.nvim',
+    event = 'LazyFile',
+    cmd = 'Debugprint',
+    dependencies = { 'nvim-mini/mini.hipatterns' },
+    keys = {
+      -- `refactoring.nvim` had these for its own debug prints, which
+      -- debugprint neither finds nor deletes; one kind of print is less
+      -- to clean up
+      {
+        '<leader>rp',
+        'g?v',
+        remap = true,
+        mode = { 'n', 'x' },
+        desc = 'Debug Print Variable',
+      },
+      { '<leader>rP', 'g?p', remap = true, desc = 'Debug Print Location' },
+      { '<leader>rc', '<cmd>Debugprint delete<cr>', desc = 'Debug Cleanup' },
+      {
+        '<leader>rC',
+        '<cmd>Debugprint commenttoggle<cr>',
+        desc = 'Debug Print Comment Toggle',
+      },
+      { '<leader>sP', '<cmd>Debugprint search<cr>', desc = 'Debug Prints' },
+    },
+    opts = {
+      picker = 'snacks.picker',
+    },
+  },
+  {
     -- Lualine extensions for DAP
     'lualine.nvim',
     opts = {

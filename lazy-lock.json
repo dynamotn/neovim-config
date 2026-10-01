@@ -44,6 +44,7 @@
   "crates.nvim": { "branch": "main", "commit": "7039bc1d130e424232a7aa64ceddb170a154ff5b" },
   "crazy-coverage.nvim": { "branch": "main", "commit": "0b1b6af31450230fffbfe7d71df66f4d6a3e6770" },
   "csvview.nvim": { "branch": "main", "commit": "2466bdda54047f525d4faca53040fe657c9c33db" },
+  "debugprint.nvim": { "branch": "main", "commit": "957093d8b695aa4cc18c18f421ef0cb6c7380c59" },
   "dial.nvim": { "branch": "master", "commit": "f2634758455cfa52a8acea6f142dcd6271a1bf57" },
   "dropbar.nvim": { "branch": "fix-event", "commit": "4d28d568d1807dd9513c712059e1f1fbdcaeffed" },
   "edgy.nvim": { "branch": "main", "commit": "8bfd2808994a988c975694122f68624b8a219f5f" },
