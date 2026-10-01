@@ -43,6 +43,33 @@ return {
           })
         )
       end
+
+      -- null-ls answers `supports_method` from the filetype of the current
+      -- buffer and ignores the buffer it is asked about. Otter forwards
+      -- requests from a markdown buffer to its hidden `.otter.py` buffer, so
+      -- null-ls claimed completion there on the strength of the markdown
+      -- `jira` source, answered first with no items, and that empty list
+      -- won over the real language server's
+      local on_init = opts.on_init
+      opts.on_init = function(client, initialize_result)
+        local supports_method = client.supports_method
+        client.supports_method = function(self, method, bufnr)
+          if type(bufnr) == 'table' then bufnr = bufnr.bufnr end
+          if
+            bufnr
+            and bufnr ~= 0
+            and bufnr ~= vim.api.nvim_get_current_buf()
+            and vim.api.nvim_buf_is_loaded(bufnr)
+          then
+            return vim.api.nvim_buf_call(
+              bufnr,
+              function() return supports_method(self, method) end
+            )
+          end
+          return supports_method(self, method)
+        end
+        if on_init then on_init(client, initialize_result) end
+      end
       null_ls.setup(opts)
     end,
   },
