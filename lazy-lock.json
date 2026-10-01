@@ -79,6 +79,7 @@
   "mini.icons": { "branch": "main", "commit": "f642e3ba8c12afbc8f32f6d77ef6597eac56786f" },
   "mini.pairs": { "branch": "main", "commit": "1a3e73649c0eaef2f6c48ce1e761c6f0a7c11918" },
   "mini.surround": { "branch": "main", "commit": "33a2ebe5df8eb4751828fcba133e18ed0fbbdfab" },
+  "multicursor.nvim": { "branch": "main", "commit": "704b99f10a72cc05d370cfeb294ff83412a8ab55" },
   "neogen": { "branch": "main", "commit": "23e7e9f883d01289ebd90e98025acc860ea26366" },
   "neotest": { "branch": "master", "commit": "27bf921498043f7ecd821d6db68d05de244bbd02" },
   "neotest-dart": { "branch": "main", "commit": "f10fc22a17559b3a7abb400e266db0a1201979e7" },
