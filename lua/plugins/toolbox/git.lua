@@ -1,3 +1,7 @@
+-- GitHub is the `gh` remote in my repositories, with `origin` often on GitLab,
+-- so plugins asking a forge take the first of these that exists
+local remotes = { 'upstream', 'gh', 'github', 'origin' }
+
 return {
   {
     -- VSCode-style diff to review changes, history and merge conflicts
@@ -30,6 +34,24 @@ return {
     keys = {
       { '<leader>gC', '<cmd>CI<cr>', desc = 'CI Checks' },
     },
+    config = function()
+      -- It picks the forge from `upstream`, else `origin`, and has no option
+      -- to say otherwise: with `origin` on GitLab, `:CI` asked a project that
+      -- runs no pipelines for the checks GitHub runs. `gh` finds the GitHub
+      -- remote by itself once it is the CLI asked.
+      local forge = require('ci.forge')
+      local host = forge.host
+      forge.host = function()
+        for _, name in ipairs(remotes) do
+          local r = vim
+            .system({ 'git', 'remote', 'get-url', name }, { text = true })
+            :wait(2000)
+          local url = r.code == 0 and vim.trim(r.stdout or '') or ''
+          if url ~= '' then return forge.host_of(url) or host() end
+        end
+        return host()
+      end
+    end,
   },
   -- Review GitHub pull requests and issues. The extra hands `<leader>gi`,
   -- `gI`, `gp` and `gP` over from Snacks' `gh` pickers to Octo.
@@ -50,9 +72,7 @@ return {
       { '#', false, mode = 'i', ft = 'octo' },
     },
     opts = {
-      -- GitHub is the `gh` remote in my repositories, with `origin` often on
-      -- GitLab; Octo takes the first of these that exists
-      default_remote = { 'upstream', 'gh', 'github', 'origin' },
+      default_remote = remotes,
     },
   },
   {
