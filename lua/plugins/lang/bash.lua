@@ -1,5 +1,4 @@
 local language = require('config.languages').bash
-local neogen_config = require('neogen.configurations.sh')
 
 --- Neogen strips the literal string `$1` from a rendered line and turns it into
 --- a jump mark, so an `@arg $1` written straight into a template comes out
@@ -90,90 +89,101 @@ local function extract_positionals(node)
   return positionals
 end
 
--- `dybatpho::expect_args` is the authoritative signature when it is there, so
--- the positional scan is only a fallback for a function that does not use it.
--- Reporting both would double up: `expect_args name path -- "$@"` ends in `$@`,
--- which the scan would pick up as an argument of its own.
---
--- An empty key still counts as a result, which would keep the `no_results` rows
--- of the template -- `@noargs` among them -- from ever firing, so a key is
--- reported only when something was actually found.
-neogen_config.data.func['function_definition']['0'].extract = function(node)
-  local args, declared = extract_expect_args(node)
-  if declared then
-    -- `expect_args -- "$@"` names nothing on purpose: the function takes no
-    -- arguments. Falling through to the scan would report the `$@` of that very
-    -- line as one.
-    return #args > 0 and { args = args } or {}
+--- Neogen's `sh` configuration, made over in the dybatpho house style.
+---
+--- Only called once neogen loads: requiring its configuration while the spec
+--- is read would have lazy.nvim load neogen on every startup.
+--- @return table
+local function sh_config()
+  local neogen_config = require('neogen.configurations.sh')
+
+  -- `dybatpho::expect_args` is the authoritative signature when it is there,
+  -- so the positional scan is only a fallback for a function that does not use
+  -- it. Reporting both would double up: `expect_args name path -- "$@"` ends
+  -- in `$@`, which the scan would pick up as an argument of its own.
+  --
+  -- An empty key still counts as a result, which would keep the `no_results`
+  -- rows of the template -- `@noargs` among them -- from ever firing, so a key
+  -- is reported only when something was actually found.
+  neogen_config.data.func['function_definition']['0'].extract = function(node)
+    local args, declared = extract_expect_args(node)
+    if declared then
+      -- `expect_args -- "$@"` names nothing on purpose: the function takes no
+      -- arguments. Falling through to the scan would report the `$@` of that
+      -- very line as one.
+      return #args > 0 and { args = args } or {}
+    end
+
+    local positionals = extract_positionals(node)
+    if #positionals > 0 then return { positionals = positionals } end
+
+    return {}
   end
 
-  local positionals = extract_positionals(node)
-  if #positionals > 0 then return { positionals = positionals } end
+  neogen_config.template = {
+    use_default_comment = false,
+    --- @diagnostic disable-next-line: assign-type-mismatch
+    position = nil,
+    annotation_convention = 'sh_docs',
 
-  return {}
+    -- The dybatpho house style: banner comments, and arguments named by
+    -- `dybatpho::expect_args`.
+    sh_docs = {
+      { nil, '#!/usr/bin/env bash', { no_results = true, type = { 'file' } } },
+      { nil, '# @file $1', { no_results = true, type = { 'file' } } },
+      { nil, '# @brief $1', { no_results = true, type = { 'file' } } },
+      { nil, '# @description $1', { no_results = true, type = { 'file' } } },
+      { nil, '', { no_results = true, type = { 'file' } } },
+
+      -- A row without `no_results` is only rendered when the extractor found
+      -- something, so the banners of the two cases cannot be shared: each block
+      -- carries its own pair.
+      {
+        nil,
+        '#######################################',
+        { no_results = true, type = { 'func' } },
+      },
+      { nil, '# @description $1', { no_results = true, type = { 'func' } } },
+      { nil, '# @noargs', { no_results = true, type = { 'func' } } },
+      { nil, '# @stdout $1', { no_results = true, type = { 'func' } } },
+      { nil, '# @exitcode 0 $1', { no_results = true, type = { 'func' } } },
+      { nil, '# @exitcode 1 $1', { no_results = true, type = { 'func' } } },
+      {
+        nil,
+        '#######################################',
+        { no_results = true, type = { 'func' } },
+      },
+
+      { nil, '#######################################', { type = { 'func' } } },
+      { nil, '# @description $1', { type = { 'func' } } },
+      -- Arguments named by `dybatpho::expect_args`: the name seeds the
+      -- description, the way the existing sources read.
+      {
+        { 'index', 'arg' },
+        '# @arg ' .. ARG_SENTINEL .. '%d@ string %s',
+        {
+          required = 'args',
+          type = { 'func' },
+        },
+      },
+      -- Arguments a function without `expect_args` reads positionally.
+      {
+        { 'positional' },
+        '# @arg ' .. ARG_SENTINEL .. '%s@ string $1',
+        {
+          required = 'positionals',
+          type = { 'func' },
+        },
+      },
+      { nil, '# @stdout $1', { type = { 'func' } } },
+      { nil, '# @exitcode 0 $1', { type = { 'func' } } },
+      { nil, '# @exitcode 1 $1', { type = { 'func' } } },
+      { nil, '#######################################', { type = { 'func' } } },
+    },
+  }
+
+  return neogen_config
 end
-
-neogen_config.template = {
-  use_default_comment = false,
-  --- @diagnostic disable-next-line: assign-type-mismatch
-  position = nil,
-  annotation_convention = 'sh_docs',
-
-  -- The dybatpho house style: banner comments, and arguments named by
-  -- `dybatpho::expect_args`.
-  sh_docs = {
-    { nil, '#!/usr/bin/env bash', { no_results = true, type = { 'file' } } },
-    { nil, '# @file $1', { no_results = true, type = { 'file' } } },
-    { nil, '# @brief $1', { no_results = true, type = { 'file' } } },
-    { nil, '# @description $1', { no_results = true, type = { 'file' } } },
-    { nil, '', { no_results = true, type = { 'file' } } },
-
-    -- A row without `no_results` is only rendered when the extractor found
-    -- something, so the banners of the two cases cannot be shared: each block
-    -- carries its own pair.
-    {
-      nil,
-      '#######################################',
-      { no_results = true, type = { 'func' } },
-    },
-    { nil, '# @description $1', { no_results = true, type = { 'func' } } },
-    { nil, '# @noargs', { no_results = true, type = { 'func' } } },
-    { nil, '# @stdout $1', { no_results = true, type = { 'func' } } },
-    { nil, '# @exitcode 0 $1', { no_results = true, type = { 'func' } } },
-    { nil, '# @exitcode 1 $1', { no_results = true, type = { 'func' } } },
-    {
-      nil,
-      '#######################################',
-      { no_results = true, type = { 'func' } },
-    },
-
-    { nil, '#######################################', { type = { 'func' } } },
-    { nil, '# @description $1', { type = { 'func' } } },
-    -- Arguments named by `dybatpho::expect_args`: the name seeds the
-    -- description, the way the existing sources read.
-    {
-      { 'index', 'arg' },
-      '# @arg ' .. ARG_SENTINEL .. '%d@ string %s',
-      {
-        required = 'args',
-        type = { 'func' },
-      },
-    },
-    -- Arguments a function without `expect_args` reads positionally.
-    {
-      { 'positional' },
-      '# @arg ' .. ARG_SENTINEL .. '%s@ string $1',
-      {
-        required = 'positionals',
-        type = { 'func' },
-      },
-    },
-    { nil, '# @stdout $1', { type = { 'func' } } },
-    { nil, '# @exitcode 0 $1', { type = { 'func' } } },
-    { nil, '# @exitcode 1 $1', { type = { 'func' } } },
-    { nil, '#######################################', { type = { 'func' } } },
-  },
-}
 
 --- Swap the sentinel back for a literal `$` in every rendered annotation.
 ---
@@ -237,11 +247,10 @@ return vim.list_contains(_G.enabled_languages, 'bash')
       {
         -- Custom neogen with my Shell style guide
         'neogen',
-        opts = {
-          languages = {
-            sh = neogen_config,
-          },
-        },
+        opts = function(_, opts)
+          opts.languages = opts.languages or {}
+          opts.languages.sh = sh_config()
+        end,
         config = function(_, opts)
           require('neogen').setup(opts)
           install_arg_sentinel_fixup()

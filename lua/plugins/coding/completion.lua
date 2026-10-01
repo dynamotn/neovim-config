@@ -83,23 +83,32 @@ return {
               },
             },
           },
-          -- tmux panes
+          -- tmux panes. Both pane sources capture every pane synchronously
+          -- and would do it again on each key, so their words are kept for a
+          -- while by `tools.completion.cached`. That only holds while
+          -- `triggered_only` is off: on, the items depend on the cursor.
           tmux = {
-            module = 'blink-cmp-tmux',
+            module = 'tools.completion.cached',
             name = 'tmux',
             opts = {
-              panes = 'session',
-              capture_history = false,
-              triggered_only = false,
+              source = 'blink-cmp-tmux',
+              opts = {
+                panes = 'session',
+                capture_history = false,
+                triggered_only = false,
+              },
             },
           },
           -- zellij panes
           zellij = {
-            module = 'blink-cmp-zellij',
+            module = 'tools.completion.cached',
             name = 'zellij',
             opts = {
-              all_panes = true,
-              triggered_only = false,
+              source = 'blink-cmp-zellij',
+              opts = {
+                all_panes = true,
+                triggered_only = false,
+              },
             },
           },
           -- kitty windows

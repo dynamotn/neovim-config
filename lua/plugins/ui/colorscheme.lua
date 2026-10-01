@@ -14,6 +14,20 @@ return {
         light = 'latte',
         dark = 'macchiato',
       },
+      -- Detecting integrations walks every installed plugin and loads
+      -- catppuccin's whole mapping table on each startup, about a tenth of
+      -- it. LazyVim names most of them already; these are the ones detection
+      -- found on top. A plugin added later with a catppuccin integration
+      -- goes here too.
+      auto_integrations = false,
+      integrations = {
+        dadbod_ui = true,
+        dap = true,
+        dropbar = { enabled = true },
+        harpoon = true,
+        markview = true,
+        rainbow_delimiters = true,
+      },
       transparent_background = false,
       dim_inactive = {
         enabled = true,

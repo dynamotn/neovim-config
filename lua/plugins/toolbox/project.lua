@@ -14,7 +14,7 @@ return {
     -- Open alternative files in the project
     'rgroli/other.nvim',
     main = 'other-nvim',
-    lazy = false,
+    cmd = { 'Other', 'OtherTabNew', 'OtherSplit', 'OtherVSplit', 'OtherClear' },
     opts = {
       mappings = {
         'angular',
