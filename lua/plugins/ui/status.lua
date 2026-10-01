@@ -87,6 +87,46 @@ return {
     cond = not vim.g.started_by_firenvim,
   },
   {
+    -- Scrollbar marking the cursor, search results, diagnostics, git hunks,
+    -- marks and quickfix entries across the whole buffer
+    'lewis6991/satellite.nvim',
+    event = 'LazyFile',
+    cond = not vim.g.started_by_firenvim,
+    opts = {
+      -- Side panels and pickers have nothing to scroll through worth marking
+      excluded_filetypes = {
+        'dap-view',
+        'dap-repl',
+        'Outline',
+        'trouble',
+        'qf',
+        'snacks_dashboard',
+        'snacks_picker_list',
+        'snacks_picker_input',
+        'snacks_terminal',
+        'codecompanion',
+        'lazy',
+        'mason',
+      },
+      handlers = {
+        -- `marks.nvim` sets the marks, with its own `m` mappings
+        marks = { enable = true, show_builtins = false, key = 'm' },
+      },
+    },
+    config = function(_, opts)
+      require('satellite').setup(opts)
+      local enabled = true
+      Snacks.toggle({
+        name = 'Scrollbar',
+        get = function() return enabled end,
+        set = function(state)
+          enabled = state
+          vim.cmd(state and 'SatelliteEnable' or 'SatelliteDisable')
+        end,
+      }):map('<leader>uB')
+    end,
+  },
+  {
     -- Winbar to show context of current position
     -- 'Bekaboo/dropbar.nvim',
     'cubewhy/dropbar.nvim',
