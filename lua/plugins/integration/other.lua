@@ -180,5 +180,60 @@ return {
       end
       return opts
     end,
+    config = function(_, opts)
+      -- im-switch waits on its command at every `InsertLeave`, `InsertEnter`
+      -- and `CmdlineLeave`, about 6 ms each on macOS, twice on leaving Insert
+      -- mode. Switching needs no answer, so those run in the background, one
+      -- after another to keep their order; only reading the current input
+      -- method, which needs one, still waits, and only once they are done.
+      local im = require('im-switch.im')
+      local im_command = require('im-switch.utils.im_command')
+      local queue, running = {}, false
+
+      local function next_command()
+        local cmd = table.remove(queue, 1)
+        running = cmd ~= nil
+        if not cmd then return end
+        vim.system(cmd, { text = true }, function(result)
+          if result.code ~= 0 then
+            vim.schedule(
+              function()
+                vim.notify(
+                  'im-switch: ' .. vim.trim(result.stderr or ''),
+                  vim.log.levels.ERROR
+                )
+              end
+            )
+          end
+          next_command()
+        end)
+      end
+
+      ---@param value? string
+      local function switch(value)
+        local cmd, err = im_command.get_im_command('set', value)
+        if not cmd then
+          vim.notify('im-switch: ' .. tostring(err), vim.log.levels.ERROR)
+          return false
+        end
+        table.insert(queue, cmd)
+        if not running then next_command() end
+        return true
+      end
+
+      local save_im_state = im.save_im_state
+      im.save_im_state = function()
+        vim.wait(200, function() return not running end, 5)
+        return save_im_state()
+      end
+      im.set_default_im = function() return switch() end
+      im.restore_im = function()
+        if not vim.b.im_switch_last_state and not im.save_im_state() then
+          return false
+        end
+        return switch(vim.b.im_switch_last_state)
+      end
+      require('im-switch').setup(opts)
+    end,
   },
 }
