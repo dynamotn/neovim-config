@@ -51,7 +51,7 @@ end
 
 --- Add a word to one of my own word lists, rebuild its spell file, and hand
 --- it to every running Harper too, which otherwise would only see it on the
---- next start, when `lsp/harper_ls.lua` merges the lists again
+--- next start, when `util.harper` merges the lists again
 ---@param lang string A key of `spell_files` whose list lives in `spell/`
 local add_word = function(lang)
   local word = target_word()

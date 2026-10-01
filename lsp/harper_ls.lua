@@ -38,41 +38,6 @@ local language_ids = {
   vue = 'html',
 }
 
--- Harper takes a single user dictionary and rewrites it whenever a word is
--- added through its code action, so it is not pointed at the word lists behind
--- `:DySpell` directly. It gets a file of its own instead, rebuilt here from
--- every `spell/*.txt` plus whatever it already holds, so the words Harper
--- learned survive and the Vim spell lists stay untouched.
----@return string path The merged dictionary
-local function build_user_dict()
-  local dict =
-    vim.fs.joinpath(vim.fn.stdpath('state'), 'harper', 'dictionary.txt')
-  local sources = vim.fn.glob(
-    vim.fs.joinpath(vim.fn.stdpath('config'), 'spell', '*.txt'),
-    false,
-    true
-  )
-  table.insert(sources, dict)
-
-  local seen, words = {}, {}
-  for _, source in ipairs(sources) do
-    if vim.uv.fs_stat(source) then
-      for _, word in ipairs(vim.fn.readfile(source)) do
-        word = vim.trim(word)
-        if word ~= '' and not seen[word] then
-          seen[word] = true
-          table.insert(words, word)
-        end
-      end
-    end
-  end
-  table.sort(words)
-
-  vim.fn.mkdir(vim.fs.dirname(dict), 'p')
-  vim.fn.writefile(words, dict)
-  return dict
-end
-
 -- Harper reads every comment as prose, including the ones written for another
 -- tool, and it has no setting to skip them -- only `harper:ignore` around a
 -- block. Each pattern below marks the span of such a directive on its line,
@@ -401,7 +366,8 @@ return {
   },
   settings = {
     ['harper-ls'] = {
-      userDictPath = build_user_dict(),
+      -- See `util.harper` for why the dictionary is merged and built once
+      userDictPath = require('util.harper').user_dict(),
     },
   },
 }
