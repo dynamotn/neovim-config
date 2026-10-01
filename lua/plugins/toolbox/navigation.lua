@@ -1,44 +1,102 @@
 return {
   {
-    -- Smoothly navigate between neovim and tmux/zellij
-    'dynamotn/Navigator.nvim',
-    event = 'UIEnter',
-    config = function(_, opts) require('Navigator').setup(opts) end,
+    -- Move between, resize and swap windows, past the edge into tmux/zellij
+    -- panes
+    --
+    -- zellij's `nvim-navigator` plugin tells a Neovim pane by the command it
+    -- runs and hands it `Shift-<Arrow>`; at the edge of Neovim these keys
+    -- carry on into the next pane, or tab, of the multiplexer.
+    'mrjones2014/smart-splits.nvim',
     keys = {
       {
         '<S-Left>',
-        function() require('Navigator').left() end,
+        function() require('smart-splits').move_cursor_left() end,
         desc = 'Navigate to left window',
         mode = { 'n', 't' },
       },
       {
         '<S-Down>',
-        function() require('Navigator').down() end,
+        function() require('smart-splits').move_cursor_down() end,
         desc = 'Navigate to down window',
         mode = { 'n', 't' },
-        noremap = true,
       },
       {
         '<S-Up>',
-        function() require('Navigator').up() end,
+        function() require('smart-splits').move_cursor_up() end,
         desc = 'Navigate to up window',
         mode = { 'n', 't' },
-        noremap = true,
       },
       {
         '<S-Right>',
-        function() require('Navigator').right() end,
+        function() require('smart-splits').move_cursor_right() end,
         desc = 'Navigate to right window',
         mode = { 'n', 't' },
-        noremap = true,
       },
       {
         '<C-\\>',
-        function() require('Navigator').previous() end,
+        function() require('smart-splits').move_cursor_previous() end,
         desc = 'Navigate to previous window',
         mode = { 'n', 't' },
-        noremap = true,
       },
+      -- Take over LazyVim's resize keys, which stop at Neovim's own edge
+      {
+        '<C-Up>',
+        function() require('smart-splits').resize_up() end,
+        desc = 'Resize window up',
+      },
+      {
+        '<C-Down>',
+        function() require('smart-splits').resize_down() end,
+        desc = 'Resize window down',
+      },
+      {
+        '<C-Left>',
+        function() require('smart-splits').resize_left() end,
+        desc = 'Resize window left',
+      },
+      {
+        '<C-Right>',
+        function() require('smart-splits').resize_right() end,
+        desc = 'Resize window right',
+      },
+      -- `<C-w><Arrow>` is `<C-w>hjkl` again, so the arrows under the window
+      -- group are free to swap instead
+      {
+        '<leader>w<Up>',
+        function() require('smart-splits').swap_buf_up() end,
+        desc = 'Swap buffer up',
+      },
+      {
+        '<leader>w<Down>',
+        function() require('smart-splits').swap_buf_down() end,
+        desc = 'Swap buffer down',
+      },
+      {
+        '<leader>w<Left>',
+        function() require('smart-splits').swap_buf_left() end,
+        desc = 'Swap buffer left',
+      },
+      {
+        '<leader>w<Right>',
+        function() require('smart-splits').swap_buf_right() end,
+        desc = 'Swap buffer right',
+      },
+    },
+    opts = {
+      -- Stop at the last window when there is no pane beyond, rather than
+      -- wrapping round to the first
+      at_edge = 'stop',
+      -- zellij binds `Shift-Left`/`Shift-Right` to `MoveFocusOrTab`, so going
+      -- past its last pane moves on to the next tab, from Neovim as well
+      zellij_move_focus_or_tab = true,
+      -- Keep editing the buffer that was moved, not the one it landed on
+      cursor_follows_swapped_bufs = true,
+      -- Only the multiplexers there is a pane to resize in. Left to detect on
+      -- its own, it also picks kitty and wezterm, whose remote control is not
+      -- set up for it here.
+      multiplexer_integration = vim.env.ZELLIJ and 'zellij'
+        or vim.env.TMUX and 'tmux'
+        or false,
     },
   },
   {
