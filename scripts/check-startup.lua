@@ -190,6 +190,20 @@ local function skip_installs()
       end
     end
   end)
+  -- Turns Copilot's status into notifications, and an account that is not
+  -- signed in into an error. That is the state of the machine the check runs
+  -- on, not of the configuration, and only shows when the server reports it
+  -- before Neovim quits.
+  before_config('sidekick.nvim', function()
+    local status = require('sidekick.status')
+    local on_status = status.on_status
+    status.on_status = function(err, res, ctx)
+      if res and res.message and res.message:find('not signed') then
+        res = vim.tbl_extend('force', res, { message = nil })
+      end
+      return on_status(err, res, ctx)
+    end
+  end)
 end
 
 --- Report the recorded installs no real install could carry out
