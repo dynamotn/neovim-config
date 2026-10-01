@@ -168,7 +168,7 @@ return {
     opts = function()
       local opts = {
         macos = {
-          default_im = 'com.apple.keylayout.ABC',
+          default_im = 'com.apple.keylayout.USExtended',
         },
       }
       if vim.fn.executable('fcitx5-remote') == 1 then
@@ -209,6 +209,37 @@ return {
         end)
       end
 
+      -- The macOS CLI panics on `set` with any input method it does not
+      -- `list` (one removed from System Settings, a layout it cannot
+      -- select), so those are skipped instead of handed to it.
+      local selectable, warned = nil, {}
+
+      ---@param cli string
+      ---@param value string
+      ---@return boolean
+      local function can_select(cli, value)
+        if vim.fn.has('mac') == 0 then return true end
+        if not selectable then
+          local result = vim.system({ cli, 'list' }, { text = true }):wait()
+          if result.code ~= 0 then return true end
+          selectable = {}
+          for _, id in
+            ipairs(vim.split(result.stdout or '', '\n', { trimempty = true }))
+          do
+            selectable[vim.trim(id)] = true
+          end
+        end
+        if selectable[value] then return true end
+        if not warned[value] then
+          warned[value] = true
+          vim.notify(
+            'im-switch: ' .. value .. ' is not an enabled input method, skipped',
+            vim.log.levels.WARN
+          )
+        end
+        return false
+      end
+
       ---@param value? string
       local function switch(value)
         local cmd, err = im_command.get_im_command('set', value)
@@ -216,6 +247,7 @@ return {
           vim.notify('im-switch: ' .. tostring(err), vim.log.levels.ERROR)
           return false
         end
+        if not can_select(cmd[1], cmd[#cmd]) then return false end
         table.insert(queue, cmd)
         if not running then next_command() end
         return true
