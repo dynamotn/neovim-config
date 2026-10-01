@@ -168,7 +168,7 @@ return {
     opts = function()
       local opts = {
         macos = {
-          default_im = 'com.apple.keylayout.USExtended',
+          default_im = 'com.apple.keylayout.ABC',
         },
       }
       if vim.fn.executable('fcitx5-remote') == 1 then
