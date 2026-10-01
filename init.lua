@@ -8,7 +8,7 @@ require('per_machine')
 -- `latest` runs plugins at their newest commit, and those follow Neovim's
 -- nightly. On their tagged releases nothing needs more than 0.12: that is
 -- the floor several of them enforce themselves (nvim-treesitter `main`,
--- rustaceanvim, codecompanion, native Copilot through
+-- rustaceanvim, avante, native Copilot through
 -- `vim.lsp.inline_completion`), and every 0.13 check found in them has a
 -- fallback.
 local version = _G.plugin_channel == 'stable' and '0.12.0' or '0.13.0'

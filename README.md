@@ -233,7 +233,6 @@ _G.dark_mode = false
 _G.enabled_languages = { 'lua', 'bash', 'markdown' }
 _G.obsidian.paths.personal = vim.fn.expand('~/Notes')
 _G.dictionaries_path = vim.fn.expand('~/.local/share/dictionaries')
-_G.image_dirs = { '~/Pictures' }
 ```
 
 Locally developed plugins (specs with `dev = true`) are looked for under

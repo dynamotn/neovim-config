@@ -1,5 +1,5 @@
 local languages_list = require('config.languages')
-local markview_filetypes = { 'codecompanion' }
+local markview_filetypes = { 'Avante' }
 vim.list_extend(markview_filetypes, languages_list.markdown.filetypes)
 vim.list_extend(markview_filetypes, languages_list.html.filetypes)
 vim.list_extend(markview_filetypes, languages_list.typst.filetypes)

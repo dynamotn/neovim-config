@@ -95,7 +95,7 @@ return {
 
       cmdline = ' ',
       copilot = ' ',
-      CodeCompanion = '󰚩 ',
+      Avante = '󰚩 ',
       dictionary = ' ',
       calc = ' ',
       sql = ' ',

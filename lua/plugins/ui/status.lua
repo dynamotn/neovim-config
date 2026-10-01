@@ -50,7 +50,11 @@ return {
         help = 'Help Guide',
         terminal = 'Terminal',
         snacks_picker_list = 'Explorer',
-        codecompanion = 'Code Companion',
+        Avante = 'Avante',
+        AvanteInput = 'Avante',
+        AvanteSelectedFiles = 'Avante',
+        AvanteSelectedCode = 'Avante',
+        AvanteTodos = 'Avante',
       }
     end,
     config = function(_, opts)

@@ -140,9 +140,10 @@ return {
     event = 'VeryLazy',
     opts = {
       filetypes = {
-        codecompanion = {
+        -- Avante pastes through img-clip itself, and sends the file it saved
+        AvanteInput = {
+          embed_image_as_base64 = false,
           prompt_for_file_name = false,
-          template = '[Image]($FILE_PATH)',
           use_absolute_path = true,
         },
       },

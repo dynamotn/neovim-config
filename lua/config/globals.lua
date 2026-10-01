@@ -141,10 +141,6 @@ _G.dictionaries_path = vim.fs.joinpath(
   'dictionaries'
 )
 
----@type string[] Folders the AI chat `/image` command picks images from, on
---- top of the working directory. Missing ones are skipped.
-_G.image_dirs = { '~/Multimedia/Pictures' }
-
 ---@type string Where locally developed plugins are checked out, for `dev` specs.
 --- `NVIM_DEV_PLUGINS` points it elsewhere without editing any file, and
 --- `per_machine` may still override it. The folder need not exist: lazy.nvim

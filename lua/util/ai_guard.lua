@@ -65,74 +65,70 @@ M.watch_copilot = function()
   })
 end
 
---- CodeCompanion's own switch for sending code, as `opts.send_code`
+--- Guard every way Avante reads a buffer or a file
 ---
---- It is asked from the chat buffer as often as from the file, so the buffer a
---- chat was opened from counts as well as the current one.
----@return boolean
-M.codecompanion_send_code = function()
-  local buffers = { vim.api.nvim_get_current_buf() }
-  -- Set by CodeCompanion to the buffer its chat was last opened from
-  ---@diagnostic disable-next-line: undefined-field
-  local context = _G.codecompanion_current_context
-  if type(context) == 'number' then table.insert(buffers, context) end
-  local ok, codecompanion = pcall(require, 'codecompanion')
-  local chat = ok and codecompanion.buf_get_chat(buffers[1]) or nil
-  if chat and chat.buffer_context then
-    table.insert(buffers, chat.buffer_context.bufnr)
+--- Avante has no switch like a `send_code`, so each place it reads is
+--- wrapped: a question or an edit asked from a sensitive buffer carries its
+--- selection, a file added to the chat is sent whole, and the model's own
+--- tools go through one permission check before touching a path.
+M.guard_avante = function()
+  local ok_api, api = pcall(require, 'avante.api')
+  for _, key in ipairs({ 'ask', 'edit' }) do
+    wrap(ok_api and api or nil, key, 'Avante ' .. key, function(original, ...)
+      if sensitive.is_sensitive(0) then return refuse('Avante ' .. key) end
+      return original(...)
+    end)
   end
 
-  for _, bufnr in ipairs(buffers) do
-    if sensitive.is_sensitive(bufnr) then return false end
-  end
-  return true
-end
-
---- Guard what `send_code` cannot see: a file or buffer picked in a chat, and
---- a file the model asks to read
-M.guard_codecompanion = function()
-  local prefix = 'codecompanion.interactions.'
-  for _, kind in ipairs({ 'file', 'buffer' }) do
-    local ok, slash = pcall(require, prefix .. 'shared.slash_commands.' .. kind)
-    wrap(
-      ok and slash or nil,
-      'output',
-      'CodeCompanion /' .. kind,
-      function(output, self, selected, ...)
-        local picked = selected or {}
-        if
-          (picked.bufnr and sensitive.is_sensitive(picked.bufnr))
-          or (picked.path and sensitive.is_sensitive_path(picked.path))
-        then
-          refuse('CodeCompanion /' .. kind)
-          return false
-        end
-        return output(self, selected, ...)
-      end
-    )
-  end
-
-  local ok, read_file = pcall(require, prefix .. 'chat.tools.builtin.read_file')
+  -- `@` picks, all buffers, and the current file added on open all end here
+  local ok_selector, selector = pcall(require, 'avante.file_selector')
   wrap(
-    ok and read_file.cmds or nil,
-    1,
-    'CodeCompanion read_file',
-    function(read, self, args, opts)
+    ok_selector and selector or nil,
+    'add_selected_file',
+    'Avante add_selected_file',
+    function(add, self, filepath, ...)
       if
-        args
-        and args.filepath
-        and sensitive.is_sensitive_path(args.filepath)
+        type(filepath) == 'string'
+        and filepath ~= ''
+        and sensitive.is_sensitive_path(filepath)
       then
-        -- Answered like a failed read, so the model is told and carries on.
-        return opts.output_cb({
-          status = 'error',
-          data = string.format(
-            'Reading `%s` is not allowed: the file is sensitive',
-            args.filepath
-          ),
-        })
+        return refuse('Avante')
       end
-      return read(self, args, opts)
+      return add(self, filepath, ...)
+    end
+  )
+
+  -- Asked by `view`, the edit tools and the rest before they touch a path.
+  -- Turned down, the model is told it has no permission and carries on.
+  local ok_helpers, helpers = pcall(require, 'avante.llm_tools.helpers')
+  wrap(
+    ok_helpers and helpers or nil,
+    'has_permission_to_access',
+    'Avante tool permission',
+    function(allowed, abs_path, ...)
+      if
+        type(abs_path) == 'string' and sensitive.is_sensitive_path(abs_path)
+      then
+        return false
+      end
+      return allowed(abs_path, ...)
+    end
+  )
+
+  -- The one reader behind selected files and the tools, for whatever reaches
+  -- it without asking for permission first
+  local ok_utils, utils = pcall(require, 'avante.utils')
+  wrap(
+    ok_utils and utils or nil,
+    'read_file_from_buf_or_disk',
+    'Avante file reader',
+    function(read, filepath, ...)
+      if
+        type(filepath) == 'string' and sensitive.is_sensitive_path(filepath)
+      then
+        return nil, 'the file is sensitive'
+      end
+      return read(filepath, ...)
     end
   )
 end
@@ -228,7 +224,7 @@ end
 --- Install every guard: Copilot's now, the others as their plugin loads
 M.setup = function()
   M.watch_copilot()
-  on_load('codecompanion.nvim', M.guard_codecompanion)
+  on_load('avante.nvim', M.guard_avante)
   on_load('sidekick.nvim', M.guard_sidekick)
   on_load('claudecode.nvim', M.guard_claudecode)
 end
