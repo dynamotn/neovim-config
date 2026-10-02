@@ -245,11 +245,7 @@ return {
               require('util.lazy_install').on_filetype(
                 language.filetypes,
                 function()
-                  if
-                    not require('mason-registry').is_installed(tool_package)
-                  then
-                    require('mason.api.command').MasonInstall({ tool_package })
-                  end
+                  require('util.lazy_install').install_once(tool_package)
                 end
               )
             end

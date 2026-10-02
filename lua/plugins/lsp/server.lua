@@ -268,7 +268,7 @@ return {
                   lsp_config.filetypes == nil
                   or vim.tbl_contains(lsp_config.filetypes, args.match)
                 then
-                  require('mason.api.command').MasonInstall({ server_package })
+                  require('util.lazy_install').install_once(server_package)
                 end
               end
             )
