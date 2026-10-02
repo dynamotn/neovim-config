@@ -303,14 +303,26 @@ return {
         end
       end
 
-      require('mason-lspconfig').setup({
-        automatic_installation = false,
-        ensure_installed = vim.tbl_deep_extend(
-          'force',
-          LazyVim.dedup(ensure_installed),
-          LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
-        ),
-      })
+      -- Off the blocking path: this runs from `BufReadPre`, so until it
+      -- returns the file is not on screen, and `scripts/bench-filetypes.lua`
+      -- measured it at around a tenth of a second of the first file opened in
+      -- a session. Nothing here has to happen before the buffer is drawn --
+      -- it enables the servers Mason has already installed, and starts the
+      -- installs for the ones it has not -- and `vim.lsp.enable` replays
+      -- `FileType` over the buffers that are already open, so a server
+      -- enabled a tick late still attaches to this one.
+      vim.schedule(
+        function()
+          require('mason-lspconfig').setup({
+            automatic_installation = false,
+            ensure_installed = vim.tbl_deep_extend(
+              'force',
+              LazyVim.dedup(ensure_installed),
+              LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
+            ),
+          })
+        end
+      )
     end,
   },
 }
