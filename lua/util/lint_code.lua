@@ -9,9 +9,10 @@
 --- could ever fire.
 ---
 --- Each linter below is wrapped with nvim-lint's own `util.wrap`, which maps
---- over whatever the parser returned. The wrapper is installed as a function,
---- so the upstream linter is still required at lint time rather than at
---- startup, and a mapper that finds nothing hands the diagnostic back
+--- over whatever the parser returned. It keeps the upstream definition's
+--- shape: a table stays a table, so a language's `opts` can still set `args`
+--- on it, and a function is still only called at lint time. A mapper that
+--- finds nothing hands the diagnostic back
 --- untouched: a tool that changes the shape of its output loses the ignore
 --- comment again and nothing else.
 
@@ -101,10 +102,10 @@ M.setup = function()
   local lint = require('lint')
   local wrap = require('lint.util').wrap
   for name, mapper in pairs(M.mappers) do
-    lint.linters[name] = wrap(function()
-      local linter = require('lint.linters.' .. name)
-      return type(linter) == 'function' and linter() or linter
-    end, mapper)
+    -- Indexing `lint.linters` requires the upstream module. Wrapping it in a
+    -- function instead would turn a table linter into a function, and the
+    -- `lint.linters[name].args = ...` a language sets would index a function
+    lint.linters[name] = wrap(lint.linters[name], mapper)
   end
 end
 
