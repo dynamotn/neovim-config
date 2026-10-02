@@ -1,6 +1,9 @@
 ---@class DyLangSpec
 ---@field filetypes string[]
 ---@field parser string|DyParserSpec
+---@field injected_parsers? string[] Parsers this language's injection
+--- queries name. An injection is dropped in silence when its parser is
+--- missing, so they are installed with the language's own.
 ---@field ext? string File extension of the parser's language, when the two
 --- differ. `injected` names the scratch file it hands a formatter after the
 --- language, and a formatter that switches on the file name (`prettier`,
@@ -1751,6 +1754,8 @@ return {
   yaml = {
     filetypes = reuse_filetypes.yaml.filetypes,
     parser = 'yaml',
+    -- `queries/yaml/injections.scm` hands every CI script to `bash`.
+    injected_parsers = { 'bash' },
     lsp_servers = {
       'yamlls',
       { 'gitlab_ci_ls', filetypes = { 'yaml.gitlab' } },

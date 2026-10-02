@@ -60,20 +60,34 @@ return {
             vim.treesitter.language.register(parser_name, ft)
           end
 
+          -- An injection names the parser it wants and is dropped without a
+          -- word when that parser is missing, so a language carries the
+          -- parsers its queries inject along with its own.
+          local injected_parsers = language.injected_parsers or {}
+
           -- install parser of language in bundle languages
           if vim.list_contains(_G.bundle_languages, name) then
             table.insert(opts.ensure_installed, { parser_name })
+            vim.list_extend(opts.ensure_installed, injected_parsers)
           end
           -- lazy install parser of language not in bundle languages
           if vim.list_contains(_G.enabled_languages, name) then
+            local wanted = { parser_name }
+            vim.list_extend(wanted, injected_parsers)
             require('util.lazy_install').on_filetype(
               language.filetypes,
               function(ev)
-                if not LazyVim.treesitter.get_installed()[parser_name] then
+                local installed = LazyVim.treesitter.get_installed()
+                local missing = vim.tbl_filter(
+                  function(parser) return not installed[parser] end,
+                  wanted
+                )
+                if #missing > 0 then
                   treesitter
-                    .install({ parser_name }, { summary = true })
+                    .install(missing, { summary = true })
                     :await(function()
-                      LazyVim.treesitter.get_installed(true) -- refresh the installed langs
+                      -- refresh the installed langs
+                      LazyVim.treesitter.get_installed(true)
                       vim.cmd(string.format('%dbuffer', ev.buf))
                       vim.cmd('e!')
                     end)
@@ -161,6 +175,24 @@ return {
             else
               return false
             end
+          end,
+          { force = true, all = false }
+        )
+      end
+
+      -- Predicates that ask what a buffer *is* rather than what it is called.
+      -- `ftdetect/filetype.lua` already knows that `.github/workflows/ci.yml`
+      -- is a workflow and that `.gitlab-ci.yml` is a pipeline; the file name
+      -- on its own does not, so a query that only applies to one CI flavour
+      -- matches on the filetype instead.
+      local filetype_predicates = opts.custom_filetype_predicates or {}
+      for predicate, filetypes in pairs(filetype_predicates) do
+        local wanted = type(filetypes) == 'table' and filetypes or { filetypes }
+        require('vim.treesitter.query').add_predicate(
+          predicate,
+          function(_, _, bufnr, _)
+            local buf = tonumber(bufnr) or 0
+            return vim.list_contains(wanted, vim.bo[buf].filetype)
           end,
           { force = true, all = false }
         )
