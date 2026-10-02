@@ -5,6 +5,10 @@ return {
     opts = function(_, opts)
       local languages = require('config.languages')
 
+      -- Several parsers drop the rule id, which leaves `<leader>ci` with
+      -- nothing to write an ignore comment from
+      require('util.lint_code').setup()
+
       -- Add each linter's own config to the list of tools if exist
       for _, language in pairs(languages) do
         for _, tool in ipairs(language.linters or {}) do
