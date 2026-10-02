@@ -55,12 +55,20 @@ return {
         -- for. Several of ours had none, so `<leader>ci` did nothing on a
         -- Dockerfile, a Ruby file or a Terraform plan.
         --
-        -- Left out on purpose: a tool whose nvim-lint parser reports no code
-        -- (`tflint`, `clj-kondo`, `golangcilint`, `phpcs`, `perlcritic`,
-        -- `credo`, `gitlint`) has nothing to put in the comment, and a tool
-        -- with no per-line directive at all (`jsonlint`, `htmlhint`,
-        -- `statix`, `twigcs`, `cue vet`, the `fish`/`gawk`/`zsh` syntax
-        -- checks) has nowhere to put one.
+        -- The three rulebook ships with that only work because of
+        -- `util.lint_code` -- `markdownlint`, `ansible-lint` and `swiftlint`
+        -- -- are not repeated here; it is the missing rule id that was
+        -- keeping them from ever firing, not the entry.
+        --
+        -- Left out on purpose. `clj-kondo` and `credo` throw the rule away
+        -- before nvim-lint can see it, so there is nothing to put back. A
+        -- `vint` directive holds until the end of the file rather than over
+        -- one line, `prisma-lint`'s belongs on the model instead of the
+        -- violation, and `gitlint`'s would have to go above the subject line
+        -- of the commit. And a tool with no per-line directive at all --
+        -- `jsonlint`, `htmlhint`, `statix`, `twigcs`, `cue vet`, `hlint`,
+        -- `erb-lint`, `ktlint`, the `fish`/`gawk`/`zsh` syntax checks -- has
+        -- nowhere to put one.
         ignoreComments = {
           dyshellint = dyshellint,
           shfmt = dyshellint,
@@ -132,6 +140,56 @@ return {
             multiRuleIgnore = true,
             multiRuleSeparator = ',',
             docs = 'https://docs.sqlfluff.com/en/stable/perma/noqa.html',
+          },
+
+          -- Reachable only once `util.lint_code` has put the rule id back on
+          -- the diagnostic.
+          tflint = {
+            comment = '# tflint-ignore: %s',
+            location = 'prevLine',
+            multiRuleIgnore = true,
+            multiRuleSeparator = ', ',
+            docs = 'https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/annotations.md',
+          },
+          perlcritic = {
+            comment = '## no critic (%s)',
+            location = 'sameLine',
+            multiRuleIgnore = true,
+            multiRuleSeparator = ', ',
+            docs = 'https://metacpan.org/pod/Perl::Critic#BENDING-THE-RULES',
+          },
+          ['golangci-lint'] = {
+            -- Go only, so the marker is written out rather than taken from
+            -- `commentstring`: the directive has to sit tight against the
+            -- slashes or the compiler's own `//go:` scanner reads past it.
+            comment = '//nolint:%s',
+            location = 'sameLine',
+            multiRuleIgnore = true,
+            multiRuleSeparator = ',',
+            docs = 'https://golangci-lint.run/usage/false-positives/#nolint-directive',
+          },
+          buf_lint = {
+            comment = '// buf:lint:ignore %s',
+            location = 'prevLine',
+            multiRuleIgnore = false,
+            docs = 'https://buf.build/docs/lint/overview/#ignore-lint-errors',
+          },
+
+          -- These two always reported a code; they were simply never
+          -- written down.
+          phpcs = {
+            comment = '// phpcs:ignore %s',
+            location = 'sameLine',
+            multiRuleIgnore = true,
+            multiRuleSeparator = ',',
+            docs = 'https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Advanced-Usage#ignoring-parts-of-a-file',
+          },
+          ['npm-groovy-lint'] = {
+            comment = '/* groovylint-disable-next-line %s */',
+            location = 'prevLine',
+            multiRuleIgnore = true,
+            multiRuleSeparator = ', ',
+            docs = 'https://github.com/nvuillam/npm-groovy-lint#disabling-rules-in-source',
           },
         },
       }
