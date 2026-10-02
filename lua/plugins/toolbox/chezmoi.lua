@@ -13,6 +13,38 @@ return {
     -- `*.tmpl`, managed files typed by their target, `:Chezmoi` commands
     'dpezto/chezmoi-template.nvim',
     enabled = enabled,
+    init = function()
+      -- chezmoi templates everything under `.chezmoitemplates/` whatever the
+      -- extension, so the plugin forces those partials to `gotmpl`. Plenty of
+      -- them hold no action at all -- `dytoy` package data, `ssh` snippets --
+      -- and as `gotmpl` they lose their schema, linter and formatter. Hand
+      -- those back their own filetype; a partial that really templates stays
+      -- `gotmpl`.
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('chezmoi_plain_partials', {}),
+        pattern = 'gotmpl',
+        callback = function(ctx)
+          local file = vim.api.nvim_buf_get_name(ctx.buf)
+          if
+            not file:find('/.chezmoitemplates/', 1, true)
+            or file:match('%.tmpl$')
+          then
+            return
+          end
+          for _, line in
+            ipairs(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false))
+          do
+            if line:find('{{', 1, true) then return end
+          end
+          -- Seeded by the plugin from the attribute-stripped basename
+          local ft = vim.b[ctx.buf].chezmoi_target_lang
+            or vim.filetype.match({ filename = vim.fs.basename(file) })
+          if ft and ft ~= '' and ft ~= 'gotmpl' then
+            vim.bo[ctx.buf].filetype = ft
+          end
+        end,
+      })
+    end,
     -- Lazy-loads itself from `plugin/`, and its Tree-sitter directive has to
     -- be there before the first `gotmpl` tree is parsed
     lazy = false,
