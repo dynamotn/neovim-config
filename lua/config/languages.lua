@@ -2,8 +2,12 @@
 ---@field filetypes string[]
 ---@field parser string|DyParserSpec
 ---@field injected_parsers? string[] Parsers this language's injection
---- queries name. An injection is dropped in silence when its parser is
---- missing, so they are installed with the language's own.
+--- queries name outright, nvim-treesitter's as well as the ones in
+--- `queries/` and `after/queries/`. An injection whose parser is missing is
+--- dropped in silence, and a parser only ever arrives with the filetype that
+--- asks for it, so they are installed alongside the language's own. A query
+--- that reads its language off the buffer instead -- a Markdown code fence,
+--- a D2 block tag -- cannot be served this way and is left alone.
 ---@field ext? string File extension of the parser's language, when the two
 --- differ. `injected` names the scratch file it hands a formatter after the
 --- language, and a formatter that switches on the file name (`prettier`,
@@ -473,6 +477,7 @@ return {
   angular = { -- See `html` and `typescript`
     filetypes = { 'htmlangular' },
     parser = 'angular',
+    injected_parsers = { 'css', 'javascript', 'json' },
     ext = 'html',
     lsp_servers = { 'angularls', 'tailwindcss', 'harper_ls' },
     linters = {
@@ -487,6 +492,7 @@ return {
   arduino = { -- See `cpp`
     filetypes = { 'arduino' },
     parser = 'cpp',
+    injected_parsers = { 'doxygen', 'printf', 're2c' },
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
     linters = {
       -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
@@ -498,6 +504,7 @@ return {
   astro = { -- See `html` and `typescript`
     filetypes = { 'astro' },
     parser = 'astro',
+    injected_parsers = { 'css', 'javascript', 'json', 'scss', 'typescript' },
     -- `prettier` needs `prettier-plugin-astro` for a component file, so
     -- formatting is left to the language server.
     lsp_servers = { 'astro', 'tailwindcss', 'harper_ls' },
@@ -506,6 +513,7 @@ return {
   bash = {
     filetypes = reuse_filetypes.bash.filetypes,
     parser = 'bash',
+    injected_parsers = { 'awk', 'printf', 'readline' },
     ext = 'sh',
     lsp_servers = {
       'bashls',
@@ -532,6 +540,7 @@ return {
   cpp = {
     filetypes = { 'c', 'cpp' },
     parser = 'cpp',
+    injected_parsers = { 'doxygen', 'printf', 're2c' },
     lsp_servers = { 'clangd', 'harper_ls' },
     linters = {
       -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
@@ -562,6 +571,14 @@ return {
   blade = { -- See `php` and `html`
     filetypes = { 'blade' },
     parser = 'blade',
+    injected_parsers = {
+      'css',
+      'javascript',
+      'json',
+      'php_only',
+      'python',
+      'toml',
+    },
     lsp_servers = { 'laravel_ls', 'tailwindcss', 'harper_ls' },
     formatters = { 'blade-formatter' },
     autopairs = mustache_autopairs,
@@ -620,6 +637,7 @@ return {
   elixir = {
     filetypes = { 'elixir' },
     parser = 'elixir',
+    injected_parsers = { 'eex', 'heex', 'json', 'surface', 'zig' },
     ext = 'exs',
     lsp_servers = { 'elixirls', 'harper_ls' },
     -- `mix credo` and `mix format` are tasks of the project's own toolchain.
@@ -685,6 +703,7 @@ return {
   go = {
     filetypes = { 'go' },
     parser = 'go',
+    injected_parsers = { 'printf', 're2c' },
     lsp_servers = { 'gopls', 'harper_ls' },
     linters = {
       {
@@ -714,6 +733,7 @@ return {
   handlebars = { -- See `html`
     filetypes = { 'handlebars' },
     parser = 'glimmer',
+    injected_parsers = { 'css', 'javascript' },
     ext = 'hbs',
     lsp_servers = { 'ember', 'tailwindcss', 'harper_ls' },
     autopairs = mustache_autopairs,
@@ -722,6 +742,17 @@ return {
   haskell = {
     filetypes = { 'haskell' },
     parser = 'haskell',
+    injected_parsers = {
+      'css',
+      'graphql',
+      'haskell_persistent',
+      'html',
+      'javascript',
+      'json',
+      'python',
+      'sql',
+      'typescript',
+    },
     ext = 'hs',
     lsp_servers = { 'hls', 'harper_ls' },
     linters = { 'hlint' },
@@ -741,6 +772,7 @@ return {
   heex = { -- See `elixir`
     filetypes = { 'heex' },
     parser = 'heex',
+    injected_parsers = { 'elixir' },
     -- A Phoenix template is part of an Elixir project: the same server reads
     -- it and the same `mix format` writes it back.
     lsp_servers = { 'elixirls', 'tailwindcss', 'harper_ls' },
@@ -757,6 +789,7 @@ return {
   html = {
     filetypes = { 'html' },
     parser = 'html',
+    injected_parsers = { 'css', 'javascript', 'json', 'python', 'toml' },
     lsp_servers = { 'tailwindcss', 'html', 'harper_ls' },
     linters = { 'htmlhint' },
     formatters = { html_beautify_formatter },
@@ -764,6 +797,7 @@ return {
   java = {
     filetypes = { 'java' },
     parser = 'java',
+    injected_parsers = { 'javadoc', 'printf' },
     lsp_servers = { 'jdtls', 'harper_ls' },
     -- `jdtls` can format, but only after a project is imported and its
     -- settings resolved; a formatter works on the buffer from the start.
@@ -784,6 +818,17 @@ return {
   javascript = { -- See `typescript`
     filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx' },
     parser = 'javascript',
+    injected_parsers = {
+      'angular',
+      'css',
+      'glimmer',
+      'graphql',
+      'groq',
+      'html',
+      'jsdoc',
+      'sql',
+      'styled',
+    },
     ext = 'js',
     lsp_servers = js_lsp_servers,
     linters = js_linters,
@@ -796,6 +841,7 @@ return {
   julia = {
     filetypes = { 'julia' },
     parser = 'julia',
+    injected_parsers = { 'bash' },
     ext = 'jl',
     -- No formatter here: `JuliaFormatter` is a Julia package, run from
     -- inside a project's own environment rather than as a binary.
@@ -805,6 +851,7 @@ return {
   kotlin = {
     filetypes = { 'kotlin' },
     parser = 'kotlin',
+    injected_parsers = { 'printf' },
     ext = 'kt',
     lsp_servers = { 'kotlin_language_server', 'harper_ls' },
     -- `ktlint` can format too, but it only knows its own style; `ktfmt`
@@ -817,6 +864,7 @@ return {
   latex = {
     filetypes = { 'tex', 'plaintex' },
     parser = 'latex',
+    injected_parsers = { 'python' },
     ext = 'tex',
     lsp_servers = { 'ltex', 'texlab' },
     formatters = { 'tex-fmt' },
@@ -870,6 +918,7 @@ return {
   lua = {
     filetypes = { 'lua' },
     parser = 'lua',
+    injected_parsers = { 'bash', 'luadoc', 'luap', 'printf' },
     lsp_servers = { 'lua_ls', 'harper_ls' },
     formatters = { 'stylua' },
     dial = function(augend)
@@ -919,6 +968,7 @@ return {
   perl = {
     filetypes = { 'perl' },
     parser = 'perl',
+    injected_parsers = { 'pod' },
     ext = 'pl',
     lsp_servers = { 'perlnavigator' },
     -- both come from CPAN, Mason carries neither
@@ -930,6 +980,7 @@ return {
   php = {
     filetypes = { 'php' },
     parser = 'php',
+    injected_parsers = { 'bash', 'html', 'phpdoc' },
     lsp_servers = { 'intelephense', 'harper_ls' },
     linters = { 'phpcs' },
     formatters = {
@@ -946,6 +997,7 @@ return {
   python = {
     filetypes = { 'python' },
     parser = 'python',
+    injected_parsers = { 'printf' },
     ext = 'py',
     lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
     linters = { 'ruff' },
@@ -969,6 +1021,17 @@ return {
   qml = { -- Qt
     filetypes = { 'qml' },
     parser = 'qmljs',
+    injected_parsers = {
+      'angular',
+      'css',
+      'glimmer',
+      'graphql',
+      'groq',
+      'html',
+      'jsdoc',
+      'sql',
+      'styled',
+    },
     ext = 'qml',
     lsp_servers = { 'qmlls' },
     -- `qmlformat` comes with the Qt tooling
@@ -992,6 +1055,7 @@ return {
         url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
       },
     },
+    injected_parsers = { 'html', 'ruby' },
     ext = 'erb',
     lsp_servers = { 'ruby_lsp', 'tailwindcss', 'harper_ls' },
     linters = {
@@ -1019,6 +1083,7 @@ return {
   ruby = {
     filetypes = { 'ruby' },
     parser = 'ruby',
+    injected_parsers = { 'rbs' },
     ext = 'rb',
     lsp_servers = { 'ruby_lsp', 'harper_ls' },
     linters = { 'rubocop' },
@@ -1029,6 +1094,7 @@ return {
   rust = {
     filetypes = { 'rust' },
     parser = 'rust',
+    injected_parsers = { 're2c', 'slint' },
     ext = 'rs',
     lsp_servers = { 'rust_analyzer', 'harper_ls' },
     -- `rustfmt` comes with the toolchain, Mason has no package for it.
@@ -1070,6 +1136,7 @@ return {
   solidity = {
     filetypes = { 'solidity' },
     parser = 'solidity',
+    injected_parsers = { 'doxygen' },
     ext = 'sol',
     lsp_servers = { 'solang', 'harper_ls' },
     formatters = {
@@ -1093,6 +1160,14 @@ return {
   svelte = { -- See `typescript`
     filetypes = { 'svelte' },
     parser = 'svelte',
+    injected_parsers = {
+      'css',
+      'javascript',
+      'json',
+      'pug',
+      'scss',
+      'typescript',
+    },
     -- `prettier` needs `prettier-plugin-svelte` for a single-file component,
     -- so formatting is left to the language server.
     lsp_servers = { 'svelte', 'tailwindcss', 'harper_ls' },
@@ -1110,6 +1185,7 @@ return {
   templ = { -- See `go` and `html`
     filetypes = { 'templ' },
     parser = 'templ',
+    injected_parsers = { 'css', 'javascript', 'printf', 're2c' },
     -- one `templ` binary again: `templ lsp` and `templ fmt`
     lsp_servers = { 'templ', 'tailwindcss', 'harper_ls' },
     formatters = { 'templ' },
@@ -1123,6 +1199,17 @@ return {
   tsx = { -- See `typescript`
     filetypes = { 'typescriptreact', 'typescript.tsx' },
     parser = 'tsx',
+    injected_parsers = {
+      'angular',
+      'css',
+      'glimmer',
+      'graphql',
+      'groq',
+      'html',
+      'jsdoc',
+      'sql',
+      'styled',
+    },
     lsp_servers = js_lsp_servers,
     linters = js_linters,
     formatters = js_formatters,
@@ -1134,6 +1221,7 @@ return {
   twig = { -- Symfony
     filetypes = { 'twig' },
     parser = 'twig',
+    injected_parsers = { 'html' },
     lsp_servers = { 'twiggy_language_server', 'harper_ls' },
     -- Two tools with one purpose between them: `twigcs` only reports and
     -- `twig-cs-fixer` only rewrites.
@@ -1145,6 +1233,17 @@ return {
   typescript = {
     filetypes = { 'typescript' },
     parser = 'typescript',
+    injected_parsers = {
+      'angular',
+      'css',
+      'glimmer',
+      'graphql',
+      'groq',
+      'html',
+      'jsdoc',
+      'sql',
+      'styled',
+    },
     ext = 'ts',
     lsp_servers = js_lsp_servers,
     linters = js_linters,
@@ -1171,6 +1270,7 @@ return {
   vim = {
     filetypes = { 'vim' },
     parser = 'vim',
+    injected_parsers = { 'python', 'ruby' },
     lsp_servers = { 'vimls' },
     linters = { 'vint' },
     endwise = true,
@@ -1180,6 +1280,15 @@ return {
   vue = { -- See `html` and `typescript`
     filetypes = { 'vue' },
     parser = 'vue',
+    injected_parsers = {
+      'css',
+      'javascript',
+      'json',
+      'pug',
+      'scss',
+      'tsx',
+      'typescript',
+    },
     lsp_servers = { 'vue_ls', 'vtsls', 'tailwindcss', 'harper_ls' },
     -- `biome` cannot read a single-file component, so a Vue file goes to
     -- `prettier` the way the stylesheets already do.
@@ -1215,6 +1324,7 @@ return {
   zsh = { -- See `bash`
     filetypes = { 'zsh' },
     parser = 'zsh',
+    injected_parsers = { 'printf', 'readline' },
     lsp_servers = { 'harper_ls' },
     -- `shellcheck` and `shfmt` are for POSIX shells and bash, not for zsh;
     -- the linter is `zsh -n` and `beautysh` is what knows the syntax.
@@ -1228,6 +1338,7 @@ return {
   ansible = { -- See `yaml`
     filetypes = { 'yaml.ansible' },
     parser = 'yaml',
+    injected_parsers = { 'bash', 'promql' },
     lsp_servers = { 'ansiblels' },
     linters = {
       {
@@ -1257,6 +1368,7 @@ return {
         url = 'https://github.com/Beaglefoot/tree-sitter-awk',
       },
     },
+    injected_parsers = { 'printf' },
     lsp_servers = { 'awk_ls' },
     linters = {
       { 'gawk', mason = { enabled = false } },
@@ -1310,6 +1422,7 @@ return {
         url = 'https://github.com/madmaxieee/tree-sitter-d2',
       },
     },
+    injected_parsers = { 'javascript', 'typescript' },
     linters = { 'd2' },
     formatters = { 'd2' },
   },
@@ -1334,6 +1447,7 @@ return {
   dockerfile = {
     filetypes = reuse_filetypes.dockerfile.filetypes,
     parser = 'dockerfile',
+    injected_parsers = { 'bash' },
     lsp_servers = { 'dockerls' },
     linters = { 'hadolint' },
     formatters = { 'dockerfmt' },
@@ -1345,6 +1459,7 @@ return {
   gitcommit = {
     filetypes = { 'gitcommit' },
     parser = 'gitcommit',
+    injected_parsers = { 'git_rebase' },
     lsp_servers = { 'harper_ls' },
     linters = { 'gitlint' },
     null_ls = {
@@ -1354,6 +1469,7 @@ return {
   gitrebase = {
     filetypes = { 'gitrebase' },
     parser = 'git_rebase',
+    injected_parsers = { 'bash' },
     null_ls = {
       {
         'gitrebase',
@@ -1374,6 +1490,17 @@ return {
   gotmpl = {
     filetypes = { 'gotmpl' },
     parser = 'gotmpl',
+    injected_parsers = {
+      'bash',
+      'fish',
+      'html',
+      'ini',
+      'javascript',
+      'printf',
+      'python',
+      'toml',
+      'yaml',
+    },
     formatters = {
       injected_formatter,
     },
@@ -1405,6 +1532,7 @@ return {
   helm = { -- See `gotmpl`
     filetypes = { 'helm' },
     parser = 'helm',
+    injected_parsers = { 'html', 'javascript', 'json', 'printf', 'yaml' },
     lsp_servers = { 'helm_ls' },
     linters = { 'trivy' },
     formatters = {
@@ -1427,6 +1555,7 @@ return {
     -- `ftdetect/filetype.lua`.
     filetypes = { 'htmldjango' },
     parser = 'htmldjango',
+    injected_parsers = { 'html' },
     lsp_servers = { 'djlsp', 'tailwindcss', 'harper_ls' },
     formatters = { djlint_formatter },
     autopairs = function(filetypes, rule, cond)
@@ -1450,6 +1579,7 @@ return {
   hurl = { -- See `http`
     filetypes = { 'hurl' },
     parser = 'hurl',
+    injected_parsers = { 'json', 'xml' },
     -- `hurlfmt` is part of the `hurl` release, Mason has no package
     formatters = { { 'hurlfmt', mason = { enabled = false } } },
     autopairs = mustache_autopairs,
@@ -1457,6 +1587,7 @@ return {
   hyprlang = {
     filetypes = { 'hyprlang' },
     parser = 'hyprlang',
+    injected_parsers = { 'bash' },
     lsp_servers = { 'hyprls' },
   },
   ini = {
@@ -1468,6 +1599,7 @@ return {
     -- itself: they are registered in `ftdetect/filetype.lua`.
     filetypes = { 'jinja' },
     parser = 'jinja',
+    injected_parsers = { 'jinja_inline' },
     ext = 'j2',
     lsp_servers = { 'jinja_lsp', 'harper_ls' },
     formatters = { djlint_formatter },
@@ -1530,6 +1662,7 @@ return {
   just = {
     filetypes = { 'just' },
     parser = 'just',
+    injected_parsers = { 'bash', 'javascript', 'python' },
     lsp_servers = { 'just' },
     -- `just --fmt` is the tool itself
     formatters = { { 'just', mason = { enabled = false } } },
@@ -1548,6 +1681,7 @@ return {
   make = {
     filetypes = { 'config', 'automake', 'make' },
     parser = 'make',
+    injected_parsers = { 'bash' },
     lsp_servers = { 'autotools_ls' },
     null_ls = {
       ltcc_code_action,
@@ -1558,6 +1692,7 @@ return {
   markdown = {
     filetypes = { 'markdown', 'markdown.mdx' },
     parser = 'markdown',
+    injected_parsers = { 'html', 'markdown_inline', 'toml', 'yaml' },
     ext = 'md',
     lsp_servers = { 'marksman', 'harper_ls' },
     linters = { 'markdownlint-cli2' },
@@ -1621,6 +1756,15 @@ return {
   nix = {
     filetypes = { 'nix' },
     parser = 'nix',
+    injected_parsers = {
+      'bash',
+      'fish',
+      'haskell',
+      'javascript',
+      'perl',
+      'python',
+      'rust',
+    },
     lsp_servers = { 'nil_ls', 'harper_ls' },
     linters = {
       { 'nix', command = 'nix', mason = { enabled = false } },
@@ -1720,6 +1864,7 @@ return {
   toml = {
     filetypes = { 'toml' },
     parser = 'toml',
+    injected_parsers = { 'bash' },
     lsp_servers = { 'taplo', 'harper_ls' },
     formatters = {
       'taplo',
@@ -1730,6 +1875,7 @@ return {
   treesitter = {
     filetypes = { 'query' },
     parser = 'query',
+    injected_parsers = { 'luap' },
     ext = 'scm',
     lsp_servers = { 'ts_query_ls' },
     formatters = {
@@ -1739,6 +1885,7 @@ return {
   xml = {
     filetypes = { 'xml', 'svg', 'xsd', 'xslt' },
     parser = 'xml',
+    injected_parsers = { 'css', 'javascript', 'sql' },
     lsp_servers = { 'lemminx' },
     formatters = {
       {
@@ -1754,8 +1901,9 @@ return {
   yaml = {
     filetypes = reuse_filetypes.yaml.filetypes,
     parser = 'yaml',
-    -- `queries/yaml/injections.scm` hands every CI script to `bash`.
-    injected_parsers = { 'bash' },
+    -- `queries/yaml/injections.scm` hands every CI script to `bash` and
+    -- every Prometheus `expr:` to `promql`.
+    injected_parsers = { 'bash', 'promql' },
     lsp_servers = {
       'yamlls',
       { 'gitlab_ci_ls', filetypes = { 'yaml.gitlab' } },
@@ -1783,6 +1931,7 @@ return {
   yuck = {
     filetypes = { 'yuck' },
     parser = 'yuck',
+    injected_parsers = { 'jq' },
   },
   ----------------- }
 }
