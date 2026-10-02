@@ -75,6 +75,49 @@ return {
       -- source, edit, pick
       keymaps = { enabled = true },
     },
+    config = function(_, opts)
+      require('chezmoi-template').setup(opts)
+
+      -- The `helm` injection query inherits `gotmpl`, so `inject-chezmoi!` is
+      -- asked for a language on helm trees too. On a buffer chezmoi does not
+      -- manage the directive falls back to the filetype of the (attribute
+      -- stripped) buffer name, and `templates/*.yaml` is `helm` -- so helm
+      -- injects helm into itself, combined, and the parse recurses until
+      -- Tree-sitter overflows the stack. Guard a tree against injecting its
+      -- own language. `inject.setup()` registers the directive again when the
+      -- plugin activates, so replace the function rather than its last result.
+      local inject = require('chezmoi-template.inject')
+      local resolve = require('chezmoi-template.resolve')
+      inject.register_directive = function()
+        vim.treesitter.query.add_directive(
+          'inject-chezmoi!',
+          function(_, _, source, _, metadata)
+            local buf = type(source) == 'number' and source
+              or vim.api.nvim_get_current_buf()
+            local lang = vim.b[buf].chezmoi_target_lang
+            if not lang then
+              local ft = vim.filetype.match({
+                filename = resolve.resolve_path(vim.api.nvim_buf_get_name(buf)),
+              })
+              lang = ft and (vim.treesitter.language.get_lang(ft) or ft)
+            end
+            if
+              not lang
+              or lang
+                == vim.treesitter.language.get_lang(vim.bo[buf].filetype)
+            then
+              return
+            end
+            if pcall(vim.treesitter.language.add, lang) then
+              metadata['injection.language'] = lang
+              metadata['injection.combined'] = true
+            end
+          end,
+          { force = true }
+        )
+      end
+      inject.register_directive()
+    end,
   },
   {
     -- Complete `chezmoi data` keys inside template actions
