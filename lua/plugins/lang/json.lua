@@ -25,6 +25,12 @@ return vim.list_contains(_G.enabled_languages, 'json')
                   require('schemastore').json.schemas()
                 )
               end,
+              -- The server downloads every remote schema once and never
+              -- retries, so a dropped connection costs the buffer its
+              -- validation for the session unless the fetch is repeated
+              on_init = function(client)
+                require('util.json_schema').on_init(client)
+              end,
               settings = {
                 json = {
                   format = {
