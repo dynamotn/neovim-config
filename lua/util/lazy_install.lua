@@ -54,4 +54,26 @@ M.on_filetype = function(filetypes, handler)
   })
 end
 
+---@type table<string, true>
+local attempted = {}
+
+--- Install a Mason package once, the first time a handler asks for it
+---
+--- The dispatcher above runs its handlers on every matching `FileType`, and
+--- `is_installed` stays false for a package that cannot be installed at all --
+--- one held back by a registry pin, a missing toolchain, or a release its
+--- package manager refuses. Asking again on each buffer then starts an install
+--- per buffer: they race over the same Mason lockfile and bury the first, real
+--- error under a wall of `ENOENT` on the lock. A package is tried once per
+--- session instead, and the next attempt waits for a restart.
+---@param package string Mason package name, optionally `name@version`
+M.install_once = function(package)
+  if attempted[package] then return end
+  -- `MasonInstall` takes the version with the name, `is_installed` does not.
+  local name = package:match('^(.-)@[^@]*$') or package
+  if require('mason-registry').is_installed(name) then return end
+  attempted[package] = true
+  require('mason.api.command').MasonInstall({ package })
+end
+
 return M
