@@ -59,6 +59,27 @@ return {
   {
     -- Coverage from LCOV, Cobertura, Go, tarpaulin and LLVM reports
     'mr-u0b0dy/crazy-coverage.nvim',
+    -- Upstream ships doc/ as Markdown only, so lazy.nvim's helptags step dies
+    -- with "E151: No match: .../doc/**/*.txt". Lay down a stub vimdoc that
+    -- points at the Markdown, so the directory has something to index.
+    build = function(plugin)
+      local doc = plugin.dir .. '/doc'
+      local help = doc .. '/crazy-coverage.txt'
+      if not vim.uv.fs_stat(help) then
+        vim.fn.writefile({
+          '*crazy-coverage.txt*	Coverage from LCOV, Cobertura, Go and LLVM reports',
+          '',
+          'CRAZY-COVERAGE					*crazy-coverage*',
+          '',
+          'Upstream documents this plugin in Markdown instead of vimdoc. Start at',
+          'doc/index.md under: >',
+          '	' .. plugin.dir,
+          '<',
+          ' vim:tw=78:ts=8:ft=help:norl:',
+        }, help)
+      end
+      vim.cmd.helptags(doc)
+    end,
     cmd = {
       'CoverageToggle',
       'CoverageLoad',
