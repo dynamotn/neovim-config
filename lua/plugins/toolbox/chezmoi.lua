@@ -58,6 +58,17 @@ return {
       diagnostics = { enabled = false },
       -- Never decrypt `*.age` files on open
       encryption = { enabled = false },
+      inject = {
+        -- Seeding the target language costs a `chezmoi managed` spawn, and
+        -- that walks the whole source tree: around 600ms on this repository,
+        -- paid inside `BufReadPre` before the buffer is even shown. Partials
+        -- are the one case where it buys nothing -- they have no deploy
+        -- target, so the seeding falls back to the attribute-stripped file
+        -- name anyway, which is what the injection directive does by itself
+        -- when nothing seeded the buffer. Opening a `dytoy` template went
+        -- from ~800ms to ~235ms.
+        exclude = { '/%.chezmoitemplates/' },
+      },
       completion = {
         mask = {
           'secret',
@@ -88,6 +99,21 @@ return {
       -- plugin activates, so replace the function rather than its last result.
       local inject = require('chezmoi-template.inject')
       local resolve = require('chezmoi-template.resolve')
+
+      -- `source_set()` lists every managed source path so that resolving one
+      -- file's target costs no spawn of its own. On a source tree this size
+      -- the trade is inverted: the listing walks 2300+ files for about 700ms,
+      -- inside `BufReadPre`, before the buffer is on screen -- while the
+      -- `target-path` call it saves answers in under 20ms. Returning nothing
+      -- sends every lookup down the per-file path, and only pays off again
+      -- past some forty templates in one session.
+      --
+      -- What the listing also does is catch a source file chezmoi does not
+      -- deploy but `target-path` still answers for, such as a README.md at
+      -- the source root. `seed_buffer` has already asked `is_managed`, so
+      -- what slips through is narrow: the injected language of such a file is
+      -- guessed from its name, which is what every unmanaged template gets.
+      resolve.source_set = function() return nil end
       inject.register_directive = function()
         vim.treesitter.query.add_directive(
           'inject-chezmoi!',
