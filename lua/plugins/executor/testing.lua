@@ -72,6 +72,56 @@ return {
       { ']u', '<cmd>CoverageNextUncovered<cr>', desc = 'Next Uncovered Line' },
       { '[u', '<cmd>CoveragePrevUncovered<cr>', desc = 'Prev Uncovered Line' },
     },
-    opts = {},
+    opts = {
+      -- Root is excluded on purpose: the plugin falls back to scanning every
+      -- file of a search dir, and treats any stray JSON/XML there as a report.
+      coverage_dirs = {
+        'coverage/bats', -- kcov output of scripts/test.sh --coverage
+        'target/tarpaulin',
+        'target/coverage',
+        'build/coverage',
+        'coverage',
+        'build',
+      },
+      coverage_patterns = {
+        shell = { 'cobertura.xml', 'coverage.xml', '*.lcov', '*.info' },
+        c = {
+          '*.lcov',
+          '*.info',
+          'coverage.json',
+          'coverage.xml',
+          '*.profdata',
+        },
+        cpp = {
+          '*.lcov',
+          '*.info',
+          'coverage.json',
+          'coverage.xml',
+          '*.profdata',
+        },
+        python = {
+          '.coverage',
+          'coverage.json',
+          'coverage.xml',
+          'coverage.lcov',
+        },
+        rust = {
+          '*.lcov',
+          '*.info',
+          'coverage.json',
+          'coverage.xml',
+          'coverage-tarpaulin.lcov',
+          'coverage-tarpaulin.json',
+          'coverage-tarpaulin.xml',
+        },
+        go = {
+          'coverage.out',
+          '*.lcov',
+          '*.info',
+          'coverage.json',
+          'coverage.xml',
+        },
+      },
+    },
   },
 }
