@@ -98,14 +98,38 @@ M.mappers = {
 }
 
 --- Wrap every linter in `M.mappers`
+---
+--- The wrapping happens the first time a linter is looked up, not here.
+--- Indexing `lint.linters` requires the upstream module, and some of those do
+--- real work on load: `golangcilint` shells out to `golangci-lint version` and
+--- `go env GOMOD`, which cost every buffer of every filetype well over 100ms
+--- at startup. Wrapping in a function instead would defer that too, but would
+--- turn a table linter into a function, and the `lint.linters[name].args = ...`
+--- a language sets would then index a function. So the lookup itself is
+--- taken over: the first access loads, wraps and stores the linter, and every
+--- later one finds the wrapped table in place.
 M.setup = function()
   local lint = require('lint')
   local wrap = require('lint.util').wrap
+  local meta = getmetatable(lint.linters)
+  if meta.dy_lint_code then return end
+  meta.dy_lint_code = true
+
+  -- One set before this ran is already loaded, so there is nothing to defer.
   for name, mapper in pairs(M.mappers) do
-    -- Indexing `lint.linters` requires the upstream module. Wrapping it in a
-    -- function instead would turn a table linter into a function, and the
-    -- `lint.linters[name].args = ...` a language sets would index a function
-    lint.linters[name] = wrap(lint.linters[name], mapper)
+    local linter = rawget(lint.linters, name)
+    if linter then lint.linters[name] = wrap(linter, mapper) end
+  end
+
+  local index = meta.__index
+  meta.__index = function(linters, name)
+    local linter = index(linters, name)
+    local mapper = M.mappers[name]
+    if linter and mapper then
+      linter = wrap(linter, mapper)
+      rawset(linters, name, linter)
+    end
+    return linter
   end
 end
 
