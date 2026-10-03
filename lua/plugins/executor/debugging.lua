@@ -147,19 +147,19 @@ return {
     },
   },
   {
-    -- Completion for DAP
+    -- Completion for DAP, only ever used in the REPL. Its own spec rather than
+    -- a dependency of blink.cmp, which would load it -- and nvim-dap with all
+    -- its adapters -- on the first `InsertEnter` of any buffer.
+    'rcarriga/cmp-dap',
+    ft = 'dap-repl',
+    init = function()
+      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
+        dap = '「DAP」',
+      })
+    end,
+  },
+  {
     'blink.cmp',
-    dependencies = {
-      {
-        'rcarriga/cmp-dap',
-        init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
-              dap = '「DAP」',
-            })
-        end,
-      },
-    },
     opts = {
       sources = {
         compat = { 'dap' },

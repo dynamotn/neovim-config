@@ -63,9 +63,10 @@ return vim.list_contains(_G.enabled_languages, 'sql')
         end,
       },
       {
-        -- Completion for SQL
+        -- Completion for SQL. The two sources load on their own filetypes, not
+        -- as dependencies: a dependency loads with blink.cmp on the first
+        -- `InsertEnter` of any buffer.
         'blink.cmp',
-        dependencies = { 'vim-dadbod-completion', 'cmp-sql' },
         opts = {
           sources = {
             compat = { 'dadbod', 'sql' },

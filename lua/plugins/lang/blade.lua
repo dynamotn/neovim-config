@@ -74,9 +74,10 @@ return vim.list_contains(_G.enabled_languages, 'blade')
         end,
       },
       {
-        -- Completion for view names and Laravel's own symbols
+        -- Completion for view names and Laravel's own symbols. Both plugins
+        -- load on their own filetypes, not as dependencies: a dependency
+        -- loads with blink.cmp on the first `InsertEnter` of any buffer.
         'blink.cmp',
-        dependencies = { 'laravel.nvim', 'blade-nav.nvim' },
         opts = {
           sources = {
             compat = { 'laravel' },

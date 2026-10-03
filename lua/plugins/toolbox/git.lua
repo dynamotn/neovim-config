@@ -76,20 +76,19 @@ return {
     },
   },
   {
+    -- Completion source. Its own spec rather than a dependency of blink.cmp,
+    -- which would load it on the first `InsertEnter` of any buffer.
+    'petertriho/cmp-git',
+    ft = 'octo',
+    init = function()
+      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
+        git = '「GIT」',
+      })
+    end,
+  },
+  {
     'blink.cmp',
     optional = true,
-    dependencies = {
-      {
-        'petertriho/cmp-git',
-        ft = 'octo',
-        init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
-              git = '「GIT」',
-            })
-        end,
-      },
-    },
     opts = {
       sources = {
         compat = { 'git' },

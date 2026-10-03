@@ -5,9 +5,15 @@ local cmp_util = require('util.cmp')
 return vim.list_contains(_G.enabled_languages, 'gitrebase')
     and {
       {
+        -- Completion source, on this filetype too. Not a dependency of
+        -- blink.cmp, which would load it on the first `InsertEnter` of any
+        -- buffer.
+        'petertriho/cmp-git',
+        ft = language.filetypes,
+      },
+      {
         -- Completion
         'blink.cmp',
-        dependencies = { 'cmp-git' },
         opts = {
           sources = {
             compat = { 'git' },

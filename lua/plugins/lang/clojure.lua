@@ -83,18 +83,20 @@ return vim.list_contains(_G.enabled_languages, 'clojure')
         end,
       },
       {
-        -- Completion from the running REPL
+        -- Completion from the running REPL. Its own spec rather than a
+        -- dependency of blink.cmp, which would load it -- and conjure with
+        -- it -- on the first `InsertEnter` of any buffer.
+        'PaterJason/cmp-conjure',
+        ft = language.filetypes,
+        init = function()
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              conjure = '「REPL」',
+            })
+        end,
+      },
+      {
         'blink.cmp',
-        dependencies = {
-          'PaterJason/cmp-conjure',
-          ft = language.filetypes,
-          init = function()
-            _G.completion_sources =
-              vim.tbl_extend('force', _G.completion_sources, {
-                conjure = '「REPL」',
-              })
-          end,
-        },
         opts = {
           sources = {
             compat = { 'conjure' },

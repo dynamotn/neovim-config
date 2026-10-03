@@ -13,18 +13,21 @@ return vim.list_contains(_G.enabled_languages, 'fish')
         },
       },
       {
+        -- Completion source. Its own spec rather than a dependency of
+        -- blink.cmp, which would load it on the first `InsertEnter` of any
+        -- buffer.
+        'mtoohey31/cmp-fish',
+        ft = language.filetypes,
+        init = function()
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              fish = '「FISH」',
+            })
+        end,
+      },
+      {
         -- Completion
         'blink.cmp',
-        dependencies = {
-          'mtoohey31/cmp-fish',
-          ft = language.filetypes,
-          init = function()
-            _G.completion_sources =
-              vim.tbl_extend('force', _G.completion_sources, {
-                fish = '「FISH」',
-              })
-          end,
-        },
         opts = {
           sources = {
             compat = { 'fish' },

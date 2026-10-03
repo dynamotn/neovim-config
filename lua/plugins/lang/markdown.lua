@@ -57,9 +57,10 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         end,
       },
       {
-        -- Completion
+        -- Completion. obsidian.nvim loads on its own filetypes, not as a
+        -- dependency: a dependency loads with blink.cmp on the first
+        -- `InsertEnter` of any buffer.
         'blink.cmp',
-        dependencies = { 'obsidian.nvim' },
         opts = {
           sources = {
             -- Not need to have compat for obsidian.nvim, because it is already handled in obsidian.nvim

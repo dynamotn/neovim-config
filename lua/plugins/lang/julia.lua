@@ -22,18 +22,20 @@ return vim.list_contains(_G.enabled_languages, 'julia')
       },
       {
         -- Julia writes `α` and `∈` as source, and they are typed as `\alpha`
-        -- and `\in`, so the completion menu has to know the LaTeX names.
+        -- and `\in`, so the completion menu has to know the LaTeX names. Its
+        -- own spec rather than a dependency of blink.cmp, which would load
+        -- its symbol tables on the first `InsertEnter` of any buffer.
+        'kdheepak/cmp-latex-symbols',
+        ft = language.filetypes,
+        init = function()
+          _G.completion_sources =
+            vim.tbl_extend('force', _G.completion_sources, {
+              latex_symbols = '「TEX」',
+            })
+        end,
+      },
+      {
         'blink.cmp',
-        dependencies = {
-          'kdheepak/cmp-latex-symbols',
-          ft = language.filetypes,
-          init = function()
-            _G.completion_sources =
-              vim.tbl_extend('force', _G.completion_sources, {
-                latex_symbols = '「TEX」',
-              })
-          end,
-        },
         opts = {
           sources = {
             compat = { 'latex_symbols' },

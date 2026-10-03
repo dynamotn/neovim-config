@@ -294,17 +294,20 @@ return {
     },
   },
   {
-    -- Completion of `@` mentions and `/` commands in Avante's prompt
+    -- Completion of `@` mentions and `/` commands in Avante's prompt. Its own
+    -- spec rather than a dependency of blink.cmp, which would load it on the
+    -- first `InsertEnter` of any buffer.
+    'Kaiser-Yang/blink-cmp-avante',
+    ft = 'AvanteInput',
+    init = function()
+      _G.completion_sources =
+        vim.tbl_extend('force', _G.completion_sources or {}, {
+          Avante = '「AI」',
+        })
+    end,
+  },
+  {
     'blink.cmp',
-    dependencies = {
-      'Kaiser-Yang/blink-cmp-avante',
-      init = function()
-        _G.completion_sources =
-          vim.tbl_extend('force', _G.completion_sources or {}, {
-            Avante = '「AI」',
-          })
-      end,
-    },
     opts = {
       sources = {
         providers = {
