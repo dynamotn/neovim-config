@@ -71,6 +71,26 @@ return {
       },
     },
     config = function(_, opts)
+      -- `otter.lsp` asks `require('blink.cmp')` for client capabilities as it
+      -- loads, and lazy.nvim answers that by loading blink.cmp with every
+      -- source it depends on -- ~400ms on opening any YAML or Markdown file,
+      -- for a completion engine that is meant to wait for `InsertEnter`. The
+      -- answer is wasted besides: otter's server is in-process and replies to
+      -- `initialize` with a fixed set of capabilities, never reading the
+      -- client's. So the lookup is made to fail while otter loads, and otter
+      -- falls back to Neovim's own capabilities. A blink.cmp that is already
+      -- loaded is left alone.
+      if not package.loaded['blink.cmp'] then
+        package.preload['blink.cmp'] = function()
+          error('blink.cmp is not loaded yet')
+        end
+        local ok, err = pcall(require, 'otter.lsp')
+        package.preload['blink.cmp'] = nil
+        -- LuaJIT leaves a sentinel behind for a module whose loader failed,
+        -- and every later `require` would get that back instead of blink.cmp
+        package.loaded['blink.cmp'] = nil
+        if not ok then error(err, 0) end
+      end
       require('otter').setup(opts)
       vim.api.nvim_create_autocmd('FileType', {
         group = vim.api.nvim_create_augroup('dy_otter_activate', {}),
