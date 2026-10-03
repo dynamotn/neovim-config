@@ -92,6 +92,35 @@ return {
         if not ok then error(err, 0) end
       end
       require('otter').setup(opts)
+      -- On exit otter deletes each of its buffers so that their unsaved
+      -- changes do not hold up `:qa`. Every delete detaches the language
+      -- servers from that buffer and runs every BufDelete handler, which adds
+      -- up to 100ms and more on a Markdown file with a few embedded languages,
+      -- all to tear down buffers the exit is about to drop anyway. Marking
+      -- them unmodified unblocks `:qa` just the same. Defined before any
+      -- activation, so it runs ahead of otter's own handlers and can remove
+      -- them; it runs again on the next attempt should this exit be
+      -- cancelled.
+      vim.api.nvim_create_autocmd('ExitPre', {
+        group = vim.api.nvim_create_augroup('dy_otter_exit', {}),
+        callback = function()
+          for _, raft in pairs(require('otter.keeper').rafts) do
+            for lang, otter_nr in pairs(raft.buffers or {}) do
+              if vim.api.nvim_buf_is_loaded(otter_nr) then
+                vim.bo[otter_nr].modified = false
+              end
+              -- Only there with `buffers.write_to_disk`, but otter would
+              -- remove it either way
+              local path = raft.paths and raft.paths[lang]
+              if path and vim.uv.fs_stat(path) then vim.fn.delete(path) end
+              pcall(
+                vim.api.nvim_del_augroup_by_name,
+                'OtterAutocloseOnQuit' .. otter_nr
+              )
+            end
+          end
+        end,
+      })
       vim.api.nvim_create_autocmd('FileType', {
         group = vim.api.nvim_create_augroup('dy_otter_activate', {}),
         pattern = supported_filetypes,
