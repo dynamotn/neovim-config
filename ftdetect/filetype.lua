@@ -23,13 +23,16 @@ vim.filetype.add({
     djhtml = 'htmldjango',
   },
   filename = {
-    ['.git/ignore'] = 'gitignore',
     ['terragrunt.hcl'] = 'terragrunt',
     ['azure-pipelines.yml'] = 'yaml.az-pl',
     ['docker-compose.yml'] = 'yaml.docker-compose',
     ['PKGBUILD'] = 'sh.PKGBUILD',
   },
   pattern = {
+    -- git's per-user ignore file; a `filename` key with a slash in it is
+    -- never matched, so it takes a pattern over the full path
+    ['.*/%.git/ignore'] = 'gitignore',
+
     ['.*%.hcl'] = 'terragrunt',
     ['.*terraform/.*%.hcl'] = 'terragrunt',
 
