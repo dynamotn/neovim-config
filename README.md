@@ -18,6 +18,7 @@
   - [Install](#install)
   - [Per machine settings](#per-machine-settings)
   - [Updating plugins](#updating-plugins)
+- [Testing](#testing)
 - [Key bindings](#key-bindings)
 - [Benchmark](#benchmark)
 
@@ -253,6 +254,23 @@ The lockfile is the snapshot to roll back to: `lazy-lock.json` on `latest`,
    ```
 
    then run `:Lazy restore` in Neovim. A single plugin can be restored from its line in `:Lazy`.
+
+## Testing
+
+Unit tests live in `tests/spec` and run with
+[plenary-busted](https://github.com/nvim-lua/plenary.nvim#plenarytest_harness)
+in a headless Neovim that loads only the module each spec requires:
+
+```sh
+scripts/test.sh                                  # every spec
+scripts/test.sh tests/spec/util                  # one directory
+scripts/test.sh tests/spec/util/sensitive_spec.lua
+```
+
+Plenary and LazyVim are taken from lazy.nvim's install directory, or cloned
+into `.tests/` when the configuration has never been started. The same run is
+a pre-commit hook and a CI step, next to `scripts/check-startup.sh`, which
+loads the whole configuration and opens a file of each language.
 
 ## Key bindings
 

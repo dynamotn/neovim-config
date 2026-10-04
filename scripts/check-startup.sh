@@ -5,9 +5,10 @@
 # By default a spread of languages is opened, to keep the pre-commit hook
 # quick; `CHECK_STARTUP_ALL=1` opens every one of them, as CI does.
 #
-# The repository has no test suite, so a syntax error or a bad `require` is
-# only found by opening the editor -- and in a chezmoi `mode: symlink` setup
-# that is the real editor, already broken. Neovim is pointed at this tree
+# The unit tests (scripts/test.sh) load modules one at a time, so a syntax
+# error or a bad `require` in the wiring between them is only found by opening
+# the editor -- and in a chezmoi `mode: symlink` setup that is the real editor,
+# already broken. Neovim is pointed at this tree
 # rather than at `$HOME`, so the check reads what is about to be committed and
 # not what was applied last time.
 set -euo pipefail

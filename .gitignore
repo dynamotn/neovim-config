@@ -1,0 +1,2 @@
+# Test dependencies cloned by tests/minimal_init.lua when lazy.nvim has none
+/.tests/

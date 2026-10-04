@@ -108,6 +108,10 @@ jobs:
         with:
           path: ~/.local/share/nvim/lazy
           key: ${{ steps.cache.outputs.cache-primary-key }}
+      # Plenary and LazyVim come from the plugins just installed, so the
+      # specs run against the same commits the configuration does.
+      - name: Unit tests
+        run: ./scripts/test.sh
       # Only the registry index, no package: `validate-tools.lua` checks Mason
       # names against it, and so does the check of the installs it skipped.
       # Loaded with `--clean` so that nothing else of the configuration -- and
