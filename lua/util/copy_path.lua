@@ -89,14 +89,22 @@ function M.project_root()
 end
 
 --- Append ":line" to the given path.
----@param path string
----@return string
-function M.with_line(path) return path .. ':' .. M.line_number() end
+--- Returns nil when there is no path, so `copy` can warn about it.
+---@param path string|nil
+---@return string|nil
+function M.with_line(path)
+  if not path then return nil end
+  return path .. ':' .. M.line_number()
+end
 
 --- Append ":line:column" to the given path.
----@param path string
----@return string
-function M.with_column(path) return path .. ':' .. M.column_number() end
+--- Returns nil when there is no path, so `copy` can warn about it.
+---@param path string|nil
+---@return string|nil
+function M.with_column(path)
+  if not path then return nil end
+  return path .. ':' .. M.column_number()
+end
 
 --- Copy text to system clipboard and print it via notification.
 --- If the buffer has no associated file, shows a warning instead.
