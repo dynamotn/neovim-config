@@ -34,8 +34,8 @@ return {
         bin = 'd2-{{ version }}/bin/d2',
       },
     },
-    bin = {
-      d2 = '{{source.asset.bin}}',
-    },
+  },
+  bin = {
+    d2 = '{{source.asset.bin}}',
   },
 }
