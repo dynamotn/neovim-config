@@ -400,6 +400,11 @@ nothing else: anything vaguer (`password = …`) would turn the guard off by
 crying wolf. The buffer is read once per change, not once per question, since
 the guards ask on every cursor move.
 
+A buffer that stops being sensitive is offered back: delete the token again,
+or waive the check, and Copilot is asked about the buffer once more — but only
+when this guard is what took it away, never when the buffer was left without
+it for a reason of its own.
+
 Behind those patterns stands `betterleaks`, which already lints every buffer
 here — from standard input, with `--redact` and its API validation off, so
 nothing leaves the machine. The guard reads the diagnostics it leaves rather

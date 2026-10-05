@@ -289,6 +289,44 @@ describe('util.ai_guard', function()
       assert.is_true(refused())
     end)
 
+    it('offers the buffer back once the credential is gone', function()
+      local buf = h.buffer({
+        name = plain,
+        lines = { 'token = "ghp_0123456789abcdefghij"' },
+      })
+      settle('TextChanged', buf)
+      assert.same({ { buf, 42 } }, detached)
+
+      local reconsidered = 0
+      local group = vim.api.nvim_create_augroup('dy_spec_reattach', {})
+      vim.api.nvim_create_autocmd('FileType', {
+        group = group,
+        buffer = buf,
+        callback = function() reconsidered = reconsidered + 1 end,
+      })
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'nothing here' })
+      vim.api.nvim_exec_autocmds('TextChanged', { buffer = buf })
+      vim.wait(2000, function() return reconsidered > 0 end, 20)
+      vim.api.nvim_del_augroup_by_id(group)
+      assert.are.equal(1, reconsidered)
+    end)
+
+    it('leaves a buffer it never took Copilot from alone', function()
+      local buf = h.buffer({ name = plain, lines = { 'nothing here' } })
+      local reconsidered = 0
+      local group = vim.api.nvim_create_augroup('dy_spec_reattach', {})
+      vim.api.nvim_create_autocmd('FileType', {
+        group = group,
+        buffer = buf,
+        callback = function() reconsidered = reconsidered + 1 end,
+      })
+      settle('TextChanged', buf)
+      vim.wait(300)
+      vim.api.nvim_del_augroup_by_id(group)
+      assert.are.equal(0, reconsidered)
+      assert.same({}, detached)
+    end)
+
     it('detaches Copilot once betterleaks reports a finding', function()
       local buf = h.buffer({ name = plain, lines = { 'nothing to see' } })
       vim.diagnostic.set(

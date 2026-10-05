@@ -56,7 +56,7 @@ end
 --- with them because a linter run ends in a burst of them.
 local RECHECK_DELAY = 200
 
---- Detach Copilot from a buffer that becomes sensitive after it attached
+--- Detach Copilot from a buffer that becomes sensitive, and offer it back
 ---
 --- `:saveas`, `:file` and `:set filetype` change what a buffer is without
 --- reopening it, so `root_dir` is never asked again -- and neither a name nor
@@ -65,25 +65,60 @@ local RECHECK_DELAY = 200
 --- All four are watched, so what the content check knows reaches Copilot too.
 ---
 --- What was sent before the change is gone already; detaching stops every
---- later edit from following.
+--- later edit from following. The way back is watched too: a token deleted
+--- again, or a waiver given, leaves an ordinary buffer that Copilot would
+--- have attached to all along, so it is offered the buffer once more -- but
+--- only when this guard is what took it away.
 M.watch_copilot = function()
   local group =
     vim.api.nvim_create_augroup('dy_ai_guard_copilot', { clear = true })
 
+  --- Ask Neovim to decide about Copilot again, the way opening the file does
+  ---
+  --- There is no public call that re-runs the resolution behind an enabled
+  --- LSP configuration -- `root_dir`, the root markers, the whole of it --
+  --- but the `FileType` event does, since that is what starts a server in
+  --- the first place. The handlers of `util.lazy_install` are written to run
+  --- on every matching event, and an ftplugin guards itself with
+  --- `b:did_ftplugin`, so firing it again asks the question without redoing
+  --- the work.
   ---@param bufnr integer
-  local function detach(bufnr)
+  local function reconsider(bufnr)
+    vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, modeline = false })
+  end
+
+  ---@param bufnr integer
+  local function reconcile(bufnr)
     if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    local sensitive_now = sensitive.is_sensitive(bufnr)
+
+    -- Gone again: the token was deleted, the waiver given, the finding
+    -- cleared. Copilot is only offered back when this guard is what took it
+    -- away, never when the buffer was left without it for another reason.
+    if not sensitive_now then
+      if vim.b[bufnr].dy_ai_guard_detached then
+        vim.b[bufnr].dy_ai_guard_detached = nil
+        reconsider(bufnr)
+      end
+      return
+    end
+
     local clients = vim.lsp.get_clients({ bufnr = bufnr, name = 'copilot' })
-    if #clients == 0 or not sensitive.is_sensitive(bufnr) then return end
+    if #clients == 0 then return end
     for _, client in ipairs(clients) do
       vim.lsp.buf_detach_client(bufnr, client.id)
     end
+    vim.b[bufnr].dy_ai_guard_detached = true
     refuse('Copilot')
   end
 
   vim.api.nvim_create_autocmd({ 'BufFilePost', 'FileType' }, {
     group = group,
-    callback = function(args) detach(args.buf) end,
+    callback = function(args)
+      -- `reconsider` fires `FileType`, so only the detaching half runs here:
+      -- re-attaching from inside the event it fires would be a loop.
+      if sensitive.is_sensitive(args.buf) then reconcile(args.buf) end
+    end,
   })
 
   ---@type table<integer, true>
@@ -98,7 +133,7 @@ M.watch_copilot = function()
         pending[bufnr] = true
         vim.defer_fn(function()
           pending[bufnr] = nil
-          detach(bufnr)
+          reconcile(bufnr)
         end, RECHECK_DELAY)
       end,
     }
