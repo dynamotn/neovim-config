@@ -1,5 +1,3 @@
-:BaleiaColorize	neovim-config.txt	/*:BaleiaColorize*
-:BaleiaLogs	neovim-config.txt	/*:BaleiaLogs*
 :DySpell	neovim-config.txt	/*:DySpell*
 :YamlSchema	neovim-config.txt	/*:YamlSchema*
 _G.bundle_languages	neovim-config.txt	/*_G.bundle_languages*

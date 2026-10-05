@@ -52,7 +52,6 @@ local stale_releases = {
   'gpanders/nvim-parinfer',
   'honza/vim-snippets',
   'johmsalas/text-case.nvim',
-  'm00qek/baleia.nvim',
   'marilari88/neotest-vitest',
   'mfussenegger/nvim-jdtls',
   'nvim-lua/plenary.nvim',

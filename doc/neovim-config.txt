@@ -432,11 +432,6 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :YamlSchema reset       Hand detection back the wheel.
                         See |neovim-config-schema|.
 
-                                             *:BaleiaColorize* *:BaleiaLogs*
-:BaleiaColorize         Render the ANSI colour escapes in the buffer, the
-                        Conjure log in practice.
-:BaleiaLogs             Show baleia's own log.
-
 LazyVim's own commands, and the plugins', are unchanged: `:Lazy`, `:Mason`,
 `:LazyExtras`, `:ConformInfo`, and the rest.
 
