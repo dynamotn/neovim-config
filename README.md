@@ -359,6 +359,13 @@ answer:
 A plugin is as much of a supply chain as a package from npm or PyPI, and a
 bigger one: whatever is in it runs in this editor the next time Neovim starts.
 
+The window is otherwise invisible — `:Lazy` shows a plugin as up to date when
+it is a week behind on purpose — so `:LazyQuarantine` lists what is being held
+back: the commit or release each plugin is on, the one waiting for it, and how
+long is left. It asks git once per plugin, about a second for the whole set.
+`:checkhealth util` answers the other half, whether the window is in place at
+all.
+
 ### Files that never reach an AI
 
 A language server is handed the whole text of every buffer it attaches to,
@@ -527,6 +534,7 @@ The ones worth knowing before which-key gets a chance to tell you:
 | Command | What |
 | ------- | ---- |
 | `:DySpell {lang}` | Rebuild a spell file from its word lists |
+| `:LazyQuarantine` | Plugins the release quarantine is holding back, and for how much longer |
 | `:AiGuardCheck`, `:AiGuardAllow[!]` | Why this buffer is kept from the AI integrations, the way past the content check, and the way back |
 | `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |
 | `:YamlSchema reset` | Hand schema detection back the wheel |

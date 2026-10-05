@@ -43,13 +43,21 @@ local function git(dir, args)
   return out ~= '' and out or nil
 end
 
+--- When `rev` was committed, in seconds since the epoch
+---@param dir string
+---@param rev string
+---@return integer?
+local function committed_at(dir, rev)
+  return tonumber(git(dir, { 'log', '-1', '--format=%ct', rev }))
+end
+
 --- Whether `rev` has been in the repository for longer than the window
 ---@param dir string
 ---@param rev string
 ---@param now integer
 ---@return boolean
 local function aged(dir, rev, now)
-  local committed = tonumber(git(dir, { 'log', '-1', '--format=%ct', rev }))
+  local committed = committed_at(dir, rev)
   return committed ~= nil and os.difftime(now, committed) >= MIN_RELEASE_AGE
 end
 
@@ -109,9 +117,40 @@ function M.target(plugin, target, releases, now)
   return vim.tbl_extend('force', target, { commit = commit })
 end
 
---- The wrapper `setup` put in place
+--- The releases of `plugin` matching the version its spec asks for, newest
+--- first, as `M.target` wants them
+---
+--- The same spec `get_target` resolved the release from, so the window only
+--- ever moves to an older release of the range asked for, never out of it.
+---@param plugin LazyPlugin
+---@return fun(): { tag: string, commit: string?, version: table? }[]
+local function releases_of(plugin)
+  return function()
+    local Config = require('lazy.core.config')
+    local Git = require('lazy.manage.git')
+    local spec = (plugin.version == nil and plugin.branch == nil)
+        and Config.options.defaults.version
+      or plugin.version
+    local versions = Git.get_versions(plugin.dir, spec or '*')
+    table.sort(versions, function(a, b) return b < a end)
+    return vim.tbl_map(
+      function(version)
+        return {
+          tag = version.tag,
+          version = version,
+          commit = Git.ref(plugin.dir, 'tags/' .. version.tag),
+        }
+      end,
+      versions
+    )
+  end
+end
+
+--- The wrapper `setup` put in place, and lazy.nvim's own resolution under it
 ---@type function?
 local wrapper
+---@type function?
+local resolve
 
 --- Whether lazy.nvim is still calling that wrapper
 ---
@@ -124,40 +163,94 @@ function M.installed()
   return ok and wrapper ~= nil and Git.get_target == wrapper
 end
 
+--- The plugins the window is holding back right now
+---
+--- Asked of lazy.nvim's own resolution and of the window side by side, so a
+--- row is only there when the two disagree. A `git log` per plugin, which is
+--- why this is a command and not something the statusline could call.
+---@param now? integer Seconds since the epoch, for the specs
+---@return { name: string, held: string, available: string, clears: integer }[]
+function M.held(now)
+  now = now or os.time()
+  if not resolve then return {} end
+  local ok_config, Config = pcall(require, 'lazy.core.config')
+  if not ok_config then return {} end
+
+  local rows = {}
+  for name, plugin in pairs(Config.plugins or {}) do
+    local state = plugin._ or {}
+    if state.installed and not state.is_local then
+      local ok, target = pcall(resolve, plugin)
+      if ok and target and target.commit then
+        local held = M.target(plugin, target, releases_of(plugin), now)
+        if held and held.commit ~= target.commit then
+          local committed = committed_at(plugin.dir, target.commit) or now
+          table.insert(rows, {
+            name = name,
+            held = held.tag or held.commit:sub(1, 7),
+            available = target.tag or target.commit:sub(1, 7),
+            clears = math.max(
+              0,
+              math.floor(committed + MIN_RELEASE_AGE - now + 0.5)
+            ),
+          })
+        end
+      end
+    end
+  end
+  table.sort(rows, function(a, b) return a.name < b.name end)
+  return rows
+end
+
+--- `:LazyQuarantine`
+---
+--- The window is otherwise invisible: `:Lazy` shows a plugin as up to date
+--- when it is a week behind on purpose, and nothing says which plugins those
+--- are or how long is left.
+function M.command()
+  vim.api.nvim_create_user_command('LazyQuarantine', function()
+    local rows = M.held()
+    if #rows == 0 then
+      return vim.notify(
+        'Nothing is being held back',
+        vim.log.levels.INFO,
+        { title = 'Quarantine' }
+      )
+    end
+    local lines = vim.tbl_map(function(row)
+      local hours = math.ceil(row.clears / 3600)
+      local left = hours > 24 and ('%d days'):format(math.ceil(hours / 24))
+        or ('%d hours'):format(hours)
+      return ('- %s: on %s, %s waits %s'):format(
+        row.name,
+        row.held,
+        row.available,
+        left
+      )
+    end, rows)
+    vim.notify(
+      ('Held back for %d days:\n'):format(MIN_RELEASE_AGE / 86400)
+        .. table.concat(lines, '\n'),
+      vim.log.levels.INFO,
+      { title = 'Quarantine' }
+    )
+  end, { desc = 'Plugins the release quarantine is holding back' })
+end
+
 --- Put the window in front of lazy.nvim's target resolution
 ---
 --- Called before `require('lazy').setup()`, since that already installs what
 --- is missing.
 function M.setup()
-  local Config = require('lazy.core.config')
   local Git = require('lazy.manage.git')
-  local resolve = Git.get_target
+  resolve = Git.get_target
 
   ---@param plugin LazyPlugin
   Git.get_target = function(plugin)
-    local target = resolve(plugin)
-    return M.target(plugin, target, function()
-      -- The same spec `get_target` resolved the release from, so the window
-      -- only ever moves to an older release of the range asked for, never
-      -- out of it.
-      local spec = (plugin.version == nil and plugin.branch == nil)
-          and Config.options.defaults.version
-        or plugin.version
-      local versions = Git.get_versions(plugin.dir, spec or '*')
-      table.sort(versions, function(a, b) return b < a end)
-      return vim.tbl_map(
-        function(version)
-          return {
-            tag = version.tag,
-            version = version,
-            commit = Git.ref(plugin.dir, 'tags/' .. version.tag),
-          }
-        end,
-        versions
-      )
-    end)
+    return M.target(plugin, resolve(plugin), releases_of(plugin))
   end
   wrapper = Git.get_target
+  M.command()
 end
 
 return M

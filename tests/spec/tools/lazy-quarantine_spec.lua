@@ -145,6 +145,85 @@ describe('tools.lazy-quarantine', function()
     assert.are.equal(commits[2], picked.commit)
   end)
 
+  describe('held', function()
+    local Config, Git, restore_plugins, restore_options, restore_target
+
+    before_each(function()
+      Config = require('lazy.core.config')
+      Git = require('lazy.manage.git')
+      -- `get_target` reads `defaults.version` for a plugin with no version of
+      -- its own, and nothing has set lazy.nvim up in a spec.
+      restore_options = h.stub(
+        Config,
+        'options',
+        vim.tbl_deep_extend(
+          'force',
+          Config.options or {},
+          { defaults = { version = false } }
+        )
+      )
+      restore_plugins = h.stub(Config, 'plugins', {})
+      restore_target = h.stub(Git, 'get_target', Git.get_target)
+      h.unload('tools.lazy-quarantine')
+      require('tools.lazy-quarantine').setup()
+    end)
+
+    after_each(function()
+      restore_plugins()
+      restore_options()
+      restore_target()
+      h.unload('tools.lazy-quarantine')
+    end)
+
+    it('lists a plugin whose tip is too fresh, and when it clears', function()
+      local dir, commits, cleanup = repository({ 30 * DAY, 8 * DAY, 2 * DAY })
+      Config.plugins = {
+        ['spec.nvim'] = {
+          name = 'spec.nvim',
+          dir = dir,
+          _ = { installed = true },
+        },
+      }
+      local rows = require('tools.lazy-quarantine').held(now)
+      cleanup()
+      assert.are.equal(1, #rows)
+      assert.are.equal('spec.nvim', rows[1].name)
+      assert.are.equal(commits[2]:sub(1, 7), rows[1].held)
+      assert.are.equal(commits[3]:sub(1, 7), rows[1].available)
+      -- Committed two days ago, so five of the seven are left
+      assert.are.equal(5, math.floor(rows[1].clears / DAY))
+    end)
+
+    it('says nothing about a plugin that is up to date', function()
+      local dir, _, cleanup = repository({ 30 * DAY, 8 * DAY })
+      Config.plugins = {
+        ['spec.nvim'] = {
+          name = 'spec.nvim',
+          dir = dir,
+          _ = { installed = true },
+        },
+      }
+      local rows = require('tools.lazy-quarantine').held(now)
+      cleanup()
+      assert.are.same({}, rows)
+    end)
+
+    it('skips a plugin that is not installed, or is local', function()
+      local dir, _, cleanup = repository({ 30 * DAY, DAY })
+      Config.plugins = {
+        ['gone.nvim'] = { name = 'gone.nvim', dir = dir, _ = {} },
+        ['mine.nvim'] = {
+          name = 'mine.nvim',
+          dir = dir,
+          _ = { installed = true, is_local = true },
+        },
+      }
+      local rows = require('tools.lazy-quarantine').held(now)
+      cleanup()
+      assert.are.same({}, rows)
+    end)
+  end)
+
   it('copes with a directory that is not a repository', function()
     local dir, cleanup = h.tmpdir()
     local picked = target(dir, 'deadbeef')
