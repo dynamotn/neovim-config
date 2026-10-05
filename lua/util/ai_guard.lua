@@ -48,27 +48,61 @@ local function wrap(tbl, key, name, wrapper)
   tbl[key] = function(...) return wrapper(original, ...) end
 end
 
+--- Milliseconds the buffer has to settle before it is looked at again
+---
+--- A change event arrives per paste and per insert; the credential patterns
+--- are cheap but they read the whole buffer, and a secret pasted now is no
+--- more urgent a tenth of a second later. `DiagnosticChanged` is debounced
+--- with them because a linter run ends in a burst of them.
+local RECHECK_DELAY = 200
+
 --- Detach Copilot from a buffer that becomes sensitive after it attached
 ---
 --- `:saveas`, `:file` and `:set filetype` change what a buffer is without
---- reopening it, so `root_dir` is never asked again. What was sent before the
---- change is gone already; detaching stops every later edit from following.
+--- reopening it, so `root_dir` is never asked again -- and neither a name nor
+--- a filetype changes when a token is pasted into a file that was perfectly
+--- ordinary a second ago, or when `betterleaks` reports one after its run.
+--- All four are watched, so what the content check knows reaches Copilot too.
+---
+--- What was sent before the change is gone already; detaching stops every
+--- later edit from following.
 M.watch_copilot = function()
+  local group =
+    vim.api.nvim_create_augroup('dy_ai_guard_copilot', { clear = true })
+
+  ---@param bufnr integer
+  local function detach(bufnr)
+    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    local clients = vim.lsp.get_clients({ bufnr = bufnr, name = 'copilot' })
+    if #clients == 0 or not sensitive.is_sensitive(bufnr) then return end
+    for _, client in ipairs(clients) do
+      vim.lsp.buf_detach_client(bufnr, client.id)
+    end
+    refuse('Copilot')
+  end
+
   vim.api.nvim_create_autocmd({ 'BufFilePost', 'FileType' }, {
-    group = vim.api.nvim_create_augroup(
-      'dy_ai_guard_copilot',
-      { clear = true }
-    ),
-    callback = function(args)
-      local clients =
-        vim.lsp.get_clients({ bufnr = args.buf, name = 'copilot' })
-      if #clients == 0 or not sensitive.is_sensitive(args.buf) then return end
-      for _, client in ipairs(clients) do
-        vim.lsp.buf_detach_client(args.buf, client.id)
-      end
-      refuse('Copilot')
-    end,
+    group = group,
+    callback = function(args) detach(args.buf) end,
   })
+
+  ---@type table<integer, true>
+  local pending = {}
+  vim.api.nvim_create_autocmd(
+    { 'TextChanged', 'InsertLeave', 'DiagnosticChanged' },
+    {
+      group = group,
+      callback = function(args)
+        local bufnr = args.buf
+        if pending[bufnr] then return end
+        pending[bufnr] = true
+        vim.defer_fn(function()
+          pending[bufnr] = nil
+          detach(bufnr)
+        end, RECHECK_DELAY)
+      end,
+    }
+  )
 end
 
 --- Guard every way Avante reads a buffer or a file

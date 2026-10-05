@@ -267,6 +267,47 @@ describe('util.ai_guard', function()
       vim.bo[buf].filetype = 'lua'
       assert.same({}, detached)
     end)
+
+    --- Fire `event` for `buf` and wait for the debounced check behind it
+    ---@param event string
+    ---@param buf integer
+    local function settle(event, buf)
+      vim.api.nvim_exec_autocmds(event, { buffer = buf })
+      vim.wait(2000, function() return #detached > 0 end, 20)
+    end
+
+    it('detaches Copilot once a credential is typed into a buffer', function()
+      local buf = h.buffer({ name = plain, lines = { 'local a = 1' } })
+      settle('TextChanged', buf)
+      assert.same({}, detached)
+
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+        'local token = "ghp_0123456789abcdefghij"',
+      })
+      settle('TextChanged', buf)
+      assert.same({ { buf, 42 } }, detached)
+      assert.is_true(refused())
+    end)
+
+    it('detaches Copilot once betterleaks reports a finding', function()
+      local buf = h.buffer({ name = plain, lines = { 'nothing to see' } })
+      vim.diagnostic.set(
+        vim.api.nvim_create_namespace('dy_spec_ai_guard'),
+        buf,
+        {
+          {
+            lnum = 0,
+            col = 0,
+            severity = vim.diagnostic.severity.WARN,
+            source = 'betterleaks',
+            code = 'generic-api-key',
+            message = 'Detected a generic API key',
+          },
+        }
+      )
+      settle('DiagnosticChanged', buf)
+      assert.same({ { buf, 42 } }, detached)
+    end)
   end)
 
   describe('setup', function()
