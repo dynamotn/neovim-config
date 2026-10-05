@@ -41,6 +41,7 @@
   - Easy to show which tools are installed in lualine
   - Trigger linters/formatters if installed only
   - Hold every tool Mason installs for a week after its release, the same quarantine the surrounding dotfiles put on npm, bun, pnpm and uv, by taking the registry snapshot from [lua/tools/mason-quarantine.lua](./lua/tools/mason-quarantine.lua) instead of the newest one
+  - Hold every plugin update for a week too, by [lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua): `:Lazy update` and the checker take the newest commit, or the newest release, that has been out that long
   - Add bunch of missing features of the different tools:
     - `jira`
     - `shellcheck`
@@ -242,6 +243,12 @@ Locally developed plugins (specs with `dev = true`) are looked for under
 overrides. A plugin missing from there is cloned from its git remote instead.
 
 ### Updating plugins
+
+A plugin update is a week behind on purpose: the quarantine in
+[lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua) only lets `:Lazy
+update` move to a commit, or a release, that has been out for seven days, the
+same window the npm, bun, pnpm, uv and Mason sides use. `:Lazy restore` and a
+pinned plugin are not touched by it.
 
 The lockfile is the snapshot to roll back to: `lazy-lock.json` on `latest`,
 `lazy-lock.stable.json` on `stable`. Both live in this repository, so:
