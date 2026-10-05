@@ -23,6 +23,10 @@ local M = {}
 --- window the npm, bun, pnpm and uv configurations use
 local MIN_RELEASE_AGE = 7 * 24 * 60 * 60
 
+--- The same window, for `:checkhealth util` to hold the others against
+---@type integer
+M.window = MIN_RELEASE_AGE
+
 --- Seconds since the epoch of a UTC timestamp as the GitHub API writes them
 ---
 --- `os.time` reads its fields as local time, so what it returns for a UTC

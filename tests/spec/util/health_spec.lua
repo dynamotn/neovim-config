@@ -1,0 +1,177 @@
+local h = require('helpers')
+
+--- The entries of the section whose title starts with `prefix`
+---@param report table[]
+---@param prefix string
+---@return table[]
+local function section(report, prefix)
+  for _, part in ipairs(report) do
+    if vim.startswith(part.title, prefix) then return part.entries end
+  end
+  return {}
+end
+
+--- Whether any entry of `entries` is `level` and says `text`
+---@param entries table[]
+---@param level string
+---@param text string
+---@return boolean
+local function says(entries, level, text)
+  for _, item in ipairs(entries) do
+    if item.level == level and item.message:find(text, 1, true) then
+      return true
+    end
+  end
+  return false
+end
+
+--- Run `fn` with the config home pointing at `dir`
+---@param dir string
+---@param fn fun()
+local function with_config_home(dir, fn)
+  local before = vim.env.XDG_CONFIG_HOME
+  vim.env.XDG_CONFIG_HOME = dir
+  local ok, err = pcall(fn)
+  vim.env.XDG_CONFIG_HOME = before
+  assert.is_true(ok, err)
+end
+
+--- A fresh report
+---@return table[]
+local function report()
+  h.unload('util.health')
+  return require('util.health').report()
+end
+
+describe('util.health', function()
+  local dir, cleanup
+  before_each(function()
+    dir, cleanup = h.tmpdir()
+  end)
+  after_each(function() cleanup() end)
+
+  it('reports every section, whatever is loaded', function()
+    local titles
+    with_config_home(dir, function()
+      titles = vim.tbl_map(function(part) return part.title end, report())
+    end)
+    assert.are.equal(4, #titles)
+    assert.is_true(vim.startswith(titles[1], 'Supply chain quarantine'))
+    assert.are.same(
+      { 'AI guard', 'Tools from the system', 'Requirements' },
+      { titles[2], titles[3], titles[4] }
+    )
+  end)
+
+  it('reads the bun and uv windows out of the config home', function()
+    h.write(
+      dir .. '/.bunfig.toml',
+      { '[install]', 'minimumReleaseAge = 604800' }
+    )
+    h.write(dir .. '/uv/uv.toml', { 'exclude-newer = "7 days"' })
+    with_config_home(dir, function()
+      local entries = section(report(), 'Supply chain')
+      assert.is_true(says(entries, 'ok', 'bun holds a package for 7 days'))
+      assert.is_true(says(entries, 'ok', 'uv holds a package for 7 days'))
+    end)
+  end)
+
+  it('warns about a window shorter than the quarantine', function()
+    h.write(dir .. '/.bunfig.toml', { 'minimumReleaseAge = 3600' })
+    h.write(dir .. '/uv/uv.toml', { 'exclude-newer = "1 day"' })
+    with_config_home(dir, function()
+      local entries = section(report(), 'Supply chain')
+      assert.is_true(says(entries, 'warn', 'bun holds a package for 0 days'))
+      assert.is_true(says(entries, 'warn', 'uv holds a package for 1 days'))
+    end)
+  end)
+
+  it('says so when neither tool is configured', function()
+    with_config_home(dir, function()
+      local entries = section(report(), 'Supply chain')
+      assert.is_true(says(entries, 'info', 'No .bunfig.toml'))
+      assert.is_true(says(entries, 'info', 'No uv.toml'))
+    end)
+  end)
+
+  it('reports the lazy.nvim patch as missing until it is put in', function()
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(
+          says(section(report(), 'Supply chain'), 'error', 'lazy.nvim is not')
+        )
+      end
+    )
+  end)
+
+  it('reports the lazy.nvim patch once it is in place', function()
+    local Git = require('lazy.manage.git')
+    local original = Git.get_target
+    h.unload('tools.lazy-quarantine')
+    require('tools.lazy-quarantine').setup()
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(
+          says(section(report(), 'Supply chain'), 'ok', 'Plugin updates wait')
+        )
+      end
+    )
+    Git.get_target = original
+    h.unload('tools.lazy-quarantine')
+  end)
+
+  it('says Mason has not been loaded yet', function()
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(
+          says(section(report(), 'Supply chain'), 'info', 'mason.nvim is not')
+        )
+      end
+    )
+  end)
+
+  it('counts the rules of the AI guard', function()
+    local sensitive = require('config.sensitive')
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(
+          says(
+            section(report(), 'AI guard'),
+            'info',
+            ('%d credential formats'):format(#sensitive.content_patterns)
+          )
+        )
+      end
+    )
+  end)
+
+  it('names what holds the current buffer back', function()
+    local bufnr = h.buffer({
+      name = dir .. '/values.yaml',
+      lines = { 'token: ghp_0123456789abcdefghijklmnopqrstuvwxyz' },
+    })
+    vim.api.nvim_set_current_buf(bufnr)
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(
+          says(section(report(), 'AI guard'), 'info', 'GitHub token on line 1')
+        )
+      end
+    )
+    vim.cmd('silent! %bwipeout!')
+  end)
+
+  it('reports git, which every machine running this has', function()
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(says(section(report(), 'Requirements'), 'ok', 'git'))
+      end
+    )
+  end)
+end)

@@ -24,6 +24,10 @@ local function refuse(what)
   )
 end
 
+--- What became of each wrapper, for `:checkhealth util`
+---@type table<string, 'guarded'|'missing'>
+M.status = {}
+
 --- Wrap `tbl[key]` with `wrapper(original, ...)`, once
 ---@param tbl table?
 ---@param key string|integer
@@ -31,6 +35,7 @@ end
 ---@param wrapper fun(original: function, ...): ...
 local function wrap(tbl, key, name, wrapper)
   if type(tbl) ~= 'table' or type(tbl[key]) ~= 'function' then
+    M.status[name] = 'missing'
     vim.notify(
       name .. ' not found, left unguarded',
       vim.log.levels.WARN,
@@ -38,6 +43,7 @@ local function wrap(tbl, key, name, wrapper)
     )
     return
   end
+  M.status[name] = 'guarded'
   local original = tbl[key]
   tbl[key] = function(...) return wrapper(original, ...) end
 end
@@ -221,8 +227,53 @@ local function on_load(name, fn)
   })
 end
 
+--- `:AiGuardCheck` and `:AiGuardAllow`
+---
+--- A buffer held back for its name says so by its name; one held back for
+--- what is written in it does not, and the first sign of it is a chat that
+--- answers nothing. `:AiGuardCheck` says what was found and where, and
+--- `:AiGuardAllow` is the way past a pattern that matched something that is
+--- not a credential -- for that buffer, for as long as it is open, and never
+--- for a file the name rules already named.
+M.commands = function()
+  vim.api.nvim_create_user_command('AiGuardCheck', function()
+    local reasons = sensitive.reasons(0)
+    if #reasons == 0 then
+      return vim.notify(
+        'Nothing holding this buffer back',
+        vim.log.levels.INFO,
+        { title = 'AI guard' }
+      )
+    end
+    vim.notify(
+      'Held back from every AI integration:\n- '
+        .. table.concat(reasons, '\n- '),
+      vim.log.levels.WARN,
+      { title = 'AI guard' }
+    )
+  end, { desc = 'Why this buffer is kept from the AI integrations' })
+
+  vim.api.nvim_create_user_command('AiGuardAllow', function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    if sensitive.is_sensitive_path(vim.api.nvim_buf_get_name(bufnr)) then
+      return vim.notify(
+        'Refused: this file is sensitive by its name, not by what is in it',
+        vim.log.levels.ERROR,
+        { title = 'AI guard' }
+      )
+    end
+    sensitive.allow(bufnr)
+    vim.notify(
+      'This buffer may now be sent to the AI integrations',
+      vim.log.levels.WARN,
+      { title = 'AI guard' }
+    )
+  end, { desc = 'Waive the content check for this buffer' })
+end
+
 --- Install every guard: Copilot's now, the others as their plugin loads
 M.setup = function()
+  M.commands()
   M.watch_copilot()
   on_load('avante.nvim', M.guard_avante)
   on_load('sidekick.nvim', M.guard_sidekick)

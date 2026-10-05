@@ -81,7 +81,7 @@ four languages; what differs is a handful of globals, see
 - 🛟 **Two speeds.** `latest` rides plugin `main` branches on a Neovim
   nightly; `stable` takes tagged releases on a released Neovim. Each keeps its
   own lockfile, so the two never overwrite each other's pins.
-- 🧪 **Checked, not hoped for.** 41 plenary-busted spec files, a startup check
+- 🧪 **Checked, not hoped for.** 42 plenary-busted spec files, a startup check
   that opens a file of every language, a tool-name validator, and CI that runs
   all of it on both channels.
 - 📈 **Measured.** Two benchmarks — one for starting Neovim, one for opening a
@@ -374,6 +374,33 @@ file, a selection following the cursor into a CLI tool, a prompt on its way
 out. A wrapper that no longer finds what it wraps leaves the plugin as it is
 and says so, rather than breaking it on an upstream rename.
 
+A name only goes so far, though: a scratch buffer, a YAML of deployment values
+or a log pasted into a file carries credentials under a perfectly ordinary
+name. So the text is searched as well, for the formats a credential is
+recognisable by — a PEM header, `AKIA…`, `ghp_…`, a password in a URL — and a
+match holds the whole buffer back. Each pattern recognises a token format and
+nothing else: anything vaguer (`password = …`) would turn the guard off by
+crying wolf. The buffer is read once per change, not once per question, since
+the guards ask on every cursor move.
+
+Behind those patterns stands `betterleaks`, which already lints every buffer
+here — from standard input, with `--redact` and its API validation off, so
+nothing leaves the machine. The guard reads the diagnostics it leaves rather
+than running it a second time: no extra process, and its whole rule set backs
+the check. It only answers once it has run, on a write, a read or leaving
+insert mode, which is what the built-in patterns are for — they answer the
+instant a key is pressed, and they answer on a machine where `betterleaks` is
+not installed yet.
+
+| Command | What |
+| ------- | ---- |
+| `:AiGuardCheck` | Why this buffer is held back, and on which line |
+| `:AiGuardAllow` | Waive the content check for this buffer, for as long as it is open |
+
+`:AiGuardAllow` is the way past a pattern that matched something that is not a
+credential. It says nothing about the name rules: a `.env` stays sensitive
+however often it is allowed.
+
 ### Schemas for YAML and JSON
 
 YAML schemas are detected from the content of the buffer — Kubernetes
@@ -489,6 +516,7 @@ The ones worth knowing before which-key gets a chance to tell you:
 | Command | What |
 | ------- | ---- |
 | `:DySpell {lang}` | Rebuild a spell file from its word lists |
+| `:AiGuardCheck`, `:AiGuardAllow` | Why this buffer is kept from the AI integrations, and the way past the content check |
 | `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |
 | `:YamlSchema reset` | Hand schema detection back the wheel |
 | `:BaleiaColorize`, `:BaleiaLogs` | Render the ANSI colour escapes in the buffer (the Conjure log), and show baleia's own log |
@@ -530,7 +558,7 @@ Tags are committed, so `:help` works in a fresh clone; after editing
 
 ### Tests
 
-41 spec files under `tests/spec` run with
+42 spec files under `tests/spec` run with
 [plenary-busted](https://github.com/nvim-lua/plenary.nvim#plenarytest_harness)
 in a headless Neovim that loads only the module each spec requires:
 
@@ -551,6 +579,15 @@ scripts/check-startup.sh                              # load everything, open a 
 nvim --clean --headless -l scripts/validate-tools.lua  # every tool name, against conform, nvim-lint, lspconfig and Mason
 pre-commit run --all-files                            # the lot, plus stylua
 ```
+
+What those cannot see is the machine the configuration is running on, so
+`:checkhealth util` ([lua/util/health.lua](./lua/util/health.lua)) asks it:
+whether the quarantine in front of Mason and lazy.nvim is the one actually
+running and how old the registry snapshot it settled on is, whether the
+windows bun and uv read still agree with it, which guard of `util.ai_guard`
+found nothing to wrap and what the current buffer would be held back for,
+which tools that never come from Mason are missing here, and whether the
+programs the quick start asks for are installed.
 
 All of it runs as pre-commit hooks and in CI
 ([.github/workflows/check.yml](./.github/workflows/check.yml)), on both plugin

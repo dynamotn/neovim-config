@@ -50,4 +50,44 @@ return {
   filetypes = {
     'gitcommit',
   },
+  --- Credentials recognised by what they look like, for the file the name
+  --- rules cannot know about: a scratch buffer, a YAML of deployment values,
+  --- a log pasted into a code file. A match holds the whole buffer back from
+  --- every AI integration, so each pattern is written to recognise a token
+  --- format and nothing else -- `AKIA...`, `ghp_...`, a PEM header. Anything
+  --- vaguer (`password = ...`) would turn the guard off by crying wolf, and
+  --- is left to `betterleaks`, which runs over the repository at commit time
+  --- and can afford to be argued with.
+  ---
+  --- `name` is what the report says a buffer was held back for. `pattern` is
+  --- a Lua pattern, matched line by line.
+  ---@type { name: string, pattern: string }[]
+  content_patterns = {
+    { name = 'private key block', pattern = 'BEGIN [%u ]*PRIVATE KEY' },
+    { name = 'age secret key', pattern = 'AGE%-SECRET%-KEY%-1[%u%d]+' },
+    { name = 'AWS access key', pattern = 'A[KS]IA[%u%d][%u%d][%u%d][%u%d]+' },
+    { name = 'GitHub token', pattern = 'gh[pousr]_[%w]+' },
+    { name = 'GitHub token', pattern = 'github_pat_[%w_]+' },
+    { name = 'GitLab token', pattern = 'glpat%-[%w%-_]+' },
+    { name = 'Slack token', pattern = 'xox[abprs]%-[%w%-]+' },
+    { name = 'Slack webhook', pattern = 'hooks%.slack%.com/services/' },
+    { name = 'Anthropic API key', pattern = 'sk%-ant%-[%w%-]+' },
+    { name = 'OpenAI API key', pattern = 'sk%-proj%-[%w%-_]+' },
+    { name = 'Google API key', pattern = 'AIza[%w%-_]+' },
+    { name = 'npm token', pattern = 'npm_[%w]+' },
+    { name = 'PyPI token', pattern = 'pypi%-AgE[%w%-_]+' },
+    { name = 'Hugging Face token', pattern = 'hf_[%w]+' },
+    { name = 'Stripe key', pattern = '[sr]k_live_[%w]+' },
+    -- `header.payload.` of a JSON Web Token: both halves start from the
+    -- base64 of `{"`, which is what makes this worth matching at all.
+    { name = 'JSON Web Token', pattern = 'eyJ[%w%-_]+%.eyJ[%w%-_]+%.' },
+    -- `scheme://user:password@host`
+    { name = 'password in a URL', pattern = '://[%w%._%-]+:[^@/%s]+@' },
+  },
+  --- Bytes of a buffer read when looking for the patterns above. A buffer
+  --- bigger than this is searched up to here and reported as searched in
+  --- part, rather than holding up the editor on a log of a few hundred
+  --- megabytes.
+  ---@type integer
+  content_max_bytes = 2 * 1024 * 1024,
 }

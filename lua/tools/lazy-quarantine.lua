@@ -24,6 +24,10 @@ local M = {}
 --- checked out, the same window the npm, bun, pnpm, uv and Mason sides use
 local MIN_RELEASE_AGE = 7 * 24 * 60 * 60
 
+--- The same window, for `:checkhealth util` to hold the others against
+---@type integer
+M.window = MIN_RELEASE_AGE
+
 --- Run `git` in `dir` and hand back its output, or nil when it fails
 ---@param dir string
 ---@param args string[]
@@ -105,6 +109,21 @@ function M.target(plugin, target, releases, now)
   return vim.tbl_extend('force', target, { commit = commit })
 end
 
+--- The wrapper `setup` put in place
+---@type function?
+local wrapper
+
+--- Whether lazy.nvim is still calling that wrapper
+---
+--- `get_target` is private to lazy.nvim, so a release that renames it would
+--- leave the window in place and reaching nothing. `:checkhealth util` asks
+--- here rather than assuming the patch held.
+---@return boolean
+function M.installed()
+  local ok, Git = pcall(require, 'lazy.manage.git')
+  return ok and wrapper ~= nil and Git.get_target == wrapper
+end
+
 --- Put the window in front of lazy.nvim's target resolution
 ---
 --- Called before `require('lazy').setup()`, since that already installs what
@@ -138,6 +157,7 @@ function M.setup()
       )
     end)
   end
+  wrapper = Git.get_target
 end
 
 return M
