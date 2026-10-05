@@ -1,192 +1,116 @@
 # neovim-config
 
-> My customization configuration for neovim
+> A Neovim configuration that turns the editor into a DevOps and SA
+> workstation — every language declared in one table, and not a single tool
+> installed until a file asks for it.
 
 [![Neovim Minimum Version](https://img.shields.io/badge/Neovim-0.13-blue?style=flat-square\&logo=Neovim\&logoColor=white)](https://github.com/neovim/neovim)
 [![Lua](https://img.shields.io/badge/Made%20with%20Lua-blue.svg?style=flat-square\&logo=lua)](https://lua.org)
-[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Built on LazyVim](https://img.shields.io/badge/built%20on-LazyVim-blueviolet.svg?style=flat-square)](https://www.lazyvim.org)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
+
+This is a [LazyVim](https://www.lazyvim.org) configuration, not a distribution
+to install over yours. Every language it knows about is one declarative entry
+in [lua/config/languages.lua](./lua/config/languages.lua) — its Treesitter
+parser, LSP servers, linters, formatters, debug adapters and test runners —
+and a single `FileType` dispatcher installs that entry the first time a file
+of the language is opened. Starting Neovim stays in the tens of milliseconds
+because nothing above `init.lua` runs until a buffer asks for it.
+
+The same tree runs on a laptop with everything enabled and in a container with
+four languages; what differs is a handful of globals, see
+[Per machine settings](#per-machine-settings).
 
 <!-- toc -->
 
-- [Features](#features)
+- [Why this configuration](#why-this-configuration)
+- [Quick start](#quick-start)
+  - [Requirements](#requirements)
+  - [Install](#install)
+  - [First start](#first-start)
+- [Configuration](#configuration)
+  - [Per machine settings](#per-machine-settings)
+  - [Globals](#globals)
+  - [Plugin channels](#plugin-channels)
+  - [Updating plugins](#updating-plugins)
 - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
   - [Languages](#languages)
   - [Frameworks](#frameworks)
   - [Tools & Markup](#tools--markup)
-- [Installation](#installation)
-  - [Requirements](#requirements)
-  - [Install](#install)
-  - [Per machine settings](#per-machine-settings)
-  - [Updating plugins](#updating-plugins)
-- [Testing](#testing)
+- [Beyond LazyVim](#beyond-lazyvim)
+  - [Tooling that installs itself](#tooling-that-installs-itself)
+  - [A quarantine in front of Mason and lazy.nvim](#a-quarantine-in-front-of-mason-and-lazynvim)
+  - [Files that never reach an AI](#files-that-never-reach-an-ai)
+  - [Schemas for YAML and JSON](#schemas-for-yaml-and-json)
+  - [What is attached to this buffer](#what-is-attached-to-this-buffer)
+  - [Spelling, in several languages at once](#spelling-in-several-languages-at-once)
+  - [Diagrams in the terminal](#diagrams-in-the-terminal)
+  - [Workspace diagnostics](#workspace-diagnostics)
+  - [Tools given what they lack](#tools-given-what-they-lack)
+  - [Integrations](#integrations)
 - [Key bindings](#key-bindings)
+- [Commands](#commands)
+- [Help inside Neovim](#help-inside-neovim)
+- [Repository layout](#repository-layout)
+- [Development](#development)
+  - [Tests](#tests)
+  - [Checks](#checks)
 - [Benchmark](#benchmark)
 
 <!-- tocstop -->
 
-## Features
+## Why this configuration
 
-- 🔥 Transform your Neovim into a full-fledged IDE
-- 🚀 Blazingly fast and furious (see [benchmark](#benchmark))
-- 🧹 Sane default settings for options, autocmds, and keymaps
-- 📦 Comes with a wealth of plugins pre-configured and ready to use **for DevOps and SA**, like me
-  - Supported many languages, frameworks and tools (see [here](#languages-frameworks-or-tools-support))
-  - Load per machine configurations via `lua/per_machine/init.lua` if exists (see [my config](./lua/per_machine/config.lua.tmpl), managed by [chezmoi](https://www.chezmoi.io/))
-  - Lazy install treesitter parsers, LSP servers, formatters, linters, debug adapters... if needed when open file
-  - Bundle languages/tools when containerize or builtin development environments by `_G.bundle_languages` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
-  - Enable/disable languages/tools by `_G.enabled_languages` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
-  - Choose how far ahead plugins run by `_G.plugin_channel` in [lua/config/globals.lua](./lua/config/globals.lua), per machine:
-    - `latest` (default): LazyVim `main` and every plugin at its newest commit, on a Neovim nightly
-    - `stable`: LazyVim and every plugin that tags releases on its newest release, on Neovim 0.12 or newer. Plugins without releases, or whose last one is years old, stay on their branch
-  - Easy to show which tools are installed in lualine
-  - Trigger linters/formatters if installed only
-  - Hold every tool Mason installs for a week after its release, the same quarantine the surrounding dotfiles put on npm, bun, pnpm and uv, by taking the registry snapshot from [lua/tools/mason-quarantine.lua](./lua/tools/mason-quarantine.lua) instead of the newest one
-  - Hold every plugin update for a week too, by [lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua): `:Lazy update` and the checker take the newest commit, or the newest release, that has been out that long
-  - Add bunch of missing features of the different tools:
-    - `jira`
-    - `shellcheck`
-    - `sonarlint` (with connected mode for both SonarQube and SonarCloud)
-    - YAML schemas detected from content (Kubernetes, CRDs, cloud-init), and a picker (`<leader>cy`, `:YamlSchema`) to set one per buffer or insert it as a modeline, from the catalogs or from local files (the project, `_G.yaml_schema_dirs`, or any path)
-    - Spell check for comments
-    - Render diagram on kitty terminal (also support `zellij`)
-    - etc
-  - Integrate with various tools:
-    - [Obsidian](https://obsidian.md/) by `_G.obsidian.paths` in [lua/config/globals.lua](./lua/config/globals.lua) (see [my config](./lua/per_machine/config.lua.tmpl))
-    - [chezmoi](https://www.chezmoi.io/)
-    - **Firefox** or **Chrome** browser with [embedded neovim](https://github.com/glacambre/firenvim)
-    - [zellij](https://zellij.dev/)
-    - [Various AI CLI tool](https://github.com/folke/sidekick.nvim#default-cli-tools)
+- 🧩 **One entry per language.** Parser, servers, linters, formatters, debug
+  adapters, test runners, `dial` augends, autopairs rules — all of it in
+  [lua/config/languages.lua](./lua/config/languages.lua), one table per
+  language, nothing else to wire up.
+- 🪶 **Nothing eager.** Treesitter parsers, LSP servers, linters, formatters
+  and debug adapters are installed by Mason the first time one of their
+  filetypes shows up, through a single `FileType` dispatcher rather than a few
+  hundred autocmds.
+- 🔒 **Supply-chain aware.** Every tool Mason installs, and every plugin update
+  lazy.nvim offers, is held back for a week after its release — the same
+  quarantine the surrounding dotfiles put on npm, bun, pnpm and uv.
+- 🤖 **AI with a guard rail.** `.env` files, private keys and credential stores
+  are kept out of every AI integration — not only Copilot's `root_dir`, but
+  chats handed a file, selections following the cursor, and prompts on their
+  way to a CLI tool.
+- 🎛 **One tree, many machines.** A laptop, a workstation and a container run
+  the same checkout and differ only in a few globals.
+- 🛟 **Two speeds.** `latest` rides plugin `main` branches on a Neovim
+  nightly; `stable` takes tagged releases on a released Neovim. Each keeps its
+  own lockfile, so the two never overwrite each other's pins.
+- 🧪 **Checked, not hoped for.** 41 plenary-busted spec files, a startup check
+  that opens a file of every language, a tool-name validator, and CI that runs
+  all of it on both channels.
+- 📈 **Measured.** Two benchmarks — one for starting Neovim, one for opening a
+  file — rewrite the [Benchmark](#benchmark) section themselves when a number
+  really moves.
 
 > [!CAUTION]
 >
-> - Not used for vim (any version), or for neovim < 0.13 on the default `latest` channel (< 0.12 on `stable`)
-> - The default `latest` channel follows the newest neovim (currently 0.13 nightly) and plugin commits, so an upstream break can land with any `:Lazy update`. Set `_G.plugin_channel = 'stable'` on a machine that should not ride along
-> - Used on Linux and macOS
+> - Neovim only. Not vim, at any version; not Neovim < 0.13 on the default
+>   `latest` channel, or < 0.12 on `stable`.
+> - The `latest` channel follows the newest Neovim and the newest plugin
+>   commits, so an upstream break can land with any `:Lazy update`. Set
+>   `_G.plugin_channel = 'stable'` on a machine that should not ride along.
+> - Used on Linux and macOS.
 
-## Languages, Frameworks, or Tools support
-
-See the list of supported things in [lua/config/languages.lua](./lua/config/languages.lua)
-
-### Languages
-
-- Arduino
-- AWK
-- Bash (include some filetypes for build package on Arch, Gentoo)
-- C/C++
-- C#
-- Clojure
-- CSS/Less
-- Cucumber
-- Dart
-- Elixir
-- Erlang
-- Fish
-- GDScript (Godot)
-- GDShader (Godot)
-- Gleam
-- Go
-- GraphQL
-- Haskell
-- HTML
-- Javascript/Typescript
-- Java
-- Julia
-- Kotlin
-- LaTeX
-- Lua (of course)
-- Nushell
-- OCaml
-- Perl
-- PHP
-- Python
-- R
-- Ruby
-- Rust
-- SASS/SCSS
-- Scala
-- Solidity
-- SQL
-- Swift
-- Typst
-- Vimscript
-- Zig
-- Zsh
-
-### Frameworks
-
-- Angular
-- Astro
-- Django (templates)
-- Ember (Handlebars)
-- Laravel (Blade)
-- Phoenix (HEEx)
-- Qt (QML)
-- Rails
-- Rust
-- Svelte
-- Symfony (Twig)
-- Templ (Go)
-- Vue
-
-### Tools & Markup
-
-- Ansible
-- Beancount
-- Bicep
-- CMake
-- CSV
-- CUE
-- D2
-- DBML
-- Dockerfile
-- Git (rebase, commit)
-- GoTemplate (Helm template...)
-- Groovy (also for Jenkinsfile)
-- HTTP Rest file
-- Hurl
-- Hyprlang
-- Jinja
-- jq
-- JSON
-- Jsonnet
-- Just
-- KDL (zellij)
-- Make tools (autoconf, automake, make)
-- Markdown
-- Mermaid
-- Nginx
-- Nix
-- Prisma
-- PromQL (Prometheus)
-- Protobuf
-- Rego
-- SystemD
-- Terraform
-- Terragrunt
-- TOML
-- Treesitter
-- XML
-- YAML
-- Yuck
-
-## Installation
+## Quick start
 
 ### Requirements
 
-- **Neovim 0.13+** (nightly). Older versions stop at an error message.
-- **git**, to bootstrap [lazy.nvim](https://github.com/folke/lazy.nvim) and
-  clone the plugins on the first start.
-- A [Nerd Font](https://www.nerdfonts.com/) in the terminal, for the icons.
-- **curl**, **tar**, **unzip** and **gzip**, which Mason uses to download
-  tools.
-- A **C compiler** and the
-  [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/tree/master/crates/cli),
-  which `nvim-treesitter` needs to build parsers.
-- **ripgrep** and **fd**, for the pickers and the ripgrep completion source.
+| Needed for | Programs |
+| ---------- | -------- |
+| Running at all | **Neovim 0.13+** (nightly), or 0.12+ on the `stable` channel |
+| Bootstrapping plugins | **git** |
+| Icons | a [Nerd Font](https://www.nerdfonts.com/) in the terminal |
+| Mason downloads | **curl**, **tar**, **unzip**, **gzip** |
+| Treesitter parsers | a **C compiler**, and the [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/tree/master/crates/cli) |
+| Pickers and completion | **ripgrep**, **fd** |
 
-Everything else is installed lazily: the first time a file of a language is
-opened, its Treesitter parser, LSP servers, linters, formatters and debug
-adapters are installed by Mason. Many of those packages are built by a
+Everything else is installed lazily. Many Mason packages are built by a
 language toolchain, so what Mason can install depends on what is on `PATH`:
 **node**/**npm** (or **bun**), **python3**/**pip** (or **uv**), **go**,
 **cargo**, **java**, and so on. `bun` and `uv` are used in place of `npm` and
@@ -212,60 +136,401 @@ Optional extras:
 
 ### Install
 
-- Back up and clone this repository to `~/.config/nvim`:
+Back up whatever is there and clone this repository to `~/.config/nvim`:
 
 ```sh
-  mv ~/.config/nvim ~/.config/nvim.bak
-  git clone https://gitlab.com/dynamo-config/vim ~/.config/nvim --single-branch --depth 1
+mv ~/.config/nvim ~/.config/nvim.bak
+git clone https://gitlab.com/dynamo-config/neovim.git ~/.config/nvim --single-branch --depth 1
 ```
 
-- Open Neovim. The plugins are cloned on the first start, the language tools
-  when their files are first opened.
+To try it beside an existing configuration instead of replacing it, clone
+anywhere and run it under its own name:
+
+```sh
+git clone https://gitlab.com/dynamo-config/neovim.git ~/.config/dynamo --single-branch --depth 1
+NVIM_APPNAME=dynamo nvim
+```
+
+### First start
+
+The first `nvim` clones the plugins; the first file of a language installs
+that language's parser, servers and tools. Both report progress, and neither
+blocks the editor beyond the lazy.nvim bootstrap.
+
+Worth opening right away:
+
+- `:Lazy` — what is installed, what loaded, and how long each took.
+- `:Mason` — the tool side of the same question.
+- `:checkhealth` — what of the requirements above is missing.
+- `<Space>` — hold it and [which-key](https://github.com/folke/which-key.nvim)
+  lists everything underneath.
+
+## Configuration
 
 ### Per machine settings
 
 [chezmoi](https://www.chezmoi.io/) is not needed. It renders
 [lua/per_machine/config.lua.tmpl](./lua/per_machine/config.lua.tmpl) into
 `lua/per_machine/config.lua` on my machines; in a plain clone that file does
-not exist and the defaults in [lua/config/globals.lua](./lua/config/globals.lua)
-are used. To change them, write `lua/per_machine/config.lua` by hand and
-assign the globals there, e.g.:
+not exist, the loader stays quiet about it, and the defaults in
+[lua/config/globals.lua](./lua/config/globals.lua) stand.
+
+To change them, write `lua/per_machine/config.lua` by hand and assign the
+globals there. `init.lua` loads it before anything else, so every global below
+is still open to it:
 
 ```lua
 _G.dark_mode = false
+_G.plugin_channel = 'stable'
 _G.enabled_languages = { 'lua', 'bash', 'markdown' }
+_G.enabled_plugins.obsidian = true
 _G.obsidian.paths.personal = vim.fn.expand('~/Notes')
 _G.dictionaries_path = vim.fn.expand('~/.local/share/dictionaries')
 ```
 
-Locally developed plugins (specs with `dev = true`) are looked for under
-`_G.dev_plugins_path`, which the `NVIM_DEV_PLUGINS` environment variable
-overrides. A plugin missing from there is cloned from its git remote instead.
+An error raised inside that file is reported; only its absence is silent.
+
+### Globals
+
+Every global is declared, typed and defaulted in
+[lua/config/globals.lua](./lua/config/globals.lua).
+
+| Global | Default | What it does |
+| ------ | ------- | ------------ |
+| `_G.dark_mode` | `true` | Background to use, whenever the clock is not in charge |
+| `_G.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode`, and the colorscheme with it |
+| `_G.plugin_channel` | `'latest'` | `latest` or `stable`, see [Plugin channels](#plugin-channels) |
+| `_G.enabled_languages` | every supported language | Which languages get plugins, parsers and tools at all |
+| `_G.bundle_languages` | `{}` | Languages whose tooling is installed up front, for containers and prebuilt images |
+| `_G.enabled_plugins` | all `false` | `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi` |
+| `_G.used_full_plugins` | `false` | Install every plugin, to refresh the lockfile |
+| `_G.is_gentoo` | `false` | Add the Gentoo ebuild syntax |
+| `_G.obsidian.paths` | `{ personal = '~/Documents/Notes' }` | Vault name to folder |
+| `_G.yaml_schema_dirs` | `{}` | Local schema folders offered by the YAML schema picker |
+| `_G.dictionaries_path` | `$XDG_CONFIG_HOME/dictionaries` | Word lists for completion and `:DySpell` |
+| `_G.dev_plugins_path` | `$NVIM_DEV_PLUGINS`, else `~/Working/community/nvim` | Where `dev = true` plugin specs are looked for |
+| `_G.firenvim_site_settings` | `{}` | Per-site takeover rules for the browser embedding |
+| `_G.test_strategy` | `'toggleterm'`, `'zellij'` inside zellij | How vim-test runs a test |
+| `_G.completion_sources` | `{}` | Completion sources named in the completion menu |
+
+A plugin spec marked `dev = true` is looked for under `_G.dev_plugins_path`
+first; one missing from there is cloned from its git remote as usual, so the
+folder need not exist.
+
+### Plugin channels
+
+| | `latest` (default) | `stable` |
+| --- | --- | --- |
+| LazyVim | `main` | newest release |
+| Plugins | newest commit | newest release, or their branch when they tag none |
+| Neovim | 0.13 nightly | 0.12 or newer |
+| Lockfile | `lazy-lock.json` | `lazy-lock.stable.json` |
+
+Each channel writes only its own lockfile, so a machine on `stable` and a
+machine on `latest` never rewrite each other's pins.
 
 ### Updating plugins
 
-A plugin update is a week behind on purpose: the quarantine in
-[lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua) only lets `:Lazy
-update` move to a commit, or a release, that has been out for seven days, the
-same window the npm, bun, pnpm, uv and Mason sides use. `:Lazy restore` and a
-pinned plugin are not touched by it.
+An update is a week behind on purpose: the quarantine in
+[lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua) only lets
+`:Lazy update` move to a commit, or a release, that has been out for seven
+days — the same window the npm, bun, pnpm, uv and Mason sides use. `:Lazy
+restore` and a pinned plugin are not touched by it. See
+[A quarantine in front of Mason and lazy.nvim](#a-quarantine-in-front-of-mason-and-lazynvim).
 
-The lockfile is the snapshot to roll back to: `lazy-lock.json` on `latest`,
-`lazy-lock.stable.json` on `stable`. Both live in this repository, so:
+The lockfile is the snapshot to roll back to, and both live in this
+repository, so:
 
 1. Commit the lockfile before `:Lazy update`, so the working pins are in git.
 2. Update, then commit the new lockfile once everything still works.
-3. If an update breaks something, put the previous lockfile back and check it out again:
+3. If an update breaks something, put the previous lockfile back and check it
+   out again:
 
    ```sh
    git restore lazy-lock.json # or: git checkout <commit> -- lazy-lock.json
    ```
 
-   then run `:Lazy restore` in Neovim. A single plugin can be restored from its line in `:Lazy`.
+   then run `:Lazy restore` in Neovim. A single plugin can be restored from
+   its line in `:Lazy`.
 
-## Testing
+## Languages, Frameworks, or Tools support
 
-Unit tests live in `tests/spec` and run with
+103 entries over 126 filetypes. The authoritative list is
+[lua/config/languages.lua](./lua/config/languages.lua); what follows are its
+keys, grouped.
+
+### Languages
+
+<details open>
+<summary>42 languages</summary>
+
+| | | | |
+| --- | --- | --- | --- |
+| Arduino | AWK | Bash¹ | C/C++ |
+| C# | Clojure | CSS/Less | Cucumber |
+| Dart | Elixir | Erlang | Fish |
+| GDScript (Godot) | GDShader (Godot) | Gleam | Go |
+| GraphQL | Haskell | HTML | Java |
+| Javascript/Typescript | Julia | Kotlin | LaTeX |
+| Lua | Nushell | OCaml | Perl |
+| PHP | Python | R | Ruby |
+| Rust | SASS/SCSS | Scala | Solidity |
+| SQL | Swift | Typst | Vimscript |
+| Zig | Zsh | | |
+
+¹ including the build-recipe filetypes for Arch and Gentoo.
+
+</details>
+
+### Frameworks
+
+<details open>
+<summary>13 frameworks</summary>
+
+| | | | |
+| --- | --- | --- | --- |
+| Angular | Astro | Django (templates) | Ember (Handlebars) |
+| Laravel (Blade) | Phoenix (HEEx) | Qt (QML) | Rails |
+| Rust | Svelte | Symfony (Twig) | Templ (Go) |
+| Vue | | | |
+
+</details>
+
+### Tools & Markup
+
+<details open>
+<summary>38 tools and markup languages</summary>
+
+| | | | |
+| --- | --- | --- | --- |
+| Ansible | Beancount | Bicep | CMake |
+| CSV | CUE | D2 | DBML |
+| Dockerfile | Git (rebase, commit) | GoTemplate (Helm…) | Groovy (Jenkinsfile) |
+| HTTP Rest file | Hurl | Hyprlang | Jinja |
+| jq | JSON | Jsonnet | Just |
+| KDL (zellij) | Make (autoconf, automake) | Markdown | Mermaid |
+| Nginx | Nix | Prisma | PromQL (Prometheus) |
+| Protobuf | Rego | SystemD | Terraform |
+| Terragrunt | TOML | Treesitter | XML |
+| YAML | Yuck | | |
+
+</details>
+
+## Beyond LazyVim
+
+### Tooling that installs itself
+
+One `FileType` autocmd, one table of handlers
+([lua/util/lazy_install.lua](./lua/util/lazy_install.lua)). Opening a Go file
+installs the Go parser, `gopls`, its linters, its formatters and `delve`;
+nothing else in the table runs. An autocmd per tool would instead leave Neovim
+a few hundred patterns to walk on every `FileType` event, and make the augroup
+name the only thing keeping two handlers apart — a name two languages can
+collide on, in which case one silently clears the other.
+
+`_G.bundle_languages` is the other end of the same dial: the languages listed
+there are installed up front, which is what a container image or a prebuilt
+development environment wants.
+
+### A quarantine in front of Mason and lazy.nvim
+
+Anything freshly published is held back for a week before it may be installed
+— the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm) and
+`exclude-newer` (uv) give the rest of these dotfiles, so a compromised release
+has time to be caught and pulled before it lands on this machine.
+
+Neither Mason nor lazy.nvim has a setting for it, and each needs a different
+answer:
+
+- **Mason** resolves no versions of its own — every package carries its
+  version in the registry snapshot. So there is nothing to do per package:
+  [lua/tools/mason-quarantine.lua](./lua/tools/mason-quarantine.lua) pins that
+  snapshot to the newest registry release older than the window, instead of to
+  the newest one.
+- **lazy.nvim** decides what to check out in one function, for `:Lazy update`,
+  for the hourly checker and for the update the UI offers alike.
+  [lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua) wraps it and
+  hands back the newest commit, or the newest release, that has been out long
+  enough. What lazy.nvim then does with that target is untouched, so `:Lazy
+  restore` still puts the lockfile back commit for commit, and a pinned plugin
+  stays where it is. A repository younger than the window is installed as
+  lazy.nvim resolved it, since the alternative is not installing it at all.
+
+A plugin is as much of a supply chain as a package from npm or PyPI, and a
+bigger one: whatever is in it runs in this editor the next time Neovim starts.
+
+### Files that never reach an AI
+
+A language server is handed the whole text of every buffer it attaches to,
+before a single suggestion is asked for. Opening a `.env` or a private key is
+enough to upload it.
+
+What counts as sensitive is listed once, in
+[lua/config/sensitive.lua](./lua/config/sensitive.lua) — dotenv and direnv
+files, private keys, credential stores — and
+[plugin/ai_guard.lua](./plugin/ai_guard.lua) guards every integration at the
+one place it reads a buffer or a path: Copilot's `root_dir`, a chat handed a
+file, a selection following the cursor into a CLI tool, a prompt on its way
+out. A wrapper that no longer finds what it wraps leaves the plugin as it is
+and says so, rather than breaking it on an upstream rename.
+
+### Schemas for YAML and JSON
+
+YAML schemas are detected from the content of the buffer — Kubernetes
+manifests, CRDs, cloud-init — and `<leader>cy` (or `:YamlSchema`) opens a
+picker to set one for the buffer or write it in as a modeline. Candidates come
+from the public catalogs, from the project, from `_G.yaml_schema_dirs`, and
+from any path typed in. `:YamlSchema reset` hands detection back the wheel.
+
+### What is attached to this buffer
+
+The statusline counts the language servers and the tools that are up rather
+than spelling them out. The full list — every candidate, its state, and what
+can be done about it — is one key or one click away:
+
+| Key | What |
+| --- | ---- |
+| `<leader>cL` | Language servers of the buffer |
+| `<leader>cT` | Formatters and linters of the buffer |
+
+Each entry says whether the tool is installed, running, or missing, so a
+formatter that quietly never fires stops being a mystery. Linters and
+formatters only ever run when they are actually installed.
+
+### Spelling, in several languages at once
+
+`:DySpell {lang}` rebuilds a spell file with `mkspell` from the word lists
+under `_G.dictionaries_path` and `spell/`: Vietnamese, Chinese, plus the
+`proper` and `technical` lists kept in this repository. Comments are
+spell-checked as well as prose — through
+[ltcc](https://github.com/dynamotn/languagetool-code-comments) — and the word
+under the cursor, or a selection for anything with an apostrophe in it, can be
+added to a list from a mapping.
+
+### Diagrams in the terminal
+
+D2 diagrams render inline on kitty-graphics terminals, `zellij` included.
+`<leader>cp` previews the diagram under the cursor
+([lua/tools/diagram/d2](./lua/tools/diagram/d2)); Markdown and Typst get their
+own preview on the same key.
+
+### Workspace diagnostics
+
+`<leader>xw` asks a language server about the whole project, not only the
+files that happen to be open, by handing it every file with
+`textDocument/didOpen`. Unlike the plugin it replaces, the file list and the
+contents are read off the main loop, so a big repository does not freeze the
+editor, and each document is closed again before Neovim opens the same file
+for real, so no server ever sees two `didOpen` for one URI.
+
+### Tools given what they lack
+
+Small gaps filled in [lua/tools](./lua/tools) and [lua/lint](./lua/lint), each
+with a spec of its own:
+
+- **jira** — issue completion in commit messages.
+- **shellcheck** — code actions for the directives it suggests.
+- **sonarlint** — connected mode, for both SonarQube and SonarCloud.
+- **ltcc** — LanguageTool for code comments, as diagnostics and as code
+  actions.
+- **betterleaks**, **dyshellint**, **d2** — nvim-lint definitions that do not
+  ship with the plugin.
+- **terragrunt validate** — a diagnostic source of its own.
+- **rule ids** — put back into the diagnostics nvim-lint leaves them out of,
+  so `nvim-rulebook` can build an ignore comment for `markdownlint`,
+  `ansible-lint`, `swiftlint` and friends.
+
+### Integrations
+
+- [Obsidian](https://obsidian.md/) — vaults from `_G.obsidian.paths`.
+- [chezmoi](https://www.chezmoi.io/) — templates edited with the target
+  language injected, not as plain text.
+- **Firefox** and **Chrome** — Neovim embedded in a textarea with
+  [firenvim](https://github.com/glacambre/firenvim), tuned per site through
+  `_G.firenvim_site_settings`.
+- [zellij](https://zellij.dev/) — test runner, terminal integration, and the
+  pane sources for completion.
+- [AI CLI tools](https://github.com/folke/sidekick.nvim#default-cli-tools) —
+  through sidekick, behind the guard above.
+
+## Key bindings
+
+The leader key is `Space`. Press it and wait: which-key lists every mapping
+under it, and `<Space>sk` searches all of them.
+
+- Custom mappings live in [lua/config/keymaps.lua](./lua/config/keymaps.lua),
+  and plugin-specific ones in the `keys` of each spec under
+  [lua/plugins](./lua/plugins).
+- Everything else follows [LazyVim's defaults](https://www.lazyvim.org/keymaps).
+
+The ones worth knowing before which-key gets a chance to tell you:
+
+| Key | Mode | What |
+| --- | ---- | ---- |
+| `<leader>fy` | n | Copy the path of the file: relative or absolute, with line, with column, the directory, the project root, the file name |
+| `<leader>cL`, `<leader>cT` | n | Language servers, formatters and linters of this buffer |
+| `<leader>cy` | n | Pick a YAML schema |
+| `<leader>cp` | n | Preview the diagram, Markdown or Typst under the cursor |
+| `<leader>xw` | n | Workspace diagnostics |
+| `<leader>uk` | n | Camouflage: hide the values in a secret file |
+| `<leader>ct` | n | Translate |
+| `<leader>a` | n | AI: chat, inline edit, history, model, provider |
+| `<leader>v` | n, x | Multiple cursors |
+| `<C-c>` | n | Change word |
+| `d`, `x`, `c`, `C`, `X` | n, v | Smart delete: a blank line goes to the black hole register |
+| `p` | v | Paste over a selection without losing the register |
+| `/` | x | Search inside the selection |
+| `<C-f>`, `<C-r>` | v | Search, replace the selected text |
+| `:W`, `:Q`, `:Wq`, `:Qa`, … | c | The typo you meant |
+| `:ww` | c | Save through `sudo tee` |
+
+## Commands
+
+| Command | What |
+| ------- | ---- |
+| `:DySpell {lang}` | Rebuild a spell file from its word lists |
+| `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |
+| `:YamlSchema reset` | Hand schema detection back the wheel |
+| `:BaleiaColorize`, `:BaleiaLogs` | Render the ANSI colour escapes in the buffer (the Conjure log), and show baleia's own log |
+
+LazyVim's own commands, and the plugins', are unchanged.
+
+## Help inside Neovim
+
+The same ground, as a help file:
+
+```vim
+:help neovim-config
+```
+
+Tags are committed, so `:help` works in a fresh clone; after editing
+[doc/neovim-config.txt](./doc/neovim-config.txt), regenerate them with
+`:helptags doc`.
+
+## Repository layout
+
+| Path | What it holds |
+| ---- | ------------- |
+| `init.lua` | Globals, per-machine overrides, the version gate, LazyVim |
+| `lua/config/` | `globals`, `languages`, `options`, `keymaps`, `autocmds`, `defaults`, `sensitive` |
+| `lua/plugins/` | Plugin specs by area: `coding`, `executor`, `integration`, `lang`, `lsp`, `toolbox`, `treesitter`, `ui` |
+| `lua/util/` | Shared helpers the specs call into |
+| `lua/tools/` | Features built here: the Mason and lazy.nvim quarantines, Mason registry entries, diagram rendering, workspace diagnostics, extra completion sources and code actions |
+| `lua/lint/linters/` | nvim-lint definitions the plugin does not ship |
+| `lua/overseer/` | Task templates |
+| `lua/per_machine/` | The per-machine overrides, rendered by chezmoi |
+| `lsp/`, `ftplugin/`, `after/`, `queries/` | Native Neovim configuration, filetype by filetype |
+| `plugin/` | `ai_guard`, `spell` |
+| `snippets/`, `spell/`, `colors/`, `ftdetect/` | The rest of the runtime path |
+| `scripts/` | Benchmarks, checks, the test runner |
+| `tests/` | plenary-busted specs |
+| `doc/` | The help file |
+
+## Development
+
+### Tests
+
+41 spec files under `tests/spec` run with
 [plenary-busted](https://github.com/nvim-lua/plenary.nvim#plenarytest_harness)
 in a headless Neovim that loads only the module each spec requires:
 
@@ -276,18 +541,20 @@ scripts/test.sh tests/spec/util/sensitive_spec.lua
 ```
 
 Plenary and LazyVim are taken from lazy.nvim's install directory, or cloned
-into `.tests/` when the configuration has never been started. The same run is
-a pre-commit hook and a CI step, next to `scripts/check-startup.sh`, which
-loads the whole configuration and opens a file of each language.
+into `.tests/` when the configuration has never been started.
 
-## Key bindings
+### Checks
 
-The leader key is `Space`. Press it and wait: [which-key](https://github.com/folke/which-key.nvim)
-lists every mapping under it, and `<Space>sk` searches all of them.
+```sh
+scripts/test.sh                                       # unit tests
+scripts/check-startup.sh                              # load everything, open a file of each language
+nvim --clean --headless -l scripts/validate-tools.lua  # every tool name, against conform, nvim-lint, lspconfig and Mason
+pre-commit run --all-files                            # the lot, plus stylua
+```
 
-- Custom mappings live in [lua/config/keymaps.lua](./lua/config/keymaps.lua),
-  and plugin-specific ones in the `keys` of each spec under [lua/plugins](./lua/plugins).
-- Everything else follows [LazyVim's defaults](https://www.lazyvim.org/keymaps).
+All of it runs as pre-commit hooks and in CI
+([.github/workflows/check.yml](./.github/workflows/check.yml)), on both plugin
+channels.
 
 ## Benchmark
 

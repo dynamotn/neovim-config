@@ -1,0 +1,537 @@
+*neovim-config.txt*   A LazyVim configuration for DevOps and SA work
+
+                                                              *neovim-config*
+
+This is a LazyVim configuration, not a distribution to install over yours.
+Every language it knows about is one declarative entry in
+`lua/config/languages.lua` -- its Treesitter parser, LSP servers, linters,
+formatters, debug adapters and test runners -- and a single |FileType|
+dispatcher installs that entry the first time a file of the language is
+opened.
+
+The same tree runs on a laptop with everything enabled and in a container with
+four languages; what differs is a handful of globals, see
+|neovim-config-per-machine|.
+
+------------------------------------------------------------------------------
+CONTENTS                                             *neovim-config-contents*
+
+    1. Requirements .......................... |neovim-config-requirements|
+    2. Install ............................... |neovim-config-install|
+    3. Configuration ......................... |neovim-config-configuration|
+       3.1 Per machine settings .............. |neovim-config-per-machine|
+       3.2 Globals ........................... |neovim-config-globals|
+       3.3 Plugin channels ................... |neovim-config-channels|
+       3.4 Updating plugins .................. |neovim-config-update|
+    4. Language support ...................... |neovim-config-languages|
+    5. Beyond LazyVim ........................ |neovim-config-features|
+       5.1 Tooling that installs itself ...... |neovim-config-lazy-install|
+       5.2 Quarantine ........................ |neovim-config-quarantine|
+       5.3 Files kept from AI ................ |neovim-config-ai-guard|
+       5.4 YAML and JSON schemas ............. |neovim-config-schema|
+       5.5 Buffer servers and tools .......... |neovim-config-statusline|
+       5.6 Spelling .......................... |neovim-config-spell|
+       5.7 Diagrams .......................... |neovim-config-diagram|
+       5.8 Workspace diagnostics ............. |neovim-config-workspace|
+       5.9 Integrations ...................... |neovim-config-integrations|
+    6. Mappings .............................. |neovim-config-mappings|
+    7. Commands .............................. |neovim-config-commands|
+    8. Layout ................................ |neovim-config-layout|
+    9. Development ........................... |neovim-config-development|
+   10. Troubleshooting ....................... |neovim-config-troubleshooting|
+
+------------------------------------------------------------------------------
+1. REQUIREMENTS                                  *neovim-config-requirements*
+
+Running at all          Neovim 0.13+ (nightly), or 0.12+ on the `stable`
+                        channel.  An older Neovim stops at an error message
+                        instead of loading anything.
+Bootstrapping plugins   git
+Icons                   A Nerd Font in the terminal.
+Mason downloads         curl, tar, unzip, gzip
+Treesitter parsers      A C compiler, and the tree-sitter CLI.
+Pickers, completion     ripgrep, fd
+
+Everything else is installed lazily.  Many Mason packages are built by a
+language toolchain, so what Mason can install depends on what is on $PATH:
+node/npm (or bun), python3/pip (or uv), go, cargo, java, and so on.  `bun` and
+`uv` are used in place of `npm` and `pip` when they are installed.
+
+Some tools are never installed by Mason and must come from the system, or from
+the language's own toolchain.  They are the entries marked
+`mason = { enabled = false }` in `lua/config/languages.lua`; a missing one is
+skipped, not reported as an error.
+
+Optional: `pngpaste` (macOS) or `wl-paste`/`xclip` (Linux) to paste images,
+`fcitx5-remote` to switch input method, and `d2` with one of `rsvg-convert`,
+`resvg` or `magick` on a kitty-graphics terminal for |neovim-config-diagram|.
+
+------------------------------------------------------------------------------
+2. INSTALL                                            *neovim-config-install*
+
+Back up whatever is there and clone the repository to `~/.config/nvim`: >sh
+
+    mv ~/.config/nvim ~/.config/nvim.bak
+    git clone https://gitlab.com/dynamo-config/neovim.git ~/.config/nvim \
+        --single-branch --depth 1
+<
+To try it beside an existing configuration instead of replacing it, clone
+anywhere and run it under its own name with |$NVIM_APPNAME|: >sh
+
+    git clone https://gitlab.com/dynamo-config/neovim.git ~/.config/dynamo \
+        --single-branch --depth 1
+    NVIM_APPNAME=dynamo nvim
+<
+The first `nvim` clones the plugins; the first file of a language installs
+that language's parser, servers and tools.  `:Lazy` shows the first half,
+`:Mason` the second, and `:checkhealth` what the requirements above are
+missing.
+
+------------------------------------------------------------------------------
+3. CONFIGURATION                                *neovim-config-configuration*
+
+3.1 Per machine settings                           *neovim-config-per-machine*
+
+chezmoi is not needed.  It renders `lua/per_machine/config.lua.tmpl` into
+`lua/per_machine/config.lua` on my machines; in a plain clone that file does
+not exist, the loader stays quiet about it, and the defaults in
+`lua/config/globals.lua` stand.
+
+To change them, write `lua/per_machine/config.lua` by hand and assign the
+globals there.  `init.lua` loads it before anything else, so every global in
+|neovim-config-globals| is still open to it: >lua
+
+    _G.dark_mode = false
+    _G.plugin_channel = 'stable'
+    _G.enabled_languages = { 'lua', 'bash', 'markdown' }
+    _G.enabled_plugins.obsidian = true
+    _G.obsidian.paths.personal = vim.fn.expand('~/Notes')
+<
+An error raised inside that file is reported; only its absence is silent.
+
+3.2 Globals                                           *neovim-config-globals*
+
+Every global is declared, typed and defaulted in `lua/config/globals.lua`.
+
+                                                               *_G.dark_mode*
+`_G.dark_mode`              (default `true`)
+        Background to use, whenever the clock is not in charge.
+
+                                                               *_G.day_night*
+`_G.day_night`              (default `{ enabled = false, day_start = 6,`
+                          `night_start = 18 }`)
+        With `enabled` on, the clock drives `_G.dark_mode` and the colorscheme
+        follows it.  With it off, `_G.dark_mode` is the only thing consulted.
+
+                                                          *_G.plugin_channel*
+`_G.plugin_channel`         (default `'latest'`)
+        `'latest'` or `'stable'`, see |neovim-config-channels|.
+
+                                                        *_G.enabled_languages*
+`_G.enabled_languages`      (default: every supported language)
+        Which languages get plugins, parsers and tools at all.
+
+                                                         *_G.bundle_languages*
+`_G.bundle_languages`       (default `{}`)
+        Languages whose tooling is installed up front rather than on first
+        use, for containers and prebuilt images.
+
+                                                          *_G.enabled_plugins*
+`_G.enabled_plugins`        (default: all `false`)
+        `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi`.
+
+                                                        *_G.used_full_plugins*
+`_G.used_full_plugins`      (default `false`)
+        Install every plugin, to refresh the lockfile.
+
+                                                                *_G.is_gentoo*
+`_G.is_gentoo`              (default `false`)
+        Add the Gentoo ebuild syntax.
+
+                                                                 *_G.obsidian*
+`_G.obsidian.paths`         (default `{ personal = '~/Documents/Notes' }`)
+        Vault name to folder.  `_G.obsidian.vaults()` and
+        `_G.obsidian.todo_path()` are built from it and may be replaced too.
+
+                                                         *_G.yaml_schema_dirs*
+`_G.yaml_schema_dirs`       (default `{}`)
+        Local schema folders offered by |neovim-config-schema|, next to the
+        ones found in the project.
+
+                                                        *_G.dictionaries_path*
+`_G.dictionaries_path`      (default `$XDG_CONFIG_HOME/dictionaries`)
+        Folder of word lists (`*.txt`), fed to the dictionary completion
+        source and to |:DySpell|.  Nothing breaks when it is missing.
+
+                                                         *_G.dev_plugins_path*
+`_G.dev_plugins_path`       (default `$NVIM_DEV_PLUGINS`, else
+                          `~/Working/community/nvim`)
+        Where plugin specs marked `dev = true` are looked for.  One missing
+        from there is cloned from its git remote, so the folder need not
+        exist.
+
+                                                  *_G.firenvim_site_settings*
+`_G.firenvim_site_settings` (default `{}`)
+        Per-site `priority` and `takeover` for the browser embedding.
+
+                                                            *_G.test_strategy*
+`_G.test_strategy`          (default `'toggleterm'`, `'zellij'` inside zellij)
+        How vim-test runs a test.
+
+                                                       *_G.completion_sources*
+`_G.completion_sources`     (default `{}`)
+        Completion sources named in the completion menu.
+
+3.3 Plugin channels                                  *neovim-config-channels*
+
+                `latest` (default)        `stable`
+LazyVim         `main`                    newest release
+Plugins         newest commit           newest release, or their branch
+                                        when they tag none
+Neovim          0.13 nightly            0.12 or newer
+Lockfile        `lazy-lock.json`          `lazy-lock.stable.json`
+
+Each channel writes only its own lockfile, so a machine on `stable` and a
+machine on `latest` never rewrite each other's pins.
+
+`latest` follows the newest Neovim and the newest plugin commits, so an
+upstream break can land with any `:Lazy update`.  Set `_G.plugin_channel` to
+`'stable'` on a machine that should not ride along.
+
+3.4 Updating plugins                                   *neovim-config-update*
+
+An update is a week behind on purpose: the quarantine only lets `:Lazy update`
+move to a commit, or a release, that has been out for seven days.  `:Lazy
+restore` and a pinned plugin are not touched by it, see
+|neovim-config-quarantine|.
+
+The lockfile is the snapshot to roll back to, and both live in the
+repository, so:
+
+    1. Commit the lockfile before `:Lazy update`, so the working pins are in
+       git.
+    2. Update, then commit the new lockfile once everything still works.
+    3. If an update breaks something, put the previous lockfile back: >sh
+
+        git restore lazy-lock.json
+        # or: git checkout <commit> -- lazy-lock.json
+<
+       then run `:Lazy restore`.  A single plugin can be restored from its
+       line in `:Lazy`.
+
+------------------------------------------------------------------------------
+4. LANGUAGE SUPPORT                                 *neovim-config-languages*
+
+103 entries over 126 filetypes: 42 languages, 13 frameworks, 38 tools and
+markup languages.  The authoritative list is `lua/config/languages.lua`, and
+each entry is a `DyLangSpec`: >lua
+
+    ---@field filetypes string[]
+    ---@field parser string|DyParserSpec
+    ---@field injected_parsers? string[]
+    ---@field ext? string
+    ---@field lsp_servers? (string|DyLspSpec)[]
+    ---@field linters? (string|DyLinterSpec)[]
+    ---@field formatters? (string|DyFormatterSpec)[]
+    ---@field null_ls? DyNullLsSpec[]
+    ---@field dap? (string|DyDapSpec)[]
+    ---@field test? string[]
+    ---@field dial? fun(augend: Augend): Augend[]
+    ---@field autopairs? fun(filetypes, rule, cond, ts_cond): Rule[]
+    ---@field endwise? boolean
+    ---@field otter? boolean
+<
+Adding a language is adding one such table.  Nothing else has to be touched:
+the parser, the servers and the tools are installed from it, the statusline
+reads it, and `scripts/validate-tools.lua` checks every name in it against
+conform, nvim-lint, lspconfig and Mason.
+
+------------------------------------------------------------------------------
+5. BEYOND LAZYVIM                                    *neovim-config-features*
+
+5.1 Tooling that installs itself                  *neovim-config-lazy-install*
+
+One |FileType| autocmd, one table of handlers (`lua/util/lazy_install.lua`).
+Opening a Go file installs the Go parser, `gopls`, its linters, its formatters
+and `delve`; nothing else in the table runs.
+
+An autocmd per tool would instead leave Neovim a few hundred patterns to walk
+on every |FileType| event, and make the augroup name the only thing keeping
+two handlers apart -- a name two languages can collide on, in which case one
+silently clears the other.
+
+|_G.bundle_languages| is the other end of the same dial: the languages listed
+there are installed up front, which is what a container image or a prebuilt
+development environment wants.
+
+5.2 Quarantine                                      *neovim-config-quarantine*
+
+Anything freshly published is held back for a week before it may be installed
+-- the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm)
+and `exclude-newer` (uv) give the rest of these dotfiles, so a compromised
+release has time to be caught and pulled before it lands on this machine.  A
+plugin is as much of a supply chain as a package from npm or PyPI, and a
+bigger one: whatever is in it runs in this editor the next time Neovim starts.
+
+Neither Mason nor lazy.nvim has a setting for it, and each needs a different
+answer.
+
+Mason resolves no versions of its own: every package carries its version in
+the registry snapshot, so there is nothing to do per package.
+`lua/tools/mason-quarantine.lua` pins that snapshot to the newest registry
+release older than the window, instead of to the newest one.
+
+lazy.nvim decides what to check out in one function, for `:Lazy update`, for
+the hourly checker and for the update the UI offers alike.
+`lua/tools/lazy-quarantine.lua` wraps it and hands back the newest commit, or
+the newest release, that has been out long enough.  What lazy.nvim then does
+with that target is untouched, so `:Lazy restore` still puts the lockfile back
+commit for commit, and a pinned plugin stays where it is.  A repository
+younger than the window is installed as lazy.nvim resolved it, since the
+alternative is not installing it at all.
+
+5.3 Files kept from AI                                *neovim-config-ai-guard*
+
+A language server is handed the whole text of every buffer it attaches to,
+before a single suggestion is asked for.  Opening a `.env` or a private key is
+enough to upload it.
+
+What counts as sensitive is listed once, in `lua/config/sensitive.lua` --
+dotenv and direnv files, private keys, credential stores -- by name pattern,
+by path and by content.  `plugin/ai_guard.lua` then guards every integration
+at the one place it reads a buffer or a path: Copilot's `root_dir`, a chat
+handed a file, a selection following the cursor into a CLI tool, a prompt on
+its way out.
+
+A wrapper that no longer finds what it wraps leaves the plugin as it is and
+says so, rather than breaking it on an upstream rename.
+
+5.4 YAML and JSON schemas                              *neovim-config-schema*
+
+YAML schemas are detected from the content of the buffer -- Kubernetes
+manifests, CRDs, cloud-init.  `<leader>cy`, or |:YamlSchema|, opens a picker
+to set one for the buffer or write it in as a modeline.  Candidates come from
+the public catalogs, from the project, from |_G.yaml_schema_dirs|, and from
+any path typed in.
+
+5.5 Buffer servers and tools                       *neovim-config-statusline*
+
+The statusline counts the language servers and the tools that are up rather
+than spelling them out; the full list is one key or one click away.
+
+    `<leader>cL`       Language servers of the buffer
+    `<leader>cT`       Formatters and linters of the buffer
+
+Each entry says whether the tool is installed, running, or missing, so a
+formatter that quietly never fires stops being a mystery.  Linters and
+formatters only ever run when they are actually installed.
+
+5.6 Spelling                                            *neovim-config-spell*
+
+|:DySpell| rebuilds a spell file with |:mkspell| from the word lists under
+|_G.dictionaries_path| and `spell/`: Vietnamese, Chinese, plus the `proper`
+and `technical` lists kept in the repository.
+
+Comments are spell-checked as well as prose, through `ltcc`
+(languagetool-code-comments), as diagnostics and as code actions.  The word
+under the cursor, or a Visual selection for anything with an apostrophe or a
+dot in it -- `<cword>` stops at both -- can be added to a list from a mapping.
+
+5.7 Diagrams                                          *neovim-config-diagram*
+
+D2 diagrams render inline on kitty-graphics terminals, zellij included.
+`<leader>cp` previews the diagram under the cursor; Markdown and Typst get
+their own preview on the same key.
+
+5.8 Workspace diagnostics                           *neovim-config-workspace*
+
+`<leader>xw` asks a language server about the whole project, not only the
+files that happen to be open, by handing it every file with
+`textDocument/didOpen`.
+
+Unlike the plugin it replaces, the file list and the contents are read off the
+main loop, so a big repository does not freeze the editor, and each document
+is closed again before Neovim opens the same file for real, so no server ever
+sees two `didOpen` for one URI.
+
+5.9 Integrations                                 *neovim-config-integrations*
+
+Obsidian            Vaults from |_G.obsidian|.
+chezmoi             Templates edited with the target language injected, not
+                    as plain text.
+Firefox, Chrome     Neovim embedded in a textarea with firenvim, tuned per
+                    site through |_G.firenvim_site_settings|.
+zellij              Test runner, terminal integration, and the pane sources
+                    for completion.
+AI CLI tools        Through sidekick, behind |neovim-config-ai-guard|.
+
+Smaller gaps filled in `lua/tools` and `lua/lint`, each with a spec of its
+own: `jira` issue completion in commit messages, `shellcheck` code actions,
+`sonarlint` in connected mode for SonarQube and SonarCloud, `ltcc` diagnostics
+and code actions, nvim-lint definitions for `betterleaks`, `dyshellint` and
+`d2`, a `terragrunt validate` diagnostic source, and the rule ids put back
+into the diagnostics nvim-lint leaves them out of, so `nvim-rulebook` can
+build an ignore comment for `markdownlint`, `ansible-lint`, `swiftlint` and
+friends.
+
+------------------------------------------------------------------------------
+6. MAPPINGS                                          *neovim-config-mappings*
+
+The leader key is `<Space>`.  Press it and wait: which-key lists every mapping
+under it, and `<Space>sk` searches all of them.  Custom mappings live in
+`lua/config/keymaps.lua`, plugin-specific ones in the `keys` of each spec
+under `lua/plugins`, and everything else follows LazyVim's defaults.
+
+The ones worth knowing before which-key gets a chance to tell you:
+
+    `<leader>fy`       n      Copy the path of the file: relative or
+                            absolute, with line, with column, the
+                            directory, the project root, the file name
+    `<leader>cL`       n      Language servers of this buffer
+    `<leader>cT`       n      Formatters and linters of this buffer
+    `<leader>cy`       n      Pick a YAML schema
+    `<leader>cp`       n      Preview the diagram, Markdown or Typst under
+                            the cursor
+    `<leader>xw`       n      Workspace diagnostics
+    `<leader>uk`       n      Camouflage: hide the values in a secret file
+    `<leader>ct`       n      Translate
+    `<leader>a`        n      AI: chat, inline edit, history, model, provider
+    `<leader>v`        n, x   Multiple cursors
+    `<C-c>`            n      Change word
+    `d` `x` `c` `C` `X`        n, v   Smart delete: a blank line goes to the
+                            black hole register
+    `p`                v      Paste over a selection without losing the
+                            register
+    `/`                x      Search inside the selection
+    `<C-f>`            v      Search the selected text
+    `<C-r>`            v      Replace the selected text
+
+Command-line abbreviations, which only fire as a whole command line, so a
+`/W` in a search is left alone:
+
+    `:W` `:Q` `:Wq` `:Wa` `:WQ` `:Qa`         the typo you meant
+    `:W!` `:Q!` `:Qa!`
+    `:ww`                           save through `sudo tee`
+
+------------------------------------------------------------------------------
+7. COMMANDS                                          *neovim-config-commands*
+
+                                                                    *:DySpell*
+:DySpell {lang}         Rebuild the spell file of {lang} with |:mkspell| from
+                        its word lists.  {lang} is one of `vi`, `zh`, `proper`
+                        or `technical`; an unknown one is reported, not
+                        raised.  See |neovim-config-spell|.
+
+                                                                 *:YamlSchema*
+:YamlSchema             Open the schema picker for this YAML buffer.  Only
+                        defined once `yamlls` has attached to it.
+:YamlSchema {path}      Use the schema at {path}, a file or a URL.
+:YamlSchema modeline [{path}]
+                        Write the schema in as a modeline instead of setting
+                        it for this session only.
+:YamlSchema reset       Hand detection back the wheel.
+                        See |neovim-config-schema|.
+
+                                             *:BaleiaColorize* *:BaleiaLogs*
+:BaleiaColorize         Render the ANSI colour escapes in the buffer, the
+                        Conjure log in practice.
+:BaleiaLogs             Show baleia's own log.
+
+LazyVim's own commands, and the plugins', are unchanged: `:Lazy`, `:Mason`,
+`:LazyExtras`, `:ConformInfo`, and the rest.
+
+------------------------------------------------------------------------------
+8. LAYOUT                                              *neovim-config-layout*
+
+`init.lua`            Globals, per-machine overrides, the version gate,
+                    LazyVim
+`lua/config/`         `globals`, `languages`, `options`, `keymaps`,
+                    `autocmds`, `defaults`, `sensitive`
+`lua/plugins/`        Plugin specs by area: `coding`, `executor`,
+                    `integration`, `lang`, `lsp`, `toolbox`, `treesitter`,
+                    `ui`
+`lua/util/`           Shared helpers the specs call into
+`lua/tools/`          Features built here: the Mason and lazy.nvim
+                    quarantines, Mason registry entries, diagram rendering,
+                    workspace diagnostics, extra completion sources and code
+                    actions
+`lua/lint/linters/`   nvim-lint definitions the plugin does not ship
+`lua/overseer/`       Task templates
+`lua/per_machine/`    The per-machine overrides, rendered by chezmoi
+`lsp/` `ftplugin/`      Native Neovim configuration, filetype by filetype
+`after/` `queries/`
+`plugin/`             `ai_guard`, `spell`
+`snippets/` `spell/`    The rest of the runtime path
+`colors/` `ftdetect/`
+`scripts/`            Benchmarks, checks, the test runner
+`tests/`              plenary-busted specs
+`doc/`                This file
+
+------------------------------------------------------------------------------
+9. DEVELOPMENT                                    *neovim-config-development*
+
+41 spec files under `tests/spec` run with plenary-busted in a headless Neovim
+that loads only the module each spec requires: >sh
+
+    scripts/test.sh                      # every spec
+    scripts/test.sh tests/spec/util      # one directory
+    scripts/test.sh tests/spec/util/sensitive_spec.lua
+<
+Plenary and LazyVim are taken from lazy.nvim's install directory, or cloned
+into `.tests/` when the configuration has never been started.
+
+The rest of the checks: >sh
+
+    scripts/check-startup.sh    # load it all, open a file of each language
+    nvim --clean --headless -l scripts/validate-tools.lua
+    pre-commit run --all-files  # the lot, plus stylua
+<
+All of it runs as pre-commit hooks and in CI, on both plugin channels.
+
+Two benchmarks, because they measure different halves of the same editor: >sh
+
+    nvim --clean --headless -l scripts/bench.lua            # starting Neovim
+    nvim --clean --headless -l scripts/bench-filetypes.lua  # opening a file
+<
+Both rewrite their own section of `README.md` when a number moves by more than
+a threshold.  `BENCH_FORCE=1` and `BENCH_FT_FORCE=1` rewrite it regardless,
+and `BENCH_FT_ONLY=lua,go` times just those filetypes without touching the
+file.
+Neither installs anything.
+
+After editing this help file, regenerate its tags with: >vim
+
+    :helptags doc
+<
+------------------------------------------------------------------------------
+10. TROUBLESHOOTING                            *neovim-config-troubleshooting*
+
+Neovim says it is too old ~
+    The version gate in `init.lua` wants 0.13 on the `latest` channel and 0.12
+    on `stable`.  Either update Neovim, or set `_G.plugin_channel = 'stable'`
+    in `lua/per_machine/config.lua`, see |neovim-config-per-machine|.
+
+A formatter or linter never fires ~
+    `<leader>cT` lists every one the filetype expects, with its state.  A tool
+    is only run when it is installed, and the ones marked
+    `mason = { enabled = false }` have to come from the system.
+
+A language brings nothing at all ~
+    Check that it is in |_G.enabled_languages|.  A language left out of that
+    list gets no plugins, no parser and no tools.
+
+An update broke something ~
+    Restore the lockfile and run `:Lazy restore`, see
+    |neovim-config-update|.
+
+Startup got slow ~
+    `nvim --clean --headless -l scripts/bench.lua` prints the slowest steps.
+    Opening a file is a separate question: `scripts/bench-filetypes.lua`, or
+    `BENCH_FT_ONLY=<filetype>` for one of them.
+
+Something is missing from the system ~
+    `:checkhealth` for Neovim's own view, `:Mason` for the tools, and
+    |neovim-config-requirements| for what has to be there first.
+
+------------------------------------------------------------------------------
+vim:tw=78:ts=8:noet:ft=help:norl:

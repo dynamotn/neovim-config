@@ -1,2 +1,6 @@
 # Test dependencies cloned by tests/minimal_init.lua when lazy.nvim has none
 /.tests/
+
+# The help tags are generated, but committed all the same, so `:help
+# neovim-config` works in a fresh clone. The global ignore drops every `tags`.
+!/doc/tags
