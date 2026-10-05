@@ -103,6 +103,56 @@ describe('util.sensitive', function()
     end)
   end)
 
+  describe('is_secret_key', function()
+    for _, key in ipairs({
+      'PASSWORD',
+      'db_passwd',
+      'ssh_passphrase',
+      'client_secret',
+      'GITHUB_TOKEN',
+      'aws credential file',
+      'apiKey',
+      'api_key',
+      'access-key',
+      'privateKey',
+    }) do
+      it(
+        'names ' .. key .. ' as a secret',
+        function() assert.is_true(sensitive.is_secret_key(key)) end
+      )
+    end
+
+    for _, key in ipairs({ 'name', 'replicas', 'image', 'keyboard' }) do
+      it(
+        'leaves ' .. key .. ' alone',
+        function() assert.is_false(sensitive.is_secret_key(key)) end
+      )
+    end
+
+    it('copes with nothing to look at', function()
+      assert.is_false(sensitive.is_secret_key(nil))
+      assert.is_false(sensitive.is_secret_key(''))
+    end)
+  end)
+
+  describe('secret_format', function()
+    it('names the format a value has the shape of', function()
+      assert.are.equal(
+        'GitHub token',
+        sensitive.secret_format('ghp_0123456789abcdefghij')
+      )
+      assert.are.equal(
+        'AWS access key',
+        sensitive.secret_format('AKIAIOSFODNN7EXAMPLE')
+      )
+    end)
+
+    it('says nothing about an ordinary value', function()
+      assert.is_nil(sensitive.secret_format('nginx:1.27'))
+      assert.is_nil(sensitive.secret_format(nil))
+    end)
+  end)
+
   describe('is_sensitive', function()
     it('flags a buffer by its filetype', function()
       local bufnr = h.buffer({ filetype = 'gitcommit' })

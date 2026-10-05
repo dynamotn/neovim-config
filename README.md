@@ -365,7 +365,7 @@ A language server is handed the whole text of every buffer it attaches to,
 before a single suggestion is asked for. Opening a `.env` or a private key is
 enough to upload it.
 
-What counts as sensitive is listed once, in
+Every rule about secrets in this configuration is listed once, in
 [lua/config/sensitive.lua](./lua/config/sensitive.lua) — dotenv and direnv
 files, private keys, credential stores — and
 [plugin/ai_guard.lua](./plugin/ai_guard.lua) guards every integration at the
@@ -397,6 +397,13 @@ not installed yet.
 | `:AiGuardCheck` | Why this buffer is held back, and on which line |
 | `:AiGuardAllow` | Waive the content check for this buffer, for as long as it is open |
 | `:AiGuardAllow!` | Take that waiver back |
+
+The same lists do a second job: `camouflage.nvim` masks a value on screen when
+its key names a secret (`password`, `token`, `api_key`, …) or when the value
+itself has the shape of one, so a format worth keeping from an AI is also one
+worth keeping off the screen in a shared window. Every value of a file the
+rules name sensitive stays masked whatever it is called; everywhere else a
+Kubernetes manifest keeps reading like a Kubernetes manifest.
 
 `:AiGuardAllow` is the way past a pattern that matched something that is not a
 credential, and `:AiGuardAllow!` takes it back. It says nothing about the name

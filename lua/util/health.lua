@@ -255,10 +255,11 @@ local function ai_guard()
     entries,
     entry(
       'info',
-      ('%d name rules, %d directory rules, %d credential formats'):format(
+      ('%d name rules, %d directory rules, %d credential formats, %d secret key names'):format(
         #sensitive_config.name_patterns,
         vim.tbl_count(sensitive_config.dirs),
-        #sensitive_config.content_patterns
+        #sensitive_config.content_patterns,
+        #sensitive_config.key_patterns
       )
     )
   )

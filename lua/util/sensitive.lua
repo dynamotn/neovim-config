@@ -46,6 +46,34 @@ M.is_sensitive_path = function(path)
     and path_is_sensitive(vim.fs.normalize(real))
 end
 
+--- The credential format `text` has the shape of, if any
+---
+--- The shape half of the question, asked of one string: a line of a buffer on
+--- the way to an AI, or the value `camouflage.nvim` is about to show on
+--- screen. `is_secret_key` is the other half, and both read their patterns
+--- from `config.sensitive` so the two features cannot drift apart.
+---@param text string?
+---@return string? name The rule that matched, as it is reported
+M.secret_format = function(text)
+  if type(text) ~= 'string' then return nil end
+  for _, rule in ipairs(config.content_patterns) do
+    if text:find(rule.pattern) then return rule.name end
+  end
+  return nil
+end
+
+--- Whether `key` is the name of a value worth hiding
+---@param key string?
+---@return boolean
+M.is_secret_key = function(key)
+  if type(key) ~= 'string' then return false end
+  key = key:lower()
+  for _, pattern in ipairs(config.key_patterns) do
+    if key:find(pattern) then return true end
+  end
+  return false
+end
+
 --- The credential formats `lines` hold, one entry per rule that matched
 ---@param lines string[]
 ---@param first integer Number of the first line, for the report
@@ -54,11 +82,10 @@ local function secrets_in(lines, first)
   local found = {}
   local seen = {}
   for offset, line in ipairs(lines) do
-    for _, rule in ipairs(config.content_patterns) do
-      if not seen[rule.name] and line:find(rule.pattern) then
-        seen[rule.name] = true
-        table.insert(found, { name = rule.name, line = first + offset - 1 })
-      end
+    local name = M.secret_format(line)
+    if name and not seen[name] then
+      seen[name] = true
+      table.insert(found, { name = name, line = first + offset - 1 })
     end
   end
   return found

@@ -1,17 +1,3 @@
---- Lua patterns, matched against the lower-cased key, of values worth hiding
---- in any file camouflage parses
-local secret_keys = {
-  'password',
-  'passwd',
-  'passphrase',
-  'secret',
-  'token',
-  'credential',
-  'api[_%-]*key',
-  'access[_%-]*key',
-  'private[_%-]*key',
-}
-
 return {
   {
     -- Mask secret values on screen, without touching the file
@@ -34,14 +20,16 @@ return {
         -- Out of the box every value of every YAML, JSON or shell file is
         -- masked, which leaves a Kubernetes manifest unreadable. A file
         -- `util.sensitive` flags keeps all of its values hidden; everywhere
-        -- else only the ones whose key names a secret are.
+        -- else only the values that name a secret, or look like one, are.
+        --
+        -- Both questions are asked of `config.sensitive`, the same lists the
+        -- AI guard reads, so a format worth keeping from an AI is also one
+        -- worth keeping off the screen.
         on_variable_detected = function(bufnr, var)
-          if require('util.sensitive').is_sensitive(bufnr) then return true end
-          local key = (var.key or ''):lower()
-          for _, pattern in ipairs(secret_keys) do
-            if key:find(pattern) then return true end
-          end
-          return false
+          local sensitive = require('util.sensitive')
+          return sensitive.is_sensitive(bufnr)
+            or sensitive.is_secret_key(var.key)
+            or sensitive.secret_format(var.value) ~= nil
         end,
       },
       integrations = {

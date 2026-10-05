@@ -84,6 +84,26 @@ return {
     -- `scheme://user:password@host`
     { name = 'password in a URL', pattern = '://[%w%._%-]+:[^@/%s]+@' },
   },
+  --- Names of the values worth hiding on screen, as Lua patterns matched
+  --- against the lower-cased key
+  ---
+  --- The other half of the same question: `content_patterns` recognises a
+  --- credential by the shape of its value, this one by what the value is
+  --- called. `camouflage.nvim` masks a value whose key matches, so a
+  --- Kubernetes manifest stays readable while its `password:` does not, and
+  --- `util.sensitive.is_secret_key` is where it asks.
+  ---@type string[]
+  key_patterns = {
+    'password',
+    'passwd',
+    'passphrase',
+    'secret',
+    'token',
+    'credential',
+    'api[_%-]*key',
+    'access[_%-]*key',
+    'private[_%-]*key',
+  },
   --- Bytes of a buffer read when looking for the patterns above. A buffer
   --- bigger than this is searched up to here and reported as searched in
   --- part, rather than holding up the editor on a log of a few hundred
