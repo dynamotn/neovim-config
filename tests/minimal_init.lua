@@ -59,6 +59,14 @@ vim.opt.packpath = {}
 vim.opt.swapfile = false
 vim.opt.shadafile = 'NONE'
 
+-- Neovim's own `ftplugin/lua.lua` and its like call `vim.treesitter.start`,
+-- which throws on a machine with no parser for the filetype -- a fresh clone,
+-- a container, CI. A spec that opens a file of that filetype would fail for
+-- the machine it runs on rather than for what it is testing, and no spec here
+-- is about Treesitter, so a missing parser makes the call a no-op.
+local treesitter_start = vim.treesitter.start
+vim.treesitter.start = function(...) pcall(treesitter_start, ...) end
+
 -- Specs live outside `lua/`, so their shared helpers are found by path.
 package.path = vim.fs.joinpath(root, 'tests', '?.lua') .. ';' .. package.path
 
