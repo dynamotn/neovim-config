@@ -55,9 +55,13 @@ return {
   --- a log pasted into a code file. A match holds the whole buffer back from
   --- every AI integration, so each pattern is written to recognise a token
   --- format and nothing else -- `AKIA...`, `ghp_...`, a PEM header. Anything
-  --- vaguer (`password = ...`) would turn the guard off by crying wolf, and
-  --- is left to `betterleaks`, which runs over the repository at commit time
-  --- and can afford to be argued with.
+  --- vaguer (`password = ...`) would turn the guard off by crying wolf.
+  ---
+  --- The breadth is `betterleaks`' job: it lints every buffer with a rule set
+  --- far larger than this one, and `util.sensitive` holds a buffer back on
+  --- its findings too. These patterns are the half that answers the instant a
+  --- key is pressed, before the linter has run and on a machine where it is
+  --- not installed.
   ---
   --- `name` is what the report says a buffer was held back for. `pattern` is
   --- a Lua pattern, matched line by line.
