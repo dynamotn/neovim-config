@@ -310,6 +310,57 @@ describe('util.ai_guard', function()
     end)
   end)
 
+  describe('commands', function()
+    local sensitive
+
+    before_each(function()
+      sensitive = require('util.sensitive')
+      ai_guard.commands()
+    end)
+
+    --- The last message `:AiGuard*` notified
+    ---@return string
+    local function said() return (notes[#notes] or {}).msg or '' end
+
+    it('says when nothing holds a buffer back', function()
+      edit(plain)
+      vim.cmd('AiGuardCheck')
+      assert.is_truthy(said():find('Nothing holding', 1, true))
+    end)
+
+    it('names what holds a buffer back', function()
+      edit(plain)
+      vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+        'token = "ghp_0123456789abcdefghij"',
+      })
+      vim.cmd('AiGuardCheck')
+      assert.is_truthy(said():find('GitHub token on line 1', 1, true))
+    end)
+
+    it('waives the content check, and takes it back with a bang', function()
+      edit(plain)
+      vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+        'token = "ghp_0123456789abcdefghij"',
+      })
+      vim.cmd('AiGuardAllow')
+      assert.is_false(sensitive.is_sensitive(0))
+
+      vim.cmd('AiGuardCheck')
+      assert.is_truthy(said():find('Waived by :AiGuardAllow', 1, true))
+
+      vim.cmd('AiGuardAllow!')
+      assert.is_true(sensitive.is_sensitive(0))
+      assert.is_truthy(said():find('back on', 1, true))
+    end)
+
+    it('refuses to waive a file sensitive by its name', function()
+      edit(secret)
+      vim.cmd('AiGuardAllow')
+      assert.is_true(sensitive.is_sensitive(0))
+      assert.is_truthy(said():find('sensitive by its name', 1, true))
+    end)
+  end)
+
   describe('setup', function()
     it('installs only the Copilot watch without lazy.nvim', function()
       package.preload['lazy.core.config'] = function() error('no lazy.nvim') end

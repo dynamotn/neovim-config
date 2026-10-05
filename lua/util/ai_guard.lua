@@ -271,7 +271,9 @@ end
 --- for a file the name rules already named.
 M.commands = function()
   vim.api.nvim_create_user_command('AiGuardCheck', function()
-    local reasons = sensitive.reasons(0)
+    local bufnr = vim.api.nvim_get_current_buf()
+    local waived = sensitive.is_allowed(bufnr)
+    local reasons = sensitive.reasons(bufnr, { ignore_waiver = true })
     if #reasons == 0 then
       return vim.notify(
         'Nothing holding this buffer back',
@@ -279,16 +281,26 @@ M.commands = function()
         { title = 'AI guard' }
       )
     end
+    local headline = waived
+        and 'Waived by :AiGuardAllow, and otherwise held back for:'
+      or 'Held back from every AI integration:'
     vim.notify(
-      'Held back from every AI integration:\n- '
-        .. table.concat(reasons, '\n- '),
-      vim.log.levels.WARN,
+      headline .. '\n- ' .. table.concat(reasons, '\n- '),
+      waived and vim.log.levels.INFO or vim.log.levels.WARN,
       { title = 'AI guard' }
     )
   end, { desc = 'Why this buffer is kept from the AI integrations' })
 
-  vim.api.nvim_create_user_command('AiGuardAllow', function()
+  vim.api.nvim_create_user_command('AiGuardAllow', function(args)
     local bufnr = vim.api.nvim_get_current_buf()
+    if args.bang then
+      sensitive.allow(bufnr, false)
+      return vim.notify(
+        'The content check is back on for this buffer',
+        vim.log.levels.INFO,
+        { title = 'AI guard' }
+      )
+    end
     if sensitive.is_sensitive_path(vim.api.nvim_buf_get_name(bufnr)) then
       return vim.notify(
         'Refused: this file is sensitive by its name, not by what is in it',
@@ -298,11 +310,15 @@ M.commands = function()
     end
     sensitive.allow(bufnr)
     vim.notify(
-      'This buffer may now be sent to the AI integrations',
+      'This buffer may now be sent to the AI integrations; :AiGuardAllow! '
+        .. 'takes it back',
       vim.log.levels.WARN,
       { title = 'AI guard' }
     )
-  end, { desc = 'Waive the content check for this buffer' })
+  end, {
+    bang = true,
+    desc = 'Waive the content check for this buffer, or take it back with !',
+  })
 end
 
 --- Install every guard: Copilot's now, the others as their plugin loads

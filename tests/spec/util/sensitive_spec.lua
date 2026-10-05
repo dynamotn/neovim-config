@@ -209,6 +209,31 @@ describe('util.sensitive', function()
       assert.is_false(sensitive.is_sensitive(bufnr))
     end)
 
+    it('takes a waiver back again', function()
+      local bufnr = h.buffer({
+        name = dir .. '/main.lua',
+        lines = { 'token = "ghp_0123456789abcdefghij"' },
+      })
+      sensitive.allow(bufnr)
+      assert.is_false(sensitive.is_sensitive(bufnr))
+      sensitive.allow(bufnr, false)
+      assert.is_false(sensitive.is_allowed(bufnr))
+      assert.is_true(sensitive.is_sensitive(bufnr))
+    end)
+
+    it('says what a waived buffer would be held back for', function()
+      local bufnr = h.buffer({
+        name = dir .. '/main.lua',
+        lines = { 'token = "ghp_0123456789abcdefghij"' },
+      })
+      sensitive.allow(bufnr)
+      assert.are.same({}, sensitive.reasons(bufnr))
+      assert.are.same(
+        { 'GitHub token on line 1' },
+        sensitive.reasons(bufnr, { ignore_waiver = true })
+      )
+    end)
+
     it('lets a buffer through once it is allowed, but never a .env', function()
       local scratch = h.buffer({
         name = dir .. '/main.lua',

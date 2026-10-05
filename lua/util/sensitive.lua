@@ -135,12 +135,15 @@ end
 --- The way out of a pattern that matched something that is not a credential.
 --- It says nothing about the name rules: a `.env` stays sensitive however
 --- often it is allowed, since what that file is for is not in doubt.
+---
+--- `allowed = false` takes the waiver back, for a buffer that was let through
+--- by mistake -- without it the only way back would be closing the buffer.
 ---@param bufnr? integer
-M.allow = function(bufnr)
+---@param allowed? boolean Defaults to true
+M.allow = function(bufnr, allowed)
   if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
-  if vim.api.nvim_buf_is_valid(bufnr) then
-    vim.b[bufnr].dy_ai_guard_allow = true
-  end
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  vim.b[bufnr].dy_ai_guard_allow = allowed ~= false or nil
 end
 
 --- Whether the content check has been waived for a buffer
@@ -152,9 +155,13 @@ M.is_allowed = function(bufnr)
 end
 
 --- Why a buffer must not leave the machine, in words, or nothing when it may
+---
+--- `opts.ignore_waiver` reports what a waived buffer would be held back for,
+--- which is what `:AiGuardCheck` says over a buffer that has been allowed.
 ---@param bufnr? integer
+---@param opts? { ignore_waiver?: boolean }
 ---@return string[]
-M.reasons = function(bufnr)
+M.reasons = function(bufnr, opts)
   if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   if not vim.api.nvim_buf_is_valid(bufnr) then return {} end
 
@@ -167,7 +174,9 @@ M.reasons = function(bufnr)
   if M.is_sensitive_path(name) then
     table.insert(reasons, ('path %s'):format(vim.fn.fnamemodify(name, ':~')))
   end
-  if M.is_allowed(bufnr) then return reasons end
+  if M.is_allowed(bufnr) and not (opts or {}).ignore_waiver then
+    return reasons
+  end
   local found, partial = secrets_in_buffer(bufnr)
   vim.list_extend(found, leaks_in_buffer(bufnr))
   for _, secret in ipairs(found) do

@@ -396,10 +396,14 @@ not installed yet.
 | ------- | ---- |
 | `:AiGuardCheck` | Why this buffer is held back, and on which line |
 | `:AiGuardAllow` | Waive the content check for this buffer, for as long as it is open |
+| `:AiGuardAllow!` | Take that waiver back |
 
 `:AiGuardAllow` is the way past a pattern that matched something that is not a
-credential. It says nothing about the name rules: a `.env` stays sensitive
-however often it is allowed.
+credential, and `:AiGuardAllow!` takes it back. It says nothing about the name
+rules: a `.env` stays sensitive however often it is allowed. A waived buffer
+says so in `:AiGuardCheck` and in `:checkhealth util`, along with what it
+would otherwise be held back for, so a waiver left on by mistake is visible
+rather than silent.
 
 ### Schemas for YAML and JSON
 
@@ -516,7 +520,7 @@ The ones worth knowing before which-key gets a chance to tell you:
 | Command | What |
 | ------- | ---- |
 | `:DySpell {lang}` | Rebuild a spell file from its word lists |
-| `:AiGuardCheck`, `:AiGuardAllow` | Why this buffer is kept from the AI integrations, and the way past the content check |
+| `:AiGuardCheck`, `:AiGuardAllow[!]` | Why this buffer is kept from the AI integrations, the way past the content check, and the way back |
 | `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |
 | `:YamlSchema reset` | Hand schema detection back the wheel |
 | `:BaleiaColorize`, `:BaleiaLogs` | Render the ANSI colour escapes in the buffer (the Conjure log), and show baleia's own log |

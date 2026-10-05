@@ -263,15 +263,26 @@ local function ai_guard()
     )
   )
 
-  local reasons = require('util.sensitive').reasons(0)
-  table.insert(
-    entries,
-    #reasons == 0 and entry('info', 'This buffer may be sent to an AI')
-      or entry(
-        'info',
-        'This buffer is held back: ' .. table.concat(reasons, ', ')
+  local sensitive = require('util.sensitive')
+  local bufnr = vim.api.nvim_get_current_buf()
+  local reasons = sensitive.reasons(bufnr, { ignore_waiver = true })
+  if #reasons == 0 then
+    table.insert(entries, entry('info', 'This buffer may be sent to an AI'))
+  elseif sensitive.is_allowed(bufnr) then
+    table.insert(
+      entries,
+      entry(
+        'warn',
+        ':AiGuardAllow waived this buffer, which would otherwise be held back: '
+          .. table.concat(reasons, ', ')
       )
-  )
+    )
+  else
+    table.insert(
+      entries,
+      entry('info', 'This buffer is held back: ' .. table.concat(reasons, ', '))
+    )
+  end
   return entries
 end
 
