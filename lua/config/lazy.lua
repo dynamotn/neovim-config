@@ -19,6 +19,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     vim.fn.getchar()
     os.exit(1)
   end
+  -- The quarantine below cannot hold back the clone that brings it in, so the
+  -- fresh checkout is walked back by hand: a machine set up the morning of a
+  -- release would otherwise run that release the same day.
+  require('tools.lazy-quarantine').bootstrap(lazypath)
 end
 -- Load lazy to runtime path
 vim.opt.rtp:prepend(lazypath)

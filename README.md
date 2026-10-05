@@ -359,6 +359,16 @@ answer:
 A plugin is as much of a supply chain as a package from npm or PyPI, and a
 bigger one: whatever is in it runs in this editor the next time Neovim starts.
 
+Two edges the window alone leaves open are covered beside it. The bootstrap
+clone of lazy.nvim itself is walked back to an aged commit by hand, since the
+quarantine cannot hold back the clone that brings it in. And Mason runs its
+npm and PyPI installs through [Socket
+Firewall](https://socket.dev), which turns down a package known to be
+malicious — the half of the problem a week of waiting cannot answer, because a
+package can be caught after that week as easily as within it. `sfw` is a local
+proxy, so the installer it wraps trusts the proxy's certificate instead of the
+registry's: the verification moves to `sfw` rather than disappearing.
+
 The window is otherwise invisible — `:Lazy` shows a plugin as up to date when
 it is a week behind on purpose — so `:LazyQuarantine` lists what is being held
 back: the commit or release each plugin is on, the one waiting for it, and how

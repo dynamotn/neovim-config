@@ -14,6 +14,21 @@ return {
         'mason.providers.registry-api',
         'mason.providers.client',
       },
+      -- Socket Firewall stands between every npm and PyPI install and the
+      -- registry, and turns down a package known to be malicious -- the half
+      -- of the problem a week of quarantine cannot answer, since a package
+      -- can be caught after that week as easily as within it. `sfw` is
+      -- installed and updated by Mason itself; swapson already hands it the
+      -- installs it routes through bun and uv.
+      --
+      -- Worth knowing what it does: `sfw` is a local proxy, and the installer
+      -- it wraps runs with `NODE_TLS_REJECT_UNAUTHORIZED=0`, trusting the
+      -- proxy's certificate instead of the registry's. The verification moves
+      -- to `sfw` rather than disappearing, but it does move.
+      firewall = {
+        enabled = true,
+        auto_managed = true,
+      },
       -- Add custom registries
       registries = {
         -- 'file:' .. vim.fn.stdpath('config') .. '/mason-registry',

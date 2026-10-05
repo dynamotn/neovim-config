@@ -79,6 +79,21 @@ local function mason_quarantine()
     )
   end
 
+  local firewall = (settings.current or {}).firewall or {}
+  table.insert(
+    entries,
+    firewall.enabled
+        and entry(
+          'ok',
+          'Socket Firewall stands in front of the npm and PyPI installs'
+        )
+      or entry(
+        'warn',
+        'The Socket Firewall is off, so only the quarantine stands between '
+          .. 'an install and the registry'
+      )
+  )
+
   local root = (settings.current or {}).install_root_dir
     or vim.fs.joinpath(vim.fn.stdpath('data') --[[@as string]], 'mason')
   local info = read(

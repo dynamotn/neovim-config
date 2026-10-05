@@ -29,18 +29,22 @@ local MIN_RELEASE_AGE = 7 * 24 * 60 * 60
 M.window = MIN_RELEASE_AGE
 
 --- Run `git` in `dir` and hand back its output, or nil when it fails
+---
+--- A command that succeeds without saying anything -- `checkout` -- hands
+--- back nil as well, which is what the second return value is for.
 ---@param dir string
 ---@param args string[]
----@return string?
+---@return string? output
+---@return boolean ran Whether git exited 0
 local function git(dir, args)
   local command = { 'git', '-C', dir }
   vim.list_extend(command, args)
   local ok, result = pcall(
     function() return vim.system(command, { text = true }):wait(10000) end
   )
-  if not ok or result.code ~= 0 then return nil end
+  if not ok or result.code ~= 0 then return nil, false end
   local out = vim.trim(result.stdout or '')
-  return out ~= '' and out or nil
+  return out ~= '' and out or nil, true
 end
 
 --- When `rev` was committed, in seconds since the epoch
@@ -48,7 +52,9 @@ end
 ---@param rev string
 ---@return integer?
 local function committed_at(dir, rev)
-  return tonumber(git(dir, { 'log', '-1', '--format=%ct', rev }))
+  -- Parenthesised: `git` hands back two values, and `tonumber` reads the
+  -- second as a base.
+  return tonumber((git(dir, { 'log', '-1', '--format=%ct', rev })))
 end
 
 --- Whether `rev` has been in the repository for longer than the window
@@ -161,6 +167,31 @@ local resolve
 function M.installed()
   local ok, Git = pcall(require, 'lazy.manage.git')
   return ok and wrapper ~= nil and Git.get_target == wrapper
+end
+
+--- Hold a freshly cloned lazy.nvim back to the window as well
+---
+--- The bootstrap in `config.lazy` clones lazy.nvim itself and would take
+--- whatever was released that morning: the one checkout the window cannot
+--- reach the usual way, since lazy.nvim has to be on the runtimepath before
+--- it can hold anything back. Once the clone is there it is an ordinary git
+--- repository, so the same walk applies -- detached at the newest commit that
+--- has been out long enough, which lazy.nvim then manages from.
+---@param dir string Where lazy.nvim was cloned
+---@param now? integer Seconds since the epoch, for the specs
+---@return string? commit The commit checked out, or nil when it stayed put
+function M.bootstrap(dir, now)
+  local head = git(dir, { 'rev-parse', 'HEAD' })
+  if not head then return nil end
+  local target = M.target(
+    { dir = dir, name = 'lazy.nvim' },
+    { commit = head },
+    nil,
+    now
+  )
+  if not target or target.commit == head then return nil end
+  local _, ran = git(dir, { 'checkout', '--quiet', '--detach', target.commit })
+  return ran and target.commit or nil
 end
 
 --- The plugins the window is holding back right now
