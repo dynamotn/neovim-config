@@ -11,12 +11,19 @@ return {
       },
       {
         -- Route npm and pip through bun and uv
+        --
+        -- Both read their own configuration from `~/.config`, so every mason
+        -- install through them is held to the quarantine set there --
+        -- `minimumReleaseAge` in `.bunfig.toml`, `exclude-newer` in
+        -- `uv/uv.toml` -- on top of the aged registry snapshot
+        -- `tools.mason-quarantine` picks. swapson has no window of its own.
         'dynamotn/swapson.nvim',
         opts = {
+          -- `npm.enabled` covers the version lookups too, which is what the
+          -- retired `patch_version_lookup` used to switch on its own.
           npm = {
             enabled = true,
             tool = 'bun',
-            patch_version_lookup = true,
           },
           pip = {
             enabled = true,

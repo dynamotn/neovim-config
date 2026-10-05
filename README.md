@@ -40,6 +40,7 @@
     - `stable`: LazyVim and every plugin that tags releases on its newest release, on Neovim 0.12 or newer. Plugins without releases, or whose last one is years old, stay on their branch
   - Easy to show which tools are installed in lualine
   - Trigger linters/formatters if installed only
+  - Hold every tool Mason installs for a week after its release, the same quarantine the surrounding dotfiles put on npm, bun, pnpm and uv, by taking the registry snapshot from [lua/tools/mason-quarantine.lua](./lua/tools/mason-quarantine.lua) instead of the newest one
   - Add bunch of missing features of the different tools:
     - `jira`
     - `shellcheck`

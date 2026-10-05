@@ -4,6 +4,16 @@ return {
     opts = {
       -- Disable default tools
       ensure_installed = {},
+      -- Hold a freshly published package back for a week before it may be
+      -- installed, the same quarantine `~/.npmrc`, the bun and pnpm
+      -- configurations and `uv.toml` apply. mason has no setting for it, so
+      -- `tools.mason-quarantine` ages the registry snapshot every package
+      -- version is pinned in; see the comment at the top of that module.
+      providers = {
+        'tools.mason-quarantine',
+        'mason.providers.registry-api',
+        'mason.providers.client',
+      },
       -- Add custom registries
       registries = {
         -- 'file:' .. vim.fn.stdpath('config') .. '/mason-registry',
