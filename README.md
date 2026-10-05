@@ -200,6 +200,7 @@ Every global is declared, typed and defaulted in
 | `_G.dark_mode` | `true` | Background to use, whenever the clock is not in charge |
 | `_G.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode`, and the colorscheme with it |
 | `_G.plugin_channel` | `'latest'` | `latest` or `stable`, see [Plugin channels](#plugin-channels) |
+| `_G.quarantine_window` | `7 * 24 * 60 * 60` | How long a release waits before Mason or lazy.nvim may install it; `0` turns the wait off |
 | `_G.enabled_languages` | every supported language | Which languages get plugins, parsers and tools at all |
 | `_G.bundle_languages` | `{}` | Languages whose tooling is installed up front, for containers and prebuilt images |
 | `_G.enabled_plugins` | all `false` | `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi` |
@@ -337,7 +338,8 @@ development environment wants.
 Anything freshly published is held back for a week before it may be installed
 — the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm) and
 `exclude-newer` (uv) give the rest of these dotfiles, so a compromised release
-has time to be caught and pulled before it lands on this machine.
+has time to be caught and pulled before it lands on this machine. Both sides
+read `_G.quarantine_window`, so a machine can wait longer, or not at all.
 
 Neither Mason nor lazy.nvim has a setting for it, and each needs a different
 answer:

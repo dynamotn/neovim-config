@@ -19,13 +19,20 @@
 --- API carries no date to age them by.
 local M = {}
 
---- Seconds a release has to have been out before it may be installed, the same
---- window the npm, bun, pnpm and uv configurations use
-local MIN_RELEASE_AGE = 7 * 24 * 60 * 60
+--- The wait when `_G.quarantine_window` says nothing, the same week the npm,
+--- bun, pnpm and uv configurations give the rest of these dotfiles
+local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 
---- The same window, for `:checkhealth util` to hold the others against
----@type integer
-M.window = MIN_RELEASE_AGE
+--- The window every side of the quarantine is held to
+---
+--- Read on each question rather than kept, so `per_machine` has the say it
+--- has over every other global -- and so `:checkhealth util` reports what is
+--- in force rather than what was in force when this module first loaded.
+---@return integer
+function M.window()
+  local configured = _G.quarantine_window
+  return type(configured) == 'number' and configured or DEFAULT_WINDOW
+end
 
 --- Seconds since the epoch of a UTC timestamp as the GitHub API writes them
 ---
@@ -67,7 +74,7 @@ function M.quarantined(releases, now)
   return vim.tbl_filter(function(release)
     if release.draft or release.prerelease then return false end
     local published = epoch(release.published_at)
-    return published ~= nil and os.difftime(now, published) >= MIN_RELEASE_AGE
+    return published ~= nil and os.difftime(now, published) >= M.window()
   end, releases)
 end
 
@@ -136,7 +143,7 @@ local function aged_releases(repo)
     return Result.failure(
       ('No release of %s is older than the %d day quarantine.'):format(
         repo,
-        MIN_RELEASE_AGE / 86400
+        M.window() / 86400
       )
     )
   end

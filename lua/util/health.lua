@@ -45,7 +45,7 @@ local function days(seconds) return ('%.0f days'):format(seconds / DAY) end
 ---@return integer
 local function window()
   local ok, lazy_quarantine = pcall(require, 'tools.lazy-quarantine')
-  return ok and lazy_quarantine.window or 7 * DAY
+  return ok and lazy_quarantine.window() or 7 * DAY
 end
 
 --- Whether Mason is resolving its registry through the quarantine, and how
@@ -162,7 +162,7 @@ local function lazy_quarantine()
     return entry(
       'ok',
       ('Plugin updates wait %s, through lazy.nvim `get_target`'):format(
-        days(quarantine.window)
+        days(quarantine.window())
       )
     )
   end

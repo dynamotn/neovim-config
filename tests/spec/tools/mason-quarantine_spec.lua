@@ -87,6 +87,18 @@ describe('tools.mason-quarantine', function()
     end
   )
 
+  it('follows the window a global sets', function()
+    local before = _G.quarantine_window
+    _G.quarantine_window = 14 * DAY
+    local kept_wide =
+      kept({ release('ten', 10 * DAY), release('old', 20 * DAY) })
+    _G.quarantine_window = 0
+    local kept_off = kept({ release('fresh', 60) })
+    _G.quarantine_window = before
+    assert.are.same({ 'old' }, kept_wide)
+    assert.are.same({ 'fresh' }, kept_off)
+  end)
+
   it('reads the timestamp as UTC, whatever the local zone is', function()
     local tz = vim.env.TZ
     for _, zone in ipairs({ 'UTC', 'Asia/Ho_Chi_Minh', 'America/Anchorage' }) do

@@ -40,6 +40,16 @@ _G.used_full_plugins = false
 --- other's pins.
 _G.plugin_channel = 'latest'
 
+---@type integer Seconds a release has to have been out before it may be
+--- installed, by Mason (`tools.mason-quarantine`) or by lazy.nvim
+--- (`tools.lazy-quarantine`) alike. It is the same week `min-release-age`
+--- (npm), `minimumReleaseAge` (bun, pnpm) and `exclude-newer` (uv) give the
+--- rest of these dotfiles, so a compromised release has time to be caught
+--- and pulled before it lands here. Raise it on a machine that can afford to
+--- wait longer; `0` turns the wait off and is what a machine being set up
+--- from nothing may need.
+_G.quarantine_window = 7 * 24 * 60 * 60
+
 ---@class DyEnabledPlugins
 ---@field obsidian boolean
 ---@field leetcode boolean

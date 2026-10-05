@@ -145,6 +145,39 @@ describe('tools.lazy-quarantine', function()
     assert.are.equal(commits[2], picked.commit)
   end)
 
+  describe('window', function()
+    it('waits a week unless a global says otherwise', function()
+      h.unload('tools.lazy-quarantine')
+      local quarantine = require('tools.lazy-quarantine')
+      local before = _G.quarantine_window
+      _G.quarantine_window = nil
+      assert.are.equal(7 * DAY, quarantine.window())
+      _G.quarantine_window = 14 * DAY
+      assert.are.equal(14 * DAY, quarantine.window())
+      _G.quarantine_window = before
+    end)
+
+    it('takes a plugin as it is when the wait is turned off', function()
+      local dir, commits, cleanup = repository({ 30 * DAY, DAY })
+      local before = _G.quarantine_window
+      _G.quarantine_window = 0
+      local picked = target(dir, commits[2])
+      _G.quarantine_window = before
+      cleanup()
+      assert.are.equal(commits[2], picked.commit)
+    end)
+
+    it('holds a plugin longer when the window is wider', function()
+      local dir, commits, cleanup = repository({ 30 * DAY, 8 * DAY })
+      local before = _G.quarantine_window
+      _G.quarantine_window = 14 * DAY
+      local picked = target(dir, commits[2])
+      _G.quarantine_window = before
+      cleanup()
+      assert.are.equal(commits[1], picked.commit)
+    end)
+  end)
+
   describe('bootstrap', function()
     it('walks a fresh clone back to an aged commit', function()
       local dir, commits, cleanup = repository({ 30 * DAY, 8 * DAY, DAY })

@@ -20,13 +20,20 @@
 --- lazy.nvim resolved it, since the alternative is not installing it at all.
 local M = {}
 
---- Seconds a commit has to have been in the repository before it may be
---- checked out, the same window the npm, bun, pnpm, uv and Mason sides use
-local MIN_RELEASE_AGE = 7 * 24 * 60 * 60
+--- The wait when `_G.quarantine_window` says nothing, the same week the npm,
+--- bun, pnpm and uv configurations give the rest of these dotfiles
+local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 
---- The same window, for `:checkhealth util` to hold the others against
----@type integer
-M.window = MIN_RELEASE_AGE
+--- The window every side of the quarantine is held to
+---
+--- Read on each question rather than kept, so `per_machine` has the say it
+--- has over every other global -- and so `:checkhealth util` reports what is
+--- in force rather than what was in force when this module first loaded.
+---@return integer
+function M.window()
+  local configured = _G.quarantine_window
+  return type(configured) == 'number' and configured or DEFAULT_WINDOW
+end
 
 --- Run `git` in `dir` and hand back its output, or nil when it fails
 ---
@@ -64,7 +71,7 @@ end
 ---@return boolean
 local function aged(dir, rev, now)
   local committed = committed_at(dir, rev)
-  return committed ~= nil and os.difftime(now, committed) >= MIN_RELEASE_AGE
+  return committed ~= nil and os.difftime(now, committed) >= M.window()
 end
 
 --- The newest ancestor of `rev` that is out of quarantine
@@ -79,7 +86,7 @@ local function aged_ancestor(dir, rev, now)
   return git(dir, {
     'log',
     '-1',
-    '--until=' .. os.date('!%Y-%m-%dT%H:%M:%S+00:00', now - MIN_RELEASE_AGE),
+    '--until=' .. os.date('!%Y-%m-%dT%H:%M:%S+00:00', now - M.window()),
     '--format=%H',
     rev,
   })
@@ -222,7 +229,7 @@ function M.held(now)
             available = target.tag or target.commit:sub(1, 7),
             clears = math.max(
               0,
-              math.floor(committed + MIN_RELEASE_AGE - now + 0.5)
+              math.floor(committed + M.window() - now + 0.5)
             ),
           })
         end
@@ -260,7 +267,7 @@ function M.command()
       )
     end, rows)
     vim.notify(
-      ('Held back for %d days:\n'):format(MIN_RELEASE_AGE / 86400)
+      ('Held back for %d days:\n'):format(M.window() / 86400)
         .. table.concat(lines, '\n'),
       vim.log.levels.INFO,
       { title = 'Quarantine' }
