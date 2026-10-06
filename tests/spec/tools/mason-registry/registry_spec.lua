@@ -85,10 +85,11 @@ describe('tools.mason-registry', function()
       end)
 
       it(
-        'has a versioned package URL',
+        'has a versioned package URL, or names a dytoy tool',
         function()
           assert.is_truthy(
-            spec.source.id:match('^pkg:[%w]+/[^@]+@.+$'),
+            spec.source.id:match('^pkg:[%w]+/[^@]+@.+$')
+              or spec.source.id:match('^dytoy:[^/@]+$'),
             spec.source.id
           )
         end

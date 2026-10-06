@@ -666,12 +666,12 @@ return {
     filetypes = { 'fish' },
     parser = 'fish',
     lsp_servers = { 'fish_lsp' },
-    -- `fish -n` and `fish_indent` are the shell's own, already on `$PATH`
+    -- `fish -n` and `fish_indent` are the shell's own, installed by dytoy
     linters = {
-      { 'fish', mason = { enabled = false } },
+      { 'fish', mason = { package = 'fish' } },
     },
     formatters = {
-      { 'fish_indent', mason = { enabled = false } },
+      { 'fish_indent', mason = { package = 'fish' } },
     },
     endwise = true,
   },
@@ -1097,8 +1097,8 @@ return {
     injected_parsers = { 're2c', 'slint' },
     ext = 'rs',
     lsp_servers = { 'rust_analyzer', 'harper_ls' },
-    -- `rustfmt` comes with the toolchain, Mason has no package for it.
-    formatters = { { 'rustfmt', mason = { enabled = false } } },
+    -- `rustfmt` comes with the toolchain, which dytoy installs through mise.
+    formatters = { { 'rustfmt', mason = { package = 'rust' } } },
     dap = { 'codelldb' },
     -- `rustaceanvim` serves the neotest adapter, from `cargo test` or nextest
     test = { 'rustaceanvim.neotest' },
@@ -1825,7 +1825,7 @@ return {
     lsp_servers = { 'terraformls' },
     linters = { 'tflint', 'trivy' },
     formatters = {
-      { 'tofu_fmt', command = 'tofu', mason = { enabled = false } },
+      { 'tofu_fmt', command = 'tofu', mason = { package = 'opentofu' } },
     },
     null_ls = {
       ltcc_code_action,
@@ -1834,7 +1834,7 @@ return {
         'opentofu_validate',
         type = 'diagnostics',
         command = 'tofu',
-        mason = { enabled = false },
+        mason = { package = 'opentofu' },
       },
     },
   },
@@ -1846,7 +1846,7 @@ return {
       {
         'terragrunt_hclfmt',
         command = 'terragrunt',
-        mason = { enabled = false },
+        mason = { package = 'terragrunt' },
       },
     },
     null_ls = {
@@ -1856,7 +1856,7 @@ return {
         'terragrunt_validate',
         type = 'diagnostics',
         command = 'terragrunt',
-        mason = { enabled = false },
+        mason = { package = 'terragrunt' },
         custom = true,
       },
     },

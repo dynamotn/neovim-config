@@ -333,6 +333,16 @@ collide on, in which case one silently clears the other.
 there are installed up front, which is what a container image or a prebuilt
 development environment wants.
 
+A tool Mason has no package for — one that comes from the system package
+manager, from mise or from a script — can still be installed the same way. A
+package of the repository's own registry with `source.id = 'dytoy:<tool>'`
+hands the install to `dytoy --tool <tool>`, and each of its `bin` entries
+becomes a link to the command wherever dytoy put it
+([lua/tools/mason-dytoy.lua](./lua/tools/mason-dytoy.lua)). A tool already on
+the machine is only linked, without dytoy. When the package manager needs
+`sudo`, the password is asked for in Neovim, with `inputsecret()`, and handed
+to sudo through `SUDO_ASKPASS`.
+
 ### A quarantine in front of Mason and lazy.nvim
 
 Anything freshly published is held back for a week before it may be installed

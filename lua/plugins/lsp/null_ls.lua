@@ -79,14 +79,10 @@ return {
     opts = function(_, opts)
       for name, language in pairs(require('config.languages')) do
         for _, tool in ipairs(language.null_ls or {}) do
-          local tool_package
+          local tool_package = require('util.languages').get_mason_package(tool)
           local is_mason_tool = true
-          if type(tool) == 'string' then
-            tool_package = tool
-          elseif type(tool) == 'table' then
-            if tool.mason then is_mason_tool = tool.mason.enabled ~= false end
-            tool_package = tool.command
-              or (tool.mason and tool.mason.package or tool[1])
+          if type(tool) == 'table' and tool.mason then
+            is_mason_tool = tool.mason.enabled ~= false
           end
           if is_mason_tool then
             -- install server of language in bundle languages
