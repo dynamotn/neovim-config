@@ -6,10 +6,9 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
         -- Toolbox for clang
         'p00f/clangd_extensions.nvim',
         ft = language.filetypes,
+        -- Only the AST, memory usage and symbol info views are its own now:
+        -- clangd itself is set up like any other server
         opts = {
-          inlay_hints = {
-            inline = false,
-          },
           ast = {
             role_icons = {
               type = '',
@@ -76,19 +75,6 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
               },
             },
             harper_ls = {},
-          },
-          setup = {
-            clangd = function(_, opts)
-              local clangd_ext_opts = LazyVim.opts('clangd_extensions.nvim')
-              require('clangd_extensions').setup(
-                vim.tbl_deep_extend(
-                  'force',
-                  clangd_ext_opts or {},
-                  { server = opts }
-                )
-              )
-              return false
-            end,
           },
         },
       },
