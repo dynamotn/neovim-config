@@ -229,7 +229,6 @@ one of the same keys in those buffers.
 <leader>g  git
 
 `<leader>gB`           nx     Git Browse (open)
-`<leader>gC`           n      CI Checks
 `<leader>gD`           n      Git Diff (origin)
 `<leader>gG`           n      Lazygit (cwd)
 `<leader>gH`           n      File History (CodeDiff)
@@ -256,14 +255,7 @@ one of the same keys in those buffers.
 <leader>p  project
 
 `<leader>pa`           n      Open alternative file
-
-==============================================================================
-<leader>pc  codesettings
-
-`<leader>pce`          n      Edit project settings
-`<leader>pcf`          n      Project settings files
-`<leader>pcl`          n      Project settings
-`<leader>pcs`          n      LSP settings of the clients
+`<leader>pc`           n      CI Checks
 
 ==============================================================================
 <leader>ph  github
@@ -285,6 +277,14 @@ one of the same keys in those buffers.
 `<leader>pjs`          n      Search Issues (JQL)
 `<leader>pjv`          n      View Issue
 `<leader>pjw`          n      Log Work
+
+==============================================================================
+<leader>ps  settings (codesettings)
+
+`<leader>pse`          n      Edit project settings
+`<leader>psf`          n      Project settings files
+`<leader>psl`          n      Project settings
+`<leader>pss`          n      LSP settings of the clients
 
 ==============================================================================
 <leader>q  quit/session

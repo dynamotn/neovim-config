@@ -608,7 +608,8 @@ ones worth knowing before which-key gets a chance to tell you:
 | `<leader>ct` | n | Translate |
 | `<leader>a` | n, x | AI CLIs through sidekick; Claude Code under `<leader>ac`, Avante under `<leader>av` |
 | `<leader>yh`, `<leader>yi` | n, x | Yank history, paste an image |
-| `<leader>pc` | n | Project LSP settings (codesettings) |
+| `<leader>ps` | n | Project LSP settings (codesettings) |
+| `<leader>pc` | n | CI checks of the branch (GitHub, GitLab, Forgejo) |
 | `<leader>v` | n, x | Multiple cursors |
 | `<C-c>` | n | Change word |
 | `d`, `x`, `c`, `C`, `X` | n, v | Smart delete: a blank line goes to the black hole register |

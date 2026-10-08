@@ -105,7 +105,7 @@ return {
     cond = vim.fn.has('nvim-0.13') == 1,
     cmd = 'CI',
     keys = {
-      { '<leader>gC', '<cmd>CI<cr>', desc = 'CI Checks' },
+      { '<leader>pc', '<cmd>CI<cr>', desc = 'CI Checks' },
     },
     config = function()
       -- It picks the forge from `upstream`, else `origin`, and has no option

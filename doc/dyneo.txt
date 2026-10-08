@@ -458,7 +458,8 @@ chance to tell you:
     `<leader>av`       n, v   Avante: chat, inline edit, history, model
     `<leader>yh`       n, x   Yank history
     `<leader>yi`       n      Paste an image from the clipboard
-    `<leader>pc`       n      Project LSP settings (codesettings)
+    `<leader>ps`       n      Project LSP settings (codesettings)
+    `<leader>pc`       n      CI checks of the branch
     `<leader>v`        n, x   Multiple cursors
     `<C-c>`            n      Change word
     `d` `x` `c` `C` `X`        n, v   Smart delete: a blank line goes to the

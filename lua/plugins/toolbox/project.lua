@@ -5,22 +5,22 @@ return {
     lazy = false,
     keys = {
       {
-        '<leader>pcs',
+        '<leader>pss',
         '<cmd>Codesettings show<cr>',
         desc = 'LSP settings of the clients',
       },
       {
-        '<leader>pcl',
+        '<leader>psl',
         '<cmd>Codesettings local<cr>',
         desc = 'Project settings',
       },
       {
-        '<leader>pcf',
+        '<leader>psf',
         '<cmd>Codesettings files<cr>',
         desc = 'Project settings files',
       },
       {
-        '<leader>pce',
+        '<leader>pse',
         '<cmd>Codesettings edit<cr>',
         desc = 'Edit project settings',
       },
@@ -32,7 +32,7 @@ return {
     opts = {
       spec = {
         { '<leader>p', group = 'project' },
-        { '<leader>pc', group = 'codesettings' },
+        { '<leader>ps', group = 'settings (codesettings)' },
       },
     },
   },
