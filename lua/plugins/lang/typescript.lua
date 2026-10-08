@@ -1,5 +1,18 @@
-local language = require('config.languages').typescript
+local languages = require('config.languages')
+local language = languages.typescript
+--- Every filetype the JavaScript debugger serves: plain, JSX and TypeScript
+---@type string[]
+local js_filetypes = vim
+  .iter({
+    languages.javascript.filetypes,
+    languages.tsx.filetypes,
+    languages.typescript.filetypes,
+  })
+  :flatten()
+  :totable()
 local condition = vim.list_contains(_G.enabled_languages, 'typescript')
+  or vim.list_contains(_G.enabled_languages, 'javascript')
+  or vim.list_contains(_G.enabled_languages, 'tsx')
   or vim.list_contains(_G.enabled_languages, 'angular')
   or vim.list_contains(_G.enabled_languages, 'vue')
 return condition
@@ -175,7 +188,9 @@ return condition
         'mfussenegger/nvim-dap',
         opts = function()
           local dap = require('dap')
-          for _, adapterType in ipairs({ 'node', 'firefox' }) do
+          -- The targets js-debug knows; Firefox has an adapter of its own,
+          -- from mason-nvim-dap
+          for _, adapterType in ipairs({ 'node', 'chrome', 'msedge' }) do
             local pwaType = 'pwa-' .. adapterType
 
             if not dap.adapters[pwaType] then
@@ -207,53 +222,54 @@ return condition
           end
 
           local vscode = require('dap.ext.vscode')
-          vscode.type_to_filetypes['node'] = language.filetypes
-          vscode.type_to_filetypes['pwa-node'] = language.filetypes
+          vscode.type_to_filetypes['node'] = js_filetypes
+          vscode.type_to_filetypes['pwa-node'] = js_filetypes
 
-          for _, filetype in ipairs(language.filetypes) do
-            if not dap.configurations[filetype] then
-              local runtimeExecutable = nil
-              if filetype:find('typescript') then
-                runtimeExecutable = vim.fn.executable('tsx') == 1 and 'tsx'
-                  or 'ts-node'
-              end
-              dap.configurations[filetype] = {
-                {
-                  type = 'pwa-node',
-                  request = 'launch',
-                  name = 'Launch file',
-                  program = '${file}',
-                  cwd = '${workspaceFolder}',
-                  sourceMaps = true,
-                  runtimeExecutable = runtimeExecutable,
-                  skipFiles = {
-                    '<node_internals>/**',
-                    'node_modules/**',
-                  },
-                  resolveSourceMapLocations = {
-                    '${workspaceFolder}/**',
-                    '!**/node_modules/**',
-                  },
-                },
-                {
-                  type = 'pwa-node',
-                  request = 'attach',
-                  name = 'Attach',
-                  processId = require('dap.utils').pick_process,
-                  cwd = '${workspaceFolder}',
-                  sourceMaps = true,
-                  runtimeExecutable = runtimeExecutable,
-                  skipFiles = {
-                    '<node_internals>/**',
-                    'node_modules/**',
-                  },
-                  resolveSourceMapLocations = {
-                    '${workspaceFolder}/**',
-                    '!**/node_modules/**',
-                  },
-                },
-              }
+          -- Ahead of whatever is there already rather than instead of it:
+          -- mason-nvim-dap's Firefox handler may have run first, and its
+          -- configurations would otherwise have been the only ones
+          for _, filetype in ipairs(js_filetypes) do
+            local runtimeExecutable = nil
+            if filetype:find('typescript') then
+              runtimeExecutable = vim.fn.executable('tsx') == 1 and 'tsx'
+                or 'ts-node'
             end
+            dap.configurations[filetype] = vim.list_extend({
+              {
+                type = 'pwa-node',
+                request = 'launch',
+                name = 'Launch file',
+                program = '${file}',
+                cwd = '${workspaceFolder}',
+                sourceMaps = true,
+                runtimeExecutable = runtimeExecutable,
+                skipFiles = {
+                  '<node_internals>/**',
+                  'node_modules/**',
+                },
+                resolveSourceMapLocations = {
+                  '${workspaceFolder}/**',
+                  '!**/node_modules/**',
+                },
+              },
+              {
+                type = 'pwa-node',
+                request = 'attach',
+                name = 'Attach',
+                processId = require('dap.utils').pick_process,
+                cwd = '${workspaceFolder}',
+                sourceMaps = true,
+                runtimeExecutable = runtimeExecutable,
+                skipFiles = {
+                  '<node_internals>/**',
+                  'node_modules/**',
+                },
+                resolveSourceMapLocations = {
+                  '${workspaceFolder}/**',
+                  '!**/node_modules/**',
+                },
+              },
+            }, dap.configurations[filetype] or {})
           end
         end,
       },
