@@ -150,7 +150,7 @@ return {
     },
     keys = {
       {
-        '<leader>p',
+        '<leader>yp',
         '<cmd>PasteImage<cr>',
         desc = 'Paste image from system clipboard',
       },

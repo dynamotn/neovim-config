@@ -35,13 +35,15 @@ return condition
                 require('util.yaml_schema').on_init(client)
               end,
               keys = {
+                -- A group of its own, so `<leader>cY` stays the rulebook's
+                { '<leader>cy', '', desc = '+yaml' },
                 {
-                  '<leader>cy',
+                  '<leader>cys',
                   function() require('util.yaml_schema').select() end,
                   desc = 'Select YAML Schema',
                 },
                 {
-                  '<leader>cY',
+                  '<leader>cym',
                   function() require('util.yaml_schema').select(0, true) end,
                   desc = 'Insert YAML Schema Modeline',
                 },

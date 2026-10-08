@@ -1,12 +1,38 @@
 return {
   -- Project setting
-  { 'mrjones2014/codesettings.nvim', lazy = false },
+  {
+    'mrjones2014/codesettings.nvim',
+    lazy = false,
+    keys = {
+      {
+        '<leader>pcs',
+        '<cmd>Codesettings show<cr>',
+        desc = 'LSP settings of the clients',
+      },
+      {
+        '<leader>pcl',
+        '<cmd>Codesettings local<cr>',
+        desc = 'Project settings',
+      },
+      {
+        '<leader>pcf',
+        '<cmd>Codesettings files<cr>',
+        desc = 'Project settings files',
+      },
+      {
+        '<leader>pce',
+        '<cmd>Codesettings edit<cr>',
+        desc = 'Edit project settings',
+      },
+    },
+  },
   {
     -- Integrate project management with which-key
     'folke/which-key.nvim',
     opts = {
       spec = {
         { '<leader>p', group = 'project' },
+        { '<leader>pc', group = 'codesettings' },
       },
     },
   },

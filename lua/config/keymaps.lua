@@ -374,9 +374,6 @@ for _, key in pairs(keys) do
   )
 end
 
--- Replace selected text without copying it
-vim.keymap.set('v', 'p', '"_dP', { desc = 'Paste' })
-
 -- Fast tab
 for number = 1, 9 do
   vim.keymap.set(
@@ -458,5 +455,5 @@ vim.keymap.set(
 
 -- Fast search and replace
 vim.keymap.set('x', '/', '<Esc>/\\%V', { desc = 'Search in visual region' })
-vim.keymap.set('v', '<C-f>', 'y/<C-r>"', { desc = 'Search selected text' })
-vim.keymap.set('v', '<C-r>', 'y:%s#<C-r>"#', { desc = 'Replace selected text' })
+vim.keymap.set('x', '<C-f>', 'y/<C-r>"', { desc = 'Search selected text' })
+vim.keymap.set('x', '<C-r>', 'y:%s#<C-r>"#', { desc = 'Replace selected text' })

@@ -27,6 +27,8 @@ neovim-config-features	neovim-config.txt	/*neovim-config-features*
 neovim-config-globals	neovim-config.txt	/*neovim-config-globals*
 neovim-config-install	neovim-config.txt	/*neovim-config-install*
 neovim-config-integrations	neovim-config.txt	/*neovim-config-integrations*
+neovim-config-keymaps	neovim-config-keymaps.txt	/*neovim-config-keymaps*
+neovim-config-keymaps.txt	neovim-config-keymaps.txt	/*neovim-config-keymaps.txt*
 neovim-config-languages	neovim-config.txt	/*neovim-config-languages*
 neovim-config-layout	neovim-config.txt	/*neovim-config-layout*
 neovim-config-lazy-install	neovim-config.txt	/*neovim-config-lazy-install*

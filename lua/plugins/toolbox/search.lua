@@ -44,11 +44,7 @@ return {
         '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
         desc = 'Buffer Diagnostics (Trouble)',
       },
-      {
-        '<leader>cs',
-        '<cmd>Trouble symbols toggle<cr>',
-        desc = 'Symbols (Trouble)',
-      },
+      -- `<leader>cs` belongs to the outline, see `plugins.lsp.outline`
       {
         '<leader>cS',
         '<cmd>Trouble lsp toggle<cr>',

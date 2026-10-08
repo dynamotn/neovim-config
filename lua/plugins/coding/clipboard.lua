@@ -13,7 +13,7 @@ return {
     },
     keys = {
       {
-        '<leader>y',
+        '<leader>yh',
         function() Snacks.picker.pick('yanky') end,
         mode = { 'n', 'x' },
         desc = 'Open Yank History',

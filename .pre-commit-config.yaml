@@ -42,6 +42,13 @@ repos:
         language: system
         files: \.lua$
         pass_filenames: false
+      - id: keymaps-doc
+        name: Keymap reference
+        description: Regenerates doc/neovim-config-keymaps.txt, so the help lists the mappings the configuration actually sets.
+        entry: scripts/keymaps-doc.sh
+        language: script
+        files: \.lua$
+        pass_filenames: false
       - id: bench
         name: Startup benchmark
         description: Times the startup of this configuration and rewrites the Benchmark section of README.md when a median moved by more than 20%.

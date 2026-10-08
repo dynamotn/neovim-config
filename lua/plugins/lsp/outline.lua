@@ -36,14 +36,6 @@ local kind_filter = {
 
 return {
   {
-    -- `<leader>cs` toggles the outline instead
-    'folke/trouble.nvim',
-    optional = true,
-    keys = {
-      { '<leader>cs', false },
-    },
-  },
-  {
     -- Code outline sidebar
     'hedyhli/outline.nvim',
     keys = { { '<leader>cs', '<cmd>Outline<cr>', desc = 'Toggle Outline' } },

@@ -47,11 +47,6 @@ describe('config.keymaps', function()
     end
   end)
 
-  it(
-    'pastes over a selection without yanking it',
-    function() assert.are.equal('"_dP', map('v', 'p').rhs) end
-  )
-
   describe('smart delete', function()
     local function expand(key, line)
       local bufnr = h.buffer({ lines = { line } })

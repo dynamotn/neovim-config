@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# @file keymaps-doc.sh
+# @brief Regenerate doc/neovim-config-keymaps.txt
+# @description
+#   Loads this tree in a headless Neovim through keymaps-doc.lua, which writes
+#   every mapping it sets into the help file, then refreshes the help tags.
+#   Neovim is pointed at this tree rather than at `$HOME`, as check-startup.sh
+#   does, so the file follows what is about to be committed.
+set -euo pipefail
+
+repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+workdir="$(mktemp -d)"
+trap 'rm -rf "${workdir}"' EXIT
+mkdir -p "${workdir}/config"
+ln -s "${repo}" "${workdir}/config/nvim"
+
+XDG_CONFIG_HOME="${workdir}/config" nvim --headless -i NONE \
+  --cmd "luafile ${repo}/scripts/keymaps-doc.lua" < /dev/null
+nvim --headless -u NONE -c "helptags ${repo}/doc" -c 'qall!'
