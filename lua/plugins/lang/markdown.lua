@@ -8,11 +8,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
-            tailwindcss = {
-              filetypes_exclude = { 'markdown' },
-            },
             marksman = {},
-            vale_ls = {},
             harper_ls = {},
           },
         },
