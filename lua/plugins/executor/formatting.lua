@@ -119,6 +119,51 @@ return {
         return lang_to_ft, lang_to_ext
       end
 
+      -- Where the clean-up of `*` would change what the file means: a Markdown
+      -- hard break is two trailing spaces, an empty context line of a patch
+      -- is a single space.
+      local finish_formatters_by_ft
+      local keep_trailing_space =
+        { diff = true, gitsendemail = true, mail = true, markdown = true }
+      -- A filetype with a formatter of its own leaves blank lines to it:
+      -- Python's two between definitions are not to be squeezed into one.
+      local own_blank_lines = { diff = true, markdown = true }
+
+      --- Turn the `*` entry into a function of the buffer, and let the
+      --- language server format any filetype left without a formatter
+      ---
+      --- conform adds the `*` list to every filetype, and `lsp_format =
+      --- 'fallback'` only asks the server when that whole list is empty --
+      --- which, with `*` in it, it never is.
+      ---@param by_ft table<string, string[]>
+      ---@return table<string, any>
+      finish_formatters_by_ft = function(by_ft)
+        local common = by_ft['*'] or {}
+        by_ft['*'] = function(bufnr)
+          local ft = vim.bo[bufnr].filetype
+          local base = ft:match('^[^.]+') or ft
+          local own = by_ft[ft] or by_ft[base]
+          local has_own = type(own) == 'table' and #own > 0
+          return vim.tbl_filter(function(name)
+            if name == 'trim_whitespace' then
+              return not keep_trailing_space[base]
+            elseif name == 'condense_blank_lines' then
+              return not has_own and not own_blank_lines[base]
+            elseif name == 'trim_newlines' then
+              return base ~= 'diff'
+            end
+            return true
+          end, common)
+        end
+        for ft, tools in pairs(by_ft) do
+          if type(tools) == 'table' and #tools == 0 then
+            by_ft[ft] = { lsp_format = 'last' }
+          end
+        end
+        by_ft._ = { lsp_format = 'last' }
+        return by_ft
+      end
+
       -- `config.languages` owns the formatters of a filetype, so a filetype it
       -- names is always assigned, empty list included. But more than one entry
       -- may name the same filetype, so the lists are built whole and assigned
@@ -145,13 +190,15 @@ return {
               or name == '*'
               or tool_name == 'injected'
             then
-              for _, ft in ipairs(language.filetypes) do
+              local fts = type(tool) == 'table' and tool.filetypes
+                or language.filetypes
+              for _, ft in ipairs(fts) do
                 table.insert(by_ft[ft], tool_name)
               end
             end
           end
         end
-        return by_ft
+        return finish_formatters_by_ft(by_ft)
       end
 
       for ft, tools in pairs(build_formatters_by_ft()) do
@@ -220,7 +267,8 @@ return {
               local ft = lang_to_ft[lang] or lang
               if
                 not has_parser(lang)
-                and not vim.tbl_isempty(formatters_by_ft[ft] or {})
+                and type(formatters_by_ft[ft]) == 'table'
+                and #formatters_by_ft[ft] > 0
               then
                 missing[lang] = true
               end
