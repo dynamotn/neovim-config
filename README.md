@@ -19,11 +19,9 @@ languages; only a few globals differ.
 
 - [Highlights](#highlights)
 - [Quick start](#quick-start)
-- [Configuration](#configuration)
 - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
 - [Features](#features)
-- [Key bindings](#key-bindings)
-- [Commands](#commands)
+- [Help](#help)
 - [Repository layout](#repository-layout)
 - [Development](#development)
 - [Benchmark](#benchmark)
@@ -83,41 +81,6 @@ NVIM_APPNAME=dynamo nvim
 The first start clones the plugins; the first file of a language installs its
 tooling. Then try `:Lazy`, `:Mason`, `:checkhealth dyneo`, and `<Space>` to
 let which-key list everything.
-
-## Configuration
-
-Override the defaults of [lua/config/globals.lua](./lua/config/globals.lua) in
-`lua/per_machine/config.lua`, loaded before anything else (chezmoi renders it
-from `config.lua.tmpl` on my machines; without it the defaults stand):
-
-```lua
-DyNeo.plugin_channel = 'stable'
-DyNeo.enabled_languages = { 'lua', 'bash', 'markdown' }
-DyNeo.enabled_plugins.obsidian = true
-```
-
-| Global | Default | What it does |
-| ------ | ------- | ------------ |
-| `DyNeo.dark_mode` | `true` | Background, when the clock is not in charge |
-| `DyNeo.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode` |
-| `DyNeo.plugin_channel` | `'latest'` | `latest` (newest commits, `lazy-lock.json`) or `stable` (releases, `lazy-lock.stable.json`) |
-| `DyNeo.quarantine_window` | one week | How long a release waits before it may be installed; `0` turns it off |
-| `DyNeo.enabled_languages` | all | Languages that get plugins, parsers and tools |
-| `DyNeo.bundle_languages` | `{}` | Languages installed up front, for containers |
-| `DyNeo.enabled_plugins` | all `false` | `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi` |
-| `DyNeo.used_full_plugins` | `false` | Install every plugin, to refresh the lockfile |
-| `DyNeo.is_gentoo` | `false` | Gentoo ebuild syntax |
-| `DyNeo.obsidian.paths` | `{ personal = '~/Documents/Notes' }` | Vault name to folder |
-| `DyNeo.yaml_schema_dirs` | `{}` | Local schema folders for the YAML schema picker |
-| `DyNeo.dictionaries_path` | `$XDG_CONFIG_HOME/dictionaries` | Word lists for completion and `:DySpell` |
-| `DyNeo.dev_plugins_path` | `$NVIM_DEV_PLUGINS` or `~/Working/community/nvim` | Where `dev = true` plugins are looked for |
-| `DyNeo.firenvim_site_settings` | `{}` | Per-site rules for firenvim |
-| `DyNeo.test_strategy` | `'toggleterm'`, `'zellij'` inside zellij | How vim-test runs a test |
-| `DyNeo.completion_sources` | `{}` | Source names shown in the completion menu |
-
-**Updating plugins.** Commit the lockfile, `:Lazy update`, commit again once
-everything works. To roll back, `git restore lazy-lock.json` and `:Lazy
-restore`.
 
 ## Languages, Frameworks, or Tools support
 
@@ -231,49 +194,18 @@ mode, LanguageTool for comments, nvim-lint definitions for `betterleaks`,
   picks an issue to branch from, move, log work on, view or open; without one
   picked, the issue in the branch name is used.
 
-## Key bindings
+## Help
 
-The leader is `Space`; which-key lists everything under it and `<Space>sk`
-searches it. Every mapping is in
-[doc/dyneo-keymaps.txt](./doc/dyneo-keymaps.txt) (`:help dyneo-keymaps`).
-The ones worth knowing:
+Configuration, mappings and commands are documented inside Neovim:
 
-| Key | Mode | What |
-| --- | ---- | ---- |
-| `<leader>fy` | n | Copy the file path: relative, absolute, with line or column, directory, root |
-| `<leader>cL`, `<leader>cT` | n | Servers, formatters and linters of the buffer |
-| `<leader>cys`, `<leader>cym` | n | Pick a YAML schema, or write it as a modeline |
-| `<leader>cp` | n | Preview the diagram, Markdown or Typst |
-| `<leader>xw` | n | Workspace diagnostics |
-| `<leader>pc` | n | CI checks of the branch |
-| `<leader>ph` | n | GitHub (Octo) |
-| `<leader>pl` | n | GitLab merge requests |
-| `<leader>pj` | n | Jira |
-| `<leader>ps` | n | Project LSP settings (codesettings) |
-| `<leader>a` | n, x | AI CLIs; Claude Code at `<leader>ac`, Avante at `<leader>av` |
-| `<leader>uk` | n | Mask the values of a secret file |
-| `<leader>ct` | n | Translate |
-| `<leader>yh`, `<leader>yi` | n, x | Yank history, paste an image |
-| `<leader>v` | n, x | Multiple cursors |
-| `d`, `x`, `c`, `C`, `X` | n, v | A blank line goes to the black hole register |
-| `/`, `<C-f>`, `<C-r>` | x | Search inside, search for, replace the selection |
-| `:W`, `:Q`, `:Wq`, `:Qa`, `:ww` | c | The typo you meant; `:ww` saves through `sudo tee` |
+| Read | For |
+| ---- | --- |
+| `:help dyneo` | Everything, starting from the contents |
+| `:help dyneo-configuration` | `lua/per_machine/config.lua`, every `DyNeo.*` global, plugin channels, updating plugins |
+| `:help dyneo-mappings` | The mappings worth knowing; `:help dyneo-keymaps` lists all of them |
+| `:help dyneo-commands` | Every command this configuration adds |
 
-## Commands
-
-| Command | What |
-| ------- | ---- |
-| `:LazyQuarantine [review [{plugin}]]` | Plugins held back; or what their updates bring, flagged |
-| `:DySbom [{path}\|osv]` | Plugins and Mason packages as CycloneDX; or their known vulnerabilities |
-| `:AiGuardCheck`, `:AiGuardAllow[!]`, `:AiGuardLog[!]` | Why a buffer is kept from AI; waive it; what was sent |
-| `:YamlSchema [modeline\|reset] [{path}]` | Set the schema of a YAML buffer |
-| `:DyNeoFormat`, `:DyNeoFormatInfo` | Format; which formatters would run |
-| `:DyNeoRoot` | The roots found for this buffer |
-| `:DySpell {lang}` | Rebuild a spell file |
-| `:Runbook [run\|all\|clear\|stop]` | Run the Markdown code blocks |
-| `:Jira [search {jql}\|{action} [{key}]]` | Pick an issue, or `branch`, `move`, `worklog`, `view`, `open`, `insert`, `copy` |
-
-`:help dyneo` covers the same ground inside Neovim.
+Or press `<Space>` and let which-key show what is there.
 
 ## Repository layout
 
