@@ -84,7 +84,6 @@ M.sources = function(filetype)
     clojure = { 'conjure' },
     fish = { 'fish' },
     julia = { 'latex_symbols' },
-    r = { 'cmp_r' },
     sql = { 'dadbod', 'sql' },
     lua = { 'lazydev' },
   }

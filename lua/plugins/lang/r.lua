@@ -66,23 +66,12 @@ return vim.list_contains(_G.enabled_languages, 'r')
         },
       },
       {
-        -- Completion out of the running R session. Its own spec rather than a
-        -- dependency of blink.cmp, which would load it on the first
-        -- `InsertEnter` of any buffer.
-        'R-nvim/cmp-r',
-        ft = language.filetypes,
-        init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
-              cmp_r = '「R」',
-            })
-        end,
-      },
-      {
+        -- Completion out of the running R session comes from R.nvim's own
+        -- language server, `r_ls`, through the `lsp` source; cmp-r is
+        -- archived and no longer talks to it
         'blink.cmp',
         opts = {
           sources = {
-            compat = { 'cmp_r' },
             per_filetype = {
               r = cmp_util.sources('r'),
             },
