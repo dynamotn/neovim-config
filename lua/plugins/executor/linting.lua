@@ -41,8 +41,10 @@ return {
               tool_command = tool.command or tool_name
             end
             if
-              (vim.fn.executable(tool_command) == 1 or name == '*')
-              and tool_name ~= 'vale'
+              (
+                require('util.languages').is_available(tool_command)
+                or name == '*'
+              ) and tool_name ~= 'vale'
             then
               for _, ft in ipairs(language.filetypes) do
                 table.insert(by_ft[ft], tool_name)

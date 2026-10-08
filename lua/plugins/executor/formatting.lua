@@ -91,7 +91,7 @@ return {
               tool_command = tool.command or tool_name
             end
             if
-              vim.fn.executable(tool_command) == 1
+              require('util.languages').is_available(tool_command)
               or name == '*'
               or tool_name == 'injected'
             then

@@ -337,7 +337,7 @@ local function system_tools()
           and not seen[command]
         then
           seen[command] = true
-          if vim.fn.executable(command) == 0 then
+          if not require('util.languages').is_available(command) then
             table.insert(missing, command)
           end
         end

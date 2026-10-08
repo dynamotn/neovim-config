@@ -49,9 +49,8 @@
 --- `command` doubles as the availability probe: a filetype is only given a
 --- tool whose command is executable. A formatter that is really a subcommand
 --- of a larger binary (`ruff_format` -> `ruff`, `tofu_fmt` -> `tofu`) names
---- that binary, and one that runs inside Neovim itself names `lua`. The probe
---- is `executable()`, so `lua` still asks for an interpreter on `$PATH`; only
---- the tools of `*`, and conform's `injected`, are handed out without asking.
+--- that binary, and one that runs inside Neovim itself names `lua`, which
+--- `util.languages.is_available` counts as always there.
 ---
 --- A tool Mason has no package for still names a package, one of
 --- `tools.mason-registry`. It is built from a release or a language registry

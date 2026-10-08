@@ -101,6 +101,16 @@ M.get_mason_package = function(tool)
   return (tool.mason and tool.mason.package) or tool.command or tool[1]
 end
 
+--- Whether the command a tool spec names can run here
+---
+--- `lua` stands for a tool that runs inside Neovim itself, so it is there
+--- whether or not the machine has a Lua interpreter of its own.
+---@param command string
+---@return boolean
+M.is_available = function(command)
+  return command == 'lua' or vim.fn.executable(command) == 1
+end
+
 --- Return list of LSP servers for filetype
 ---
 --- A server whose spec carries an `enabled` check is left out of a buffer it

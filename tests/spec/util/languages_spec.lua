@@ -130,6 +130,27 @@ describe('util.languages', function()
     end)
   end)
 
+  describe('is_available', function()
+    it('counts lua as there without an interpreter on $PATH', function()
+      local restore = h.stub(vim.fn, 'executable', function() return 0 end)
+      local lua, other =
+        languages.is_available('lua'), languages.is_available('stylua')
+      restore()
+      assert.is_true(lua)
+      assert.is_false(other)
+    end)
+    it('asks executable() for any other command', function()
+      local restore = h.stub(
+        vim.fn,
+        'executable',
+        function(name) return name == 'stylua' and 1 or 0 end
+      )
+      local found = languages.is_available('stylua')
+      restore()
+      assert.is_true(found)
+    end)
+  end)
+
   describe('get_lsp_servers_by_filetype', function()
     local configs
     before_each(function()
