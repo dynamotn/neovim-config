@@ -50,6 +50,7 @@ says what is missing.
 | 🔒 | **Quarantine** — Mason and plugin releases wait a week; review what an update adds, flagged; SBOM and OSV check | `:LazyQuarantine review` · `:DySbom osv` |
 | 🤖 | **AI guard** — `.env`, keys and token-shaped text kept from every AI; masked on screen; every handover logged | `:AiGuardCheck` · `:AiGuardLog` |
 | 📜 | **Runbooks** — run a Markdown code block in place, its output fenced below; destructive commands ask first | `<localleader>r` |
+| 🏗 | **Terraform plan** — `tofu plan` shown on the blocks it changes: create, update, replace and what forces it, destroy | `<localleader>p` · `:TfPlan` |
 | 🌐 | **Forges & trackers** — GitHub (Octo), GitLab merge requests, CI checks, Jira issues to branches and worklogs | `<leader>ph` `pl` `pc` `pj` |
 | 🧭 | **YAML schemas** — Kubernetes, CRDs, cloud-init detected; pick any other | `<leader>cys` |
 | 🔍 | **Whole-project diagnostics** — every file handed to the server, off the main loop | `<leader>xw` |

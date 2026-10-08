@@ -39,7 +39,8 @@ CONTENTS                                                      *dyneo-contents*
        5.7 Diagrams .......................................... |dyneo-diagram|
        5.8 Workspace diagnostics ........................... |dyneo-workspace|
        5.9 Runbooks .......................................... |dyneo-runbook|
-       5.10 Integrations ................................ |dyneo-integrations|
+       5.10 Terraform plan .................................... |dyneo-tfplan|
+       5.11 Integrations ................................ |dyneo-integrations|
     6. Mappings ............................................. |dyneo-mappings|
     7. Commands ............................................. |dyneo-commands|
     8. Layout ................................................. |dyneo-layout|
@@ -419,7 +420,18 @@ first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
 what is running.  A block that deletes, destroys or reaches for root asks
 first.  See |:Runbook|.
 
-5.10 Integrations                                         *dyneo-integrations*
+5.10 Terraform plan                                             *dyneo-tfplan*
+
+In a Terraform buffer, `<localleader>p` (or |:TfPlan|) runs `tofu plan`,
+or `terraform plan` without OpenTofu, in the directory of the file, and
+shows what it would do on the blocks that ask for it: `+ create`,
+`~ update in place`, `-/+ replace` with the attributes forcing it, and
+`- destroy`, as diagnostics walked with `]d`, and all of it in the quickfix
+list.  A module call carries every change below it.  The plan runs with
+`-lock=false`, and its file -- every planned value in plain text -- is
+deleted once read.  `<localleader>P` clears it.
+
+5.11 Integrations                                         *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
 chezmoi             Templates edited with the target language injected, not
@@ -560,6 +572,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :Runbook clear          Remove every `output` fence.
 :Runbook stop           Stop what the buffer is running.
                         See |dyneo-runbook|.
+
+                                                                     *:TfPlan*
+:TfPlan                 Plan the module of this buffer and show it on its
+                        blocks.
+:TfPlan clear           Clear the plan shown.  See |dyneo-tfplan|.
 
                                                                        *:Jira*
 :Jira                   Pick among the issues assigned to you, then choose

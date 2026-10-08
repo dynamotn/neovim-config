@@ -9,6 +9,7 @@
 :Jira	dyneo.txt	/*:Jira*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
 :Runbook	dyneo.txt	/*:Runbook*
+:TfPlan	dyneo.txt	/*:TfPlan*
 :YamlSchema	dyneo.txt	/*:YamlSchema*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*
 DyNeo.completion_sources	dyneo.txt	/*DyNeo.completion_sources*
@@ -51,6 +52,7 @@ dyneo-runbook	dyneo.txt	/*dyneo-runbook*
 dyneo-schema	dyneo.txt	/*dyneo-schema*
 dyneo-spell	dyneo.txt	/*dyneo-spell*
 dyneo-statusline	dyneo.txt	/*dyneo-statusline*
+dyneo-tfplan	dyneo.txt	/*dyneo-tfplan*
 dyneo-troubleshooting	dyneo.txt	/*dyneo-troubleshooting*
 dyneo-update	dyneo.txt	/*dyneo-update*
 dyneo-workspace	dyneo.txt	/*dyneo-workspace*
