@@ -1,0 +1,79 @@
+--- The GitLab a repository is on, and the token to reach it with
+---
+--- gitlab.nvim looks for its token in a `.gitlab.nvim` file at the root of
+--- the project or in `GITLAB_TOKEN`, and talks to gitlab.com unless told
+--- otherwise. Both miss the usual case here: `glab` is already logged in,
+--- and `origin` may be a self-hosted instance. So the plugin's own lookup is
+--- asked first, and what it leaves out is filled in from `glab` and from the
+--- remote -- the token is handed to the plugin's local server and never
+--- kept or shown here.
+local M = {}
+
+--- The host of a git remote URL, for `https://`, `ssh://` and scp-like URLs
+---@param url string
+---@return string?
+function M.host_of(url)
+  local rest = url:match('^%a[%w+.-]*://(.*)$')
+  if rest then
+    local host = rest:gsub('^[^@/]*@', ''):match('^([^/:]+)')
+    return host
+  end
+  return url:match('^[%w_.-]+@([^:]+):')
+end
+
+--- The URL of `remote` in `dir`, or nil
+---@param dir string
+---@param remote string
+---@return string?
+function M.remote_url(dir, remote)
+  local result = vim
+    .system({ 'git', '-C', dir, 'remote', 'get-url', remote }, { text = true })
+    :wait(5000)
+  local url = result.code == 0 and vim.trim(result.stdout or '') or ''
+  return url ~= '' and url or nil
+end
+
+--- The token `glab` holds for `host`, or nil
+---@param host string
+---@return string?
+function M.glab_token(host)
+  if vim.fn.executable('glab') ~= 1 then return nil end
+  local result = vim
+    .system({ 'glab', 'config', 'get', 'token', '--host', host }, { text = true })
+    :wait(5000)
+  local token = result.code == 0 and vim.trim(result.stdout or '') or ''
+  return token ~= '' and token or nil
+end
+
+--- The token and the URL gitlab.nvim connects with
+---
+--- `fallback` is the plugin's own lookup, which reads `.gitlab.nvim` and the
+--- environment; whatever it leaves empty comes from `glab` and from the
+--- remote of the repository the editor is in.
+---@param fallback fun(): string?, string?, string?
+---@param remote string The remote gitlab.nvim targets
+---@return string? token
+---@return string? url
+---@return string? err
+function M.auth(fallback, remote)
+  local token, url = fallback()
+  if token and token ~= '' and url and url ~= '' then return token, url end
+
+  local dir = vim.fs.root(0, '.git') or vim.uv.cwd() --[[@as string]]
+  local remote_url = M.remote_url(dir, remote)
+  local host = remote_url and M.host_of(remote_url)
+  if (not url or url == '') and host then url = 'https://' .. host end
+  if (not token or token == '') and host then token = M.glab_token(host) end
+
+  if not token or token == '' then
+    -- gitlab.nvim gives up silently on an error, so it is said here
+    local err = ('No GitLab token for %s: run `glab auth login`, or set GITLAB_TOKEN'):format(
+      host or remote
+    )
+    vim.notify(err, vim.log.levels.ERROR, { title = 'GitLab' })
+    return nil, nil, err
+  end
+  return token, url
+end
+
+return M

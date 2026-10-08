@@ -202,6 +202,55 @@ return {
         },
       }
     or {},
+  -- Review GitLab merge requests -- diff, comments, approvals, pipeline --
+  -- when the `glab` CLI is there, which is also where the token comes from
+  -- (`util.gitlab_auth`). Its own `gl…` mappings are turned off for these,
+  -- under `<leader>pl`.
+  vim.fn.executable('glab') == 1
+      and {
+        'harrisoncramer/gitlab.nvim',
+        dependencies = {
+          'MunifTanjim/nui.nvim',
+          -- The maintained fork gitlab.nvim recommends: it detects renames
+          -- with GitLab's own threshold, so comments land on the right file
+          'dlyongemallo/diffview-plus.nvim',
+        },
+        -- Builds the local Go server the plugin talks to GitLab through
+        build = function() require('gitlab.server').build(true) end,
+        opts = function()
+          local remote = 'origin'
+          return {
+            auth_provider = function()
+              return require('util.gitlab_auth').auth(
+                require('gitlab.state').default_auth_provider,
+                remote
+              )
+            end,
+            connection_settings = { remote = remote },
+            keymaps = { global = { disable_all = true } },
+          }
+        end,
+        -- stylua: ignore
+        keys = {
+          { '<leader>pl', '', desc = '+gitlab' },
+          { '<leader>plc', function() require('gitlab').choose_merge_request() end, desc = 'Choose MR (GitLab)' },
+          { '<leader>plS', function() require('gitlab').review() end, desc = 'Review This Branch (GitLab)' },
+          { '<leader>plQ', function() require('gitlab').close_review() end, desc = 'Close Review (GitLab)' },
+          { '<leader>pls', function() require('gitlab').summary() end, desc = 'MR Summary (GitLab)' },
+          { '<leader>pld', function() require('gitlab').toggle_discussions() end, desc = 'Discussions (GitLab)' },
+          { '<leader>pln', function() require('gitlab').create_note() end, desc = 'Note (GitLab)' },
+          { '<leader>plD', function() require('gitlab').toggle_draft_mode() end, desc = 'Toggle Draft Mode (GitLab)' },
+          { '<leader>plP', function() require('gitlab').publish_all_drafts() end, desc = 'Publish Drafts (GitLab)' },
+          { '<leader>plA', function() require('gitlab').approve() end, desc = 'Approve (GitLab)' },
+          { '<leader>plR', function() require('gitlab').revoke() end, desc = 'Revoke Approval (GitLab)' },
+          { '<leader>plM', function() require('gitlab').merge() end, desc = 'Merge (GitLab)' },
+          { '<leader>plC', function() require('gitlab').create_mr() end, desc = 'Create MR (GitLab)' },
+          { '<leader>plp', function() require('gitlab').pipeline() end, desc = 'Pipeline (GitLab)' },
+          { '<leader>plo', function() require('gitlab').open_in_browser() end, desc = 'Open MR in Browser (GitLab)' },
+          { '<leader>plu', function() require('gitlab').copy_mr_url() end, desc = 'Copy MR URL (GitLab)' },
+        },
+      }
+    or {},
   {
     -- Completion source. Its own spec rather than a dependency of blink.cmp,
     -- which would load it on the first `InsertEnter` of any buffer.

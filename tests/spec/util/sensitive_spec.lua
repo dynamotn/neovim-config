@@ -34,6 +34,7 @@ describe('util.sensitive', function()
       '.npmrc',
       '.pypirc',
       '.vault-token',
+      '.gitlab.nvim',
     }) do
       it(
         'flags a file named ' .. name,

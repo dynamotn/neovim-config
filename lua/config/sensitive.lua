@@ -22,6 +22,7 @@ return {
     '^%.npmrc$', -- package registry tokens
     '^%.pypirc$',
     '^%.vault%-token$',
+    '^%.gitlab%.nvim$', -- gitlab.nvim's `auth_token=` file
   },
   --- Directory names: every file below one of them is sensitive, whatever it
   --- is called, because they hold credentials under ordinary names (`config`,

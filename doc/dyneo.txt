@@ -412,6 +412,12 @@ Firefox, Chrome     Neovim embedded in a textarea with firenvim, tuned per
 zellij              Test runner, terminal integration, and the pane sources
                     for completion.
 AI CLI tools        Through sidekick, behind |dyneo-ai-guard|.
+GitHub, GitLab      Pull requests and issues through Octo when `gh` is
+                    installed, under `<leader>ph`; merge requests through
+                    gitlab.nvim when `glab` is, under `<leader>pl`.  The
+                    GitLab token comes from `.gitlab.nvim`, `GITLAB_TOKEN`
+                    or `glab`, the instance from the remote.  CI checks of
+                    the branch are on `<leader>pc`.
 Jira                |:Jira|: the issues assigned, and the chores of one --
                     a branch named after it, a move, a worklog -- through
                     jira-cli, whose own configuration holds the credentials.
@@ -449,6 +455,9 @@ chance to tell you:
     `<leader>cp`       n      Preview the diagram, Markdown or Typst under
                             the cursor
     `<leader>xw`       n      Workspace diagnostics
+    `<leader>pc`       n      CI checks of the branch
+    `<leader>ph`       n      GitHub (Octo): issues, pull requests
+    `<leader>pl`       n      GitLab: review a merge request, approve, merge
     `<leader>pj`       n      Jira: my issues, search, branch, move, log
                             work, view, open
     `<leader>uk`       n      Camouflage: hide the values in a secret file
@@ -459,7 +468,6 @@ chance to tell you:
     `<leader>yh`       n, x   Yank history
     `<leader>yi`       n      Paste an image from the clipboard
     `<leader>ps`       n      Project LSP settings (codesettings)
-    `<leader>pc`       n      CI checks of the branch
     `<leader>v`        n, x   Multiple cursors
     `<C-c>`            n      Change word
     `d` `x` `c` `C` `X`        n, v   Smart delete: a blank line goes to the

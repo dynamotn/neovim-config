@@ -572,6 +572,17 @@ with a spec of its own:
   pane sources for completion.
 - [AI CLI tools](https://github.com/folke/sidekick.nvim#default-cli-tools) —
   through sidekick, behind the guard above.
+- **GitHub** and **GitLab** — pull requests and issues through
+  [Octo](https://github.com/pwntester/octo.nvim) when `gh` is installed, under
+  `<leader>ph`; merge requests through
+  [gitlab.nvim](https://github.com/harrisoncramer/gitlab.nvim) when `glab` is,
+  under `<leader>pl` — pick one, review its diff, comment, approve, merge, read
+  its pipeline. gitlab.nvim takes its token from a `.gitlab.nvim` file or
+  `GITLAB_TOKEN` as usual, and from `glab` when neither has one, and its
+  instance from the remote, so a self-hosted `origin` needs nothing set
+  ([lua/util/gitlab_auth.lua](./lua/util/gitlab_auth.lua)). A `.gitlab.nvim`
+  file holds a token, so it is one of the files kept from every AI. CI checks
+  of the branch, on GitHub, GitLab or Forgejo, are on `<leader>pc`.
 - [Jira](https://github.com/ankitpokhrel/jira-cli) — `:Jira` picks among the
   issues assigned (or any JQL) and does the day's chores on one: start a
   branch named after it (`fix/OPS-12-login-fails`, the prefix guessed from
@@ -603,6 +614,8 @@ ones worth knowing before which-key gets a chance to tell you:
 | `<leader>cys`, `<leader>cym` | n | Pick a YAML schema, or write it in as a modeline |
 | `<leader>cp` | n | Preview the diagram, Markdown or Typst under the cursor |
 | `<leader>xw` | n | Workspace diagnostics |
+| `<leader>ph` | n | GitHub (Octo): issues, pull requests, repositories, search |
+| `<leader>pl` | n | GitLab: choose and review a merge request, comment, approve, merge, pipeline |
 | `<leader>pj` | n | Jira: my issues, search, branch, move, log work, view, open |
 | `<leader>uk` | n | Camouflage: hide the values in a secret file |
 | `<leader>ct` | n | Translate |

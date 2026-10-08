@@ -279,6 +279,25 @@ one of the same keys in those buffers.
 `<leader>pjw`          n      Log Work
 
 ==============================================================================
+<leader>pl  gitlab
+
+`<leader>plA`          n      Approve (GitLab)
+`<leader>plC`          n      Create MR (GitLab)
+`<leader>plD`          n      Toggle Draft Mode (GitLab)
+`<leader>plM`          n      Merge (GitLab)
+`<leader>plP`          n      Publish Drafts (GitLab)
+`<leader>plQ`          n      Close Review (GitLab)
+`<leader>plR`          n      Revoke Approval (GitLab)
+`<leader>plS`          n      Review This Branch (GitLab)
+`<leader>plc`          n      Choose MR (GitLab)
+`<leader>pld`          n      Discussions (GitLab)
+`<leader>pln`          n      Note (GitLab)
+`<leader>plo`          n      Open MR in Browser (GitLab)
+`<leader>plp`          n      Pipeline (GitLab)
+`<leader>pls`          n      MR Summary (GitLab)
+`<leader>plu`          n      Copy MR URL (GitLab)
+
+==============================================================================
 <leader>ps  settings (codesettings)
 
 `<leader>pse`          n      Edit project settings
