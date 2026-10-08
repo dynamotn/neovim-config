@@ -640,21 +640,23 @@ Other keys
 `>P`                   n      Put Before and Indent Right
 `>p`                   n      Put and Indent Right
 `A`                    x      Append on each line
-`C`                    nv     Smart delete
+`C`                    nx     Smart delete
 `I`                    x      Insert on each line
 `K`                    n      Hover  (LSP)
 `N`                    nox    Prev Search Result
 `P`                    nx     Put Text Before Cursor
 `R`                    ox     Treesitter Search
 `S`                    nox    Flash Treesitter
-`X`                    nv     Smart delete
+`X`                    nx     Smart delete
 `a`                    ox     Around textobject
 `al`                   ox     Around last textobject
 `an`                   ox     Around next textobject
 `b`                    nox    Previous subword
-`c`                    nv     Smart delete
+`c`                    x      Smart delete
+`cc`                   n      Smart delete
 `cw`                   n      Change to end of subword
-`d`                    nv     Smart delete
+`d`                    x      Smart delete
+`dd`                   n      Smart delete
 `e`                    nox    End of subword
 `i`                    ox     Inside textobject
 `il`                   ox     Inside last textobject
@@ -666,7 +668,7 @@ Other keys
 `r`                    o      Remote Flash
 `s`                    nox    Flash
 `w`                    nox    Next subword
-`x`                    nv     Smart delete
+`x`                    nx     Smart delete
 `y`                    nx     Yank Text
 
 vim:tw=78:ts=8:noet:ft=help:norl:

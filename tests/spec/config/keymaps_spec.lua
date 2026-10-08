@@ -76,22 +76,68 @@ describe('config.keymaps', function()
   end)
 
   describe('smart delete', function()
-    local function expand(key, line)
-      local bufnr = h.buffer({ lines = { line } })
+    local function expand(mode, key, lines)
+      local bufnr = h.buffer({ lines = lines })
       vim.api.nvim_set_current_buf(bufnr)
-      return map('n', key).callback()
+      return map(mode, key).callback()
     end
 
-    for _, key in ipairs({ 'd', 'x', 'c', 'C', 'X' }) do
+    for _, case in ipairs({
+      { 'n', 'dd' },
+      { 'n', 'cc' },
+      { 'n', 'x' },
+      { 'n', 'X' },
+      { 'n', 'C' },
+      { 'x', 'd' },
+      { 'x', 'x' },
+      { 'x', 'c' },
+      { 'x', 'C' },
+      { 'x', 'X' },
+    }) do
+      local mode, key = case[1], case[2]
       it(
-        key .. ' goes to the black hole on a blank line',
-        function() assert.are.equal('"_' .. key, expand(key, '   ')) end
+        mode .. ' ' .. key .. ' goes to the black hole on a blank line',
+        function() assert.are.equal('"_' .. key, expand(mode, key, { '   ' })) end
       )
       it(
-        key .. ' yanks on a line with text',
-        function() assert.are.equal(key, expand(key, 'text')) end
+        mode .. ' ' .. key .. ' yanks on a line with text',
+        function() assert.are.equal(key, expand(mode, key, { 'text' })) end
       )
     end
+
+    it('leaves the `d` and `c` operators alone', function()
+      -- `d}` on a blank line takes the paragraph after it
+      assert.same({}, map('n', 'd'))
+      assert.same({}, map('n', 'c'))
+    end)
+
+    it('is not mapped in Select mode, where the keys type text', function()
+      assert.same({}, map('s', 'd'))
+      assert.same({}, map('s', 'x'))
+    end)
+
+    -- Typed for real: `v:count1` and `v:register` cannot be stubbed
+    local function type_keys(keys, lines)
+      vim.api.nvim_set_current_buf(h.buffer({ lines = lines }))
+      vim.fn.setreg('"', 'kept')
+      vim.api.nvim_feedkeys(keys, 'mx', false)
+    end
+
+    it('yanks when the count reaches a line with text', function()
+      type_keys('2dd', { '', 'text' })
+      assert.are.equal('\ntext\n', vim.fn.getreg('"'))
+    end)
+
+    it('keeps the yank when every counted line is blank', function()
+      type_keys('2dd', { '', '  ', 'text' })
+      assert.are.equal('kept', vim.fn.getreg('"'))
+    end)
+
+    it('honours a register given explicitly', function()
+      vim.fn.setreg('a', '')
+      type_keys('"add', { '' })
+      assert.are.equal('\n', vim.fn.getreg('a'))
+    end)
   end)
 
   describe('command abbreviations', function()
@@ -134,6 +180,15 @@ describe('config.keymaps', function()
     assert.same({}, map('n', '<C-c>'))
     assert.same({}, map('x', '<C-r>'))
     assert.are.equal('<Esc>/\\%V', map('x', '/').rhs)
+  end)
+
+  it('searches the selection literally, without yanking it', function()
+    vim.api.nvim_set_current_buf(h.buffer({ lines = { 'a.b/c<d\\', 'x' } }))
+    vim.fn.setreg('"', 'kept')
+    local keys = vim.keycode('0v$h<C-f><CR>')
+    vim.api.nvim_feedkeys(keys, 'mx', false)
+    assert.are.equal('\\Va.b\\/c<d\\\\', vim.fn.getreg('/'))
+    assert.are.equal('kept', vim.fn.getreg('"'))
   end)
 
   it('keeps the command line of the search mappings in sight', function()

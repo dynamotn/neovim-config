@@ -214,8 +214,8 @@ map('n', '<leader>xq', function()
   if not success and err then vim.notify(err, vim.log.levels.ERROR) end
 end, { desc = 'Quickfix List' })
 
-map('n', '[q', vim.cmd.cprev, { desc = 'Previous Quickfix' })
-map('n', ']q', vim.cmd.cnext, { desc = 'Next Quickfix' })
+-- `[q` and `]q` are Neovim's own, which take a count; `trouble.nvim` claims
+-- them when it is loaded.
 
 -- formatting
 map(
@@ -368,27 +368,58 @@ for mode, keys in pairs({
   end
 end
 
--- Change word faster
-map('n', '<C-c>', 'ciw', { desc = 'Change word' })
+-- Change word faster. Left as it is where nothing can be changed, and in the
+-- command-line window, where `<C-c>` goes back to the command line.
+map('n', '<C-c>', function()
+  if vim.bo.modifiable and vim.fn.getcmdwintype() == '' then return 'ciw' end
+  return '<C-c>'
+end, { desc = 'Change word', expr = true })
 
--- Smart delete: on a blank line the text goes to the black-hole register, so
--- clearing empty lines does not overwrite what was yanked
-local smart_delete = function(key)
-  local l = vim.api.nvim_win_get_cursor(0)[1]
-  local line = vim.api.nvim_buf_get_lines(0, l - 1, l, true)[1]
-  return (line:match('^%s*$') and '"_' or '') .. key
+-- Smart delete: clearing blank lines sends them to the black-hole register,
+-- so it does not overwrite what was yanked.
+-- Only whole-line commands are mapped: an operator such as `d}` starting on a
+-- blank line still takes the paragraph after it, which must be kept. A register
+-- given explicitly (`"add`) is always honoured.
+local function default_register()
+  local clipboard = vim.o.clipboard
+  if clipboard:find('unnamedplus', 1, true) then return '+' end
+  if clipboard:find('unnamed', 1, true) then return '*' end
+  return '"'
 end
 
--- `dd` needs no entry of its own: on a blank line the `d` mapping already
--- returns `"_d`, and the second `d` doubles that operator, which is the same
--- thing.
+local function all_blank(first, last)
+  if first > last then
+    first, last = last, first
+  end
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, first - 1, last, false)) do
+    if not line:match('^%s*$') then return false end
+  end
+  return true
+end
+
+local smart_delete = function(key, visual)
+  if vim.v.register ~= default_register() then return key end
+  local first = vim.fn.line(visual and 'v' or '.')
+  local last = vim.fn.line('.')
+  if not visual then last = first + vim.v.count1 - 1 end
+  return (all_blank(first, last) and '"_' or '') .. key
+end
+
 -- `s` and `S` are left alone, they belong to `flash.nvim`.
-local keys = { 'd', 'x', 'c', 'C', 'X' }
-for _, key in pairs(keys) do
+-- Visual mode only (`x`): in Select mode these keys must type text.
+for _, key in ipairs({ 'dd', 'cc', 'x', 'X', 'C' }) do
   map(
-    { 'n', 'v' },
+    'n',
     key,
     function() return smart_delete(key) end,
+    { expr = true, desc = 'Smart delete' }
+  )
+end
+for _, key in ipairs({ 'd', 'x', 'c', 'C', 'X' }) do
+  map(
+    'x',
+    key,
+    function() return smart_delete(key, true) end,
     { expr = true, desc = 'Smart delete' }
   )
 end
@@ -461,10 +492,27 @@ map(
   '<Esc>/\\%V',
   { desc = 'Search in visual region', silent = false }
 )
-map('x', '<C-f>', 'y/<C-r>"', { desc = 'Search selected text', silent = false })
+-- The selection is read in place rather than yanked, so the clipboard is left
+-- alone, and is matched literally (`\V`) whatever it holds.
+local function selected_pattern(delimiter)
+  local text = vim.fn.getregion(
+    vim.fn.getpos('v'),
+    vim.fn.getpos('.'),
+    { type = vim.fn.mode() }
+  )
+  local pattern = vim.fn.escape(table.concat(text, '\n'), '\\' .. delimiter)
+  -- The result is read as keys: a `<` must not start a key code
+  return '\\V' .. pattern:gsub('<', '<lt>')
+end
+map(
+  'x',
+  '<C-f>',
+  function() return '<Esc>/' .. selected_pattern('/') end,
+  { desc = 'Search selected text', silent = false, expr = true }
+)
 map(
   'x',
   '<C-r>',
-  'y:%s#<C-r>"#',
-  { desc = 'Replace selected text', silent = false }
+  function() return '<Esc>:%s#' .. selected_pattern('#') .. '#' end,
+  { desc = 'Replace selected text', silent = false, expr = true }
 )
