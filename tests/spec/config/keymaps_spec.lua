@@ -1,21 +1,43 @@
 local h = require('helpers')
 
 describe('config.keymaps', function()
-  local restore
+  local restore, restore_keys, claimed
   before_each(function()
     vim.g.mapleader = ' '
     -- The defaults go through Snacks, which is not loaded here: any field or
     -- call on this stand-in hands the stand-in back, so `toggle(...):map()`
-    -- chains do nothing
+    -- chains do nothing. Its `keymap.set` does map a global key, whenever
+    -- the right-hand side is one Neovim takes rather than the stand-in.
     local snacks
-    snacks = setmetatable({}, {
+    snacks = setmetatable({
+      keymap = {
+        set = function(mode, lhs, rhs, opts)
+          opts = vim.deepcopy(opts or {})
+          if opts.ft or opts.lsp then return end
+          opts.enabled = nil
+          if type(rhs) == 'string' or type(rhs) == 'function' then
+            vim.keymap.set(mode, lhs, rhs, opts)
+          end
+        end,
+      },
+    }, {
       __index = function() return snacks end,
       __call = function() return snacks end,
     })
     restore = h.stub(_G, 'Snacks', snacks)
-    dofile(h.root .. '/lua/config/keymaps.lua')
+    -- Keys a plugin spec claims with `keys`, as lazy.nvim's handler sees them
+    claimed = {}
+    restore_keys = h.stub(require('lazy.core.handler').handlers, 'keys', {
+      have = function(_, lhs, mode) return claimed[mode .. lhs] == true end,
+    })
   end)
-  after_each(function() restore() end)
+  after_each(function()
+    restore_keys()
+    restore()
+  end)
+
+  -- Specs below run on the mappings as `config.keymaps` leaves them
+  before_each(function() dofile(h.root .. '/lua/config/keymaps.lua') end)
 
   local function map(mode, lhs) return vim.fn.maparg(lhs, mode, false, true) end
 
@@ -101,5 +123,23 @@ describe('config.keymaps', function()
       'leaves a search alone',
       function() assert.are.equal('ww', expand('ww', '/', 'ww')) end
     )
+  end)
+
+  it('leaves a key claimed by a plugin spec to it', function()
+    for _, key in ipairs({ { 'n', '<C-c>' }, { 'x', '<C-r>' } }) do
+      vim.keymap.del(key[1], key[2])
+      claimed[key[1] .. key[2]] = true
+    end
+    dofile(h.root .. '/lua/config/keymaps.lua')
+    assert.same({}, map('n', '<C-c>'))
+    assert.same({}, map('x', '<C-r>'))
+    assert.are.equal('<Esc>/\\%V', map('x', '/').rhs)
+  end)
+
+  it('keeps the command line of the search mappings in sight', function()
+    for _, lhs in ipairs({ '/', '<C-f>', '<C-r>' }) do
+      assert.are.equal(0, map('x', lhs).silent, lhs)
+    end
+    assert.are.equal(1, map('n', '<C-c>').silent)
   end)
 end)

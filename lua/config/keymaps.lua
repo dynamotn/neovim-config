@@ -369,7 +369,7 @@ for mode, keys in pairs({
 end
 
 -- Change word faster
-vim.keymap.set('n', '<C-c>', 'ciw', { desc = 'Change word' })
+map('n', '<C-c>', 'ciw', { desc = 'Change word' })
 
 -- Smart delete: on a blank line the text goes to the black-hole register, so
 -- clearing empty lines does not overwrite what was yanked
@@ -385,17 +385,17 @@ end
 -- `s` and `S` are left alone, they belong to `flash.nvim`.
 local keys = { 'd', 'x', 'c', 'C', 'X' }
 for _, key in pairs(keys) do
-  vim.keymap.set(
+  map(
     { 'n', 'v' },
     key,
     function() return smart_delete(key) end,
-    { noremap = true, expr = true, desc = 'Smart delete' }
+    { expr = true, desc = 'Smart delete' }
   )
 end
 
 -- Fast tab
 for number = 1, 9 do
-  vim.keymap.set(
+  map(
     'n',
     '<leader><tab>' .. number,
     '<cmd>tabn' .. number .. '<cr>',
@@ -405,67 +405,47 @@ end
 
 -- Copy path of current file
 local copy_path = require('util.copy_path')
-vim.keymap.set(
-  'n',
-  '<leader>fyy',
-  copy_path.copy_relative,
-  { desc = 'Path (relative)' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>fyY',
-  copy_path.copy_absolute,
-  { desc = 'Path (absolute)' }
-)
-vim.keymap.set(
+map('n', '<leader>fyy', copy_path.copy_relative, { desc = 'Path (relative)' })
+map('n', '<leader>fyY', copy_path.copy_absolute, { desc = 'Path (absolute)' })
+map(
   'n',
   '<leader>fyl',
   copy_path.copy_relative_with_line,
   { desc = 'Path (relative, :line)' }
 )
-vim.keymap.set(
+map(
   'n',
   '<leader>fyL',
   copy_path.copy_absolute_with_line,
   { desc = 'Path (absolute, :line)' }
 )
-vim.keymap.set(
+map(
   'n',
   '<leader>fyc',
   copy_path.copy_relative_with_line_column,
   { desc = 'Path (relative, :line:col)' }
 )
-vim.keymap.set(
+map(
   'n',
   '<leader>fyC',
   copy_path.copy_absolute_with_line_column,
   { desc = 'Path (absolute, :line:col)' }
 )
-vim.keymap.set(
+map(
   'n',
   '<leader>fyd',
   copy_path.copy_relative_directory,
   { desc = 'Directory (relative)' }
 )
-vim.keymap.set(
+map(
   'n',
   '<leader>fyD',
   copy_path.copy_absolute_directory,
   { desc = 'Directory (absolute)' }
 )
-vim.keymap.set(
-  'n',
-  '<leader>fyP',
-  copy_path.copy_project,
-  { desc = 'Project Root' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>fyn',
-  copy_path.copy_filename,
-  { desc = 'Filename' }
-)
-vim.keymap.set(
+map('n', '<leader>fyP', copy_path.copy_project, { desc = 'Project Root' })
+map('n', '<leader>fyn', copy_path.copy_filename, { desc = 'Filename' })
+map(
   'n',
   '<leader>fyN',
   copy_path.copy_filename_no_ext,
@@ -473,6 +453,18 @@ vim.keymap.set(
 )
 
 -- Fast search and replace
-vim.keymap.set('x', '/', '<Esc>/\\%V', { desc = 'Search in visual region' })
-vim.keymap.set('x', '<C-f>', 'y/<C-r>"', { desc = 'Search selected text' })
-vim.keymap.set('x', '<C-r>', 'y:%s#<C-r>"#', { desc = 'Replace selected text' })
+-- Not silent: each leaves a command line to finish, which a silent mapping
+-- would keep out of sight until the next key
+map(
+  'x',
+  '/',
+  '<Esc>/\\%V',
+  { desc = 'Search in visual region', silent = false }
+)
+map('x', '<C-f>', 'y/<C-r>"', { desc = 'Search selected text', silent = false })
+map(
+  'x',
+  '<C-r>',
+  'y:%s#<C-r>"#',
+  { desc = 'Replace selected text', silent = false }
+)
