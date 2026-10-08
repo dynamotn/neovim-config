@@ -176,12 +176,15 @@ describe('dyneo.health', function()
     )
   end)
 
-  it('names what holds the current buffer back', function()
+  it('names what holds the buffer it was run from back', function()
     local bufnr = h.buffer({
       name = dir .. '/values.yaml',
       lines = { 'token: ghp_0123456789abcdefghijklmnopqrstuvwxyz' },
     })
     vim.api.nvim_set_current_buf(bufnr)
+    -- `:checkhealth` runs in a buffer of its own
+    vim.cmd.enew()
+    vim.bo.buftype = 'nofile'
     with_config_home(
       dir,
       function()

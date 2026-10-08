@@ -240,6 +240,34 @@ local function tool_windows()
   return entries
 end
 
+--- The buffer `:checkhealth` was run from. Health checks run in the
+--- `health://` buffer, so the current one is never it: the alternate buffer
+--- is, or else the file buffer used last.
+---@return integer?
+local function checked_buffer()
+  local current = vim.api.nvim_get_current_buf()
+  local alternate = vim.fn.bufnr('#')
+  if
+    alternate > 0
+    and alternate ~= current
+    and vim.bo[alternate].buftype == ''
+  then
+    return alternate
+  end
+  local last, used = nil, -1
+  for _, info in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+    if
+      info.bufnr ~= current
+      and info.name ~= ''
+      and vim.bo[info.bufnr].buftype == ''
+      and info.lastused > used
+    then
+      last, used = info.bufnr, info.lastused
+    end
+  end
+  return last
+end
+
 --- Which guard of `util.ai_guard` found its plugin, and what the current
 --- buffer would be held back for
 ---@return DyHealthEntry[]
@@ -292,7 +320,10 @@ local function ai_guard()
   )
 
   local sensitive = require('util.sensitive')
-  local bufnr = vim.api.nvim_get_current_buf()
+  local bufnr = checked_buffer()
+  if not bufnr then return entries end
+  local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':~:.')
+  table.insert(entries, entry('info', 'Buffer checked: ' .. name))
   local reasons = sensitive.reasons(bufnr, { ignore_waiver = true })
   if #reasons == 0 then
     table.insert(entries, entry('info', 'This buffer may be sent to an AI'))

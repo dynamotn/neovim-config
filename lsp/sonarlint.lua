@@ -10,7 +10,7 @@ vim.fn.mkdir(token_path, 'p', '0700')
 
 local did_change_configuration = function(client, settings)
   if not client then return end
-  client.notify('workspace/didChangeConfiguration', {
+  client:notify('workspace/didChangeConfiguration', {
     settings = settings,
   })
 end
@@ -207,7 +207,8 @@ return {
     ['sonarlint/listAllRules'] = function(err, result)
       if err then
         vim.notify(
-          'Cannot request the list of rules: ' .. err,
+          'Cannot request the list of rules: '
+            .. (err.message or vim.inspect(err)),
           vim.log.levels.ERROR
         )
         return
