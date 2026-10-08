@@ -13,11 +13,56 @@
 --- release back by a week and every version it pins is at least a week old,
 --- whatever it is installed from -- npm, PyPI, a GitHub release, Go, Open VSX.
 ---
---- This is a mason provider, listed ahead of mason's own in the `providers`
---- setting, and answers only for GitHub releases; everything else falls
---- through to the providers behind it. Git tags are left alone too: the refs
---- API carries no date to age them by.
+--- This is a mason provider, and the only one in the `providers` setting. It
+--- answers for GitHub releases itself and hands every other question -- git
+--- tags, which the refs API gives no date to age by, and the versions npm,
+--- PyPI and the rest list -- to mason's own providers in turn.
+---
+--- It has to stand alone: mason asks the next provider whenever one fails, so
+--- with mason's own listed behind it, a quarantine that could not answer --
+--- rate limited, offline, or with nothing old enough -- would let the newest
+--- snapshot through. A failure here stays a failure, and mason keeps the
+--- snapshot it already has.
 local M = {}
+
+--- mason's own providers, asked in this order for what is not aged here
+local UPSTREAM = { 'mason.providers.registry-api', 'mason.providers.client' }
+
+--- `service.method` of the first upstream provider that answers it
+---@param service string
+---@param method string
+---@return fun(...): Result
+local function delegate(service, method)
+  return function(...)
+    local Result = require('mason-core.result')
+    local errors = {}
+    for _, module in ipairs(UPSTREAM) do
+      local impl = vim.tbl_get(require(module), service, method)
+      if impl then
+        local ok, result = pcall(impl, ...)
+        if ok and result:is_success() then return result end
+        table.insert(errors, tostring(ok and result:err_or_nil() or result))
+      end
+    end
+    return Result.failure(
+      ('%s.%s: %s'):format(service, method, table.concat(errors, '; '))
+    )
+  end
+end
+
+--- `own` with every method it lacks handed to `delegate`
+---@param service string
+---@param own? table<string, function>
+---@return table<string, function>
+local function forward(service, own)
+  return setmetatable(own or {}, {
+    __index = function(methods, method)
+      local impl = delegate(service, method)
+      rawset(methods, method, impl)
+      return impl
+    end,
+  })
+end
 
 --- The wait when `_G.quarantine_window` says nothing, the same week the npm,
 --- bun, pnpm and uv configurations give the rest of these dotfiles
@@ -150,7 +195,7 @@ local function aged_releases(repo)
   return Result.success(aged)
 end
 
-M.github = {
+M.github = forward('github', {
   ---@async
   ---@param repo string
   ---@return Result # Result<GitHubRelease>
@@ -166,6 +211,19 @@ M.github = {
       return vim.tbl_map(function(release) return release.tag_name end, aged)
     end)
   end,
-}
+})
+
+-- Every other service mason knows is passed through whole
+for _, service in ipairs({
+  'npm',
+  'pypi',
+  'rubygems',
+  'packagist',
+  'crates',
+  'golang',
+  'openvsx',
+}) do
+  M[service] = forward(service)
+end
 
 return M

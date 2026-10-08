@@ -63,10 +63,20 @@ local function mason_quarantine()
   end
 
   local providers = (settings.current or {}).providers or {}
-  if vim.list_contains(providers, 'tools.mason-quarantine') then
+  if vim.deep_equal(providers, { 'tools.mason-quarantine' }) then
     table.insert(
       entries,
       entry('ok', 'Mason resolves its registry through tools.mason-quarantine')
+    )
+  elseif vim.list_contains(providers, 'tools.mason-quarantine') then
+    table.insert(
+      entries,
+      entry(
+        'error',
+        'Mason `providers` lists others beside tools.mason-quarantine: '
+          .. 'mason asks them whenever the quarantine fails, and gets the '
+          .. 'newest snapshot'
+      )
     )
   else
     table.insert(

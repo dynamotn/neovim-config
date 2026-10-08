@@ -8,11 +8,11 @@ return {
       -- installed, the same quarantine `~/.npmrc`, the bun and pnpm
       -- configurations and `uv.toml` apply. mason has no setting for it, so
       -- `tools.mason-quarantine` ages the registry snapshot every package
-      -- version is pinned in; see the comment at the top of that module.
+      -- version is pinned in; see the comment at the top of that module. It
+      -- stands alone, asking mason's own providers itself: any provider
+      -- listed after it would answer whenever the quarantine fails.
       providers = {
         'tools.mason-quarantine',
-        'mason.providers.registry-api',
-        'mason.providers.client',
       },
       -- Socket Firewall stands between every npm and PyPI install and the
       -- registry, and turns down a package known to be malicious -- the half
