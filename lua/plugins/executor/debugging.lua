@@ -74,10 +74,8 @@ return {
       end
 
       -- Read `.vscode/launch.json` with its comments
-      local vscode = require('dap.ext.vscode')
-      local json = require('plenary.json')
-      vscode.json_decode = function(str)
-        return vim.json.decode(json.json_strip_comments(str))
+      require('dap.ext.vscode').json_decode = function(str)
+        return vim.json.decode(str, { skip_comments = true })
       end
     end,
   },
