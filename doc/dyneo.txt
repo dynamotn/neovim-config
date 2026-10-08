@@ -40,7 +40,8 @@ CONTENTS                                                      *dyneo-contents*
        5.8 Workspace diagnostics ........................... |dyneo-workspace|
        5.9 Runbooks .......................................... |dyneo-runbook|
        5.10 Terraform plan .................................... |dyneo-tfplan|
-       5.11 Integrations ................................ |dyneo-integrations|
+       5.11 Kubernetes .......................................... |dyneo-kube|
+       5.12 Integrations ................................ |dyneo-integrations|
     6. Mappings ............................................. |dyneo-mappings|
     7. Commands ............................................. |dyneo-commands|
     8. Layout ................................................. |dyneo-layout|
@@ -431,7 +432,25 @@ list.  A module call carries every change below it.  The plan runs with
 `-lock=false`, and its file -- every planned value in plain text -- is
 deleted once read.  `<localleader>P` clears it.
 
-5.11 Integrations                                         *dyneo-integrations*
+5.11 Kubernetes                                                   *dyneo-kube*
+
+A YAML buffer a cluster would take -- a manifest with `apiVersion` and
+`kind`, a `kustomization.yaml`, or any file of a Helm chart -- gets mappings
+under `<localleader>k`, and |:Kube| does the same from the command line:
+
+    `<localleader>kd`  Diff with the cluster (`kubectl diff`)
+    `<localleader>kv`  Validate with a server-side dry run
+    `<localleader>ka`  Apply, after a confirmation naming the context
+    `<localleader>kr`  Render the chart (`helm template`) or kustomization
+    `<localleader>kc`  Switch the context
+    `<localleader>kn`  Switch the namespace of the context
+
+A manifest goes to `kubectl -f`, a kustomization to `kubectl -k`, and a file
+of a chart is rendered first and piped in, with the values file being edited
+as its values.  A diff or a render can hold Secret data, so its buffer is
+kept from every AI integration.
+
+5.12 Integrations                                         *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
 chezmoi             Templates edited with the target language injected, not
@@ -577,6 +596,16 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :TfPlan                 Plan the module of this buffer and show it on its
                         blocks.
 :TfPlan clear           Clear the plan shown.  See |dyneo-tfplan|.
+
+                                                                       *:Kube*
+:Kube [diff]            Diff this manifest, kustomization or chart with the
+                        cluster.
+:Kube dryrun            Validate it with a server-side dry run.
+:Kube apply             Apply it, after a confirmation naming the context.
+:Kube render            Render the chart or the kustomization.
+:Kube context           Switch the current context.
+:Kube namespace         Switch the namespace of the current context.
+                        See |dyneo-kube|.
 
                                                                        *:Jira*
 :Jira                   Pick among the issues assigned to you, then choose

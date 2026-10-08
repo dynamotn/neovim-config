@@ -181,6 +181,28 @@ M.is_allowed = function(bufnr)
     and vim.b[bufnr].dy_ai_guard_allow == true
 end
 
+--- Hold a buffer back for a reason of its own, whatever its name or its text
+---
+--- For a buffer whose content is sensitive by where it came from rather than
+--- by what it looks like: a file decrypted for editing, a Helm chart rendered
+--- with its Secrets. Like the name rules, it cannot be waived.
+---@param bufnr integer
+---@param reason string Said by `:AiGuardCheck`
+M.mark = function(bufnr, reason)
+  if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
+  vim.b[bufnr].dy_sensitive = reason
+end
+
+--- Why `bufnr` was marked sensitive, if it was
+---@param bufnr integer
+---@return string?
+M.marked = function(bufnr)
+  if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
+  if not vim.api.nvim_buf_is_valid(bufnr) then return nil end
+  local reason = vim.b[bufnr].dy_sensitive
+  return type(reason) == 'string' and reason or nil
+end
+
 --- Why a buffer must not leave the machine, in words, or nothing when it may
 ---
 --- `opts.ignore_waiver` reports what a waived buffer would be held back for,
@@ -201,6 +223,8 @@ M.reasons = function(bufnr, opts)
   if M.is_sensitive_path(name) then
     table.insert(reasons, ('path %s'):format(vim.fn.fnamemodify(name, ':~')))
   end
+  local marked = M.marked(bufnr)
+  if marked then table.insert(reasons, marked) end
   if M.is_allowed(bufnr) and not (opts or {}).ignore_waiver then
     return reasons
   end
@@ -225,6 +249,7 @@ M.is_sensitive = function(bufnr)
     return true
   end
   if M.is_sensitive_path(vim.api.nvim_buf_get_name(bufnr)) then return true end
+  if M.marked(bufnr) then return true end
   if M.is_allowed(bufnr) then return false end
   return #(secrets_in_buffer(bufnr)) > 0 or #(leaks_in_buffer(bufnr)) > 0
 end

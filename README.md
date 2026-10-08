@@ -51,6 +51,7 @@ says what is missing.
 | 🤖 | **AI guard** — `.env`, keys and token-shaped text kept from every AI; masked on screen; every handover logged | `:AiGuardCheck` · `:AiGuardLog` |
 | 📜 | **Runbooks** — run a Markdown code block in place, its output fenced below; destructive commands ask first | `<localleader>r` |
 | 🏗 | **Terraform plan** — `tofu plan` shown on the blocks it changes: create, update, replace and what forces it, destroy | `<localleader>p` · `:TfPlan` |
+| ☸️ | **Kubernetes** — diff with the cluster, server dry run, apply, render Helm and Kustomize, switch context and namespace | `<localleader>k` · `:Kube` |
 | 🌐 | **Forges & trackers** — GitHub (Octo), GitLab merge requests, CI checks, Jira issues to branches and worklogs | `<leader>ph` `pl` `pc` `pj` |
 | 🧭 | **YAML schemas** — Kubernetes, CRDs, cloud-init detected; pick any other | `<leader>cys` |
 | 🔍 | **Whole-project diagnostics** — every file handed to the server, off the main loop | `<leader>xw` |

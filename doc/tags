@@ -7,6 +7,7 @@
 :DySbom	dyneo.txt	/*:DySbom*
 :DySpell	dyneo.txt	/*:DySpell*
 :Jira	dyneo.txt	/*:Jira*
+:Kube	dyneo.txt	/*:Kube*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
 :Runbook	dyneo.txt	/*:Runbook*
 :TfPlan	dyneo.txt	/*:TfPlan*
@@ -41,6 +42,7 @@ dyneo-install	dyneo.txt	/*dyneo-install*
 dyneo-integrations	dyneo.txt	/*dyneo-integrations*
 dyneo-keymaps	dyneo-keymaps.txt	/*dyneo-keymaps*
 dyneo-keymaps.txt	dyneo-keymaps.txt	/*dyneo-keymaps.txt*
+dyneo-kube	dyneo.txt	/*dyneo-kube*
 dyneo-languages	dyneo.txt	/*dyneo-languages*
 dyneo-layout	dyneo.txt	/*dyneo-layout*
 dyneo-lazy-install	dyneo.txt	/*dyneo-lazy-install*
