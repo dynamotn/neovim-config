@@ -44,61 +44,53 @@ return {
     },
   },
   {
-    -- Disable auto install debugger
+    -- Debug adapters from Mason. Its `setup` is LazyVim's to call, from
+    -- nvim-dap's own `config`; a second call here would run every handler
+    -- twice and list each of their configurations twice.
     'jay-babu/mason-nvim-dap.nvim',
-    opts = {
-      automatic_installation = false,
-    },
-    config = function(_, opts)
+    -- The adapters of a language are installed with its first buffer, from a
+    -- handler registered at startup: nvim-dap itself only loads with the
+    -- first `<leader>d` key, so one registered from there would miss the
+    -- buffer that was already open and leave that first session without its
+    -- debugger.
+    init = function()
       local dap_util = require('util.dap')
-      local registry = require('mason-registry')
-      opts.ensure_installed = opts.ensure_installed or {}
-
-      ---@param spec string|DyDapSpec
-      ---@param install fun(package: string)
-      local function install_missing(spec, install)
-        local package = dap_util.package(spec)
-        if package and not registry.is_installed(package) then
-          install(package)
+      for name, language in pairs(require('config.languages')) do
+        if language.dap and vim.list_contains(_G.enabled_languages, name) then
+          require('util.lazy_install').on_filetype(
+            language.filetypes,
+            function()
+              for _, spec in ipairs(language.dap) do
+                local package = dap_util.package(spec)
+                if package then
+                  require('util.lazy_install').install_once(package)
+                end
+              end
+            end
+          )
         end
       end
-
-      local languages = require('config.languages')
-      for name, language in pairs(languages) do
-        if language.dap then
-          -- install the adapters of bundle languages up front: mason-nvim-dap
-          -- takes the adapters it knows by name, the rest are installed here
-          if vim.list_contains(_G.bundle_languages, name) then
-            for _, spec in ipairs(language.dap) do
-              if dap_util.is_mapped(spec) then
-                table.insert(opts.ensure_installed, spec)
-              else
-                install_missing(spec, function(package)
-                  local ok, pkg = pcall(registry.get_package, package)
-                  if ok then pkg:install() end
-                end)
+    end,
+    -- Install the adapters of bundle languages up front: mason-nvim-dap takes
+    -- the adapters it knows by name, the rest are installed here
+    opts = function(_, opts)
+      local dap_util = require('util.dap')
+      opts.automatic_installation = false
+      opts.ensure_installed = opts.ensure_installed or {}
+      for name, language in pairs(require('config.languages')) do
+        if language.dap and vim.list_contains(_G.bundle_languages, name) then
+          for _, spec in ipairs(language.dap) do
+            if dap_util.is_mapped(spec) then
+              table.insert(opts.ensure_installed, spec)
+            else
+              local package = dap_util.package(spec)
+              if package then
+                require('util.lazy_install').install_once(package)
               end
             end
           end
-          -- and the others once a buffer of their language opens
-          if vim.list_contains(_G.enabled_languages, name) then
-            require('util.lazy_install').on_filetype(
-              language.filetypes,
-              function()
-                for _, spec in ipairs(language.dap) do
-                  install_missing(
-                    spec,
-                    function(package)
-                      require('mason.api.command').MasonInstall({ package })
-                    end
-                  )
-                end
-              end
-            )
-          end
         end
       end
-      require('mason-nvim-dap').setup(opts)
     end,
   },
   {

@@ -15,13 +15,37 @@ M.name = function(spec)
   return spec
 end
 
+---@type table<string, string>?
+local nvim_dap_to_package
+
+--- mason-nvim-dap's map from adapter name to Mason package
+---
+--- Read from its file rather than required: a `require` has lazy.nvim load
+--- mason-nvim-dap, and nvim-dap with every adapter after it, on the first
+--- buffer of any language that can be debugged.
+---@return table<string, string>
+local function mappings()
+  local loaded = package.loaded['mason-nvim-dap.mappings.source']
+  if loaded then return loaded.nvim_dap_to_package or {} end
+  if nvim_dap_to_package then return nvim_dap_to_package end
+  local ok, source = pcall(function()
+    local path = LazyVim.get_plugin_path(
+      'mason-nvim-dap.nvim',
+      'lua/mason-nvim-dap/mappings/source.lua'
+    )
+    return assert(loadfile(path))()
+  end)
+  if not ok then return {} end
+  nvim_dap_to_package = source.nvim_dap_to_package or {}
+  return nvim_dap_to_package
+end
+
 --- Mason package that installs the adapter of `spec`
 ---@param spec string|DyDapSpec
 ---@return string?
 M.package = function(spec)
   if type(spec) == 'table' and spec.mason then return spec.mason.package end
-  local ok, source = pcall(require, 'mason-nvim-dap.mappings.source')
-  return ok and source.nvim_dap_to_package[M.name(spec)] or nil
+  return mappings()[M.name(spec)]
 end
 
 --- Whether mason-nvim-dap knows the adapter of `spec` by name
