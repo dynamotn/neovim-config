@@ -38,7 +38,8 @@ CONTENTS                                                      *dyneo-contents*
        5.6 Spelling ............................................ |dyneo-spell|
        5.7 Diagrams .......................................... |dyneo-diagram|
        5.8 Workspace diagnostics ........................... |dyneo-workspace|
-       5.9 Integrations ................................. |dyneo-integrations|
+       5.9 Runbooks .......................................... |dyneo-runbook|
+       5.10 Integrations ................................ |dyneo-integrations|
     6. Mappings ............................................. |dyneo-mappings|
     7. Commands ............................................. |dyneo-commands|
     8. Layout ................................................. |dyneo-layout|
@@ -402,7 +403,18 @@ main loop, so a big repository does not freeze the editor, and each document
 is closed again before Neovim opens the same file for real, so no server ever
 sees two `didOpen` for one URI.
 
-5.9 Integrations                                          *dyneo-integrations*
+5.9 Runbooks                                                   *dyneo-runbook*
+
+In a Markdown file, `<localleader>r` runs the fenced block under the cursor
+from the directory of the file, and puts what it printed right under it in an
+`output` fence, replaced on the next run.  `sh`, `bash`, `shell`, `zsh`,
+`fish`, `python` and `js` blocks run as they are; a `console` block runs only
+its `$ ` lines.  `<localleader>R` runs every block in turn and stops at the
+first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
+what is running.  A block that deletes, destroys or reaches for root asks
+first.  See |:Runbook|.
+
+5.10 Integrations                                         *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
 chezmoi             Templates edited with the target language injected, not
@@ -536,6 +548,13 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         as it is open; with [!], put it back under the check.
                         Refused for a file the name rules hold back.  See
                         |dyneo-ai-guard|.
+
+                                                                    *:Runbook*
+:Runbook [run]          Run the code block under the cursor.
+:Runbook all            Run every block in turn, stopping at a failure.
+:Runbook clear          Remove every `output` fence.
+:Runbook stop           Stop what the buffer is running.
+                        See |dyneo-runbook|.
 
                                                                        *:Jira*
 :Jira                   Pick among the issues assigned to you, then choose

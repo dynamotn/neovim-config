@@ -53,6 +53,7 @@ four languages; what differs is a handful of globals, see
   - [Diagrams in the terminal](#diagrams-in-the-terminal)
   - [Workspace diagnostics](#workspace-diagnostics)
   - [Tasks for each language](#tasks-for-each-language)
+  - [Runbooks that run](#runbooks-that-run)
   - [Tools given what they lack](#tools-given-what-they-lack)
   - [Integrations](#integrations)
 - [Key bindings](#key-bindings)
@@ -543,6 +544,25 @@ A task appears only when its language is in `DyNeo.enabled_languages` and its
 program is on `$PATH`. Project tooling overseer reads on its own (make, just,
 npm, cargo, mix, ...) is left to it.
 
+### Runbooks that run
+
+A runbook is a Markdown file of steps, each a fenced block of commands —
+`kubectl`, `helm`, `psql`, a `curl` against a health endpoint. `<localleader>r`
+runs the block under the cursor from the directory of the file, and what it
+printed lands right under it in an `output` fence, replaced on the next run,
+so the file is the record of what was done and what came back
+([lua/tools/runbook.lua](./lua/tools/runbook.lua)).
+
+`sh`, `bash`, `shell`, `zsh`, `fish`, `python` and `js` blocks run as they
+are; a `console` block runs only its `$ ` lines, since the rest is output it
+once printed. `<localleader>R` runs every block in turn and stops at the first
+that fails, `<localleader>x` clears the outputs, `<localleader>s` stops what
+is running. A block that deletes, destroys or reaches for root — `sudo`,
+`rm -rf`, `kubectl delete`, `tofu destroy`, a forced push, `DROP TABLE` —
+asks before it runs, since a runbook is read in a hurry. An output holding a
+credential is caught by the content check of the AI guard like any other
+text.
+
 ### Tools given what they lack
 
 Small gaps filled in [lua/tools](./lua/tools) and [lua/lint](./lua/lint), each
@@ -645,6 +665,7 @@ ones worth knowing before which-key gets a chance to tell you:
 | `:YamlSchema reset` | Hand schema detection back the wheel |
 | `:DyNeoFormat`, `:DyNeoFormatInfo` | Format the buffer; which formatters would run, and whether it formats on save |
 | `:DyNeoRoot` | The roots found for this buffer, the one in use first |
+| `:Runbook [run\|all\|clear\|stop]` | Run the code block under the cursor, or every one, with the output under it |
 | `:Jira [search {jql}]` | Pick an issue assigned, or matching `{jql}`, and act on it |
 | `:Jira branch\|move\|worklog\|view\|open\|insert\|copy [{key}]` | Act on `{key}`, the issue of the branch, or one picked |
 

@@ -8,6 +8,7 @@
 :DySpell	dyneo.txt	/*:DySpell*
 :Jira	dyneo.txt	/*:Jira*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
+:Runbook	dyneo.txt	/*:Runbook*
 :YamlSchema	dyneo.txt	/*:YamlSchema*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*
 DyNeo.completion_sources	dyneo.txt	/*DyNeo.completion_sources*
@@ -45,6 +46,7 @@ dyneo-mappings	dyneo.txt	/*dyneo-mappings*
 dyneo-per-machine	dyneo.txt	/*dyneo-per-machine*
 dyneo-quarantine	dyneo.txt	/*dyneo-quarantine*
 dyneo-requirements	dyneo.txt	/*dyneo-requirements*
+dyneo-runbook	dyneo.txt	/*dyneo-runbook*
 dyneo-schema	dyneo.txt	/*dyneo-schema*
 dyneo-spell	dyneo.txt	/*dyneo-spell*
 dyneo-statusline	dyneo.txt	/*dyneo-statusline*
