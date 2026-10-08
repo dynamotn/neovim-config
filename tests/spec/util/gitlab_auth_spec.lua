@@ -79,7 +79,7 @@ describe('util.gitlab_auth', function()
       assert.is_nil(err)
     end)
 
-    it('keeps a token from the environment and adds the URL', function()
+    it('keeps a token from the environment on its own host', function()
       table.insert(
         restores,
         h.stub(auth, 'glab_token', function() error('asked glab') end)
@@ -89,7 +89,26 @@ describe('util.gitlab_auth', function()
         'origin'
       )
       assert.equals('from-env', token)
-      assert.equals('https://git.example.org', url)
+      -- Not `origin`'s host: the token may be another server's
+      assert.is_nil(url)
+    end)
+
+    it('asks glab for the token of the URL a repository file names', function()
+      local asked
+      table.insert(
+        restores,
+        h.stub(auth, 'glab_token', function(host)
+          asked = host
+          return nil
+        end)
+      )
+      local token, _, err = auth.auth(
+        function() return nil, 'https://attacker.example' end,
+        'origin'
+      )
+      assert.equals('attacker.example', asked)
+      assert.is_nil(token)
+      assert.is_truthy(err)
     end)
 
     it('says why when there is no token anywhere', function()
