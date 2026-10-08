@@ -52,6 +52,16 @@
       "matchStrings": [
         "--\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\s*\\nlocal version = '(?<currentValue>[^']+)'"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "Tools the own Mason registry builds with `cargo` from a commit of a repository that has no release, followed on its `main` branch",
+      "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
+      "matchStrings": [
+        "'pkg:cargo/(?<depName>[^@']+)@(?<currentDigest>[0-9a-f]{40})\\?repository_url=(?<packageName>[^&']+)&rev=true'"
+      ],
+      "datasourceTemplate": "git-refs",
+      "currentValueTemplate": "main"
     }
   ],
   "packageRules": [
@@ -60,6 +70,12 @@
       "matchManagers": ["custom.regex"],
       "groupName": "mason registry",
       "schedule": ["before 9am on monday"]
+    },
+    {
+      "description": "Hold a release back for the same week `tools.mason-quarantine` and the npm, bun, pnpm and uv configurations do. Only datasources that date their releases are listed: a commit followed through `git-refs` carries no date to wait on.",
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["github-releases", "github-tags", "go", "npm", "pypi"],
+      "minimumReleaseAge": "7 days"
     }
   ]
 }

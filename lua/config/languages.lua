@@ -496,8 +496,8 @@ return {
     lsp_servers = { 'arduino_language_server', 'harper_ls' },
     linters = {
       -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
-      -- comes with the system's clang rather than from Mason.
-      { 'clangtidy', command = 'clang-tidy', mason = { enabled = false } },
+      -- comes with the system's clang, which dytoy installs.
+      { 'clangtidy', command = 'clang-tidy', mason = { package = 'clang' } },
     },
     formatters = { 'clang-format' },
   },
@@ -544,8 +544,8 @@ return {
     lsp_servers = { 'clangd', 'harper_ls' },
     linters = {
       -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
-      -- comes with the system's clang rather than from Mason.
-      { 'clangtidy', command = 'clang-tidy', mason = { enabled = false } },
+      -- comes with the system's clang, which dytoy installs.
+      { 'clangtidy', command = 'clang-tidy', mason = { package = 'clang' } },
     },
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
@@ -627,10 +627,10 @@ return {
   dart = {
     filetypes = { 'dart' },
     parser = 'dart',
-    -- `dartls` and `dart format` both ship with the SDK, Mason has neither.
+    -- `dartls` and `dart format` both ship with the SDK, which dytoy installs.
     lsp_servers = { 'dartls', 'harper_ls' },
     formatters = {
-      { 'dart_format', command = 'dart', mason = { enabled = false } },
+      { 'dart_format', command = 'dart', mason = { package = 'dart' } },
     },
     autopairs = block_comment_autopairs,
   },
@@ -640,9 +640,10 @@ return {
     injected_parsers = { 'eex', 'heex', 'json', 'surface', 'zig' },
     ext = 'exs',
     lsp_servers = { 'elixirls', 'harper_ls' },
-    -- `mix credo` and `mix format` are tasks of the project's own toolchain.
-    linters = { { 'credo', command = 'mix', mason = { enabled = false } } },
-    formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+    -- `mix credo` and `mix format` are tasks of the Elixir toolchain, which
+    -- dytoy installs.
+    linters = { { 'credo', command = 'mix', mason = { package = 'elixir' } } },
+    formatters = { { 'mix', command = 'mix', mason = { package = 'elixir' } } },
     endwise = true,
   },
   erlang = { -- See `elixir`
@@ -652,7 +653,7 @@ return {
     -- `elp` is the Erlang Language Platform; `erlang_ls` is the older one and
     -- is not in lspconfig.
     lsp_servers = { 'elp' },
-    formatters = { { 'erlfmt', mason = { enabled = false } } },
+    formatters = { { 'erlfmt', mason = { package = 'erlfmt' } } },
     autopairs = function(filetypes, rule)
       return {
         -- Close a binary
@@ -695,10 +696,9 @@ return {
   gleam = {
     filetypes = { 'gleam' },
     parser = 'gleam',
-    -- the `gleam` binary is both the server and the formatter, and Mason has
-    -- no package for it
+    -- the `gleam` binary is both the server and the formatter
     lsp_servers = { 'gleam', 'harper_ls' },
-    formatters = { { 'gleam', mason = { enabled = false } } },
+    formatters = { { 'gleam', mason = { package = 'gleam' } } },
   },
   go = {
     filetypes = { 'go' },
@@ -776,7 +776,7 @@ return {
     -- A Phoenix template is part of an Elixir project: the same server reads
     -- it and the same `mix format` writes it back.
     lsp_servers = { 'elixirls', 'tailwindcss', 'harper_ls' },
-    formatters = { { 'mix', command = 'mix', mason = { enabled = false } } },
+    formatters = { { 'mix', command = 'mix', mason = { package = 'elixir' } } },
     autopairs = function(filetypes, rule)
       return {
         -- Add spaces in an embedded tag
@@ -944,9 +944,9 @@ return {
   nu = {
     filetypes = { 'nu' },
     parser = 'nu',
-    -- both ship with nushell itself
+    -- the server ships with nushell itself; Mason builds `nufmt` from git
     lsp_servers = { 'nushell' },
-    formatters = { { 'nufmt', mason = { enabled = false } } },
+    formatters = { { 'nufmt', mason = { package = 'nufmt' } } },
   },
   ocaml = {
     filetypes = { 'ocaml' },
@@ -971,9 +971,9 @@ return {
     injected_parsers = { 'pod' },
     ext = 'pl',
     lsp_servers = { 'perlnavigator' },
-    -- both come from CPAN, Mason carries neither
-    linters = { { 'perlcritic', mason = { enabled = false } } },
-    formatters = { { 'perltidy', mason = { enabled = false } } },
+    -- both come from CPAN, through the system packages dytoy installs
+    linters = { { 'perlcritic', mason = { package = 'perlcritic' } } },
+    formatters = { { 'perltidy', mason = { package = 'perltidy' } } },
     dap = { { 'perl', mason = { package = 'perl-debug-adapter' } } },
     test = { 'vim-test' },
   },
@@ -1034,8 +1034,8 @@ return {
     },
     ext = 'qml',
     lsp_servers = { 'qmlls' },
-    -- `qmlformat` comes with the Qt tooling
-    formatters = { { 'qmlformat', mason = { enabled = false } } },
+    -- `qmlformat` comes with the Qt tooling, which dytoy installs
+    formatters = { { 'qmlformat', mason = { package = 'qmlformat' } } },
     autopairs = block_comment_autopairs,
   },
   r = {
@@ -1127,10 +1127,9 @@ return {
   scala = {
     filetypes = { 'scala' },
     parser = 'scala',
-    -- `metals` bootstraps itself and `scalafmt` comes from the build tool,
-    -- Mason carries neither.
+    -- `metals` bootstraps itself.
     lsp_servers = { 'metals', 'harper_ls' },
-    formatters = { { 'scalafmt', mason = { enabled = false } } },
+    formatters = { { 'scalafmt', mason = { package = 'scalafmt' } } },
     autopairs = block_comment_autopairs,
   },
   solidity = {
@@ -1140,7 +1139,7 @@ return {
     ext = 'sol',
     lsp_servers = { 'solang', 'harper_ls' },
     formatters = {
-      { 'forge_fmt', command = 'forge', mason = { enabled = false } },
+      { 'forge_fmt', command = 'forge', mason = { package = 'foundry' } },
     },
     autopairs = block_comment_autopairs,
   },
@@ -1315,7 +1314,7 @@ return {
     parser = 'zig',
     lsp_servers = { 'zls', 'harper_ls' },
     formatters = {
-      { 'zigfmt', command = 'zig', mason = { enabled = false } },
+      { 'zigfmt', command = 'zig', mason = { package = 'zig' } },
     },
     dap = { 'codelldb' },
     test = { 'neotest-zig' },
@@ -1328,7 +1327,7 @@ return {
     lsp_servers = { 'harper_ls' },
     -- `shellcheck` and `shfmt` are for POSIX shells and bash, not for zsh;
     -- the linter is `zsh -n` and `beautysh` is what knows the syntax.
-    linters = { { 'zsh', mason = { enabled = false } } },
+    linters = { { 'zsh', mason = { package = 'zsh' } } },
     formatters = { 'beautysh' },
     endwise = true,
   },
@@ -1371,10 +1370,10 @@ return {
     injected_parsers = { 'printf' },
     lsp_servers = { 'awk_ls' },
     linters = {
-      { 'gawk', mason = { enabled = false } },
+      { 'gawk', mason = { package = 'gawk' } },
     },
     formatters = {
-      { 'gawk', mason = { enabled = false } },
+      { 'gawk', mason = { package = 'gawk' } },
     },
   },
   beancount = {
@@ -1382,10 +1381,14 @@ return {
     parser = 'beancount',
     lsp_servers = { 'beancount' },
     linters = {
-      { 'bean_check', command = 'bean-check', mason = { enabled = false } },
+      {
+        'bean_check',
+        command = 'bean-check',
+        mason = { package = 'beancount' },
+      },
     },
     formatters = {
-      { 'bean-format', mason = { enabled = false } },
+      { 'bean-format', mason = { package = 'beancount' } },
     },
   },
   bicep = {
@@ -1393,7 +1396,7 @@ return {
     parser = 'bicep',
     lsp_servers = { 'bicep' },
     formatters = {
-      { 'bicep', mason = { enabled = false } },
+      { 'bicep', mason = { package = 'bicep' } },
     },
   },
   cmake = {
@@ -1405,7 +1408,7 @@ return {
       {
         'cmake_format',
         command = 'cmake-format',
-        mason = { enabled = false },
+        mason = { package = 'cmakelang' },
       },
     },
     endwise = true,
@@ -1580,8 +1583,8 @@ return {
     filetypes = { 'hurl' },
     parser = 'hurl',
     injected_parsers = { 'json', 'xml' },
-    -- `hurlfmt` is part of the `hurl` release, Mason has no package
-    formatters = { { 'hurlfmt', mason = { enabled = false } } },
+    -- `hurlfmt` is part of the `hurl` release
+    formatters = { { 'hurlfmt', mason = { package = 'hurl' } } },
     autopairs = mustache_autopairs,
   },
   hyprlang = {
@@ -1665,7 +1668,7 @@ return {
     injected_parsers = { 'bash', 'javascript', 'python' },
     lsp_servers = { 'just' },
     -- `just --fmt` is the tool itself
-    formatters = { { 'just', mason = { enabled = false } } },
+    formatters = { { 'just', mason = { package = 'just' } } },
     -- Recipe bodies
     otter = true,
   },
@@ -1750,7 +1753,7 @@ return {
     parser = 'nginx',
     lsp_servers = { 'nginx_language_server' },
     formatters = {
-      { 'nginxfmt', command = 'nginxfmt.py', mason = { enabled = false } },
+      { 'nginxfmt', mason = { package = 'nginx-config-formatter' } },
     },
   },
   nix = {
@@ -1767,8 +1770,8 @@ return {
     },
     lsp_servers = { 'nil_ls', 'harper_ls' },
     linters = {
-      { 'nix', command = 'nix', mason = { enabled = false } },
-      { 'statix', command = 'statix', mason = { enabled = false } },
+      { 'nix', command = 'nix', mason = { package = 'nix' } },
+      { 'statix', command = 'statix', mason = { package = 'statix' } },
     },
     formatters = { 'nixfmt' },
     null_ls = {
@@ -1778,9 +1781,9 @@ return {
   prisma = {
     filetypes = { 'prisma' },
     parser = 'prisma',
-    -- the server formats; `prisma-lint` is an npm tool Mason does not carry
+    -- the server formats
     lsp_servers = { 'prismals' },
-    linters = { { 'prisma-lint', mason = { enabled = false } } },
+    linters = { { 'prisma-lint', mason = { package = 'prisma-lint' } } },
   },
   promql = {
     filetypes = { 'promql' },

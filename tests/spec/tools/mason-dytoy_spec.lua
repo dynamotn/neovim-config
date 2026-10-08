@@ -44,6 +44,35 @@ describe('tools.mason-dytoy', function()
     )
   end)
 
+  describe('path', function()
+    it(
+      'leaves out what it is told to skip',
+      function()
+        assert.are.equal(
+          '/usr/bin:/bin',
+          dytoy().path('/mason/bin:/usr/bin:/mason/bin/:/bin', {
+            skip = { '/mason/bin' },
+          })
+        )
+      end
+    )
+
+    it(
+      'puts its own directories first',
+      function()
+        assert.are.equal(
+          '/helpers:/usr/bin',
+          dytoy().path('/usr/bin', { first = { '/helpers' } })
+        )
+      end
+    )
+
+    it(
+      'drops empty entries',
+      function() assert.are.equal('/a:/b', dytoy().path(':/a::/b:', {})) end
+    )
+  end)
+
   describe('resolve', function()
     local dir, cleanup
     before_each(function()

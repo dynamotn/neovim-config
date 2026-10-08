@@ -207,6 +207,44 @@ local function locate(ctx, skip)
   return found
 end
 
+--- The `PATH` dytoy runs with
+---
+--- Without mason's own `bin`: dytoy skips a tool whose command it already
+--- finds, and a command there -- this package's link, a release mason
+--- downloaded before, another package's -- would answer for a tool the
+--- machine does not have.
+---@param path string `PATH` to start from
+---@param opts { first?: string[], skip?: string[] }
+---@return string
+function M.path(path, opts)
+  local skip = {}
+  for _, dir in ipairs(opts.skip or {}) do
+    skip[vim.fs.normalize(dir)] = true
+  end
+  local dirs = vim.list_extend({}, opts.first or {})
+  for dir in vim.gsplit(path, ':', { plain = true }) do
+    if dir ~= '' and not skip[vim.fs.normalize(dir)] then
+      table.insert(dirs, dir)
+    end
+  end
+  return table.concat(dirs, ':')
+end
+
+--- The one dytoy run allowed at a time
+---
+--- mason installs packages side by side, but dytoy cannot run beside itself:
+--- `mise use -g` rewrites one global configuration file, and a package
+--- manager locks its database, so of two runs at once only one lands. Its own
+--- interface runs these methods one tool at a time for the same reason.
+---@type Semaphore?
+local semaphore
+
+---@return Semaphore
+local function queue()
+  semaphore = semaphore or require('mason-core.async.control').Semaphore:new(1)
+  return semaphore
+end
+
 --- Run `dytoy --tool`, with a `sudo` that asks through this Neovim
 ---@async
 ---@param ctx InstallContext
@@ -233,7 +271,7 @@ local function run_dytoy(ctx, tool)
   local sudo = vim.fn.exepath('sudo')
 
   local env = { NO_COLOR = '1' }
-  local with_paths = {}
+  local first = {}
   if sudo ~= '' then
     env.SUDO_ASKPASS = M.write_helpers(helpers, {
       sudo = sudo,
@@ -241,22 +279,27 @@ local function run_dytoy(ctx, tool)
       server = server,
       token = token,
     })
-    with_paths = { helpers }
+    first = { helpers }
   end
+  local mason_bin =
+    require('mason-core.installer.InstallLocation').global():bin()
+  env.PATH = M.path(vim.env.PATH or '', { first = first, skip = { mason_bin } })
 
   M.pending[token] = tool
+  local permit = queue():acquire()
   ctx.stdio_sink:stdout(('Installing %s with dytoy…\n'):format(tool))
-  local result = ctx.spawn.dytoy({
+  local ok, result = pcall(ctx.spawn.dytoy, {
     '--no-tui',
     '--tool',
     tool,
     env = env,
-    with_paths = with_paths,
   })
+  permit:forget()
 
   a.scheduler()
   M.pending[token] = nil
   vim.fn.delete(helpers, 'rf')
+  if not ok then return Result.failure(result) end
   return result
 end
 
