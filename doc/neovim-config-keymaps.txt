@@ -238,8 +238,8 @@ one of the same keys in those buffers.
 `<leader>gC`           n      CI Checks
 `<leader>gD`           n      Git Diff (origin)
 `<leader>gG`           n      Lazygit (cwd)
-`<leader>gH`           x      Line History (CodeDiff)
 `<leader>gH`           n      File History (CodeDiff)
+`<leader>gH`           x      Line History (CodeDiff)
 `<leader>gI`           n      Search Issues (Octo)
 `<leader>gL`           n      Git Log (cwd)
 `<leader>gP`           n      Search PRs (Octo)
@@ -369,7 +369,6 @@ one of the same keys in those buffers.
 `<leader>tS`           n      Stop (Neotest)
 `<leader>tT`           n      Run All Test Files (Neotest)
 `<leader>ta`           n      Attach to Test (Neotest)
-`<leader>ta`           n      Ansible Run Playbook/Role  (ft: yaml.ansible)
 `<leader>tc`           n      Toggle Coverage
 `<leader>td`           n      Debug Nearest
 `<leader>tf`           n      Run File (Vimtest)
@@ -463,7 +462,7 @@ one of the same keys in those buffers.
 <leader>y  yank
 
 `<leader>yh`           nx     Open Yank History
-`<leader>yp`           n      Paste image from system clipboard
+`<leader>yi`           n      Paste image from system clipboard
 
 ==============================================================================
 <leader>z  dictionary

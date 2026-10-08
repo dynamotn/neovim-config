@@ -34,18 +34,11 @@ return vim.list_contains(DyNeo.enabled_languages, 'ansible')
         },
       },
       {
-        -- Working with playbook
+        -- `ansible-doc` for `K`, and `gf` into a role's `files/` and
+        -- `templates/`. Running a playbook or a role is the `ansible run`
+        -- task of overseer (`<leader>oo`).
         'mfussenegger/nvim-ansible',
         ft = language.filetypes,
-        keys = {
-          {
-            '<leader>ta',
-            function() require('ansible').run() end,
-            ft = language.filetypes,
-            desc = 'Ansible Run Playbook/Role',
-            silent = true,
-          },
-        },
       },
     }
   or {}

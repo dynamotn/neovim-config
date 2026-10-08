@@ -254,7 +254,10 @@ local function render(names)
     local entries = sections[prefix]
     table.sort(entries, function(a, b)
       if a.lhs ~= b.lhs then return a.lhs < b.lhs end
-      return a.scope < b.scope
+      if a.scope ~= b.scope then return a.scope < b.scope end
+      local am, bm = table.concat(a.modes), table.concat(b.modes)
+      if am ~= bm then return am < bm end
+      return a.desc < b.desc
     end)
     for _, map in ipairs(entries) do
       local line = ('%-22s %-6s %s'):format(

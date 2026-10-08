@@ -417,7 +417,7 @@ chance to tell you:
     `<leader>ac`       n, v   Claude Code
     `<leader>av`       n, v   Avante: chat, inline edit, history, model
     `<leader>yh`       n, x   Yank history
-    `<leader>yp`       n      Paste an image from the clipboard
+    `<leader>yi`       n      Paste an image from the clipboard
     `<leader>pc`       n      Project LSP settings (codesettings)
     `<leader>v`        n, x   Multiple cursors
     `<C-c>`            n      Change word

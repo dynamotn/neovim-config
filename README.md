@@ -550,7 +550,7 @@ ones worth knowing before which-key gets a chance to tell you:
 | `<leader>uk` | n | Camouflage: hide the values in a secret file |
 | `<leader>ct` | n | Translate |
 | `<leader>a` | n, x | AI CLIs through sidekick; Claude Code under `<leader>ac`, Avante under `<leader>av` |
-| `<leader>yh`, `<leader>yp` | n, x | Yank history, paste an image |
+| `<leader>yh`, `<leader>yi` | n, x | Yank history, paste an image |
 | `<leader>pc` | n | Project LSP settings (codesettings) |
 | `<leader>v` | n, x | Multiple cursors |
 | `<C-c>` | n | Change word |

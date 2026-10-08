@@ -3,7 +3,10 @@ local h = require('helpers')
 describe('overseer.template.dytask', function()
   it('lists every template of the bundle', function()
     local list = require('overseer.template.dytask')
-    assert.are.same({ 'dytask.bash', 'dytask.go', 'dytask.cpp' }, list)
+    assert.are.same(
+      { 'dytask.bash', 'dytask.go', 'dytask.cpp', 'dytask.ansible' },
+      list
+    )
     for _, name in ipairs(list) do
       assert.is_not_nil(
         vim.api.nvim_get_runtime_file(
@@ -15,7 +18,7 @@ describe('overseer.template.dytask', function()
     end
   end)
 
-  for _, name in ipairs({ 'bash', 'go', 'cpp' }) do
+  for _, name in ipairs({ 'bash', 'go', 'cpp', 'ansible' }) do
     it(name .. ' is a well-formed template', function()
       local template = require('overseer.template.dytask.' .. name)
       assert.are.equal('string', type(template.name))
@@ -62,6 +65,36 @@ describe('overseer.template.dytask', function()
         deps.task_names[1]
       )
       assert.are.equal('output', task.components[2])
+    end)
+
+    it('runs a playbook with ansible-playbook', function()
+      local task = build('ansible', 'playbooks/site.yml')
+      assert.are.same(
+        { 'ansible-playbook', dir .. '/playbooks/site.yml' },
+        task.cmd
+      )
+    end)
+
+    it('runs a task file as its role, against this machine', function()
+      h.write(dir .. '/roles/web-app/tasks/main.yml', { '- become: true' })
+      local task = build('ansible', 'roles/web-app/tasks/main.yml')
+      assert.are.same({
+        'ansible',
+        'localhost',
+        '--playbook-dir',
+        dir,
+        '-m',
+        'import_role',
+        '-a',
+        'name=web-app',
+        '--ask-become-pass',
+      }, task.cmd)
+    end)
+
+    it('runs from the directory holding ansible.cfg', function()
+      h.write(dir .. '/ansible.cfg', { '[defaults]' })
+      local task = build('ansible', 'playbooks/site.yml')
+      assert.are.equal(dir, task.cwd)
     end)
   end)
 
