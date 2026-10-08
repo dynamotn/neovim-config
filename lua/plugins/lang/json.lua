@@ -17,8 +17,14 @@ return vim.list_contains(_G.enabled_languages, 'json')
         opts = {
           servers = {
             jsonls = {
-              -- lazy-load schemastore when needed
+              -- lazy-load schemastore when needed. A server's own
+              -- `before_init` replaces the one `*` sets rather than running
+              -- after it, so the project's local settings are read here too.
               before_init = function(_, new_config)
+                require('codesettings').with_local_settings(
+                  new_config.name,
+                  new_config
+                )
                 new_config.settings.json.schemas = vim.tbl_deep_extend(
                   'force',
                   new_config.settings.json.schemas or {},
