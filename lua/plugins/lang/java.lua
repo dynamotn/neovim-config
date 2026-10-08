@@ -23,6 +23,10 @@ return vim.list_contains(_G.enabled_languages, 'java')
             jdtls = {},
             harper_ls = {},
           },
+          setup = {
+            -- nvim-jdtls starts its own client
+            jdtls = function() return true end,
+          },
         },
       },
       {

@@ -149,6 +149,9 @@ return {
       local mason_configs =
         require('mason-lspconfig').get_mappings().lspconfig_to_package
       local ensure_installed = {} ---@type string[]
+      -- mason-lspconfig enables every server it has installed, so the ones a
+      -- plugin starts itself, or that are turned off, are kept from it
+      local mason_exclude = {} ---@type string[]
 
       -- get all the servers that are available through my config
       local languages = require('config.languages')
@@ -283,7 +286,13 @@ return {
         end
 
         local setup = opts.setup[server] or opts.setup['*']
-        if setup and setup(server, server_opts) then return end
+        if setup and setup(server, server_opts) then
+          table.insert(mason_exclude, server)
+          return
+        end
+        if server_opts.enabled == false then
+          table.insert(mason_exclude, server)
+        end
         -- Merged into what was set for the server so far, not into its
         -- resolved config: resolving it here would search the runtimepath
         -- once more, and `vim.lsp` lays `lsp/<server>.lua` and `*` underneath
@@ -321,12 +330,13 @@ return {
       vim.schedule(
         function()
           require('mason-lspconfig').setup({
-            automatic_installation = false,
-            ensure_installed = vim.tbl_deep_extend(
-              'force',
-              LazyVim.dedup(ensure_installed),
-              LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
+            ensure_installed = LazyVim.dedup(
+              vim.list_extend(
+                ensure_installed,
+                LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
+              )
             ),
+            automatic_enable = { exclude = LazyVim.dedup(mason_exclude) },
           })
         end
       )

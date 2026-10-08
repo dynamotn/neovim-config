@@ -9,6 +9,10 @@ return vim.list_contains(_G.enabled_languages, 'rust')
           servers = {
             harper_ls = {},
           },
+          setup = {
+            -- rustaceanvim starts its own client
+            rust_analyzer = function() return true end,
+          },
         },
       },
       {
