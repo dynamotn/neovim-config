@@ -216,6 +216,7 @@ return {
           },
         })
       end
+      require('util.statusline').setup()
       require('lualine').setup(opts)
     end,
   },

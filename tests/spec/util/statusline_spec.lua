@@ -110,6 +110,15 @@ describe('util.statusline', function()
       clients = { { name = 'lua_ls', id = 1 } }
       assert.equals('L 1/2!', statusline.lsp_status('L '))
     end)
+
+    it('keeps the count of a buffer until it is forgotten', function()
+      lang.lsp = { 'lua_ls' }
+      assert.equals('L 0/1!', statusline.lsp_status('L '))
+      clients = { { name = 'lua_ls', id = 1 } }
+      assert.equals('L 0/1!', statusline.lsp_status('L '))
+      statusline.forget(vim.api.nvim_get_current_buf())
+      assert.equals('L 1', statusline.lsp_status('L '))
+    end)
   end)
 
   describe('tools_status', function()
@@ -117,9 +126,69 @@ describe('util.statusline', function()
       lang.tools = { 'lua', 'stylua', 'selene' }
       assert.equals('T 0/2!', statusline.tools_status('T '))
       executables.stylua, executables.selene = '/x', '/y'
+      statusline.forget()
       assert.equals('T 2', statusline.tools_status('T '))
       lang.tools = { 'git' }
       assert.equals('T', statusline.tools_status('T '))
+    end)
+
+    it('asks `executable()` once per tool until forgotten', function()
+      lang.tools = { 'stylua' }
+      local asked = 0
+      local inner = vim.fn.executable
+      vim.fn.executable = function(name)
+        asked = asked + 1
+        return inner(name)
+      end
+      statusline.tools_status('T ')
+      statusline.tools_status('T ')
+      assert.equals(1, asked)
+      statusline.forget()
+      statusline.tools_status('T ')
+      assert.equals(2, asked)
+      vim.fn.executable = inner
+    end)
+  end)
+
+  describe('setup', function()
+    after_each(
+      function() vim.api.nvim_create_augroup('dyneo_statusline', {}) end
+    )
+
+    it('forgets a buffer on the events that change its count', function()
+      package.loaded['util.plugin'] = { on_load = function() end }
+      statusline.setup()
+      lang.lsp = { 'lua_ls' }
+      assert.equals('L 0/1!', statusline.lsp_status('L '))
+      clients = { { name = 'lua_ls', id = 1 } }
+      vim.api.nvim_exec_autocmds('FileType', {
+        group = 'dyneo_statusline',
+        buffer = vim.api.nvim_get_current_buf(),
+      })
+      assert.equals('L 1', statusline.lsp_status('L '))
+      h.unload('util.plugin')
+    end)
+
+    it('forgets the tools on focus and on a Mason install', function()
+      local listeners = {}
+      package.loaded['util.plugin'] = { on_load = function(_, fn) fn() end }
+      package.loaded['mason-registry'] = {
+        on = function(_, event, fn) listeners[event] = fn end,
+      }
+      statusline.setup()
+      lang.tools = { 'stylua' }
+      assert.equals('T 0/1!', statusline.tools_status('T '))
+      executables.stylua = '/x'
+      vim.api.nvim_exec_autocmds('FocusGained', { group = 'dyneo_statusline' })
+      assert.equals('T 1', statusline.tools_status('T '))
+      executables.stylua = nil
+      listeners['package:uninstall:success']()
+      vim.wait(
+        100,
+        function() return statusline.tools_status('T ') ~= 'T 1' end
+      )
+      assert.equals('T 0/1!', statusline.tools_status('T '))
+      h.unload('util.plugin')
     end)
   end)
 

@@ -15,6 +15,16 @@ local M = {}
 --- them, so they are neither counted nor listed
 local ignored_tools = { 'lua', 'git', 'curl', 'sed' }
 
+--- What the statusline asks on every redraw, kept until an event can change
+--- the answer: the server count of each buffer until a client attaches or
+--- detaches or the filetype changes, and whether each tool is on `$PATH`
+--- until Mason installs or removes a package or Neovim regains the focus
+--- (a tool installed from another terminal).
+---@type table<integer, string>
+local lsp_text = {}
+---@type table<string, boolean>
+local executable = {}
+
 ---@class DyLspCandidate
 ---@field name string
 ---@field client? vim.lsp.Client The client attached to the buffer, if any
@@ -95,20 +105,24 @@ end
 ---@param icon string
 ---@return string
 function M.lsp_status(icon)
+  local bufnr = vim.api.nvim_get_current_buf()
+  if lsp_text[bufnr] then return lsp_text[bufnr] end
   local up, total = 0, 0
-  for _, candidate in ipairs(M.lsp_candidates(0)) do
+  for _, candidate in ipairs(M.lsp_candidates(bufnr)) do
     if candidate.expected then
       total = total + 1
       if candidate.client then up = up + 1 end
     end
   end
-  return count(icon, up, total)
+  lsp_text[bufnr] = count(icon, up, total)
+  return lsp_text[bufnr]
 end
 
 --- Return the statusline text of the tools of the current buffer
 ---
 --- Checked with `executable()` instead of going through `tool_candidates`,
---- which resolves each path: the statusline asks on every redraw.
+--- which resolves each path, and each answer kept: the statusline asks on
+--- every redraw.
 ---@param icon string
 ---@return string
 function M.tools_status(icon)
@@ -116,10 +130,57 @@ function M.tools_status(icon)
   for _, tool in ipairs(languages.get_tools_by_filetype(vim.bo.filetype)) do
     if not vim.list_contains(ignored_tools, tool) then
       total = total + 1
-      if vim.fn.executable(tool) == 1 then up = up + 1 end
+      if executable[tool] == nil then
+        executable[tool] = vim.fn.executable(tool) == 1
+      end
+      if executable[tool] then up = up + 1 end
     end
   end
   return count(icon, up, total)
+end
+
+--- Drop what the statusline kept, for `bufnr` only when given
+---@param bufnr? integer
+function M.forget(bufnr)
+  if bufnr then
+    lsp_text[bufnr] = nil
+  else
+    lsp_text, executable = {}, {}
+  end
+end
+
+--- Forget what the statusline kept whenever its answer may have changed
+function M.setup()
+  local group = vim.api.nvim_create_augroup('dyneo_statusline', {})
+  vim.api.nvim_create_autocmd({ 'LspAttach', 'FileType', 'BufFilePost' }, {
+    group = group,
+    callback = function(event) M.forget(event.buf) end,
+  })
+  vim.api.nvim_create_autocmd('LspDetach', {
+    group = group,
+    -- The detaching client is still listed while the event runs
+    callback = function(event)
+      M.forget(event.buf)
+      vim.schedule(function() M.forget(event.buf) end)
+    end,
+  })
+  vim.api.nvim_create_autocmd('BufWipeout', {
+    group = group,
+    callback = function(event) M.forget(event.buf) end,
+  })
+  vim.api.nvim_create_autocmd('FocusGained', {
+    group = group,
+    callback = function() executable = {} end,
+  })
+  require('util.plugin').on_load('mason.nvim', function()
+    local registry = require('mason-registry')
+    for _, event in ipairs({
+      'package:install:success',
+      'package:uninstall:success',
+    }) do
+      registry:on(event, vim.schedule_wrap(function() executable = {} end))
+    end
+  end)
 end
 
 local function refresh()
