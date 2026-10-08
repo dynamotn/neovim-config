@@ -1,5 +1,6 @@
 :AiGuardAllow	dyneo.txt	/*:AiGuardAllow*
 :AiGuardCheck	dyneo.txt	/*:AiGuardCheck*
+:AiGuardLog	dyneo.txt	/*:AiGuardLog*
 :DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
 :DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
 :DyNeoRoot	dyneo.txt	/*:DyNeoRoot*

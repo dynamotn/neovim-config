@@ -58,6 +58,9 @@ vim.opt.packpath = {}
 _G.DyNeo = {}
 vim.opt.swapfile = false
 vim.opt.shadafile = 'NONE'
+-- What a module keeps between sessions -- the AI audit log among it -- goes
+-- next to the tests, not into the state of the Neovim the specs run beside.
+vim.env.XDG_STATE_HOME = vim.fs.joinpath(root, '.tests', 'state')
 
 -- Neovim's own `ftplugin/lua.lua` and its like call `vim.treesitter.start`,
 -- which throws on a machine with no parser for the filetype -- a fresh clone,

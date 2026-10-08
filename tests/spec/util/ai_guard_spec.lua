@@ -25,7 +25,7 @@ describe('util.ai_guard', function()
       'notify',
       function(msg, level) table.insert(notes, { msg = msg, level = level }) end
     )
-    h.unload('util.ai_guard', unpack(plugin_modules))
+    h.unload('util.ai_guard', 'util.ai_audit', unpack(plugin_modules))
     ai_guard = require('util.ai_guard')
   end)
   after_each(function()
@@ -65,6 +65,22 @@ describe('util.ai_guard', function()
     return false
   end
 
+  --- What `util.ai_audit` logged, as `integration action path (detail)`
+  ---@return string[]
+  local function audited()
+    return vim.tbl_map(
+      function(entry)
+        return ('%s %s %s (%s)'):format(
+          entry.integration,
+          entry.action,
+          entry.what,
+          entry.detail or ''
+        )
+      end,
+      require('util.ai_audit').entries
+    )
+  end
+
   describe('guard_avante', function()
     local api, selector, helpers, utils, calls
 
@@ -99,6 +115,18 @@ describe('util.ai_guard', function()
       assert.equals('asked', api.ask('q'))
       assert.equals('edited', api.edit())
       assert.same({ 'q' }, calls.ask[1])
+    end)
+
+    it('logs what went out and what was refused', function()
+      edit(plain)
+      api.ask('q')
+      selector.add_selected_file(selector, secret)
+      helpers.has_permission_to_access(plain)
+      assert.same({
+        'Avante sent ' .. plain .. ' (ask)',
+        'Avante refused ' .. secret .. ' ()',
+        'Avante sent ' .. plain .. ' (tool)',
+      }, audited())
     end)
 
     it('refuses to add a sensitive file to the chat', function()
@@ -163,6 +191,15 @@ describe('util.ai_guard', function()
       assert.is_true(refused())
       edit(plain)
       assert.equals('sent', cli.send())
+    end)
+
+    it('logs the prompt a buffer was sent with', function()
+      edit(plain)
+      cli.send({ prompt = 'review' })
+      assert.same(
+        { 'sidekick sent ' .. plain .. ' (prompt review)' },
+        audited()
+      )
     end)
 
     it('reports a sensitive buffer as inactive', function()
@@ -249,6 +286,25 @@ describe('util.ai_guard', function()
       assert.same({ plain, 1, 2 }, mention_calls[1])
       assert.is_true(claudecode.send_at_mention(nil))
     end)
+
+    it('logs a mention and a selection once a minute', function()
+      edit(plain)
+      claudecode.send_at_mention(plain, 1, 2)
+      selection.update_selection()
+      selection.update_selection()
+      assert.same({
+        'Claude Code sent ' .. plain .. ' (lines 1-2)',
+        'Claude Code sent ' .. plain .. ' (selection)',
+      }, audited())
+    end)
+
+    it('does not log a buffer that is no file', function()
+      local buf = h.buffer({ name = plain })
+      vim.bo[buf].buftype = 'nofile'
+      vim.api.nvim_set_current_buf(buf)
+      selection.update_selection()
+      assert.same({}, audited())
+    end)
   end)
 
   describe('watch_copilot', function()
@@ -331,6 +387,21 @@ describe('util.ai_guard', function()
       local buf = h.buffer({ name = plain })
       vim.bo[buf].filetype = 'gitcommit'
       assert.same({ { buf, 42 } }, detached)
+    end)
+
+    it('logs Copilot attaching to a buffer', function()
+      local restore = h.stub(
+        vim.lsp,
+        'get_client_by_id',
+        function(id) return { id = id, name = 'copilot' } end
+      )
+      local buf = h.buffer({ name = plain })
+      vim.api.nvim_exec_autocmds(
+        'LspAttach',
+        { buffer = buf, data = { client_id = 42 } }
+      )
+      restore()
+      assert.same({ 'Copilot sent ' .. plain .. ' (attached)' }, audited())
     end)
 
     it('leaves an ordinary buffer attached', function()

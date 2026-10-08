@@ -332,6 +332,14 @@ its way out.
 A wrapper that no longer finds what it wraps leaves the plugin as it is and
 says so, rather than breaking it on an upstream rename.
 
+Every decision a guard makes is logged as well, so what left the editor can
+be looked back on and not only what was kept in: which integration, which
+file, when, and whether it went out or was refused.  Only the path and a line
+range are kept, never the text.  |:AiGuardLog| lists this session, and
+|:AiGuardLog!| every session still in `stdpath('state')/dyneo/ai_audit.jsonl`.
+The same handover is logged once a minute at most, since Claude Code is handed
+the selection on every cursor move.
+
 5.4 YAML and JSON schemas                                       *dyneo-schema*
 
 YAML schemas are detected from the content of the buffer -- Kubernetes
@@ -488,6 +496,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         as it is open; with [!], put it back under the check.
                         Refused for a file the name rules hold back.  See
                         |dyneo-ai-guard|.
+
+                                                                 *:AiGuardLog*
+:AiGuardLog[!]          What the AI integrations were handed, and refused,
+                        this session, newest first; with [!], every session
+                        the log file still holds.  See |dyneo-ai-guard|.
 
 The plugins' own commands are unchanged: `:Lazy`, `:Mason`, `:ConformInfo`,
 and the rest.

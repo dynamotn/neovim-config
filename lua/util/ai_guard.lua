@@ -11,17 +11,35 @@
 --- wrapped. A wrapper that no longer finds what it wraps leaves the plugin as
 --- it is and says so, rather than breaking it on an upstream rename.
 
+local audit = require('util.ai_audit')
 local sensitive = require('util.sensitive')
 
 local M = {}
 
----@param what string
-local function refuse(what)
+--- Log a handover to `util.ai_audit`, of a path or of a buffer
+---@param integration string
+---@param action 'sent'|'refused'
+---@param target string|integer A path, or a buffer number
+---@param detail? string
+local function log(integration, action, target, detail)
+  if type(target) == 'number' then
+    audit.record_buffer(integration, action, target, detail)
+  elseif type(target) == 'string' and target ~= '' then
+    audit.record(integration, action, vim.fs.normalize(target), detail)
+  end
+end
+
+--- Say that `what` was turned down, and log it
+---@param what string Shown in the notification
+---@param integration string Logged as
+---@param target string|integer The path or the buffer turned down
+local function refuse(what, integration, target)
   vim.notify(
     what .. ' refused: the file is sensitive',
     vim.log.levels.WARN,
     { title = 'AI guard' }
   )
+  log(integration, 'refused', target)
 end
 
 --- What became of each wrapper, for `:checkhealth dyneo`
@@ -66,7 +84,7 @@ M.detach_copilot = function(bufnr)
     vim.lsp.buf_detach_client(bufnr, client.id)
   end
   vim.b[bufnr].dy_ai_guard_detached = true
-  refuse('Copilot')
+  refuse('Copilot', 'Copilot', bufnr)
 end
 
 --- Methods that carry a buffer's text to the server
@@ -153,11 +171,16 @@ M.watch_copilot = function()
   -- The content check above runs after the buffer settles; by then Neovim
   -- has sent the change already. Each Copilot client is filtered as well,
   -- so what turns a buffer sensitive is never sent in the first place.
+  -- What it is handed -- the whole buffer, the moment it attaches -- is
+  -- logged, since nothing else says so.
   vim.api.nvim_create_autocmd('LspAttach', {
     group = group,
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
-      if client and client.name == 'copilot' then M.filter_copilot(client) end
+      if client and client.name == 'copilot' then
+        M.filter_copilot(client)
+        log('Copilot', 'sent', args.buf, 'attached')
+      end
     end,
   })
 
@@ -199,7 +222,10 @@ M.guard_avante = function()
   local ok_api, api = pcall(require, 'avante.api')
   for _, key in ipairs({ 'ask', 'edit' }) do
     wrap(ok_api and api or nil, key, 'Avante ' .. key, function(original, ...)
-      if sensitive.is_sensitive(0) then return refuse('Avante ' .. key) end
+      if sensitive.is_sensitive(0) then
+        return refuse('Avante ' .. key, 'Avante', 0)
+      end
+      log('Avante', 'sent', 0, key)
       return original(...)
     end)
   end
@@ -216,8 +242,9 @@ M.guard_avante = function()
         and filepath ~= ''
         and sensitive.is_sensitive_path(filepath)
       then
-        return refuse('Avante')
+        return refuse('Avante', 'Avante', filepath)
       end
+      log('Avante', 'sent', filepath, 'added to chat')
       return add(self, filepath, ...)
     end
   )
@@ -233,9 +260,12 @@ M.guard_avante = function()
       if
         type(abs_path) == 'string' and sensitive.is_sensitive_path(abs_path)
       then
+        log('Avante', 'refused', abs_path, 'tool')
         return false
       end
-      return allowed(abs_path, ...)
+      local granted = allowed(abs_path, ...)
+      if granted then log('Avante', 'sent', abs_path, 'tool') end
+      return granted
     end
   )
 
@@ -250,6 +280,7 @@ M.guard_avante = function()
       if
         type(filepath) == 'string' and sensitive.is_sensitive_path(filepath)
       then
+        log('Avante', 'refused', filepath, 'read')
         return nil, 'the file is sensitive'
       end
       return read(filepath, ...)
@@ -261,9 +292,18 @@ end
 --- `{this}`, `{selection}` and friends expand to its content
 M.guard_sidekick = function()
   local ok, cli = pcall(require, 'sidekick.cli')
-  wrap(ok and cli or nil, 'send', 'sidekick send', function(send, ...)
-    if sensitive.is_sensitive(0) then return refuse('sidekick') end
-    return send(...)
+  wrap(ok and cli or nil, 'send', 'sidekick send', function(send, opts, ...)
+    if sensitive.is_sensitive(0) then
+      return refuse('sidekick', 'sidekick', 0)
+    end
+    local prompt = type(opts) == 'table' and opts.prompt
+    log(
+      'sidekick',
+      'sent',
+      0,
+      type(prompt) == 'string' and ('prompt ' .. prompt) or 'message'
+    )
+    return send(opts, ...)
   end)
 
   -- The statusline icon asks for the Copilot client of the buffer, and a
@@ -320,7 +360,10 @@ M.guard_claudecode = function()
     'update_selection',
     'claudecode selection',
     function(update, ...)
-      if sensitive.is_sensitive(0) then return end
+      if sensitive.is_sensitive(0) then
+        return log('Claude Code', 'refused', 0, 'selection')
+      end
+      log('Claude Code', 'sent', 0, 'selection')
       return update(...)
     end
   )
@@ -354,12 +397,20 @@ M.guard_claudecode = function()
     ok_main and claudecode or nil,
     'send_at_mention',
     'claudecode send_at_mention',
-    function(send, file_path, ...)
+    function(send, file_path, start_line, end_line, ...)
       if file_path and sensitive.is_sensitive_path(file_path) then
-        refuse('Claude Code')
+        refuse('Claude Code', 'Claude Code', file_path)
         return false, 'the file is sensitive'
       end
-      return send(file_path, ...)
+      log(
+        'Claude Code',
+        'sent',
+        file_path,
+        start_line
+            and ('lines %s-%s'):format(start_line, end_line or start_line)
+          or 'mention'
+      )
+      return send(file_path, start_line, end_line, ...)
     end
   )
 end
@@ -450,6 +501,7 @@ end
 --- Install every guard: Copilot's now, the others as their plugin loads
 M.setup = function()
   M.commands()
+  audit.command()
   M.watch_copilot()
   on_load('avante.nvim', M.guard_avante)
   on_load('sidekick.nvim', M.guard_sidekick)

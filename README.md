@@ -437,6 +437,7 @@ not installed yet.
 | `:AiGuardCheck` | Why this buffer is held back, and on which line |
 | `:AiGuardAllow` | Waive the content check for this buffer, for as long as it is open |
 | `:AiGuardAllow!` | Take that waiver back |
+| `:AiGuardLog[!]` | What the AI integrations were handed or refused, this session or every session |
 
 The same lists do a second job: `camouflage.nvim` masks a value on screen when
 its key names a secret (`password`, `token`, `api_key`, …) or when the value
@@ -451,6 +452,16 @@ rules: a `.env` stays sensitive however often it is allowed. A waived buffer
 says so in `:AiGuardCheck` and in `:checkhealth dyneo`, along with what it
 would otherwise be held back for, so a waiver left on by mistake is visible
 rather than silent.
+
+Every decision a guard makes is logged too, so what left the editor can be
+looked back on and not only what was kept in: which integration, which file,
+when, and whether it went out or was refused — Copilot attaching, a file added
+to an Avante chat, a tool reading a path, a prompt sent through sidekick, a
+selection or a mention reaching Claude Code. Only the path and a line range
+are kept, never the text, since a log of what reached an AI must not become
+one more copy of it. `:AiGuardLog` lists this session, `:AiGuardLog!` every
+session still in `stdpath('state')/dyneo/ai_audit.jsonl`, and the same
+handover is logged once a minute at most.
 
 ### Schemas for YAML and JSON
 
@@ -587,6 +598,7 @@ ones worth knowing before which-key gets a chance to tell you:
 | `:DySpell {lang}` | Rebuild a spell file from its word lists |
 | `:LazyQuarantine` | Plugins the release quarantine is holding back, and for how much longer |
 | `:AiGuardCheck`, `:AiGuardAllow[!]` | Why this buffer is kept from the AI integrations, the way past the content check, and the way back |
+| `:AiGuardLog[!]` | What the AI integrations were handed or refused: paths and times, never the text |
 | `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |
 | `:YamlSchema reset` | Hand schema detection back the wheel |
 | `:DyNeoFormat`, `:DyNeoFormatInfo` | Format the buffer; which formatters would run, and whether it formats on save |
