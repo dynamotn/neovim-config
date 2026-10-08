@@ -79,6 +79,17 @@ describe('util.ai_audit', function()
     )
   end)
 
+  it('logs a decrypted buffer, written by a handler of its own', function()
+    local bufnr = h.buffer({ name = dir .. '/secrets.yaml' })
+    vim.bo[bufnr].buftype = 'acwrite'
+    assert.is_true(audit.record_buffer('Avante', 'refused', bufnr))
+  end)
+
+  it('keeps its file to this user', function()
+    audit.record('Avante', 'sent', dir .. '/a')
+    assert.equals('rw-------', vim.fn.getfperm(audit.file()))
+  end)
+
   it('leaves out a buffer that is no file', function()
     local scratch = h.buffer({ name = dir .. '/chat' })
     vim.bo[scratch].buftype = 'nofile'

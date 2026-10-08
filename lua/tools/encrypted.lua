@@ -123,11 +123,34 @@ local function private_copy(lines)
   return path
 end
 
+--- The editor `sops edit` runs to put the buffer in place: it copies `copy`
+--- over the file sops hands it, once. sops asks the editor again when it
+--- cannot parse what it got back, waiting for a key in between -- which,
+--- with no terminal, never comes, and sops loops until it is killed and
+--- leaves its own clear copy behind. A second call fails instead, and sops
+--- gives up and cleans up after itself.
+---@param copy string
+---@return string script
+---@return string marker
+local function sops_editor(copy)
+  local script, marker = copy .. '.editor', copy .. '.used'
+  vim.fn.writefile({
+    '#!/bin/sh',
+    ('[ -e %s ] && exit 1'):format(vim.fn.shellescape(marker)),
+    (': > %s'):format(vim.fn.shellescape(marker)),
+    ('exec cp %s "$1"'):format(vim.fn.shellescape(copy)),
+  }, script)
+  vim.fn.setfperm(script, 'rwx------')
+  return script, marker
+end
+
 --- Encrypt the clear text of `bufnr` back into its file
 ---@param bufnr integer
 ---@return boolean written
 function M.write(bufnr)
   local kind = vim.b[bufnr].dy_encrypted
+  -- A handler left from an earlier opening of a buffer no longer decrypted
+  if not TOOLS[kind] then return false end
   local file = vim.api.nvim_buf_get_name(bufnr)
   local tool = TOOLS[kind].bin
   if vim.fn.executable(tool) ~= 1 then
@@ -137,12 +160,15 @@ function M.write(bufnr)
 
   local copy = private_copy(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
   local command, env
+  local extra = {}
   if kind == 'sops' then
     -- `sops edit` decrypts into a file of its own, hands it to the editor
     -- and encrypts what the editor left there with the key it already had.
     -- The editor here only copies the buffer over that file.
     command = { 'sops', 'edit', file }
-    env = { SOPS_EDITOR = 'cp ' .. copy, EDITOR = 'cp ' .. copy }
+    local script, marker = sops_editor(copy)
+    extra = { script, marker }
+    env = { SOPS_EDITOR = script, EDITOR = script }
   elseif kind == 'chezmoi' then
     -- To the recipients of chezmoi's configuration, armoured or not as
     -- that configuration says
@@ -161,6 +187,9 @@ function M.write(bufnr)
     end
   )
   vim.fn.delete(copy)
+  for _, path in ipairs(extra) do
+    vim.fn.delete(path)
+  end
   if not ok then
     notify(tostring(result), vim.log.levels.ERROR)
     return false
@@ -224,14 +253,64 @@ function M.open(bufnr)
   vim.b[bufnr].dy_encrypted = kind
   vim.b[bufnr].dy_vault_id = kind == 'ansible' and M.vault_id(lines[1]) or nil
   vim.bo[bufnr].buftype = 'acwrite'
-  if not vim.b[bufnr].dy_encrypted_write then
-    vim.b[bufnr].dy_encrypted_write = true
-    vim.api.nvim_create_autocmd('BufWriteCmd', {
-      buffer = bufnr,
-      callback = function(args) M.write(args.buf) end,
+  M.guard(bufnr)
+  return true
+end
+
+--- Whether a buffer has held clear text this session, so the registers it
+--- may have filled are kept out of the shada file
+local decrypted_any = false
+
+--- Write `bufnr` encrypted, and keep its clear text out of the system
+--- clipboard while it is the current buffer
+---
+--- The autocmds live in a group of the buffer's own, cleared each time it
+--- is opened: `:bdelete` forgets buffer variables but not buffer-local
+--- autocmds, and a flag kept in one would let every reopening add another
+--- handler, encrypting once per handler on each `:w`.
+---@param bufnr integer
+function M.guard(bufnr)
+  local group =
+    vim.api.nvim_create_augroup('dy_encrypted_' .. bufnr, { clear = true })
+  vim.api.nvim_create_autocmd('BufWriteCmd', {
+    group = group,
+    buffer = bufnr,
+    callback = function(args) M.write(args.buf) end,
+  })
+  -- `unnamedplus` would put every yank of a password into the system
+  -- clipboard, and from there into a clipboard manager's history
+  local saved
+  vim.api.nvim_create_autocmd('BufEnter', {
+    group = group,
+    buffer = bufnr,
+    callback = function()
+      saved = vim.o.clipboard
+      vim.o.clipboard = ''
+    end,
+  })
+  vim.api.nvim_create_autocmd({ 'BufLeave', 'BufWipeout' }, {
+    group = group,
+    buffer = bufnr,
+    callback = function()
+      if saved then
+        vim.o.clipboard, saved = saved, nil
+      end
+    end,
+  })
+  if vim.api.nvim_get_current_buf() == bufnr then
+    saved = vim.o.clipboard
+    vim.o.clipboard = ''
+  end
+
+  if not decrypted_any then
+    decrypted_any = true
+    -- Registers and the search history are written to the shada file on
+    -- quitting: after clear text was in a buffer, neither is kept
+    vim.api.nvim_create_autocmd('VimLeavePre', {
+      group = vim.api.nvim_create_augroup('dy_encrypted_shada', {}),
+      callback = function() vim.opt.shada:append({ '<0', '/0', '@0' }) end,
     })
   end
-  return true
 end
 
 return M
