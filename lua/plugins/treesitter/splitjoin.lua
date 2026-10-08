@@ -18,7 +18,7 @@ return {
     },
     opts = {
       -- The defaults are `<leader>m`, `<leader>j` and `<leader>s`, and all
-      -- three are LazyVim groups already.
+      -- three are which-key groups already.
       use_default_keymaps = false,
       -- A join that ends up past the text width is not the shorter form of
       -- anything, so it is left split.

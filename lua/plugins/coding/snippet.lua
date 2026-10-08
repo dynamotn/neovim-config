@@ -26,10 +26,12 @@ local function new_snippet_file(ft, paths)
 end
 
 return {
-  -- Use Luasnip for Snipmate
-  { import = 'lazyvim.plugins.extras.coding.luasnip' },
   {
+    -- Use Luasnip for Snipmate
     'L3MON4D3/LuaSnip',
+    build = vim.fn.has('win32') == 0
+        and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
+      or nil,
     dependencies = {
       {
         'rafamadriz/friendly-snippets',
@@ -52,6 +54,33 @@ return {
           })
         end,
         desc = 'Edit Snippets',
+      },
+    },
+    opts = function()
+      local actions = require('util.blink').actions
+      actions.snippet_forward = function()
+        if require('luasnip').jumpable(1) then
+          vim.schedule(function() require('luasnip').jump(1) end)
+          return true
+        end
+      end
+      actions.snippet_stop = function()
+        if require('luasnip').expand_or_jumpable() then
+          require('luasnip').unlink_current()
+          return true
+        end
+      end
+      return {
+        history = true,
+        delete_check_events = 'TextChanged',
+      }
+    end,
+  },
+  {
+    'saghen/blink.cmp',
+    opts = {
+      snippets = {
+        preset = 'luasnip',
       },
     },
   },

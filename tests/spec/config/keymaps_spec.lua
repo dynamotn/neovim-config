@@ -1,10 +1,21 @@
 local h = require('helpers')
 
 describe('config.keymaps', function()
+  local restore
   before_each(function()
     vim.g.mapleader = ' '
+    -- The defaults go through Snacks, which is not loaded here: any field or
+    -- call on this stand-in hands the stand-in back, so `toggle(...):map()`
+    -- chains do nothing
+    local snacks
+    snacks = setmetatable({}, {
+      __index = function() return snacks end,
+      __call = function() return snacks end,
+    })
+    restore = h.stub(_G, 'Snacks', snacks)
     dofile(h.root .. '/lua/config/keymaps.lua')
   end)
+  after_each(function() restore() end)
 
   local function map(mode, lhs) return vim.fn.maparg(lhs, mode, false, true) end
 

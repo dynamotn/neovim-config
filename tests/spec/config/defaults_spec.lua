@@ -20,7 +20,7 @@ describe('config.defaults', function()
     end
   end)
 
-  it('shapes the DAP signs as LazyVim expects', function()
+  it('shapes the DAP signs as the nvim-dap spec expects', function()
     for name, sign in pairs(defaults.icons.dap) do
       assert(type(sign) == 'string' or type(sign[1]) == 'string', name)
     end

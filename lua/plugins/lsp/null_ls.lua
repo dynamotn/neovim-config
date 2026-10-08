@@ -1,13 +1,42 @@
 return {
-  -- Use null-ls for formatting/diagnostics with some none-LSP tools
-  { import = 'lazyvim.plugins.extras.lsp.none-ls' },
   {
+    -- Use null-ls for formatting/diagnostics with some none-LSP tools
     'nvimtools/none-ls.nvim',
-    -- I don't want to use default LazyVim sources
+    event = 'LazyFile',
+    dependencies = { 'mason.nvim' },
+    init = function()
+      require('util.plugin').on_very_lazy(function()
+        -- Format through null-ls ahead of conform and the LSP formatter
+        require('util.format').register({
+          name = 'none-ls.nvim',
+          priority = 200,
+          primary = true,
+          format = function(buf)
+            return require('util.lsp').format({
+              bufnr = buf,
+              filter = function(client) return client.name == 'null-ls' end,
+            })
+          end,
+          sources = function(buf)
+            local ret = require('null-ls.sources').get_available(
+              vim.bo[buf].filetype,
+              'NULL_LS_FORMATTING'
+            ) or {}
+            return vim.tbl_map(function(source) return source.name end, ret)
+          end,
+        })
+      end)
+    end,
+    -- Only the sources of `config.languages`, none of the defaults
     config = function(_, opts)
       local null_ls = require('null-ls')
       opts.root_dir = opts.root_dir
-        or require('null-ls.utils').root_pattern('Makefile', '.git')
+        or require('null-ls.utils').root_pattern(
+          '.null-ls-root',
+          '.neoconf.json',
+          'Makefile',
+          '.git'
+        )
       opts.sources = {}
 
       -- Unified null_ls source configs
@@ -77,6 +106,7 @@ return {
     -- Auto install tools
     'mason-org/mason.nvim',
     opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
       for name, language in pairs(require('config.languages')) do
         for _, tool in ipairs(language.null_ls or {}) do
           local tool_package = require('util.languages').get_mason_package(tool)

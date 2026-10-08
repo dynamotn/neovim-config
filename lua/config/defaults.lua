@@ -1,7 +1,14 @@
----@class LazyVimOptions
 return {
   colorscheme = 'catppuccin',
   icons = {
+    misc = {
+      dots = '󰇘',
+    },
+    ft = {
+      octo = ' ',
+      gh = ' ',
+      ['markdown.gh'] = ' ',
+    },
     me = ' ',
     treesitter = {
       core = ' ',
@@ -108,6 +115,43 @@ return {
       git = ' ',
       emoji = '󰞅 ',
       nerdfont = '󰀺 ',
+    },
+  },
+  -- Symbol kinds the symbol pickers list, per filetype; `false` lists them
+  -- all
+  ---@type table<string, string[]|false>
+  kind_filter = {
+    default = {
+      'Class',
+      'Constructor',
+      'Enum',
+      'Field',
+      'Function',
+      'Interface',
+      'Method',
+      'Module',
+      'Namespace',
+      'Package',
+      'Property',
+      'Struct',
+      'Trait',
+    },
+    markdown = false,
+    help = false,
+    lua = {
+      'Class',
+      'Constructor',
+      'Enum',
+      'Field',
+      'Function',
+      'Interface',
+      'Method',
+      'Module',
+      'Namespace',
+      -- `Package` is left out: lua_ls reports control flow under it
+      'Property',
+      'Struct',
+      'Trait',
     },
   },
   ---@type table<string, string>

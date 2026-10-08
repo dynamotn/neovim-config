@@ -9,7 +9,6 @@
   "diagnostics": {
     "globals": [
       "vim",
-      "LazyVim",
       "Snacks"
     ],
     "groupSeverity": {

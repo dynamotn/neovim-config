@@ -1,5 +1,6 @@
 _G.dark_mode = {{ .darkMode }}
 _G.is_gentoo = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
+_G.is_gentoo = {{ eq .osid "linux-gentoo" }}
 _G.enabled_plugins.obsidian = {{ or (eq .kind "pc" "laptop") (eq .chezmoi.os "android") }}
 _G.enabled_plugins.leetcode = {{ eq .kind "pc" "laptop" }}
 _G.enabled_plugins.firenvim = {{ eq .kind "pc" "laptop" }}

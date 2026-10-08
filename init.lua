@@ -13,7 +13,7 @@ require('per_machine')
 -- fallback.
 local version = _G.plugin_channel == 'stable' and '0.12.0' or '0.13.0'
 if vim.fn.has('nvim-' .. version) == 1 then
-  -- Load LazyVim
+  -- Load lazy.nvim and the plugins
   require('config.lazy')
 else
   vim.notify(

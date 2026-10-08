@@ -2,8 +2,8 @@
 -- modules under test lean on, and nothing else of the configuration.
 --
 -- The specs require modules one at a time and stub what they reach for, so
--- neither LazyVim nor the plugin specs are loaded. Plenary (the test runner)
--- and LazyVim (whose `LazyVim.*` helpers a few modules call) are taken from
+-- the plugin specs are not loaded. Plenary (the test runner) and lazy.nvim
+-- (whose `lazy.core` modules `util.plugin` builds on) are taken from
 -- lazy.nvim's install directory when the configuration has been started once
 -- on this machine, and cloned next to the tests otherwise.
 --
@@ -50,8 +50,6 @@ end
 vim.opt.runtimepath = {
   root,
   dependency('plenary.nvim', 'https://github.com/nvim-lua/plenary.nvim'),
-  dependency('LazyVim', 'https://github.com/LazyVim/LazyVim'),
-  -- `lazyvim.util` requires `lazy.core.util` as it loads
   dependency('lazy.nvim', 'https://github.com/folke/lazy.nvim'),
   vim.env.VIMRUNTIME,
 }

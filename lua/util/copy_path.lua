@@ -1,10 +1,12 @@
+local Plugin = require('util.plugin')
+
 local M = {}
 
 --- Get the current buffer's file path. Returns nil if not a file buffer.
 ---@return string|nil
 function M.bufpath()
   local name = vim.api.nvim_buf_get_name(0)
-  return name ~= '' and LazyVim.norm(name) or nil
+  return name ~= '' and Plugin.norm(name) or nil
 end
 
 --- Absolute file path of the current buffer, normalized.
@@ -14,7 +16,7 @@ function M.absolute()
   local p = M.bufpath()
   if not p then return nil end
   -- Expand `~` and environment variables, and normalize
-  return LazyVim.norm(vim.fn.expand(p)) or p
+  return Plugin.norm(vim.fn.expand(p)) or p
 end
 
 --- Parent directory of the current buffer's file.
@@ -33,8 +35,8 @@ end
 function M.relative()
   local abs = M.absolute()
   if not abs then return nil end
-  -- LazyVim.root() can fail in headless/unusual contexts; fall back to absolute
-  local ok, root = pcall(LazyVim.root)
+  -- The root can fail in headless/unusual contexts; fall back to absolute
+  local ok, root = pcall(require('util.root').get)
   if not ok then return abs end
   -- Ensure root ends with / for consistent string matching
   if root:sub(-1) ~= '/' then root = root .. '/' end
@@ -82,8 +84,8 @@ end
 --- Git root directory, or project root as fallback.
 ---@return string
 function M.project_root()
-  -- LazyVim.root.git() can fail in headless/unusual contexts; fall back to cwd
-  local ok, root = pcall(LazyVim.root.git)
+  -- The git root can fail in headless/unusual contexts; fall back to cwd
+  local ok, root = pcall(require('util.root').git)
   if not ok then return vim.uv.cwd() .. '/' end
   return root .. '/'
 end
@@ -114,7 +116,7 @@ end
 function M.copy(get_path, desc)
   local text = get_path()
   if not text then
-    LazyVim.warn(
+    Plugin.warn(
       'Current buffer is not attached to a file!',
       { title = 'Copy Path' }
     )
@@ -123,7 +125,7 @@ function M.copy(get_path, desc)
   -- Write to system clipboard (+ register), character mode for clean copy
   vim.fn.setreg('+', text, 'c')
   -- Print the copied value for user feedback
-  LazyVim.info('Copied: ' .. text, { title = desc })
+  Plugin.info('Copied: ' .. text, { title = desc })
 end
 
 -- ─── Convenience functions that wire up specific path representations ───

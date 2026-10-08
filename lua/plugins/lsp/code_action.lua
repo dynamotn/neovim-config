@@ -8,17 +8,19 @@ return {
     },
   },
   {
-    -- LazyVim maps `<leader>ca` per buffer on attach, so it is replaced there;
-    -- a later entry for the same key wins. Appended rather than merged in
-    -- through `opts = {...}`, which would overwrite the list by index.
+    -- `plugins.lsp.server` maps `<leader>ca` per buffer on attach, so it is
+    -- replaced there: a later entry for the same key wins, and the server
+    -- spec puts its defaults ahead of the keys added before it.
     'neovim/nvim-lspconfig',
     opts = function(_, opts)
-      table.insert(opts.servers['*'].keys, {
-        '<leader>ca',
-        function() require('tiny-code-action').code_action() end,
-        desc = 'Code Action',
-        mode = { 'n', 'x' },
-        has = 'codeAction',
+      require('util.plugin').extend(opts, 'servers.*.keys', {
+        {
+          '<leader>ca',
+          function() require('tiny-code-action').code_action() end,
+          desc = 'Code Action',
+          mode = { 'n', 'x' },
+          has = 'codeAction',
+        },
       })
     end,
   },

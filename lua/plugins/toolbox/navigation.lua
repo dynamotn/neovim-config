@@ -1,5 +1,31 @@
 return {
   {
+    -- Jump anywhere on screen by a label shown at the end of each match
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    vscode = true,
+    ---@type Flash.Config
+    opts = {},
+    -- stylua: ignore
+    keys = {
+      { 's', mode = { 'n', 'x', 'o' }, function() require('flash').jump() end, desc = 'Flash' },
+      { 'S', mode = { 'n', 'o', 'x' }, function() require('flash').treesitter() end, desc = 'Flash Treesitter' },
+      { 'r', mode = 'o', function() require('flash').remote() end, desc = 'Remote Flash' },
+      { 'R', mode = { 'o', 'x' }, function() require('flash').treesitter_search() end, desc = 'Treesitter Search' },
+      { '<c-s>', mode = { 'c' }, function() require('flash').toggle() end, desc = 'Toggle Flash Search' },
+      -- Incremental selection by treesitter node
+      { '<c-space>', mode = { 'n', 'o', 'x' },
+        function()
+          require('flash').treesitter({
+            actions = {
+              ['<c-space>'] = 'next',
+              ['<BS>'] = 'prev',
+            },
+          })
+        end, desc = 'Treesitter Incremental Selection' },
+    },
+  },
+  {
     -- Move between, resize and swap windows, past the edge into tmux/zellij
     -- panes
     --
@@ -38,7 +64,7 @@ return {
         desc = 'Navigate to previous window',
         mode = { 'n', 't' },
       },
-      -- Take over LazyVim's resize keys, which stop at Neovim's own edge
+      -- Resize past Neovim's own edge, into the multiplexer's panes
       {
         '<C-Up>',
         function() require('smart-splits').resize_up() end,
@@ -103,7 +129,7 @@ return {
     -- Editable quickfix with context lines
     'stevearc/quicker.nvim',
     ft = 'qf',
-    -- Take over LazyVim's own toggles, which focus the list as these do.
+    -- Toggle the lists, focusing them as they open
     keys = {
       {
         '<leader>xq',

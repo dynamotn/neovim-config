@@ -4,6 +4,79 @@ local remotes = { 'upstream', 'gh', 'github', 'origin' }
 
 return {
   {
+    -- Signs for the lines changed since the last commit, and staging hunk
+    -- by hunk
+    'lewis6991/gitsigns.nvim',
+    event = 'LazyFile',
+    opts = function()
+      Snacks.toggle({
+        name = 'Git Signs',
+        get = function() return require('gitsigns.config').config.signcolumn end,
+        set = function(state) require('gitsigns').toggle_signs(state) end,
+      }):map('<leader>uG')
+
+      return {
+        signs = {
+          add = { text = '▎' },
+          change = { text = '▎' },
+          delete = { text = '' },
+          topdelete = { text = '' },
+          changedelete = { text = '▎' },
+          untracked = { text = '▎' },
+        },
+        signs_staged = {
+          add = { text = '▎' },
+          change = { text = '▎' },
+          delete = { text = '' },
+          topdelete = { text = '' },
+          changedelete = { text = '▎' },
+        },
+        on_attach = function(buffer)
+          local gs = package.loaded.gitsigns
+
+          local function map(mode, l, r, desc)
+            vim.keymap.set(
+              mode,
+              l,
+              r,
+              { buffer = buffer, desc = desc, silent = true }
+            )
+          end
+
+          -- stylua: ignore start
+          map('n', ']h', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ ']c', bang = true })
+            else
+              gs.nav_hunk('next')
+            end
+          end, 'Next Hunk')
+          map('n', '[h', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ '[c', bang = true })
+            else
+              gs.nav_hunk('prev')
+            end
+          end, 'Prev Hunk')
+          map('n', ']H', function() gs.nav_hunk('last') end, 'Last Hunk')
+          map('n', '[H', function() gs.nav_hunk('first') end, 'First Hunk')
+          map({ 'n', 'x' }, '<leader>ghs', ':Gitsigns stage_hunk<CR>', 'Stage Hunk')
+          map({ 'n', 'x' }, '<leader>ghr', ':Gitsigns reset_hunk<CR>', 'Reset Hunk')
+          map('n', '<leader>ghS', gs.stage_buffer, 'Stage Buffer')
+          map('n', '<leader>ghu', gs.undo_stage_hunk, 'Undo Stage Hunk')
+          map('n', '<leader>ghR', gs.reset_buffer, 'Reset Buffer')
+          map('n', '<leader>ghp', gs.preview_hunk_inline, 'Preview Hunk Inline')
+          map('n', '<leader>ghb', function() gs.blame_line({ full = true }) end, 'Blame Line')
+          map('n', '<leader>ghB', function() gs.blame() end, 'Blame Buffer')
+          map('n', '<leader>ghd', gs.diffthis, 'Diff This')
+          map('n', '<leader>ghD', function() gs.diffthis('~') end, 'Diff This ~')
+          map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', 'GitSigns Select Hunk')
+          -- stylua: ignore end
+        end,
+      }
+    end,
+  },
+  {
     -- VSCode-style diff to review changes, history and merge conflicts
     'esmuellert/codediff.nvim',
     cmd = 'CodeDiff',
@@ -53,28 +126,81 @@ return {
       end
     end,
   },
-  -- Review GitHub pull requests and issues. The extra hands `<leader>gi`,
-  -- `gI`, `gp` and `gP` over from Snacks' `gh` pickers to Octo.
-  {
-    import = 'lazyvim.plugins.extras.util.octo',
-    enabled = vim.fn.executable('gh') == 1,
-  },
-  {
-    'pwntester/octo.nvim',
-    optional = true,
-    keys = {
-      -- `<leader>gS` stays Snacks' git stash
-      { '<leader>gS', false },
-      { '<leader>g/', '<cmd>Octo search<cr>', desc = 'Search (Octo)' },
-      -- The blink `git` source already completes `@` and `#` as they are
-      -- typed, so the omnifunc popup these open would be a second menu
-      { '@', false, mode = 'i', ft = 'octo' },
-      { '#', false, mode = 'i', ft = 'octo' },
-    },
-    opts = {
-      default_remote = remotes,
-    },
-  },
+  -- Review GitHub pull requests and issues, when the `gh` CLI is there.
+  -- `<leader>gi`, `gI`, `gp` and `gP` are Octo's then, and Snacks' `gh`
+  -- pickers otherwise (`plugins.toolbox.picker`).
+  vim.fn.executable('gh') == 1
+      and {
+        {
+          'pwntester/octo.nvim',
+          cmd = 'Octo',
+          event = { { event = 'BufReadCmd', pattern = 'octo://*' } },
+          opts = function()
+            vim.treesitter.language.register('markdown', 'octo')
+
+            -- Keep the Octo windows of a session, empty as they are
+            vim.api.nvim_create_autocmd('ExitPre', {
+              group = vim.api.nvim_create_augroup(
+                'octo_exit_pre',
+                { clear = true }
+              ),
+              callback = function()
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                  local buf = vim.api.nvim_win_get_buf(win)
+                  if vim.bo[buf].filetype == 'octo' then
+                    vim.bo[buf].buftype = ''
+                  end
+                end
+              end,
+            })
+
+            return {
+              enable_builtin = true,
+              default_to_projects_v2 = true,
+              default_merge_method = 'squash',
+              picker = 'snacks',
+              default_remote = remotes,
+            }
+          end,
+          -- `<leader>gS` stays Snacks' git stash. `@` and `#` complete
+          -- through the blink `git` source as they are typed, so they are not
+          -- mapped to the omnifunc popup, a second menu.
+          -- stylua: ignore
+          keys = {
+            { '<leader>gi', '<cmd>Octo issue list<CR>', desc = 'List Issues (Octo)' },
+            { '<leader>gI', '<cmd>Octo issue search<CR>', desc = 'Search Issues (Octo)' },
+            { '<leader>gp', '<cmd>Octo pr list<CR>', desc = 'List PRs (Octo)' },
+            { '<leader>gP', '<cmd>Octo pr search<CR>', desc = 'Search PRs (Octo)' },
+            { '<leader>gr', '<cmd>Octo repo list<CR>', desc = 'List Repos (Octo)' },
+            { '<leader>g/', '<cmd>Octo search<cr>', desc = 'Search (Octo)' },
+
+            { '<localleader>a', '', desc = '+assignee (Octo)', ft = 'octo' },
+            { '<localleader>c', '', desc = '+comment/code (Octo)', ft = 'octo' },
+            { '<localleader>l', '', desc = '+label (Octo)', ft = 'octo' },
+            { '<localleader>i', '', desc = '+issue (Octo)', ft = 'octo' },
+            { '<localleader>r', '', desc = '+react (Octo)', ft = 'octo' },
+            { '<localleader>p', '', desc = '+pr (Octo)', ft = 'octo' },
+            { '<localleader>pr', '', desc = '+rebase (Octo)', ft = 'octo' },
+            { '<localleader>ps', '', desc = '+squash (Octo)', ft = 'octo' },
+            { '<localleader>v', '', desc = '+review (Octo)', ft = 'octo' },
+            { '<localleader>g', '', desc = '+goto_issue (Octo)', ft = 'octo' },
+          },
+        },
+        {
+          -- Git parsers, for the issues and PRs Octo shows
+          'nvim-treesitter/nvim-treesitter',
+          opts = {
+            ensure_installed = {
+              'git_config',
+              'gitcommit',
+              'git_rebase',
+              'gitignore',
+              'gitattributes',
+            },
+          },
+        },
+      }
+    or {},
   {
     -- Completion source. Its own spec rather than a dependency of blink.cmp,
     -- which would load it on the first `InsertEnter` of any buffer.

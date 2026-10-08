@@ -14,8 +14,7 @@ describe('util.languages', function()
   end
 
   before_each(function()
-    restore =
-      { h.stub(_G, 'LazyVim', { dedup = require('lazyvim.util').dedup }) }
+    restore = {}
     enabled_calls = 0
     load({
       ['*'] = {

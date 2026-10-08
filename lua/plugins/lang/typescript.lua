@@ -57,7 +57,7 @@ return condition
                     local win = vim.api.nvim_get_current_win()
                     local params =
                       vim.lsp.util.make_position_params(win, 'utf-16')
-                    LazyVim.lsp.execute({
+                    require('util.lsp').execute({
                       command = 'typescript.goToSourceDefinition',
                       arguments = { params.textDocument.uri, params.position },
                       open = true,
@@ -68,7 +68,7 @@ return condition
                 {
                   'gR',
                   function()
-                    LazyVim.lsp.execute({
+                    require('util.lsp').execute({
                       command = 'typescript.findAllFileReferences',
                       arguments = { vim.uri_from_bufnr(0) },
                       open = true,
@@ -78,28 +78,28 @@ return condition
                 },
                 {
                   '<leader>co',
-                  LazyVim.lsp.action['source.organizeImports'],
+                  require('util.lsp').action['source.organizeImports'],
                   desc = 'Organize Imports',
                 },
                 {
                   '<leader>cM',
-                  LazyVim.lsp.action['source.addMissingImports.ts'],
+                  require('util.lsp').action['source.addMissingImports.ts'],
                   desc = 'Add missing imports',
                 },
                 {
                   '<leader>cu',
-                  LazyVim.lsp.action['source.removeUnused.ts'],
+                  require('util.lsp').action['source.removeUnused.ts'],
                   desc = 'Remove unused imports',
                 },
                 {
                   '<leader>cD',
-                  LazyVim.lsp.action['source.fixAll.ts'],
+                  require('util.lsp').action['source.fixAll.ts'],
                   desc = 'Fix all diagnostics',
                 },
                 {
                   '<leader>cV',
                   function()
-                    LazyVim.lsp.execute({
+                    require('util.lsp').execute({
                       command = 'typescript.selectTypeScriptVersion',
                     })
                   end,
@@ -180,7 +180,11 @@ return condition
         -- Extend LSP config of vtsls by plugin for Typescript and Javascript
         'neovim/nvim-lspconfig',
         opts = function(_, opts)
-          LazyVim.extend(opts.servers.vtsls, 'filetypes', language.filetypes)
+          require('util.plugin').extend(
+            opts.servers.vtsls,
+            'filetypes',
+            language.filetypes
+          )
         end,
       },
       {
@@ -296,7 +300,7 @@ return condition
             -- finds the project's own jest and the nearest `jest.config.*`
             ['neotest-jest'] = {
               env = { CI = true },
-              cwd = function(_) return require('lazyvim.util.root').get() end,
+              cwd = function(_) return require('util.root').get() end,
             },
             ['neotest-vitest'] = {},
             ['neotest-playwright'] = {

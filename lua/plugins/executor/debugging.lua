@@ -1,12 +1,85 @@
 local cmp_util = require('util.cmp')
 
+--- Wrap `config` so its arguments are asked for, prefilled with its own
+---@param config {type?:string, args?:string[]|fun():string[]?}
+local function get_args(config)
+  local args = type(config.args) == 'function' and (config.args() or {})
+    or config.args
+    or {} --[[@as string[] | string ]]
+  local args_str = type(args) == 'table' and table.concat(args, ' ') or args --[[@as string]]
+
+  config = vim.deepcopy(config)
+  ---@cast args string[]
+  config.args = function()
+    local new_args = vim.fn.expand(vim.fn.input('Run with args: ', args_str)) --[[@as string]]
+    if config.type and config.type == 'java' then
+      ---@diagnostic disable-next-line: return-type-mismatch
+      return new_args
+    end
+    return require('dap.utils').splitstr(new_args)
+  end
+  return config
+end
+
 return {
-  -- Debug Adapter implementation
-  { import = 'lazyvim.plugins.extras.dap.core' },
-  { 'rcarriga/nvim-dap-ui', enabled = false }, -- Replaced by nvim-dap-view
   {
+    -- Debug Adapter implementation
     'mfussenegger/nvim-dap',
-    dependencies = { 'igorlfs/nvim-dap-view' },
+    dependencies = {
+      'igorlfs/nvim-dap-view',
+      -- Virtual text for the debugger
+      { 'theHamsta/nvim-dap-virtual-text', opts = {} },
+    },
+    -- stylua: ignore
+    keys = {
+      { '<leader>dB', function() require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = 'Breakpoint Condition' },
+      { '<leader>db', function() require('dap').toggle_breakpoint() end, desc = 'Toggle Breakpoint' },
+      { '<leader>dc', function() require('dap').continue() end, desc = 'Run/Continue' },
+      { '<leader>da', function() require('dap').continue({ before = get_args }) end, desc = 'Run with Args' },
+      { '<leader>dC', function() require('dap').run_to_cursor() end, desc = 'Run to Cursor' },
+      { '<leader>dg', function() require('dap').goto_() end, desc = 'Go to Line (No Execute)' },
+      { '<leader>di', function() require('dap').step_into() end, desc = 'Step Into' },
+      { '<leader>dj', function() require('dap').down() end, desc = 'Down' },
+      { '<leader>dk', function() require('dap').up() end, desc = 'Up' },
+      { '<leader>dl', function() require('dap').run_last() end, desc = 'Run Last' },
+      { '<leader>do', function() require('dap').step_out() end, desc = 'Step Out' },
+      { '<leader>dO', function() require('dap').step_over() end, desc = 'Step Over' },
+      { '<leader>dP', function() require('dap').pause() end, desc = 'Pause' },
+      { '<leader>dr', function() require('dap').repl.toggle() end, desc = 'Toggle REPL' },
+      { '<leader>ds', function() require('dap').session() end, desc = 'Session' },
+      { '<leader>dt', function() require('dap').terminate() end, desc = 'Terminate' },
+      { '<leader>dw', function() require('dap.ui.widgets').hover() end, desc = 'Widgets' },
+    },
+    config = function()
+      local Plugin = require('util.plugin')
+      -- Load mason-nvim-dap here, after all adapters have been setup
+      if Plugin.has('mason-nvim-dap.nvim') then
+        require('mason-nvim-dap').setup(Plugin.opts('mason-nvim-dap.nvim'))
+      end
+
+      vim.api.nvim_set_hl(
+        0,
+        'DapStoppedLine',
+        { default = true, link = 'Visual' }
+      )
+
+      for name, sign in pairs(require('config.defaults').icons.dap) do
+        sign = type(sign) == 'table' and sign or { sign }
+        vim.fn.sign_define('Dap' .. name, {
+          text = sign[1],
+          texthl = sign[2] or 'DiagnosticInfo',
+          linehl = sign[3],
+          numhl = sign[3],
+        })
+      end
+
+      -- Read `.vscode/launch.json` with its comments
+      local vscode = require('dap.ext.vscode')
+      local json = require('plenary.json')
+      vscode.json_decode = function(str)
+        return vim.json.decode(json.json_strip_comments(str))
+      end
+    end,
   },
   {
     -- Debugger UI sharing one window between its views
@@ -44,10 +117,14 @@ return {
     },
   },
   {
-    -- Debug adapters from Mason. Its `setup` is LazyVim's to call, from
-    -- nvim-dap's own `config`; a second call here would run every handler
-    -- twice and list each of their configurations twice.
+    -- Debug adapters from Mason. Its `setup` is called from nvim-dap's own
+    -- `config` above, once every adapter is set up; a second call here would
+    -- run every handler twice and list each of their configurations twice.
     'jay-babu/mason-nvim-dap.nvim',
+    dependencies = 'mason.nvim',
+    cmd = { 'DapInstall', 'DapUninstall' },
+    -- Loaded and set up by nvim-dap
+    config = function() end,
     -- The adapters of a language are installed with its first buffer, from a
     -- handler registered at startup: nvim-dap itself only loads with the
     -- first `<leader>d` key, so one registered from there would miss the
@@ -76,6 +153,8 @@ return {
     opts = function(_, opts)
       local dap_util = require('util.dap')
       opts.automatic_installation = false
+      -- Extra configuration for the handlers, see mason-nvim-dap's README
+      opts.handlers = opts.handlers or {}
       opts.ensure_installed = opts.ensure_installed or {}
       for name, language in pairs(require('config.languages')) do
         if language.dap and vim.list_contains(_G.bundle_languages, name) then

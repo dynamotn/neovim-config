@@ -2,7 +2,57 @@ return {
   {
     -- Formatters
     'stevearc/conform.nvim',
+    dependencies = { 'mason.nvim' },
+    cmd = 'ConformInfo',
+    keys = {
+      {
+        '<leader>cF',
+        function()
+          require('conform').format({
+            formatters = { 'injected' },
+            timeout_ms = 3000,
+          })
+        end,
+        mode = { 'n', 'x' },
+        desc = 'Format Injected Langs',
+      },
+    },
+    init = function()
+      -- Format through conform first, with the LSP as the fallback
+      require('util.plugin').on_very_lazy(function()
+        require('util.format').register({
+          name = 'conform.nvim',
+          priority = 100,
+          primary = true,
+          format = function(buf) require('conform').format({ bufnr = buf }) end,
+          sources = function(buf)
+            return vim.tbl_map(
+              function(v) return v.name end,
+              require('conform').list_formatters(buf)
+            )
+          end,
+        })
+      end)
+    end,
+    ---@param opts conform.setupOpts
     opts = function(_, opts)
+      opts = vim.tbl_deep_extend('keep', opts, {
+        default_format_opts = {
+          timeout_ms = 3000,
+          -- `util.format` relies on these
+          async = false,
+          quiet = false,
+          lsp_format = 'fallback',
+        },
+        formatters_by_ft = {
+          lua = { 'stylua' },
+          fish = { 'fish_indent' },
+          sh = { 'shfmt' },
+        },
+        formatters = {
+          injected = { options = { ignore_errors = true } },
+        },
+      })
       opts.formatters.condense_blank_lines = {
         command = 'sed',
         args = { ':a;N;$!ba;s/\\n\\n\\+/\\n\\n/g' },
@@ -111,7 +161,7 @@ return {
       -- A formatter Mason installs during the session was not on `$PATH` when
       -- the lists above were built, so it would sit unused until the next
       -- restart. Rebuilding once an install lands closes that gap.
-      require('lazyvim.util').on_load('mason.nvim', function()
+      require('util.plugin').on_load('mason.nvim', function()
         require('mason-registry'):on('package:install:success', function()
           vim.schedule(function()
             local formatters_by_ft = require('conform').formatters_by_ft
@@ -201,9 +251,9 @@ return {
         end
       end
 
-      -- Conform merges this on top of its own `injected` definition, and
-      -- LazyVim already put `ignore_errors` there, so extend instead of
-      -- replacing: a bare assignment loses whichever side runs first.
+      -- Conform merges this on top of its own `injected` definition, and the
+      -- defaults above already put `ignore_errors` there, so extend instead
+      -- of replacing: a bare assignment loses whichever side runs first.
       opts.formatters.injected =
         vim.tbl_deep_extend('force', opts.formatters.injected or {}, {
           options = { lang_to_ft = lang_to_ft, lang_to_ext = lang_to_ext },
@@ -217,6 +267,14 @@ return {
             )
           end,
         })
+      return opts
+    end,
+    -- Saving is `util.format`'s job, so conform must not format on its own
+    ---@param opts conform.setupOpts
+    config = function(_, opts)
+      opts.format_on_save = nil
+      opts.format_after_save = nil
+      require('conform').setup(opts)
     end,
   },
   {

@@ -27,13 +27,27 @@ end
 -- Load lazy to runtime path
 vim.opt.rtp:prepend(lazypath)
 
+local Plugin = require('util.plugin')
+-- Hold notifications back until noice has replaced `vim.notify`, so the ones
+-- sent while starting are not lost
+Plugin.lazy_notify()
+-- Options and leaders go in ahead of every plugin spec
+require('config.options')
+Plugin.snapshot_options()
+-- Reaching the system clipboard can take a while, and nothing needs it before
+-- `VeryLazy`
+local clipboard = vim.o.clipboard
+vim.o.clipboard = ''
+-- `LazyFile`, for the specs that load once a real file is open
+Plugin.lazy_file()
+
 local defaults = require('config.defaults')
 local stable = _G.plugin_channel == 'stable'
 
 -- Plugins still developed on their branch but whose newest release is more
 -- than two years old (as of 2026-10). `version = '*'` would take them back to
 -- that release -- `vim-snippets` to 2014 -- so on `stable` they stay on their
--- branch, the way LazyVim itself treats `nvim-treesitter` and `nvim-cmp`.
+-- branch, the way `plugins.treesitter.parser` keeps `nvim-treesitter` on its own.
 -- `optional` keeps a plugin out when nothing else in the spec asks for it.
 --
 -- `conform.nvim` is here for another reason: its release is younger, but
@@ -71,29 +85,7 @@ require('tools.lazy-quarantine').setup()
 -- Setup lazy
 require('lazy').setup({
   spec = {
-    {
-      'LazyVim/LazyVim',
-      import = 'lazyvim.plugins',
-      opts = {
-        colorscheme = defaults.colorscheme,
-        news = {
-          lazyvim = true,
-        },
-        icons = defaults.icons,
-      },
-    },
-    {
-      -- On `latest`, follow LazyVim's `main` instead of its releases. On
-      -- `stable`, repeat LazyVim's own `version = '*'`, so it stays on its
-      -- releases.
-      --
-      -- This cannot be folded into the entry above: LazyVim's own spec sets
-      -- `version = '*'`, so an override only sticks if it comes after the
-      -- import that pulls that spec in.
-      'LazyVim/LazyVim',
-      branch = not stable and 'main' or nil,
-      version = stable and '*' or false,
-    },
+    { 'folke/lazy.nvim', version = '*' },
     { import = 'plugins.ui' },
     { import = 'plugins.coding' },
     { import = 'plugins.treesitter' },
@@ -160,3 +152,20 @@ require('lazy').setup({
     enabled = false,
   },
 })
+
+-- A colorscheme that fails to load leaves the built-in one
+if not pcall(vim.cmd.colorscheme, defaults.colorscheme) then
+  vim.cmd.colorscheme('catppuccin')
+end
+
+-- Opening files from the command line needs the autocmds from the start;
+-- otherwise they wait with the keymaps for `VeryLazy`
+local lazy_autocmds = vim.fn.argc(-1) == 0
+if not lazy_autocmds then require('config.autocmds') end
+Plugin.on_very_lazy(function()
+  if lazy_autocmds then require('config.autocmds') end
+  require('config.keymaps')
+  vim.o.clipboard = clipboard
+  require('util.format').setup()
+  require('util.root').setup()
+end)

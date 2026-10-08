@@ -36,7 +36,7 @@ end
 
 --- The word to add: the selection in Visual mode, else the one under the
 --- cursor. `<cword>` stops at an apostrophe or a dot, so a word like
---- `LazyVim's` has to be selected.
+--- `Neovim's` has to be selected.
 ---@return string
 local target_word = function()
   local mode = vim.fn.mode()

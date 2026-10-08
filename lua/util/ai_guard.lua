@@ -275,9 +275,9 @@ end
 
 --- Run `fn` once lazy.nvim has loaded `name`, or now if it already has
 ---
---- Asked of lazy.nvim itself rather than of the `LazyVim` global: this runs
+--- Asked of lazy.nvim itself rather than through `util.plugin`: this runs
 --- from `plugin/`, which a `--clean` Neovim with this repository on its
---- runtimepath sources too, and there neither is set up. Without lazy.nvim
+--- runtimepath sources too, and there lazy.nvim is not set up. Without it
 --- none of the guarded plugins can load, so there is nothing to guard.
 ---@param name string
 ---@param fn fun()

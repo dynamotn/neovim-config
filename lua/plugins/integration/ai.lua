@@ -37,13 +37,14 @@ local function install_agy_acp()
   vim.fn.delete(zip)
 end
 
+-- Native inline completions cannot be shown as completion items, so blink
+-- shows them as ghost text instead
+vim.g.ai_cmp = false
+
 return {
   {
-    -- Copilot with native LSP
-    import = 'lazyvim.plugins.extras.ai.copilot-native',
-  },
-  {
-    -- Keep Copilot out of files holding credentials
+    -- Copilot with native LSP, its inline suggestions shown as ghost text
+    -- rather than as completion items
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
@@ -65,43 +66,228 @@ return {
               on_dir()
             end
           end,
+          -- stylua: ignore
+          keys = {
+            {
+              '<M-]>',
+              function() vim.lsp.inline_completion.select({ count = 1 }) end,
+              desc = 'Next Copilot Suggestion',
+              mode = { 'i', 'n' },
+            },
+            {
+              '<M-[>',
+              function() vim.lsp.inline_completion.select({ count = -1 }) end,
+              desc = 'Prev Copilot Suggestion',
+              mode = { 'i', 'n' },
+            },
+          },
         },
+      },
+      setup = {
+        -- Copilot's status is shown by sidekick, so it needs no handler of
+        -- its own here
+        copilot = function()
+          vim.schedule(function() vim.lsp.inline_completion.enable() end)
+          -- Accept inline suggestions or next edits
+          require('util.blink').actions.ai_accept = function()
+            return vim.lsp.inline_completion.get()
+          end
+        end,
       },
     },
   },
   {
-    -- AI CLI
-    import = 'lazyvim.plugins.extras.ai.sidekick',
+    -- AI CLI, and next edit suggestions from the Copilot server
+    'folke/sidekick.nvim',
+    opts = function(_, opts)
+      -- Jump to or apply the next edit
+      require('util.blink').actions.ai_nes = function()
+        local Nes = require('sidekick.nes')
+        if Nes.have() and (Nes.jump() or Nes.apply()) then return true end
+      end
+      Snacks.toggle({
+        name = 'Sidekick NES',
+        get = function() return require('sidekick.nes').enabled end,
+        set = function(state) require('sidekick.nes').enable(state) end,
+      }):map('<leader>uN')
+
+      -- Antigravity CLI integration
+      return vim.tbl_deep_extend('force', opts, {
+        cli = {
+          tools = {
+            antigravity = {
+              cmd = { 'agy' },
+              is_proc = '\\<agy\\>',
+              url = 'https://antigravity.google/docs/cli-overview',
+              resume = { '--continue' },
+              continue = { '--continue' },
+              format = function(text)
+                require('sidekick.text').transform(
+                  text,
+                  function(str)
+                    return str:find('[^%w/_%.%-]') and ('"' .. str .. '"')
+                      or str
+                  end,
+                  'SidekickLocFile'
+                )
+              end,
+            },
+          },
+        },
+      })
+    end,
+    -- stylua: ignore
+    keys = {
+      -- NES is also useful in normal mode
+      {
+        '<tab>',
+        function() return require('util.blink').map({ 'ai_nes' }, '<tab>')() end,
+        mode = { 'n' },
+        expr = true,
+      },
+      { '<leader>a', '', desc = '+ai', mode = { 'n', 'v' } },
+      {
+        '<c-.>',
+        function() require('sidekick.cli').focus() end,
+        desc = 'Sidekick Focus',
+        mode = { 'n', 't', 'i', 'x' },
+      },
+      {
+        '<leader>aa',
+        function() require('sidekick.cli').toggle() end,
+        desc = 'Sidekick Toggle CLI',
+      },
+      {
+        '<leader>as',
+        function() require('sidekick.cli').select() end,
+        desc = 'Select CLI',
+      },
+      {
+        '<leader>ad',
+        function() require('sidekick.cli').close() end,
+        desc = 'Detach a CLI Session',
+      },
+      {
+        '<leader>at',
+        function() require('sidekick.cli').send({ msg = '{this}' }) end,
+        mode = { 'x', 'n' },
+        desc = 'Send This',
+      },
+      {
+        '<leader>af',
+        function() require('sidekick.cli').send({ msg = '{file}' }) end,
+        desc = 'Send File',
+      },
+      {
+        '<leader>av',
+        function() require('sidekick.cli').send({ msg = '{selection}' }) end,
+        mode = { 'x' },
+        desc = 'Send Visual Selection',
+      },
+      {
+        '<leader>ap',
+        function() require('sidekick.cli').prompt() end,
+        mode = { 'n', 'x' },
+        desc = 'Sidekick Select Prompt',
+      },
+    },
   },
   {
-    -- Antigravity CLI integration
-    'folke/sidekick.nvim',
+    -- Send picker items to the AI CLI
+    'folke/snacks.nvim',
     opts = {
-      cli = {
-        tools = {
-          antigravity = {
-            cmd = { 'agy' },
-            is_proc = '\\<agy\\>',
-            url = 'https://antigravity.google/docs/cli-overview',
-            resume = { '--continue' },
-            continue = { '--continue' },
-            format = function(text)
-              require('sidekick.text').transform(
-                text,
-                function(str)
-                  return str:find('[^%w/_%.%-]') and ('"' .. str .. '"') or str
-                end,
-                'SidekickLocFile'
-              )
-            end,
+      picker = {
+        actions = {
+          sidekick_send = function(...)
+            return require('sidekick.cli.picker.snacks').send(...)
+          end,
+        },
+        win = {
+          input = {
+            keys = {
+              ['<a-a>'] = {
+                'sidekick_send',
+                mode = { 'n', 'i' },
+              },
+            },
           },
         },
       },
     },
   },
   {
+    -- Copilot status and running AI CLI sessions
+    'nvim-lualine/lualine.nvim',
+    opts = function(_, opts)
+      opts.sections = opts.sections or {}
+      local lualine_x = opts.sections.lualine_x or {}
+      opts.sections.lualine_x = lualine_x
+      -- Second in `lualine_x`, or first while it is still empty
+      local pos = math.min(2, #lualine_x + 1)
+      local icons = {
+        Error = { ' ', 'DiagnosticError' },
+        Inactive = { ' ', 'MsgArea' },
+        Warning = { ' ', 'DiagnosticWarn' },
+        Normal = { ' ', 'Special' },
+      }
+      table.insert(lualine_x, pos, {
+        function()
+          local status = require('sidekick.status').get()
+          return status and vim.tbl_get(icons, status.kind, 1)
+        end,
+        cond = function() return require('sidekick.status').get() ~= nil end,
+        color = function()
+          local status = require('sidekick.status').get()
+          local hl = status
+            and (
+              status.busy and 'DiagnosticWarn'
+              or vim.tbl_get(icons, status.kind, 2)
+            )
+          return { fg = Snacks.util.color(hl) }
+        end,
+      })
+
+      table.insert(lualine_x, pos, {
+        function()
+          local status = require('sidekick.status').cli()
+          return ' ' .. (#status > 1 and #status or '')
+        end,
+        cond = function() return #require('sidekick.status').cli() > 0 end,
+        color = function() return { fg = Snacks.util.color('Special') } end,
+      })
+    end,
+  },
+  {
     -- Claude Code
-    import = 'lazyvim.plugins.extras.ai.claudecode',
+    'coder/claudecode.nvim',
+    opts = {},
+    keys = {
+      { '<leader>a', '', desc = '+ai', mode = { 'n', 'v' } },
+      { '<leader>ac', '<cmd>ClaudeCode<cr>', desc = 'Toggle Claude' },
+      { '<leader>af', '<cmd>ClaudeCodeFocus<cr>', desc = 'Focus Claude' },
+      { '<leader>ar', '<cmd>ClaudeCode --resume<cr>', desc = 'Resume Claude' },
+      {
+        '<leader>aC',
+        '<cmd>ClaudeCode --continue<cr>',
+        desc = 'Continue Claude',
+      },
+      { '<leader>ab', '<cmd>ClaudeCodeAdd %<cr>', desc = 'Add current buffer' },
+      {
+        '<leader>as',
+        '<cmd>ClaudeCodeSend<cr>',
+        mode = 'v',
+        desc = 'Send to Claude',
+      },
+      {
+        '<leader>as',
+        '<cmd>ClaudeCodeTreeAdd<cr>',
+        desc = 'Add file',
+        ft = { 'NvimTree', 'neo-tree', 'oil' },
+      },
+      -- Diff management
+      { '<leader>aa', '<cmd>ClaudeCodeDiffAccept<cr>', desc = 'Accept diff' },
+      { '<leader>ad', '<cmd>ClaudeCodeDiffDeny<cr>', desc = 'Deny diff' },
+    },
   },
   {
     -- LLMs & Agents

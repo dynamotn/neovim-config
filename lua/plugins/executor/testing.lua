@@ -13,12 +13,108 @@ for _, language in pairs(languages) do
     end
   end
 end
+
+--- Turn `adapters` into adapter instances: a list item is an adapter or the
+--- module of one, a named entry is the module of an adapter set up with its
+--- value, or left out when that is false
+---@param adapters table
+---@return table
+local function load_adapters(adapters)
+  local ret = {}
+  for name, config in pairs(adapters) do
+    if type(name) == 'number' then
+      if type(config) == 'string' then config = require(config) end
+      ret[#ret + 1] = config
+    elseif config ~= false then
+      local adapter = require(name)
+      if type(config) == 'table' and not vim.tbl_isempty(config) then
+        local meta = getmetatable(adapter)
+        if adapter.setup then
+          adapter.setup(config)
+        elseif adapter.adapter then
+          adapter.adapter(config)
+          adapter = adapter.adapter
+        elseif meta and meta.__call then
+          adapter = adapter(config)
+        else
+          error('Adapter ' .. name .. ' does not support setup')
+        end
+      end
+      ret[#ret + 1] = adapter
+    end
+  end
+  return ret
+end
+
+--- Consumer refreshing trouble after a run, and closing it when every test
+--- passed
+---@type neotest.Consumer
+local function trouble_consumer(client)
+  client.listeners.results = function(adapter_id, results, partial)
+    if partial then return end
+    local tree = assert(client:get_position(nil, { adapter = adapter_id }))
+
+    local failed = 0
+    for pos_id, result in pairs(results) do
+      if result.status == 'failed' and tree:get_key(pos_id) then
+        failed = failed + 1
+      end
+    end
+    vim.schedule(function()
+      local trouble = require('trouble')
+      if trouble.is_open() then
+        trouble.refresh()
+        if failed == 0 then trouble.close() end
+      end
+    end)
+    return {}
+  end
+end
+
 return {
-  -- Test integration
-  { import = 'lazyvim.plugins.extras.test.core' },
   {
+    -- Test integration
     'nvim-neotest/neotest',
+    -- stylua: ignore
+    keys = {
+      { '<leader>t', '', desc = '+test' },
+      { '<leader>ta', function() require('neotest').run.attach() end, desc = 'Attach to Test (Neotest)' },
+      { '<leader>tt', function() require('neotest').run.run(vim.fn.expand('%')) end, desc = 'Run File (Neotest)' },
+      { '<leader>tT', function() require('neotest').run.run(vim.uv.cwd()) end, desc = 'Run All Test Files (Neotest)' },
+      { '<leader>tr', function() require('neotest').run.run() end, desc = 'Run Nearest (Neotest)' },
+      { '<leader>tl', function() require('neotest').run.run_last() end, desc = 'Run Last (Neotest)' },
+      { '<leader>ts', function() require('neotest').summary.toggle() end, desc = 'Toggle Summary (Neotest)' },
+      { '<leader>to', function() require('neotest').output.open({ enter = true, auto_close = true }) end, desc = 'Show Output (Neotest)' },
+      { '<leader>tO', function() require('neotest').output_panel.toggle() end, desc = 'Toggle Output Panel (Neotest)' },
+      { '<leader>tS', function() require('neotest').run.stop() end, desc = 'Stop (Neotest)' },
+      { '<leader>tw', function() require('neotest').watch.toggle(vim.fn.expand('%')) end, desc = 'Toggle Watch (Neotest)' },
+    },
+    config = function(_, opts)
+      local neotest_ns = vim.api.nvim_create_namespace('neotest')
+      vim.diagnostic.config({
+        virtual_text = {
+          format = function(diagnostic)
+            -- Keep the message on one line
+            local message = diagnostic.message
+              :gsub('\n', ' ')
+              :gsub('\t', ' ')
+              :gsub('%s+', ' ')
+              :gsub('^%s+', '')
+            return message
+          end,
+        },
+      }, neotest_ns)
+
+      if require('util.plugin').has('trouble.nvim') then
+        opts.consumers = opts.consumers or {}
+        opts.consumers.trouble = trouble_consumer
+      end
+      if opts.adapters then opts.adapters = load_adapters(opts.adapters) end
+
+      require('neotest').setup(opts)
+    end,
     dependencies = {
+      'nvim-neotest/nvim-nio',
       {
         -- Test runner compatibility that support vim-test
         'nvim-neotest/neotest-vim-test',
@@ -49,11 +145,32 @@ return {
       },
     },
     opts = {
+      -- A list of adapters, of adapter modules, or a table of adapter
+      -- modules to their config, see `load_adapters`
       adapters = {
         ['neotest-vim-test'] = {
           ignore_filetypes = not_supported_filetypes,
         },
       },
+      status = { virtual_text = true },
+      output = { open_on_run = true },
+      quickfix = {
+        open = function()
+          if require('util.plugin').has('trouble.nvim') then
+            require('trouble').open({ mode = 'quickfix', focus = false })
+          else
+            vim.cmd('copen')
+          end
+        end,
+      },
+    },
+  },
+  {
+    'mfussenegger/nvim-dap',
+    optional = true,
+    -- stylua: ignore
+    keys = {
+      { '<leader>td', function() require('neotest').run.run({ strategy = 'dap' }) end, desc = 'Debug Nearest' },
     },
   },
   {

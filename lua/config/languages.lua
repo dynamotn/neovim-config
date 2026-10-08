@@ -477,10 +477,10 @@ return {
     end,
   },
   -- Fallback for a filetype left with no tool of that kind: `conform` and
-  -- LazyVim's `nvim-lint` setup reach for it when the filetype's own list is
-  -- empty. A tool whose command is not on `$PATH` is dropped from that list,
-  -- so a declared language with nothing installed falls back here too, not
-  -- only a filetype no entry names. Only `formatters` and `linters` are read;
+  -- the `nvim-lint` setup in `plugins.executor.linting` reach for it when
+  -- the filetype's own list is empty. A tool whose command is not on
+  -- `$PATH` is dropped from that list, so a declared language with nothing
+  -- installed falls back here too, not only a filetype no entry names. Only `formatters` and `linters` are read;
   -- servers and `null_ls` sources have no such fallback.
   ---@diagnostic disable-next-line: missing-fields
   ['_'] = {

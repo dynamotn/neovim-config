@@ -1,17 +1,17 @@
 local h = require('helpers')
 
 describe('util.copy_path', function()
-  local copy_path, dir, cleanup, restore_lazyvim, messages, root
+  local copy_path, dir, cleanup, restores, messages, root, root_module
 
   before_each(function()
     dir, cleanup = h.tmpdir()
     messages, root = {}, dir
-    local root_fn = setmetatable({
+    root_module = {
+      get = function() return root end,
       git = function() return root end,
-    }, { __call = function() return root end })
-    restore_lazyvim = h.stub(_G, 'LazyVim', {
+    }
+    local plugin = {
       norm = function(path) return vim.fs.normalize(path) end,
-      root = root_fn,
       warn = function(msg, opts)
         table.insert(
           messages,
@@ -24,12 +24,18 @@ describe('util.copy_path', function()
           { level = 'info', msg = msg, title = opts.title }
         )
       end,
-    })
+    }
+    restores = {
+      h.stub(package.loaded, 'util.root', root_module),
+      h.stub(package.loaded, 'util.plugin', plugin),
+    }
     h.unload('util.copy_path')
     copy_path = require('util.copy_path')
   end)
   after_each(function()
-    restore_lazyvim()
+    for i = #restores, 1, -1 do
+      restores[i]()
+    end
     vim.cmd('silent! %bwipeout!')
     cleanup()
   end)
@@ -122,7 +128,7 @@ describe('util.copy_path', function()
     end)
 
     it('falls back to the absolute path when the root fails', function()
-      getmetatable(LazyVim.root).__call = function() error('headless') end
+      root_module.get = function() error('headless') end
       assert.equals(path, copy_path.relative())
     end)
 
@@ -136,7 +142,7 @@ describe('util.copy_path', function()
 
     it('gives the git root, or the cwd when that fails', function()
       assert.equals(dir .. '/', copy_path.project_root())
-      LazyVim.root.git = function() error('no git') end
+      root_module.git = function() error('no git') end
       assert.equals(vim.uv.cwd() .. '/', copy_path.project_root())
     end)
 

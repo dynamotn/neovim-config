@@ -1,13 +1,151 @@
+local Plugin = require('util.plugin')
+local Lsp = require('util.lsp')
+
+--- Defaults under whatever the specs loaded ahead of this one set
+---@return PluginLspOpts
+local function default_opts()
+  local icons = require('config.defaults').icons.diagnostics
+  ---@class PluginLspOpts
+  local ret = {
+    ---@type vim.diagnostic.Opts
+    diagnostics = {
+      underline = true,
+      update_in_insert = false,
+      virtual_text = {
+        spacing = 4,
+        source = 'if_many',
+        -- `icons` picks the icon of each severity
+        prefix = '●',
+      },
+      severity_sort = true,
+      signs = {
+        text = {
+          [vim.diagnostic.severity.ERROR] = icons.Error,
+          [vim.diagnostic.severity.WARN] = icons.Warn,
+          [vim.diagnostic.severity.HINT] = icons.Hint,
+          [vim.diagnostic.severity.INFO] = icons.Info,
+        },
+      },
+    },
+    inlay_hints = {
+      enabled = true,
+      exclude = { 'vue' }, -- filetypes without inlay hints
+    },
+    codelens = {
+      enabled = false,
+    },
+    folds = {
+      enabled = true,
+    },
+    -- Options for `vim.lsp.buf.format`
+    format = {
+      formatting_options = nil,
+      timeout_ms = nil,
+    },
+    -- `*` is the default of every server. On top of `vim.lsp.Config`, a
+    -- server takes `enabled` and `keys`, keys with `has` limited to servers
+    -- supporting that method.
+    ---@type table<string, vim.lsp.Config|{ enabled?: boolean, keys?: LspKeysSpec[] }|boolean>
+    servers = {
+      ['*'] = {
+        capabilities = {
+          workspace = {
+            fileOperations = {
+              didRename = true,
+              willRename = true,
+            },
+          },
+        },
+        -- stylua: ignore
+        keys = {
+          { '<leader>cl', function() Snacks.picker.lsp_config() end, desc = 'Lsp Info' },
+          { 'gd', vim.lsp.buf.definition, desc = 'Goto Definition', has = 'definition' },
+          { 'gr', vim.lsp.buf.references, desc = 'References', nowait = true },
+          { 'gI', vim.lsp.buf.implementation, desc = 'Goto Implementation' },
+          { 'gy', vim.lsp.buf.type_definition, desc = 'Goto T[y]pe Definition' },
+          { 'gD', vim.lsp.buf.declaration, desc = 'Goto Declaration' },
+          { 'K', function() return vim.lsp.buf.hover() end, desc = 'Hover' },
+          { 'gK', function() return vim.lsp.buf.signature_help() end, desc = 'Signature Help', has = 'signatureHelp' },
+          { '<c-k>', function() return vim.lsp.buf.signature_help() end, mode = 'i', desc = 'Signature Help', has = 'signatureHelp' },
+          { '<leader>ca', vim.lsp.buf.code_action, desc = 'Code Action', mode = { 'n', 'x' }, has = 'codeAction' },
+          { '<leader>cc', vim.lsp.codelens.run, desc = 'Run Codelens', mode = { 'n', 'x' }, has = 'codeLens' },
+          { '<leader>cC', vim.lsp.codelens.refresh, desc = 'Refresh & Display Codelens', mode = { 'n' }, has = 'codeLens' },
+          { '<leader>cR', function() Snacks.rename.rename_file() end, desc = 'Rename File', mode = { 'n' }, has = { 'workspace/didRenameFiles', 'workspace/willRenameFiles' } },
+          { '<leader>cr', vim.lsp.buf.rename, desc = 'Rename', has = 'rename' },
+          { '<leader>cA', Lsp.action.source, desc = 'Source Action', has = 'codeAction' },
+          { ']]', function() Snacks.words.jump(vim.v.count1) end, has = 'documentHighlight',
+            desc = 'Next Reference', enabled = function() return Snacks.words.is_enabled() end },
+          { '[[', function() Snacks.words.jump(-vim.v.count1) end, has = 'documentHighlight',
+            desc = 'Prev Reference', enabled = function() return Snacks.words.is_enabled() end },
+          { '<a-n>', function() Snacks.words.jump(vim.v.count1, true) end, has = 'documentHighlight',
+            desc = 'Next Reference', enabled = function() return Snacks.words.is_enabled() end },
+          { '<a-p>', function() Snacks.words.jump(-vim.v.count1, true) end, has = 'documentHighlight',
+            desc = 'Prev Reference', enabled = function() return Snacks.words.is_enabled() end },
+          {
+            '<leader>co',
+            Lsp.action['source.organizeImports'],
+            desc = 'Organize Imports',
+            has = 'codeAction',
+            enabled = function(buf)
+              local code_actions = vim.tbl_filter(
+                function(action) return action:find('^source%.organizeImports%.?$') end,
+                Lsp.code_actions({ bufnr = buf })
+              )
+              return #code_actions > 0
+            end,
+          },
+        },
+      },
+      stylua = { enabled = false },
+      lua_ls = {
+        settings = {
+          Lua = {
+            workspace = {
+              checkThirdParty = false,
+            },
+            codeLens = {
+              enable = true,
+            },
+            completion = {
+              callSnippet = 'Replace',
+            },
+            doc = {
+              privateName = { '^_' },
+            },
+            hint = {
+              enable = true,
+              setType = false,
+              paramType = true,
+              paramName = 'Disable',
+              semicolon = 'Disable',
+              arrayIndex = 'Disable',
+            },
+          },
+        },
+      },
+    },
+    -- Per server, or `*` for any: a function returning true sets the server
+    -- up itself, and keeps it from `vim.lsp.config`
+    ---@type table<string, fun(server: string, opts: vim.lsp.Config): boolean?>
+    setup = {},
+  }
+  return ret
+end
+
 return {
   {
     -- I want to self-managed LSP by my way
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
+    opts_extend = { 'servers.*.keys' },
     dependencies = {
+      'mason.nvim',
       {
-        -- Auto install LSP servers with needed
+        -- Auto install LSP servers with needed. Set up from the `config`
+        -- below, not on its own.
         'mason-org/mason-lspconfig.nvim',
         dependencies = { 'mason-org/mason.nvim' },
+        config = function() end,
       },
       {
         -- Route npm and pip through bun and uv
@@ -44,22 +182,28 @@ return {
       },
     },
     opts = function(_, opts)
-      opts.setup = opts.setup or {}
+      local defaults = default_opts()
+      -- The default keys go first, so a key added by an earlier spec for the
+      -- same `lhs` still wins
+      local keys = vim.tbl_get(opts, 'servers', '*', 'keys') or {}
+      opts = vim.tbl_deep_extend('keep', opts, defaults)
+      opts.servers['*'].keys = vim.list_extend(defaults.servers['*'].keys, keys)
       opts.folds.enabled = false
       opts.servers['*'].before_init = function(_, config)
         local codesettings = require('codesettings')
         codesettings.with_local_settings(config.name, config)
       end
+      return opts
     end,
     ---@param opts PluginLspOpts
     config = function(_, opts)
       -- setup auto format
-      LazyVim.format.register(LazyVim.lsp.formatter())
+      require('util.format').register(Lsp.formatter())
 
       -- setup keymaps
       for server, server_opts in pairs(opts.servers) do
         if type(server_opts) == 'table' and server_opts.keys then
-          require('lazyvim.plugins.lsp.keymaps').set(
+          Lsp.keymaps.set(
             { name = server ~= '*' and server or nil },
             server_opts.keys
           )
@@ -88,8 +232,8 @@ return {
       -- folds
       if opts.folds.enabled then
         Snacks.util.lsp.on({ method = 'textDocument/foldingRange' }, function()
-          if LazyVim.set_default('foldmethod', 'expr') then
-            LazyVim.set_default('foldexpr', 'v:lua.vim.lsp.foldexpr()')
+          if Plugin.set_default('foldmethod', 'expr') then
+            Plugin.set_default('foldexpr', 'v:lua.vim.lsp.foldexpr()')
           end
         end)
       end
@@ -125,7 +269,7 @@ return {
         and opts.diagnostics.virtual_text.prefix == 'icons'
       then
         opts.diagnostics.virtual_text.prefix = function(diagnostic)
-          local icons = LazyVim.config.icons.diagnostics
+          local icons = require('config.defaults').icons.diagnostics
           for d, icon in pairs(icons) do
             if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
               return icon
@@ -198,9 +342,8 @@ return {
               or (vim.lsp.config[server] or {}).filetypes
               or {}
           )
-          widened_filetypes[server] = LazyVim.dedup(
-            vim.list_extend(filetypes, declared_filetypes[server])
-          )
+          widened_filetypes[server] =
+            Plugin.dedup(vim.list_extend(filetypes, declared_filetypes[server]))
         end
         return widened_filetypes[server]
       end
@@ -330,13 +473,13 @@ return {
       vim.schedule(
         function()
           require('mason-lspconfig').setup({
-            ensure_installed = LazyVim.dedup(
+            ensure_installed = Plugin.dedup(
               vim.list_extend(
                 ensure_installed,
-                LazyVim.opts('mason-lspconfig.nvim').ensure_installed or {}
+                Plugin.opts('mason-lspconfig.nvim').ensure_installed or {}
               )
             ),
-            automatic_enable = { exclude = LazyVim.dedup(mason_exclude) },
+            automatic_enable = { exclude = Plugin.dedup(mason_exclude) },
           })
         end
       )

@@ -1,6 +1,87 @@
 local opt = vim.opt
 local g = vim.g
 
+g.mapleader = ' '
+g.maplocalleader = '\\'
+
+g.autoformat = true -- Format on save, see `util.format`
+g.snacks_animate = true
+g.ai_cmp = true -- AI suggestions through the completion menu, not inline
+-- Root detection for `util.root`: detector names, root markers, or functions
+g.root_spec = { 'lsp', { '.git', 'lua' }, 'cwd' }
+g.root_lsp_ignore = { 'copilot' } -- LSP clients whose root is never used
+g.deprecation_warnings = false
+g.trouble_lualine = true -- Document symbols from Trouble in lualine
+g.markdown_recommended_style = 0 -- Keep markdown indentation settings
+
+opt.autowrite = true
+-- Not over SSH, where the OSC 52 integration takes over
+opt.clipboard = vim.env.SSH_CONNECTION and '' or 'unnamedplus'
+opt.completeopt = 'menu,menuone,noselect'
+opt.conceallevel = 2 -- Hide * markup for bold and italic
+opt.confirm = true -- Confirm to save changes before exiting modified buffer
+opt.cursorline = true
+opt.expandtab = true
+opt.fillchars = {
+  foldopen = '',
+  foldclose = '',
+  fold = ' ',
+  foldsep = ' ',
+  diff = '╱',
+  eob = ' ',
+}
+opt.foldlevel = 99
+opt.foldmethod = 'indent'
+opt.foldtext = ''
+opt.formatexpr = "v:lua.require'util.format'.formatexpr()"
+opt.formatoptions = 'jcroqlnt'
+opt.grepformat = '%f:%l:%c:%m'
+opt.grepprg = 'rg --vimgrep'
+opt.ignorecase = true
+opt.inccommand = 'nosplit' -- Preview incremental substitute
+opt.jumpoptions = 'view'
+opt.laststatus = 3 -- Global statusline
+opt.linebreak = true -- Wrap lines at convenient points
+opt.list = true -- Show some invisible characters
+opt.number = true
+opt.pumblend = 10
+opt.pumheight = 10
+opt.relativenumber = true
+opt.ruler = false
+opt.scrolloff = 4
+opt.sessionoptions = {
+  'buffers',
+  'curdir',
+  'tabpages',
+  'winsize',
+  'help',
+  'globals',
+  'skiprtp',
+  'folds',
+}
+opt.shiftround = true
+opt.shiftwidth = 2
+opt.shortmess:append({ W = true, I = true, c = true, C = true })
+opt.showmode = false -- The statusline shows it
+opt.sidescrolloff = 8
+opt.signcolumn = 'yes' -- Always there, so the text does not shift
+opt.smartcase = true
+opt.smartindent = true
+opt.smoothscroll = true
+opt.splitbelow = true
+opt.splitkeep = 'screen'
+opt.splitright = true
+opt.statuscolumn = "%!v:lua.require'util.plugin'.statuscolumn()"
+opt.tabstop = 2
+opt.termguicolors = true
+opt.timeoutlen = vim.g.vscode and 1000 or 300 -- Quick to trigger which-key
+opt.undofile = true
+opt.undolevels = 10000
+opt.updatetime = 200
+opt.virtualedit = 'block'
+opt.wildmode = 'longest:full,full'
+opt.winminwidth = 5
+
 opt.guifont = 'Iosevka Dynamo:h11' -- Font for GUI
 opt.listchars = 'tab:→ ,trail:·,extends:↷,precedes:↶' -- Highlight unwanted space
 opt.fileencoding = 'utf-8'
@@ -11,7 +92,7 @@ opt.backup = true -- Enable backup
 opt.backupdir = vim.fn.stdpath('state') .. '/backup'
 opt.showmatch = true -- Highlight matching parenthesis
 opt.backspace = 'indent,eol,start' -- Flexible backspace
-opt.mouse:remove('a') -- Not use mouse
+opt.mouse = '' -- Not use mouse
 opt.title = true -- Allow to change terminal's title
 opt.autoread = true -- Automatically read a file changed outside of vim
 opt.colorcolumn = '80,120' -- 80, 120 column chars line length
@@ -64,7 +145,7 @@ local function is_trusted(directory)
 end
 
 local function setup_project_rtp()
-  local directory = require('lazyvim.util.root').get() .. '/.nvim'
+  local directory = require('util.root').get() .. '/.nvim'
   if directory == project_rtp then return end
   if project_rtp then
     vim.opt.rtp:remove(project_rtp)
@@ -78,7 +159,7 @@ end
 
 setup_project_rtp()
 -- The root follows the working directory, so it is worth another look whenever
--- that moves, instead of being settled once at startup. LazyVim drops its
+-- that moves, instead of being settled once at startup. `util.root` drops its
 -- cached root from a handler of this very event, so the fresh one is only
 -- there once the event has been dealt with.
 vim.api.nvim_create_autocmd('DirChanged', {

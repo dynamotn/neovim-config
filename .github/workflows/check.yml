@@ -108,7 +108,7 @@ jobs:
         with:
           path: ~/.local/share/nvim/lazy
           key: ${{ steps.cache.outputs.cache-primary-key }}
-      # Plenary and LazyVim come from the plugins just installed, so the
+      # Plenary and lazy.nvim come from the plugins just installed, so the
       # specs run against the same commits the configuration does.
       - name: Unit tests
         run: ./scripts/test.sh

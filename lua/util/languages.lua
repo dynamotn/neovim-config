@@ -83,7 +83,7 @@ M.get_tools_by_filetype = function(filetype)
     table.insert(result, tool.command)
   end
 
-  tools_of[language_name] = LazyVim.dedup(result)
+  tools_of[language_name] = require('util.plugin').dedup(result)
   return tools_of[language_name]
 end
 
@@ -166,7 +166,8 @@ M.get_lsp_servers_by_filetype = function(filetype, bufnr)
     ::continue::
   end
 
-  return LazyVim.dedup(result), LazyVim.dedup(optional)
+  return require('util.plugin').dedup(result),
+    require('util.plugin').dedup(optional)
 end
 
 return M

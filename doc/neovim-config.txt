@@ -1,8 +1,9 @@
-*neovim-config.txt*   A LazyVim configuration for DevOps and SA work
+*neovim-config.txt*   DyNeo, a Neovim configuration for DevOps and SA work
 
                                                               *neovim-config*
 
-This is a LazyVim configuration, not a distribution to install over yours.
+This is DyNeo, a standalone lazy.nvim configuration, not a distribution to
+install over yours.
 Every language it knows about is one declarative entry in
 `lua/config/languages.lua` -- its Treesitter parser, LSP servers, linters,
 formatters, debug adapters and test runners -- and a single |FileType|
@@ -24,7 +25,7 @@ CONTENTS                                             *neovim-config-contents*
        3.3 Plugin channels ................... |neovim-config-channels|
        3.4 Updating plugins .................. |neovim-config-update|
     4. Language support ...................... |neovim-config-languages|
-    5. Beyond LazyVim ........................ |neovim-config-features|
+    5. Beyond the defaults ................... |neovim-config-features|
        5.1 Tooling that installs itself ...... |neovim-config-lazy-install|
        5.2 Quarantine ........................ |neovim-config-quarantine|
        5.3 Files kept from AI ................ |neovim-config-ai-guard|
@@ -185,7 +186,6 @@ Every global is declared, typed and defaulted in `lua/config/globals.lua`.
 3.3 Plugin channels                                  *neovim-config-channels*
 
                 `latest` (default)        `stable`
-LazyVim         `main`                    newest release
 Plugins         newest commit           newest release, or their branch
                                         when they tag none
 Neovim          0.13 nightly            0.12 or newer
@@ -247,7 +247,7 @@ reads it, and `scripts/validate-tools.lua` checks every name in it against
 conform, nvim-lint, lspconfig and Mason.
 
 ------------------------------------------------------------------------------
-5. BEYOND LAZYVIM                                    *neovim-config-features*
+5. BEYOND THE DEFAULTS                               *neovim-config-features*
 
 5.1 Tooling that installs itself                  *neovim-config-lazy-install*
 
@@ -390,7 +390,8 @@ friends.
 The leader key is `<Space>`.  Press it and wait: which-key lists every mapping
 under it, and `<Space>sk` searches all of them.  Custom mappings live in
 `lua/config/keymaps.lua`, plugin-specific ones in the `keys` of each spec
-under `lua/plugins`, and everything else follows LazyVim's defaults.
+under `lua/plugins`, and the general defaults -- windows, buffers, tabs,
+diagnostics, `<leader>u` toggles, git -- at the top of `lua/config/keymaps.lua`.
 
 The ones worth knowing before which-key gets a chance to tell you:
 
@@ -441,15 +442,19 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         it for this session only.
 :YamlSchema reset       Hand detection back the wheel.
                         See |neovim-config-schema|.
+:DyNeoFormat            Format the buffer, or the selection.
+:DyNeoFormatInfo        Which formatters would run, and whether the buffer
+                        formats on save.
+:DyNeoRoot              The roots found for this buffer, the one in use first.
 
-LazyVim's own commands, and the plugins', are unchanged: `:Lazy`, `:Mason`,
-`:LazyExtras`, `:ConformInfo`, and the rest.
+The plugins' own commands are unchanged: `:Lazy`, `:Mason`, `:ConformInfo`,
+and the rest.
 
 ------------------------------------------------------------------------------
 8. LAYOUT                                              *neovim-config-layout*
 
 `init.lua`            Globals, per-machine overrides, the version gate,
-                    LazyVim
+                    lazy.nvim
 `lua/config/`         `globals`, `languages`, `options`, `keymaps`,
                     `autocmds`, `defaults`, `sensitive`
 `lua/plugins/`        Plugin specs by area: `coding`, `executor`,
@@ -482,7 +487,7 @@ that loads only the module each spec requires: >sh
     scripts/test.sh tests/spec/util      # one directory
     scripts/test.sh tests/spec/util/sensitive_spec.lua
 <
-Plenary and LazyVim are taken from lazy.nvim's install directory, or cloned
+Plenary and lazy.nvim are taken from lazy.nvim's install directory, or cloned
 into `.tests/` when the configuration has never been started.
 
 The rest of the checks: >sh

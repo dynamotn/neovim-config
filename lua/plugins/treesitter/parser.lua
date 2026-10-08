@@ -1,9 +1,31 @@
+local TS = require('util.treesitter')
+local Plugin = require('util.plugin')
+
 return {
   {
     'nvim-treesitter/nvim-treesitter',
-    -- I don't want to use default LazyVim parsers
-    opts = function(_, opts)
-      opts.ensure_installed = {
+    branch = 'main',
+    -- The last release is far too old for the `main` branch API
+    version = false,
+    build = function()
+      local treesitter = require('nvim-treesitter')
+      if not treesitter.get_installed then
+        Plugin.error(
+          'Please restart Neovim and run `:TSUpdate` to use the `nvim-treesitter` **main** branch.'
+        )
+        return
+      end
+      TS.build(function() treesitter.update(nil, { summary = true }) end)
+    end,
+    event = { 'LazyFile', 'VeryLazy' },
+    cmd = { 'TSUpdate', 'TSInstall', 'TSLog', 'TSUninstall' },
+    opts_extend = { 'ensure_installed' },
+    ---@alias TSFeat { enable?: boolean, disable?: string[] }
+    opts = {
+      indent = { enable = true }, ---@type TSFeat
+      highlight = { enable = true }, ---@type TSFeat
+      folds = { enable = true }, ---@type TSFeat
+      ensure_installed = {
         'diff', -- for diff file
         'comment', -- for comment tags
         'query', -- for treesitter itself query
@@ -18,13 +40,16 @@ return {
         'c',
         'lua',
         'markdown',
-      }
-    end,
+      },
+    },
     config = function(_, opts)
       local treesitter = require('nvim-treesitter')
+      if not treesitter.get_installed then
+        return Plugin.error('Please use `:Lazy` and update `nvim-treesitter`')
+      end
       -- Setup from opts
       treesitter.setup(opts)
-      LazyVim.treesitter.get_installed(true) -- initialize the installed langs
+      TS.get_installed(true) -- initialize the installed langs
 
       -- Setup treesitter parser to work with defined filetypes
       local parsers = require('nvim-treesitter.parsers')
@@ -77,7 +102,7 @@ return {
             require('util.lazy_install').on_filetype(
               language.filetypes,
               function(ev)
-                local installed = LazyVim.treesitter.get_installed()
+                local installed = TS.get_installed()
                 local missing = vim.tbl_filter(
                   function(parser) return not installed[parser] end,
                   wanted
@@ -87,7 +112,7 @@ return {
                     .install(missing, { summary = true })
                     :await(function()
                       -- refresh the installed langs
-                      LazyVim.treesitter.get_installed(true)
+                      TS.get_installed(true)
                       vim.cmd(string.format('%dbuffer', ev.buf))
                       vim.cmd('e!')
                     end)
@@ -99,38 +124,38 @@ return {
       end
 
       -- install missing parsers
-      opts.ensure_installed = LazyVim.dedup(opts.ensure_installed)
+      opts.ensure_installed = Plugin.dedup(opts.ensure_installed)
       local install = vim.tbl_filter(
-        function(parser_name) return not LazyVim.treesitter.have(parser_name) end,
+        function(parser_name) return not TS.have(parser_name) end,
         opts.ensure_installed or {}
       )
       if #install > 0 then
-        LazyVim.treesitter.build(function()
+        TS.build(function()
           treesitter.install(install, { summary = true }):await(function()
-            LazyVim.treesitter.get_installed(true) -- refresh the installed langs
+            TS.get_installed(true) -- refresh the installed langs
           end)
         end)
       end
 
       vim.api.nvim_create_autocmd('FileType', {
         group = vim.api.nvim_create_augroup(
-          'lazyvim_treesitter',
+          'dyneo_treesitter',
           { clear = true }
         ),
         callback = function(ev)
           local ft, lang = ev.match, vim.treesitter.language.get_lang(ev.match)
-          if not LazyVim.treesitter.have(ft) then return end
+          if not TS.have(ft) then return end
 
           ---@param feat string
           ---@param query string
           local function enabled(feat, query)
-            local f = opts[feat] or {} ---@type lazyvim.TSFeat
+            local f = opts[feat] or {} ---@type TSFeat
             return f.enable ~= false
               and not (type(f.disable) == 'table' and vim.tbl_contains(
                 f.disable,
                 lang
               ))
-              and LazyVim.treesitter.have(ft, query)
+              and TS.have(ft, query)
           end
 
           -- highlighting
@@ -140,18 +165,18 @@ return {
 
           -- indents
           if enabled('indent', 'indents') then
-            LazyVim.set_default(
+            Plugin.set_default(
               'indentexpr',
-              'v:lua.LazyVim.treesitter.indentexpr()'
+              "v:lua.require'util.treesitter'.indentexpr()"
             )
           end
 
           -- folds
           if enabled('folds', 'folds') then
-            if LazyVim.set_default('foldmethod', 'expr') then
-              LazyVim.set_default(
+            if Plugin.set_default('foldmethod', 'expr') then
+              Plugin.set_default(
                 'foldexpr',
-                'v:lua.LazyVim.treesitter.foldexpr()'
+                "v:lua.require'util.treesitter'.foldexpr()"
               )
             end
           end

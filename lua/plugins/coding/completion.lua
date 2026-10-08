@@ -39,9 +39,18 @@ return {
   {
     -- Engine for completion
     'saghen/blink.cmp',
+    version = '*',
     event = { 'InsertEnter', 'CmdlineEnter' },
+    -- Lists other specs add to rather than replace. `sources.compat` names
+    -- nvim-cmp sources to run through blink.compat.
+    opts_extend = {
+      'sources.completion.enabled_providers',
+      'sources.compat',
+      'sources.default',
+    },
     dependencies = {
-      'saghen/blink.compat',
+      'rafamadriz/friendly-snippets',
+      { 'saghen/blink.compat', version = '*', opts = {} },
       'onsails/lspkind.nvim', -- pictograms
       'blink-cmp-fuzzy-path',
       'blink-cmp-dictionary',
@@ -54,12 +63,25 @@ return {
       'blink-emoji.nvim',
       'blink-nerdfont.nvim',
     },
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config|{ sources: { compat: string[] } }
     opts = {
+      snippets = { preset = 'default' },
+      appearance = {
+        nerd_font_variant = 'mono',
+        kind_icons = require('config.defaults').icons.kinds,
+      },
       keymap = {
         preset = 'enter',
         ['<C-y>'] = { 'select_and_accept' },
         ['<Tab>'] = {
-          LazyVim.cmp.map({ 'snippet_forward', 'ai_nes', 'ai_accept' }),
+          function()
+            return require('util.blink').map({
+              'snippet_forward',
+              'ai_nes',
+              'ai_accept',
+            })()
+          end,
           'fallback',
         },
       },
@@ -153,7 +175,7 @@ return {
             module = 'blink.cmp.sources.path',
             name = 'project_path',
             opts = {
-              get_cwd = function(_) return require('lazyvim.util.root').get() end,
+              get_cwd = function(_) return require('util.root').get() end,
             },
           },
           fuzzy_path = {
@@ -165,6 +187,12 @@ return {
           lsp = {
             score_offset = 20,
           },
+          lazydev = {
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
+            -- Above the LSP's own items
+            score_offset = 100,
+          },
           snippets = {
             score_offset = 19,
           },
@@ -173,7 +201,9 @@ return {
           },
         },
         default = function() return require('util.cmp').setup_default_sources() end,
-        per_filetype = {},
+        per_filetype = {
+          lua = { inherit_defaults = true, 'lazydev' },
+        },
       },
       -- No typos allowed, as fzf does; blink's default forgives one for every
       -- four characters typed
@@ -223,10 +253,17 @@ return {
         end,
       },
       completion = {
-        documentation = { window = { border = 'rounded' } },
+        accept = { auto_brackets = { enabled = true } },
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 200,
+          window = { border = 'rounded' },
+        },
+        ghost_text = { enabled = vim.g.ai_cmp },
         menu = {
           border = 'rounded',
           draw = {
+            treesitter = { 'lsp' },
             columns = {
               { 'source_name', 'kind_icon' },
               { 'label', 'label_description', gap = 1 },
@@ -291,6 +328,55 @@ return {
         },
       },
     },
+    ---@param opts blink.cmp.Config|{ sources: { compat: string[] } }
+    config = function(_, opts)
+      if opts.snippets and opts.snippets.preset == 'default' then
+        opts.snippets.expand = require('util.blink').expand
+      end
+      -- Run the nvim-cmp sources named in `compat` through blink.compat
+      local enabled = opts.sources.default
+      for _, source in ipairs(opts.sources.compat or {}) do
+        opts.sources.providers[source] = vim.tbl_deep_extend(
+          'force',
+          { name = source, module = 'blink.compat.source' },
+          opts.sources.providers[source] or {}
+        )
+        if
+          type(enabled) == 'table' and not vim.tbl_contains(enabled, source)
+        then
+          table.insert(enabled, source)
+        end
+      end
+      -- Not an option of blink's own, which would reject it
+      opts.sources.compat = nil
+
+      -- A provider's `kind` adds a completion item kind of its own
+      for _, provider in pairs(opts.sources.providers or {}) do
+        ---@cast provider blink.cmp.SourceProviderConfig|{ kind?: string }
+        if provider.kind then
+          local CompletionItemKind =
+            require('blink.cmp.types').CompletionItemKind
+          local kind_idx = #CompletionItemKind + 1
+          CompletionItemKind[kind_idx] = provider.kind
+          CompletionItemKind[provider.kind] = kind_idx
+
+          local transform_items = provider.transform_items
+          provider.transform_items = function(ctx, items)
+            items = transform_items and transform_items(ctx, items) or items
+            for _, item in ipairs(items) do
+              item.kind = kind_idx or item.kind
+              item.kind_icon = require('config.defaults').icons.kinds[item.kind_name]
+                or item.kind_icon
+                or nil
+            end
+            return items
+          end
+          provider.kind = nil
+        end
+      end
+
+      require('blink.cmp').setup(opts)
+    end,
     init = function()
       _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
         Path = '「PATH」',
@@ -310,6 +396,11 @@ return {
         nerdfont = '「NERD」',
       })
     end,
+  },
+  {
+    'catppuccin',
+    optional = true,
+    opts = { integrations = { blink_cmp = true } },
   },
   {
     -- Name the group of `plugin/spell.lua` adding words to my word lists

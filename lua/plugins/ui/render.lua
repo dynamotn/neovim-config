@@ -8,10 +8,7 @@ return {
         backend = 'kitty',
       },
     },
-    config = function(_, opts)
-      require('snacks').setup(opts)
-      require('tools.diagram.d2.snacks')
-    end,
+    -- `plugins.ui.snacks` loads the d2 renderer once Snacks is set up
   },
   {
     -- Render `:help` pages: headings, tables, code blocks, tags and links

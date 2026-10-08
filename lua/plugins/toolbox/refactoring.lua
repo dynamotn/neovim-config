@@ -1,15 +1,49 @@
 return {
-  -- Refactoring
-  { import = 'lazyvim.plugins.extras.editor.refactoring' },
+  { 'lewis6991/async.nvim', lazy = true },
   {
-    -- Its debug-print keys go to debugprint.nvim (`plugins.executor`), whose
-    -- prints the other's cleanup would not find. Dropped here, after the
-    -- import that adds them, or they would just be added back.
+    -- Refactoring
+    --
+    -- Its debug-print keys are left to debugprint.nvim (`plugins.executor`),
+    -- whose prints the other's cleanup would not find.
     'ThePrimeagen/refactoring.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     keys = {
-      { '<leader>rp', false, mode = { 'n', 'x' } },
-      { '<leader>rP', false },
-      { '<leader>rc', false },
+      { '<leader>r', '', desc = '+refactor', mode = { 'n', 'x' } },
+      {
+        '<leader>rs',
+        function() return require('refactoring').select_refactor() end,
+        mode = { 'n', 'x' },
+        desc = 'Select Refactor',
+      },
+      {
+        '<leader>ri',
+        function() return require('refactoring').inline_var() end,
+        mode = { 'n', 'x' },
+        desc = 'Inline Variable',
+        expr = true,
+      },
+      {
+        '<leader>rf',
+        function() return require('refactoring').extract_func() end,
+        mode = { 'n', 'x' },
+        desc = 'Extract Function',
+        expr = true,
+      },
+      {
+        '<leader>rF',
+        function() return require('refactoring').extract_func_to_file() end,
+        mode = { 'n', 'x' },
+        desc = 'Extract Function To File',
+        expr = true,
+      },
+      {
+        '<leader>rx',
+        function() return require('refactoring').extract_var() end,
+        mode = { 'n', 'x' },
+        desc = 'Extract Variable',
+        expr = true,
+      },
     },
+    opts = {},
   },
 }

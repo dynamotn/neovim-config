@@ -30,8 +30,8 @@ _G.is_gentoo = false
 _G.used_full_plugins = false
 
 ---@alias DyPluginChannel
----| 'latest' # LazyVim `main` and every plugin at its newest commit; needs a Neovim nightly
----| 'stable' # LazyVim and every plugin that tags releases on its newest release
+---| 'latest' # Every plugin at its newest commit; needs a Neovim nightly
+---| 'stable' # Every plugin that tags releases on its newest release
 
 ---@type DyPluginChannel What `:Lazy update` moves plugins to. `latest` gets
 --- fixes the day they land and breakage with them; `stable` trades that for

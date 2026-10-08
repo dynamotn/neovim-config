@@ -104,9 +104,12 @@ local function config_formatters()
   local defined = {}
   local ok, spec = pcall(dofile, root .. '/lua/plugins/executor/formatting.lua')
   if not ok then return defined end
-  package.loaded['lazyvim.util'] = { on_load = function() end }
+  package.loaded['util.plugin'] = { on_load = function() end }
   local opts = { formatters = {}, formatters_by_ft = {} }
-  if pcall(spec[1].opts, nil, opts) then
+  local called, returned = pcall(spec[1].opts, nil, opts)
+  if called then
+    -- The spec may hand back a new table rather than fill this one
+    opts = returned or opts
     for formatter in pairs(opts.formatters) do
       defined[formatter] = true
     end

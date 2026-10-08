@@ -46,7 +46,8 @@ local cmd = {
 }
 
 if
-  (vim.uv or vim.loop).fs_stat(extension_dir) and LazyVim.has('mason.nvim')
+  (vim.uv or vim.loop).fs_stat(extension_dir)
+  and require('util.plugin').has('mason.nvim')
 then
   cmd = vim.list_extend(cmd, {
     '-analyzers',

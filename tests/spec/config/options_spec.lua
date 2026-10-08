@@ -3,15 +3,14 @@ local h = require('helpers')
 describe('config.options', function()
   local dir, cleanup, cwd, restores
   before_each(function()
-    h.lazyvim()
     h.globals()
     dir, cleanup = h.tmpdir()
     cwd = vim.fn.getcwd()
     vim.cmd.cd(dir)
-    -- LazyVim's root detection wants LazyVim set up; the working directory
-    -- is the root it would find for an unnamed buffer anyway
+    -- Root detection wants lazy.nvim set up; the working directory is the
+    -- root it would find for an unnamed buffer anyway
     restores = {
-      h.stub(package.loaded, 'lazyvim.util.root', {
+      h.stub(package.loaded, 'util.root', {
         get = function() return vim.fn.getcwd() end,
       }),
     }

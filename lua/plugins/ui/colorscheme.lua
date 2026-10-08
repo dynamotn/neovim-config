@@ -1,9 +1,9 @@
 return {
-  { 'folke/tokyonight.nvim', enabled = false }, -- Disable tokyonight
   {
     -- Catppuccin for both Dark (Macchiato) and Light (Latte) colorscheme
     'catppuccin/nvim',
     name = 'catppuccin',
+    lazy = true,
     event = 'UIEnter',
     opts = {
       -- `auto` drops the fixed flavour and reads `background` instead, so
@@ -14,19 +14,50 @@ return {
         light = 'latte',
         dark = 'macchiato',
       },
+      lsp_styles = {
+        underlines = {
+          errors = { 'undercurl' },
+          hints = { 'undercurl' },
+          warnings = { 'undercurl' },
+          information = { 'undercurl' },
+        },
+      },
       -- Detecting integrations walks every installed plugin and loads
       -- catppuccin's whole mapping table on each startup, about a tenth of
-      -- it. LazyVim names most of them already; these are the ones detection
-      -- found on top. A plugin added later with a catppuccin integration
-      -- goes here too.
+      -- it. So they are named here instead, and a plugin added later with a
+      -- catppuccin integration goes here too.
       auto_integrations = false,
       integrations = {
+        aerial = true,
+        alpha = true,
+        cmp = true,
         dadbod_ui = true,
         dap = true,
+        dashboard = true,
         dropbar = { enabled = true },
+        flash = true,
+        fzf = true,
+        gitsigns = true,
+        grug_far = true,
         harpoon = true,
+        headlines = true,
+        illuminate = true,
+        indent_blankline = { enabled = true },
+        leap = true,
+        lsp_trouble = true,
         markview = true,
+        mason = true,
+        mini = true,
+        navic = { enabled = true, custom_bg = 'lualine' },
+        neotest = true,
+        neotree = true,
+        noice = true,
+        notify = true,
         rainbow_delimiters = true,
+        snacks = true,
+        telescope = true,
+        treesitter_context = true,
+        which_key = true,
       },
       transparent_background = false,
       dim_inactive = {
@@ -161,6 +192,19 @@ return {
           },
         }
       end,
+    },
+    specs = {
+      {
+        -- Bufferline in catppuccin's colours
+        'akinsho/bufferline.nvim',
+        optional = true,
+        opts = function(_, opts)
+          if (vim.g.colors_name or ''):find('catppuccin') then
+            opts.highlights =
+              require('catppuccin.special.bufferline').get_theme()
+          end
+        end,
+      },
     },
   },
 }

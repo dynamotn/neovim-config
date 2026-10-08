@@ -14,7 +14,7 @@ return vim.list_contains(_G.enabled_languages, 'typst')
                   '<leader>cP',
                   function()
                     local buf_name = vim.api.nvim_buf_get_name(0)
-                    LazyVim.lsp.execute({
+                    require('util.lsp').execute({
                       command = 'tinymist.pinMain',
                       arguments = { buf_name },
                     })

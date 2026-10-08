@@ -19,7 +19,7 @@ return vim.list_contains(_G.enabled_languages, 'vue')
         'neovim/nvim-lspconfig',
         opts = function(_, opts)
           table.insert(opts.servers.vtsls.filetypes, 'vue')
-          LazyVim.extend(
+          require('util.plugin').extend(
             opts.servers.vtsls,
             'settings.vtsls.tsserver.globalPlugins',
             {
@@ -29,7 +29,7 @@ return vim.list_contains(_G.enabled_languages, 'vue')
                 -- as JSON, and a function cannot be encoded. The package is
                 -- only installed with the first Vue file, so a missing one
                 -- is expected and not warned about.
-                location = LazyVim.get_pkg_path(
+                location = require('util.plugin').get_pkg_path(
                   'vue-language-server',
                   '/node_modules/@vue/language-server',
                   { warn = false }

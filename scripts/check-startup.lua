@@ -114,7 +114,7 @@ local function check_installs()
   -- Without a registry on disk every name would look unknown, so the Mason
   -- half is only checked where there is one to ask.
   if ok and registry.sources:is_all_installed() then
-    for _, name in ipairs(LazyVim.dedup(installs.mason)) do
+    for _, name in ipairs(require('util.plugin').dedup(installs.mason)) do
       if not registry.has_package(name) then
         report(string.format('no Mason package `%s` to install', name))
       end
@@ -126,7 +126,7 @@ local function check_installs()
     package.loaded['nvim-treesitter.parsers'] = nil
     local parsers = require('nvim-treesitter.parsers')
     vim.api.nvim_exec_autocmds('User', { pattern = 'TSUpdate' })
-    for _, name in ipairs(LazyVim.dedup(installs.parser)) do
+    for _, name in ipairs(require('util.plugin').dedup(installs.parser)) do
       if not parsers[name] then
         report(string.format('no tree-sitter parser `%s` to install', name))
       end
@@ -197,7 +197,7 @@ end
 if #prompts > 0 then
   io.stdout:write(
     'check-startup: cancelled prompts '
-      .. table.concat(LazyVim.dedup(prompts), ', ')
+      .. table.concat(require('util.plugin').dedup(prompts), ', ')
       .. '\n'
   )
 end
@@ -207,7 +207,7 @@ for kind, names in pairs(installs) do
       string.format(
         'check-startup: skipped installing %s %s\n',
         kind,
-        table.concat(LazyVim.dedup(names), ', ')
+        table.concat(require('util.plugin').dedup(names), ', ')
       )
     )
   end
@@ -245,7 +245,7 @@ end
 if #missing > 0 then
   io.stdout:write(
     'check-startup: missing because their install was skipped '
-      .. table.concat(LazyVim.dedup(missing), ', ')
+      .. table.concat(require('util.plugin').dedup(missing), ', ')
       .. '\n'
   )
 end

@@ -42,6 +42,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         -- Nvim LSP
         'folke/lazydev.nvim',
         ft = language.filetypes,
+        cmd = 'LazyDev',
         init = function()
           _G.completion_sources =
             vim.tbl_extend('force', _G.completion_sources, {
@@ -51,9 +52,7 @@ return vim.list_contains(_G.enabled_languages, 'lua')
         opts = {
           library = {
             { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
-            { path = 'LazyVim', words = { 'LazyVim' } },
             { path = 'snacks.nvim', words = { 'Snacks' } },
-            { path = 'lazy.nvim', words = { 'LazyVim' } },
             { path = 'nvim-lspconfig', words = { 'lspconfig.settings' } },
             { path = 'dial.nvim' },
             { path = 'nvim-autopairs' },

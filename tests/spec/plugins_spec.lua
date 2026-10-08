@@ -4,7 +4,6 @@
 -- types lazy.nvim accepts.
 local h = require('helpers')
 
-h.lazyvim()
 h.globals()
 
 local function is_any(value, ...)

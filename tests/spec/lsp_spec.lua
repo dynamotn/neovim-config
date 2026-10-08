@@ -24,7 +24,6 @@ end
 describe('lsp', function()
   local dir, cleanup, restores
   before_each(function()
-    h.lazyvim()
     dir, cleanup = h.tmpdir()
     restores = {
       -- The merged dictionary is `util.harper`'s business, tested on its own

@@ -22,8 +22,8 @@ return {
     event = { 'BufReadPost', 'BufNewFile' },
     ft = supported_filetypes,
     config = function()
-      if LazyVim.is_loaded('nvim-treesitter') then
-        local opts = LazyVim.opts('nvim-treesitter')
+      if require('util.plugin').is_loaded('nvim-treesitter') then
+        local opts = require('util.plugin').opts('nvim-treesitter')
         ---@diagnostic disable-next-line: missing-fields
         require('nvim-treesitter').setup({ endwise = opts.endwise })
       end

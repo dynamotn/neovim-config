@@ -1,13 +1,114 @@
 local enabled = require('util.chezmoi').enabled()
 
+--- Pick a chezmoi managed file and edit it through `chezmoi edit --watch`
+local function pick_chezmoi()
+  local results = require('chezmoi.commands').list({
+    args = {
+      '--path-style',
+      'absolute',
+      '--include',
+      'files',
+      '--exclude',
+      'externals',
+    },
+  })
+  local items = {}
+  for _, file in ipairs(results) do
+    table.insert(items, { text = file, file = file })
+  end
+
+  ---@type snacks.picker.Config
+  local opts = {
+    items = items,
+    confirm = function(picker, item)
+      picker:close()
+      require('chezmoi.commands').edit({
+        targets = { item.text },
+        args = { '--watch' },
+      })
+    end,
+  }
+  Snacks.picker.pick(opts)
+end
+
+-- Specs of plugins used without chezmoi too, only extended when it is there
+local extra_specs = not enabled and {}
+  or {
+    {
+      -- The dashboard's config entry picks a managed file instead
+      'folke/snacks.nvim',
+      opts = function(_, opts)
+        local keys = vim.tbl_get(opts, 'dashboard', 'preset', 'keys')
+        if not keys then return end
+        local chezmoi_entry = {
+          icon = ' ',
+          key = 'c',
+          desc = 'Config',
+          action = pick_chezmoi,
+        }
+        local config_index = #keys + 1
+        for i = #keys, 1, -1 do
+          if keys[i].key == 'c' then
+            table.remove(keys, i)
+            config_index = i
+            break
+          end
+        end
+        table.insert(keys, config_index, chezmoi_entry)
+      end,
+    },
+    {
+      -- Filetype icons
+      'nvim-mini/mini.icons',
+      opts = {
+        file = {
+          ['.chezmoiignore'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['.chezmoiremove'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['.chezmoiroot'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['.chezmoiversion'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['bash.tmpl'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['json.tmpl'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['ps1.tmpl'] = { glyph = '󰨊', hl = 'MiniIconsGrey' },
+          ['sh.tmpl'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['toml.tmpl'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['yaml.tmpl'] = { glyph = '', hl = 'MiniIconsGrey' },
+          ['zsh.tmpl'] = { glyph = '', hl = 'MiniIconsGrey' },
+        },
+      },
+    },
+  }
+
 return {
-  -- Edit chezmoi managed files
   {
-    import = 'lazyvim.plugins.extras.util.chezmoi',
+    -- Edit chezmoi managed files
+    'xvzc/chezmoi.nvim',
     enabled = enabled,
+    cmd = { 'ChezmoiEdit' },
+    keys = {
+      { '<leader>sz', pick_chezmoi, desc = 'Chezmoi' },
+    },
+    opts = {
+      edit = {
+        watch = false,
+        force = false,
+      },
+      notification = {
+        on_open = true,
+        on_apply = true,
+        on_watch = false,
+      },
+    },
+    init = function()
+      -- Run `chezmoi edit --watch` on files opened from the source directory
+      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = { vim.env.HOME .. '/.local/share/chezmoi/*' },
+        callback = function()
+          vim.schedule(require('chezmoi.commands.__edit').watch)
+        end,
+      })
+    end,
   },
-  -- Disable unused plugin
-  { 'alker0/chezmoi.vim', enabled = false },
+  extra_specs,
   {
     -- Edit chezmoi source files in place: the target language injected into
     -- `*.tmpl`, managed files typed by their target, `:Chezmoi` commands
@@ -154,6 +255,9 @@ return {
       _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
         chezmoi = '「CZ」',
       })
+      opts.sources = opts.sources or {}
+      opts.sources.providers = opts.sources.providers or {}
+      opts.sources.per_filetype = opts.sources.per_filetype or {}
       opts.sources.providers.chezmoi = {
         name = 'chezmoi',
         module = 'chezmoi-template.blink',

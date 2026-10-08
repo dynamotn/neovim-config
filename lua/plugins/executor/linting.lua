@@ -2,7 +2,21 @@ return {
   {
     -- Linters
     'mfussenegger/nvim-lint',
+    event = 'LazyFile',
     opts = function(_, opts)
+      opts = vim.tbl_deep_extend('keep', opts, {
+        -- Events to lint on
+        events = { 'BufWritePost', 'BufReadPost', 'InsertLeave' },
+        -- `*` runs on every filetype, `_` on those without linters of their own
+        linters_by_ft = {
+          fish = { 'fish' },
+        },
+        -- Merged into nvim-lint's own linter of that name, or added as a new
+        -- one. `prepend_args` goes ahead of its `args`, and `condition(ctx)`
+        -- decides per buffer.
+        ---@type table<string, table>
+        linters = {},
+      })
       local languages = require('config.languages')
 
       -- Several parsers drop the rule id, which leaves `<leader>ci` with
@@ -62,7 +76,7 @@ return {
       -- A linter Mason installs during the session was not on `$PATH` when the
       -- lists above were built, so it would sit unused until the next restart.
       -- Rebuilding once an install lands closes that gap.
-      require('lazyvim.util').on_load('mason.nvim', function()
+      require('util.plugin').on_load('mason.nvim', function()
         require('mason-registry'):on('package:install:success', function()
           vim.schedule(function()
             local linters_by_ft = require('lint').linters_by_ft
@@ -121,9 +135,9 @@ return {
             if not vim.api.nvim_buf_is_valid(args.buf) then return end
             vim.api.nvim_buf_call(args.buf, function()
               local lint = require('lint')
-              -- The same fallback LazyVim's own lint applies: a filetype
+              -- The same fallback the `config` lint applies: a filetype
               -- left with no linter of its own gets the `_` ones. A run
-              -- still in flight from LazyVim is cancelled, not doubled.
+              -- still in flight from there is cancelled, not doubled.
               local names = lint._resolve_linter_by_ft(vim.bo.filetype)
               if #names == 0 then names = lint.linters_by_ft['_'] or {} end
               if #names > 0 then lint.try_lint(names) end
@@ -135,6 +149,67 @@ return {
               end
             end)
           end, 100)
+        end,
+      })
+      return opts
+    end,
+    config = function(_, opts)
+      local lint = require('lint')
+      for name, linter in pairs(opts.linters) do
+        if type(linter) == 'table' and type(lint.linters[name]) == 'table' then
+          lint.linters[name] =
+            vim.tbl_deep_extend('force', lint.linters[name], linter)
+          if type(linter.prepend_args) == 'table' then
+            local args = lint.linters[name].args or {}
+            lint.linters[name].args =
+              vim.list_extend(vim.list_extend({}, linter.prepend_args), args)
+          end
+        else
+          lint.linters[name] = linter
+        end
+      end
+      lint.linters_by_ft = opts.linters_by_ft
+
+      local function run()
+        -- nvim-lint's own resolution first: the full filetype, else each
+        -- part of a dotted one
+        local names =
+          vim.list_extend({}, lint._resolve_linter_by_ft(vim.bo.filetype))
+        if #names == 0 then
+          vim.list_extend(names, lint.linters_by_ft['_'] or {})
+        end
+        vim.list_extend(names, lint.linters_by_ft['*'] or {})
+
+        local ctx = { filename = vim.api.nvim_buf_get_name(0) }
+        ctx.dirname = vim.fn.fnamemodify(ctx.filename, ':h')
+        names = vim.tbl_filter(function(name)
+          local linter = lint.linters[name]
+          if not linter then
+            require('util.plugin').warn(
+              'Linter not found: ' .. name,
+              { title = 'nvim-lint' }
+            )
+          end
+          return linter
+            and not (
+              type(linter) == 'table'
+              and linter.condition
+              and not linter.condition(ctx)
+            )
+        end, names)
+
+        if #names > 0 then lint.try_lint(names) end
+      end
+
+      local timer = assert(vim.uv.new_timer())
+      vim.api.nvim_create_autocmd(opts.events, {
+        group = vim.api.nvim_create_augroup('nvim-lint', { clear = true }),
+        -- Debounced, as a save fires several of these events at once
+        callback = function()
+          timer:start(100, 0, function()
+            timer:stop()
+            vim.schedule(run)
+          end)
         end,
       })
     end,

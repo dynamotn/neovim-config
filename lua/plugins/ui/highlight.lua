@@ -6,15 +6,14 @@ vim.list_extend(markview_filetypes, languages_list.typst.filetypes)
 vim.list_extend(markview_filetypes, languages_list.yaml.filetypes)
 
 return {
-  -- Highlight patterns (colors)
-  { import = 'lazyvim.plugins.extras.util.mini-hipatterns' },
   {
-    -- Trailing whitespace, in red
+    -- Highlight patterns: hex colours, Tailwind classes and trailing
+    -- whitespace
     --
-    -- `listchars` already marks it with a `\u00b7`, and that is easy to read past
-    -- in a diff full of them. A background colour is not. The extra above
-    -- brings the plugin in, so only the one highlighter is added here.
+    -- `listchars` already marks trailing whitespace with a `\u00b7`, and that
+    -- is easy to read past in a diff full of them. A red background is not.
     'nvim-mini/mini.hipatterns',
+    event = 'LazyFile',
     init = function()
       vim.api.nvim_create_autocmd('InsertLeave', {
         group = vim.api.nvim_create_augroup(
@@ -34,8 +33,47 @@ return {
         end,
       })
     end,
-    opts = function(_, opts)
-      opts.highlighters = opts.highlighters or {}
+    opts = function()
+      local hi = require('mini.hipatterns')
+      local opts = {
+        -- Not an option of mini.hipatterns: `config` below turns it into the
+        -- Tailwind highlighter
+        tailwind = {
+          enabled = true,
+          ft = {
+            'astro',
+            'css',
+            'heex',
+            'html',
+            'html-eex',
+            'javascript',
+            'javascriptreact',
+            'rust',
+            'svelte',
+            'typescript',
+            'typescriptreact',
+            'vue',
+          },
+          -- `full` paints the whole class, `compact` only its colour
+          style = 'full',
+        },
+        highlighters = {
+          hex_color = hi.gen_highlighter.hex_color({ priority = 2000 }),
+          shorthand = {
+            pattern = '()#%x%x%x()%f[^%x%w]',
+            group = function(_, _, data)
+              ---@type string
+              local match = data.full_match
+              if match == '#add' then return end
+              local r, g, b = match:sub(2, 2), match:sub(3, 3), match:sub(4, 4)
+              local hex_color = '#' .. r .. r .. g .. g .. b .. b
+
+              return MiniHipatterns.compute_hex_color_group(hex_color, 'bg')
+            end,
+            extmark_opts = { priority = 2000 },
+          },
+        },
+      }
       opts.highlighters.trailing_whitespace = {
         pattern = '%f[%s]%s+$',
         group = function(buf_id, _, data)
@@ -53,6 +91,13 @@ return {
         end,
       }
       return opts
+    end,
+    config = function(_, opts)
+      if type(opts.tailwind) == 'table' and opts.tailwind.enabled then
+        opts.highlighters.tailwind =
+          require('util.mini').tailwind_highlighter(opts.tailwind)
+      end
+      require('mini.hipatterns').setup(opts)
     end,
   },
   {

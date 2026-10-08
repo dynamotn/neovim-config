@@ -35,7 +35,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
         ft = language.filetypes,
         opts = function()
           local cmd = { vim.fn.exepath('jdtls') }
-          if LazyVim.has('mason.nvim') then
+          if require('util.plugin').has('mason.nvim') then
             table.insert(
               cmd,
               string.format(
@@ -108,11 +108,11 @@ return vim.list_contains(_G.enabled_languages, 'java')
           -- Find the extra bundles that should be passed on the jdtls command-line
           -- if nvim-dap is enabled with java debug/test.
           local bundles = {} ---@type string[]
-          if LazyVim.has('mason.nvim') then
+          if require('util.plugin').has('mason.nvim') then
             local mason_registry = require('mason-registry')
             if
               opts.dap
-              and LazyVim.has('nvim-dap')
+              and require('util.plugin').has('nvim-dap')
               and mason_registry.is_installed('java-debug-adapter')
             then
               bundles = vim.fn.glob(
@@ -141,7 +141,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
               },
               settings = opts.settings,
               -- enable CMP capabilities
-              capabilities = LazyVim.has('blink.cmp')
+              capabilities = require('util.plugin').has('blink.cmp')
                   and require('blink.cmp').get_lsp_capabilities()
                 or nil,
             }, opts.jdtls)
@@ -222,11 +222,11 @@ return vim.list_contains(_G.enabled_languages, 'java')
                   },
                 })
 
-                if LazyVim.has('mason.nvim') then
+                if require('util.plugin').has('mason.nvim') then
                   local mason_registry = require('mason-registry')
                   if
                     opts.dap
-                    and LazyVim.has('nvim-dap')
+                    and require('util.plugin').has('nvim-dap')
                     and mason_registry.is_installed('java-debug-adapter')
                   then
                     -- custom init for Java debugger

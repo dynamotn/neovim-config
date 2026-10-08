@@ -31,10 +31,10 @@ local function mappings()
   local ok, source = pcall(function()
     -- Outside lazy.nvim -- `scripts/validate-tools.lua` -- nothing loads on
     -- a `require`, and the plugin is found on the runtimepath
-    if not rawget(_G, 'LazyVim') then
+    if not package.loaded['lazy.core.config'] then
       return require('mason-nvim-dap.mappings.source')
     end
-    local path = LazyVim.get_plugin_path(
+    local path = require('util.plugin').get_plugin_path(
       'mason-nvim-dap.nvim',
       'lua/mason-nvim-dap/mappings/source.lua'
     )

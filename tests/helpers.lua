@@ -63,12 +63,6 @@ M.buffer = function(opts)
   return bufnr
 end
 
---- Load LazyVim's helpers as the `LazyVim` global, as lazy.nvim would
-M.lazyvim = function()
-  _G.LazyVim = _G.LazyVim or require('lazyvim.util')
-  return _G.LazyVim
-end
-
 --- Load `config.globals` the way `init.lua` does, without a `per_machine`
 M.globals = function()
   M.unload('config.globals', 'config.languages')

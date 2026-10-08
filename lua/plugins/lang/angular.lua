@@ -34,7 +34,7 @@ return vim.list_contains(_G.enabled_languages, 'angular')
         -- Extend LSP config of tailwindcss by plugin for Angular
         'neovim/nvim-lspconfig',
         opts = function(_, opts)
-          LazyVim.extend(
+          require('util.plugin').extend(
             opts.servers.tailwindcss,
             'filetypes',
             language.filetypes

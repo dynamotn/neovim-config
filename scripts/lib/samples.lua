@@ -170,7 +170,7 @@ function M.skip_installs()
     require('mason.api.command').MasonInstall = function(packages)
       vim.list_extend(installs.mason, packages)
     end
-    -- LazyVim's `ensure_installed` and anything else that asks a package
+    -- mason's `ensure_installed` and anything else that asks a package
     -- directly. The handle it hands back is only ever listened on.
     require('mason-core.package').install = function(self)
       table.insert(installs.mason, self.name)
@@ -195,7 +195,7 @@ function M.skip_installs()
     -- `build` only makes sure the tree-sitter CLI and a C compiler are there
     -- to compile parsers with, and installs the CLI through Mason if not. A
     -- script that compiles nothing does not need either.
-    LazyVim.treesitter.build = function(cb) cb() end
+    require('util.treesitter').build = function(cb) cb() end
   end)
   -- Fetches its own `tinymist` and `websocat` release binaries on setup.
   M.before_config('typst-preview.nvim', function()

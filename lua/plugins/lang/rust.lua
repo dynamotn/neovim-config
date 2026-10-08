@@ -81,7 +81,7 @@ return vim.list_contains(_G.enabled_languages, 'rust')
           vim.g.rustaceanvim =
             vim.tbl_deep_extend('keep', vim.g.rustaceanvim or {}, opts or {})
           if vim.fn.executable('rust-analyzer') == 0 then
-            LazyVim.error(
+            require('util.plugin').error(
               '**rust-analyzer** not found in PATH, please install it.\nhttps://rust-analyzer.github.io/',
               { title = 'rustaceanvim' }
             )
