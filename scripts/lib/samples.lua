@@ -39,9 +39,11 @@ M.names_of = {
   dosini = 'sample.ini',
   gitcommit = 'COMMIT_EDITMSG',
   gitrebase = 'git-rebase-todo',
-  gomod = 'go.mod',
-  gosum = 'go.sum',
-  gowork = 'go.work',
+  -- Away from `sample.go`: gopls takes an empty `go.mod` or `go.work` next
+  -- to it for a broken module, and fails every request on the file
+  gomod = 'gomodule/go.mod',
+  gosum = 'gomodule/go.sum',
+  gowork = 'goworkspace/go.work',
   helm = 'chart/templates/sample.yaml',
   htmlangular = 'sample.component.html',
   htmldjango = 'templates/sample.html',

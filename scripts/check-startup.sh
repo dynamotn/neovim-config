@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Load this configuration in a throwaway Neovim, open a file of each language
-# in it (see check-startup.lua), and fail on any error.
+# @file check-startup.sh
+# @brief Load the configuration in a throwaway Neovim and fail on any error
+# @description
+#   Opens a file of each language in it (see check-startup.lua).
 #
 # By default a spread of languages is opened, to keep the pre-commit hook
 # quick; `CHECK_STARTUP_ALL=1` opens every one of them, as CI does.
@@ -15,7 +17,7 @@ set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if ! command -v nvim > /dev/null 2>&1; then
+if ! command -v nvim &> /dev/null; then
   echo "check-startup: nvim not found, skipping" >&2
   exit 0
 fi
@@ -30,9 +32,16 @@ set +e
 # The Lua file quits on its own once it is done. `cquit` is only reached when
 # it failed before that, which would otherwise leave Neovim waiting for input
 # that never comes; stdin is closed for the same reason.
-XDG_CONFIG_HOME="${workdir}/config" CHECK_STARTUP_WORKDIR="${workdir}" nvim --headless -i NONE \
-  -c "luafile ${repo}/scripts/check-startup.lua" -c 'cquit' \
-  < /dev/null > "${output}" 2>&1
+# Run from the scratch directory: a server with no project marker to go by
+# (clojure-lsp) takes the working directory as its root, and leaves its cache
+# there. Every file is opened by an absolute path.
+(
+  cd "${workdir}" \
+    && XDG_CONFIG_HOME="${workdir}/config" CHECK_STARTUP_WORKDIR="${workdir}" \
+      nvim --headless -i NONE \
+      -c "luafile ${repo}/scripts/check-startup.lua" -c 'cquit' \
+      < /dev/null &> "${output}"
+)
 status=$?
 set -e
 
