@@ -57,7 +57,7 @@ return {
       },
     },
     opts = function()
-      local actions = require('util.blink').actions
+      local actions = require('util.cmp').actions
       actions.snippet_forward = function()
         if require('luasnip').jumpable(1) then
           vim.schedule(function() require('luasnip').jump(1) end)

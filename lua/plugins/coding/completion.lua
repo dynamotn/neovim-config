@@ -76,7 +76,7 @@ return {
         ['<C-y>'] = { 'select_and_accept' },
         ['<Tab>'] = {
           function()
-            return require('util.blink').map({
+            return require('util.cmp').map({
               'snippet_forward',
               'ai_nes',
               'ai_accept',
@@ -241,7 +241,7 @@ return {
           },
           ghost_text = { enabled = true },
         },
-        sources = function() return require('util.blink').cmdline_sources() end,
+        sources = function() return require('util.cmp').cmdline_sources() end,
       },
       completion = {
         accept = { auto_brackets = { enabled = true } },
@@ -322,7 +322,7 @@ return {
     ---@param opts blink.cmp.Config|{ sources: { compat: string[] } }
     config = function(_, opts)
       if opts.snippets and opts.snippets.preset == 'default' then
-        opts.snippets.expand = require('util.blink').expand
+        opts.snippets.expand = require('util.cmp').expand
       end
       -- Run the nvim-cmp sources named in `compat` through blink.compat
       local enabled = opts.sources.default

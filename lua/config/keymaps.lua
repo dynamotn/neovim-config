@@ -110,7 +110,7 @@ map('n', '<leader>bD', '<cmd>:bd<cr>', { desc = 'Delete Buffer and Window' })
 -- Clear search and stop snippet on escape
 map({ 'i', 'n', 's' }, '<esc>', function()
   vim.cmd('noh')
-  require('util.blink').actions.snippet_stop()
+  require('util.cmp').actions.snippet_stop()
   return '<esc>'
 end, { expr = true, desc = 'Escape and Clear hlsearch' })
 
