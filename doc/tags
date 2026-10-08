@@ -38,6 +38,7 @@ dyneo-development	dyneo.txt	/*dyneo-development*
 dyneo-diagram	dyneo.txt	/*dyneo-diagram*
 dyneo-features	dyneo.txt	/*dyneo-features*
 dyneo-globals	dyneo.txt	/*dyneo-globals*
+dyneo-infra	dyneo.txt	/*dyneo-infra*
 dyneo-install	dyneo.txt	/*dyneo-install*
 dyneo-integrations	dyneo.txt	/*dyneo-integrations*
 dyneo-keymaps	dyneo-keymaps.txt	/*dyneo-keymaps*

@@ -49,11 +49,8 @@ says what is missing.
 | --- | --- | --- |
 | 🔒 | **Quarantine** — Mason and plugin releases wait a week; review what an update adds, flagged; SBOM and OSV check | `:LazyQuarantine review` · `:DySbom osv` |
 | 🤖 | **AI guard** — `.env`, keys and token-shaped text kept from every AI; masked on screen; every handover logged | `:AiGuardCheck` · `:AiGuardLog` |
-| 📜 | **Runbooks** — run a Markdown code block in place, its output fenced below; destructive commands ask first | `<localleader>r` |
-| 🏗 | **Terraform plan** — `tofu plan` shown on the blocks it changes: create, update, replace and what forces it, destroy | `<localleader>p` · `:TfPlan` |
-| ☸️ | **Kubernetes** — diff with the cluster, server dry run, apply, render Helm and Kustomize, switch context and namespace | `<localleader>k` · `:Kube` |
+| 🏗 | **Infrastructure** — YAML schemas detected (Kubernetes, CRDs, cloud-init); Kubernetes diff, server dry run, apply, Helm and Kustomize render; `tofu plan` shown on the blocks it changes; Markdown runbooks run in place, destructive steps asking first | `<localleader>k` · `<localleader>p` · `<localleader>r` · `<leader>cys` |
 | 🌐 | **Forges & trackers** — GitHub (Octo), GitLab merge requests, CI checks, Jira issues to branches and worklogs | `<leader>ph` `pl` `pc` `pj` |
-| 🧭 | **YAML schemas** — Kubernetes, CRDs, cloud-init detected; pick any other | `<leader>cys` |
 | 🔍 | **Whole-project diagnostics** — every file handed to the server, off the main loop | `<leader>xw` |
 | 🛠 | **Tasks** — run, build and test the current file or project in ~50 languages | `<leader>oo` |
 | 🖼 | **Previews** — D2 diagrams inline on kitty-graphics terminals, Markdown, Typst | `<leader>cp` |
