@@ -161,7 +161,7 @@ Worth opening right away:
 
 - `:Lazy` — what is installed, what loaded, and how long each took.
 - `:Mason` — the tool side of the same question.
-- `:checkhealth` — what of the requirements above is missing.
+- `:checkhealth dyneo` — what of the requirements above is missing.
 - `<Space>` — hold it and [which-key](https://github.com/folke/which-key.nvim)
   lists everything underneath.
 
@@ -384,7 +384,7 @@ The window is otherwise invisible — `:Lazy` shows a plugin as up to date when
 it is a week behind on purpose — so `:LazyQuarantine` lists what is being held
 back: the commit or release each plugin is on, the one waiting for it, and how
 long is left. It asks git once per plugin, about a second for the whole set.
-`:checkhealth util` answers the other half, whether the window is in place at
+`:checkhealth dyneo` answers the other half, whether the window is in place at
 all.
 
 ### Files that never reach an AI
@@ -441,7 +441,7 @@ Kubernetes manifest keeps reading like a Kubernetes manifest.
 `:AiGuardAllow` is the way past a pattern that matched something that is not a
 credential, and `:AiGuardAllow!` takes it back. It says nothing about the name
 rules: a `.env` stays sensitive however often it is allowed. A waived buffer
-says so in `:AiGuardCheck` and in `:checkhealth util`, along with what it
+says so in `:AiGuardCheck` and in `:checkhealth dyneo`, along with what it
 would otherwise be held back for, so a waiver left on by mistake is visible
 rather than silent.
 
@@ -628,8 +628,9 @@ pre-commit run --all-files                            # the lot, plus stylua
 ```
 
 What those cannot see is the machine the configuration is running on, so
-`:checkhealth util` ([lua/util/health.lua](./lua/util/health.lua)) asks it:
-whether the quarantine in front of Mason and lazy.nvim is the one actually
+`:checkhealth dyneo` ([lua/dyneo/health.lua](./lua/dyneo/health.lua)) asks it:
+whether this Neovim is new enough for the plugin channel, what nvim-treesitter
+still needs to build parsers, whether the quarantine in front of Mason and lazy.nvim is the one actually
 running and how old the registry snapshot it settled on is, whether the
 windows bun and uv read still agree with it, which guard of `util.ai_guard`
 found nothing to wrap and what the current buffer would be held back for,

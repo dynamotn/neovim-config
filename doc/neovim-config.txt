@@ -85,8 +85,8 @@ anywhere and run it under its own name with |$NVIM_APPNAME|: >sh
 <
 The first `nvim` clones the plugins; the first file of a language installs
 that language's parser, servers and tools.  `:Lazy` shows the first half,
-`:Mason` the second, and `:checkhealth` what the requirements above are
-missing.
+`:Mason` the second, and `:checkhealth dyneo` what the requirements above
+are missing.
 
 ------------------------------------------------------------------------------
 3. CONFIGURATION                                *neovim-config-configuration*
@@ -545,8 +545,8 @@ Startup got slow ~
     `BENCH_FT_ONLY=<filetype>` for one of them.
 
 Something is missing from the system ~
-    `:checkhealth` for Neovim's own view, `:Mason` for the tools, and
-    |neovim-config-requirements| for what has to be there first.
+    `:checkhealth dyneo` for this configuration's view, `:Mason` for the
+    tools, and |neovim-config-requirements| for what has to be there first.
 
 ------------------------------------------------------------------------------
 vim:tw=78:ts=8:noet:ft=help:norl:

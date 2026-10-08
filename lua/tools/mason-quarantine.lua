@@ -71,7 +71,7 @@ local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 --- The window every side of the quarantine is held to
 ---
 --- Read on each question rather than kept, so `per_machine` has the say it
---- has over every other global -- and so `:checkhealth util` reports what is
+--- has over every other global -- and so `:checkhealth dyneo` reports what is
 --- in force rather than what was in force when this module first loaded.
 ---@return integer
 function M.window()

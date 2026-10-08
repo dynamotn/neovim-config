@@ -27,7 +27,7 @@ local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 --- The window every side of the quarantine is held to
 ---
 --- Read on each question rather than kept, so `per_machine` has the say it
---- has over every other global -- and so `:checkhealth util` reports what is
+--- has over every other global -- and so `:checkhealth dyneo` reports what is
 --- in force rather than what was in force when this module first loaded.
 ---@return integer
 function M.window()
@@ -168,7 +168,7 @@ local resolve
 --- Whether lazy.nvim is still calling that wrapper
 ---
 --- `get_target` is private to lazy.nvim, so a release that renames it would
---- leave the window in place and reaching nothing. `:checkhealth util` asks
+--- leave the window in place and reaching nothing. `:checkhealth dyneo` asks
 --- here rather than assuming the patch held.
 ---@return boolean
 function M.installed()

@@ -1,8 +1,10 @@
---- `:checkhealth util` -- what this configuration cannot check for itself
+--- `:checkhealth dyneo` -- what this configuration cannot check for itself
 ---
 --- The scripts under `scripts/` answer the questions that can be asked of the
 --- tree: that every tool is named right, that a fresh Neovim starts. What
---- they cannot see is this machine: whether the quarantine in front of Mason
+--- they cannot see is this machine: whether this Neovim is new enough for the
+--- plugin channel, what nvim-treesitter needs to build parsers, whether the
+--- quarantine in front of Mason
 --- and lazy.nvim is the one actually running, whether the windows it is held
 --- to still agree with the ones bun and uv read, which guard of `util.ai_guard`
 --- found nothing to wrap, and which of the commands no package installs are
@@ -369,6 +371,52 @@ local function system_tools()
   }
 end
 
+--- Whether this Neovim is new enough for the plugin channel, the same gate
+--- `init.lua` applies
+---@return DyHealthEntry[]
+local function neovim()
+  local stable = DyNeo.plugin_channel == 'stable'
+  local version = stable and '0.12.0' or '0.13.0'
+  local channel = stable and 'stable' or 'latest'
+  if vim.fn.has('nvim-' .. version) == 1 then
+    return {
+      entry(
+        'ok',
+        ('Neovim >= %s, as the `%s` channel needs'):format(version, channel)
+      ),
+    }
+  end
+  return {
+    entry(
+      'error',
+      ('Neovim >= %s is required on the `%s` channel'):format(version, channel)
+    ),
+  }
+end
+
+--- What nvim-treesitter `main` needs to build parsers
+---@return DyHealthEntry[]
+local function treesitter()
+  local ok, health = require('util.treesitter').check()
+  local entries = {}
+  local names = vim.tbl_keys(health)
+  table.sort(names)
+  for _, name in ipairs(names) do
+    table.insert(
+      entries,
+      health[name] and entry('ok', ('`%s` is installed'):format(name))
+        or entry('error', ('`%s` is not installed'):format(name))
+    )
+  end
+  if not ok then
+    table.insert(
+      entries,
+      entry('info', 'Run `:checkhealth nvim-treesitter` for more information')
+    )
+  end
+  return entries
+end
+
 --- The programs the README asks for
 ---@return DyHealthEntry[]
 local function requirements()
@@ -377,8 +425,7 @@ local function requirements()
   local optional = {
     rg = 'the pickers and the ripgrep completion source',
     fd = 'the file pickers',
-    ['tree-sitter'] = 'building Treesitter parsers',
-    cc = 'building Treesitter parsers',
+    lazygit = 'the `<leader>gg` git UI',
     gh = 'the GitHub API, which the Mason quarantine asks first',
   }
   for _, command in ipairs(required) do
@@ -388,12 +435,21 @@ local function requirements()
         or entry('error', command .. ' is missing')
     )
   end
+  -- Debian and Ubuntu ship `fd` as `fdfind`
+  local aliases = { fd = { 'fdfind' } }
   local names = vim.tbl_keys(optional)
   table.sort(names)
   for _, command in ipairs(names) do
+    local found = command
+    for _, name in ipairs(vim.list_extend({ command }, aliases[command] or {})) do
+      if vim.fn.executable(name) == 1 then
+        found = name
+        break
+      end
+    end
     table.insert(
       entries,
-      vim.fn.executable(command) == 1 and entry('ok', command .. ' found')
+      vim.fn.executable(found) == 1 and entry('ok', found .. ' found')
         or entry(
           'warn',
           ('%s is missing, needed for %s'):format(command, optional[command])
@@ -403,22 +459,24 @@ local function requirements()
   return entries
 end
 
---- Everything `:checkhealth util` reports, section by section
+--- Everything `:checkhealth dyneo` reports, section by section
 ---@return DyHealthSection[]
 function M.report()
   local quarantine = vim.list_extend(mason_quarantine(), { lazy_quarantine() })
   return {
+    { title = 'DyNeo', entries = neovim() },
+    { title = 'Requirements', entries = requirements() },
+    { title = 'nvim-treesitter', entries = treesitter() },
     {
       title = ('Supply chain quarantine (%s)'):format(days(window())),
       entries = vim.list_extend(quarantine, tool_windows()),
     },
     { title = 'AI guard', entries = ai_guard() },
     { title = 'Tools from the system', entries = system_tools() },
-    { title = 'Requirements', entries = requirements() },
   }
 end
 
---- What `:checkhealth util` calls
+--- What `:checkhealth dyneo` calls
 function M.check()
   for _, section in ipairs(M.report()) do
     vim.health.start(section.title)

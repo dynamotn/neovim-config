@@ -39,11 +39,11 @@ end
 --- A fresh report
 ---@return table[]
 local function report()
-  h.unload('util.health')
-  return require('util.health').report()
+  h.unload('dyneo.health')
+  return require('dyneo.health').report()
 end
 
-describe('util.health', function()
+describe('dyneo.health', function()
   local dir, cleanup
   before_each(function()
     dir, cleanup = h.tmpdir()
@@ -55,12 +55,39 @@ describe('util.health', function()
     with_config_home(dir, function()
       titles = vim.tbl_map(function(part) return part.title end, report())
     end)
-    assert.are.equal(4, #titles)
-    assert.is_true(vim.startswith(titles[1], 'Supply chain quarantine'))
+    assert.are.equal(6, #titles)
     assert.are.same(
-      { 'AI guard', 'Tools from the system', 'Requirements' },
-      { titles[2], titles[3], titles[4] }
+      { 'DyNeo', 'Requirements', 'nvim-treesitter' },
+      { titles[1], titles[2], titles[3] }
     )
+    assert.is_true(vim.startswith(titles[4], 'Supply chain quarantine'))
+    assert.are.same(
+      { 'AI guard', 'Tools from the system' },
+      { titles[5], titles[6] }
+    )
+  end)
+
+  it('checks Neovim against the plugin channel', function()
+    local restore = h.stub(DyNeo, 'plugin_channel', 'stable')
+    with_config_home(
+      dir,
+      function()
+        assert.is_true(says(section(report(), 'DyNeo'), 'ok', '>= 0.12.0'))
+      end
+    )
+    restore()
+  end)
+
+  it('lists what nvim-treesitter needs to build parsers', function()
+    with_config_home(dir, function()
+      local entries = section(report(), 'nvim-treesitter')
+      for _, name in ipairs({ 'tree-sitter (CLI)', 'C compiler', 'tar', 'curl' }) do
+        assert.is_true(
+          says(entries, 'ok', name) or says(entries, 'error', name),
+          name
+        )
+      end
+    end)
   end)
 
   it('reads the bun and uv windows out of the config home', function()

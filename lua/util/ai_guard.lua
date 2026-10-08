@@ -24,7 +24,7 @@ local function refuse(what)
   )
 end
 
---- What became of each wrapper, for `:checkhealth util`
+--- What became of each wrapper, for `:checkhealth dyneo`
 ---@type table<string, 'guarded'|'missing'>
 M.status = {}
 
