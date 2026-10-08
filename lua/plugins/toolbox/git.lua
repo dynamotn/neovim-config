@@ -127,8 +127,8 @@ return {
     end,
   },
   -- Review GitHub pull requests and issues, when the `gh` CLI is there.
-  -- `<leader>gi`, `gI`, `gp` and `gP` are Octo's then, and Snacks' `gh`
-  -- pickers otherwise (`plugins.toolbox.picker`).
+  -- Under `<leader>ph`, beside the other trackers of a project: GitLab at
+  -- `<leader>pl`, Jira at `<leader>pj`.
   vim.fn.executable('gh') == 1
       and {
         {
@@ -167,12 +167,13 @@ return {
           -- mapped to the omnifunc popup, a second menu.
           -- stylua: ignore
           keys = {
-            { '<leader>gi', '<cmd>Octo issue list<CR>', desc = 'List Issues (Octo)' },
-            { '<leader>gI', '<cmd>Octo issue search<CR>', desc = 'Search Issues (Octo)' },
-            { '<leader>gp', '<cmd>Octo pr list<CR>', desc = 'List PRs (Octo)' },
-            { '<leader>gP', '<cmd>Octo pr search<CR>', desc = 'Search PRs (Octo)' },
-            { '<leader>gr', '<cmd>Octo repo list<CR>', desc = 'List Repos (Octo)' },
-            { '<leader>g/', '<cmd>Octo search<cr>', desc = 'Search (Octo)' },
+            { '<leader>ph', '', desc = '+github' },
+            { '<leader>phi', '<cmd>Octo issue list<CR>', desc = 'List Issues (Octo)' },
+            { '<leader>phI', '<cmd>Octo issue search<CR>', desc = 'Search Issues (Octo)' },
+            { '<leader>php', '<cmd>Octo pr list<CR>', desc = 'List PRs (Octo)' },
+            { '<leader>phP', '<cmd>Octo pr search<CR>', desc = 'Search PRs (Octo)' },
+            { '<leader>phr', '<cmd>Octo repo list<CR>', desc = 'List Repos (Octo)' },
+            { '<leader>ph/', '<cmd>Octo search<cr>', desc = 'Search (Octo)' },
 
             { '<localleader>a', '', desc = '+assignee (Octo)', ft = 'octo' },
             { '<localleader>c', '', desc = '+comment/code (Octo)', ft = 'octo' },

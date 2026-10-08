@@ -228,26 +228,20 @@ one of the same keys in those buffers.
 ==============================================================================
 <leader>g  git
 
-`<leader>g/`           n      Search (Octo)
 `<leader>gB`           nx     Git Browse (open)
 `<leader>gC`           n      CI Checks
 `<leader>gD`           n      Git Diff (origin)
 `<leader>gG`           n      Lazygit (cwd)
 `<leader>gH`           n      File History (CodeDiff)
 `<leader>gH`           x      Line History (CodeDiff)
-`<leader>gI`           n      Search Issues (Octo)
 `<leader>gL`           n      Git Log (cwd)
-`<leader>gP`           n      Search PRs (Octo)
 `<leader>gS`           n      Git Stash
 `<leader>gY`           nx     Git Browse (copy)
 `<leader>gb`           n      Git Blame Line
 `<leader>gd`           n      Git Diff (hunks)
 `<leader>gf`           n      Git Current File History
 `<leader>gg`           n      Lazygit (Root Dir)
-`<leader>gi`           n      List Issues (Octo)
 `<leader>gl`           n      Git Log
-`<leader>gp`           n      List PRs (Octo)
-`<leader>gr`           n      List Repos (Octo)
 `<leader>gs`           n      Git Status
 `<leader>gv`           n      Review Changes (CodeDiff)
 
@@ -270,6 +264,16 @@ one of the same keys in those buffers.
 `<leader>pcf`          n      Project settings files
 `<leader>pcl`          n      Project settings
 `<leader>pcs`          n      LSP settings of the clients
+
+==============================================================================
+<leader>ph  github
+
+`<leader>ph/`          n      Search (Octo)
+`<leader>phI`          n      Search Issues (Octo)
+`<leader>phP`          n      Search PRs (Octo)
+`<leader>phi`          n      List Issues (Octo)
+`<leader>php`          n      List PRs (Octo)
+`<leader>phr`          n      List Repos (Octo)
 
 ==============================================================================
 <leader>pj  jira
