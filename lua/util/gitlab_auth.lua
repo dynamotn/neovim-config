@@ -50,6 +50,13 @@ end
 --- `fallback` is the plugin's own lookup, which reads `.gitlab.nvim` and the
 --- environment; whatever it leaves empty comes from `glab` and from the
 --- remote of the repository the editor is in.
+---
+--- A token only ever goes to the host it belongs to. `.gitlab.nvim` sits in
+--- the repository, so a branch checked out for review may well bring one
+--- naming somebody else's server: `glab` is asked for the token of the URL
+--- given, never of `origin`. And a token from the environment keeps the
+--- plugin's own default host rather than being sent to whatever `origin`
+--- points at.
 ---@param fallback fun(): string?, string?, string?
 ---@param remote string The remote gitlab.nvim targets
 ---@return string? token
@@ -57,13 +64,20 @@ end
 ---@return string? err
 function M.auth(fallback, remote)
   local token, url = fallback()
-  if token and token ~= '' and url and url ~= '' then return token, url end
+  if token == '' then token = nil end
+  if url == '' then url = nil end
+  if token then return token, url end
 
-  local dir = vim.fs.root(0, '.git') or vim.uv.cwd() --[[@as string]]
-  local remote_url = M.remote_url(dir, remote)
-  local host = remote_url and M.host_of(remote_url)
-  if (not url or url == '') and host then url = 'https://' .. host end
-  if (not token or token == '') and host then token = M.glab_token(host) end
+  local host
+  if url then
+    host = M.host_of(url)
+  else
+    local dir = vim.fs.root(0, '.git') or vim.uv.cwd() --[[@as string]]
+    local remote_url = M.remote_url(dir, remote)
+    host = remote_url and M.host_of(remote_url)
+    if host then url = 'https://' .. host end
+  end
+  if host then token = M.glab_token(host) end
 
   if not token or token == '' then
     -- gitlab.nvim gives up silently on an error, so it is said here

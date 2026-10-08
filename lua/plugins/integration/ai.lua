@@ -59,6 +59,12 @@ local function avante_select_model()
       and sidebar.chat_history.acp_session_id
     if client and client.config_options and session then
       require('avante.api').select_acp_model()
+    elseif client and session and client:is_ready() then
+      -- Connected, with no choice to offer: waiting longer changes nothing
+      vim.notify(
+        'Avante: the ACP agent offers no model to pick',
+        vim.log.levels.WARN
+      )
     elseif tries > 0 then
       tries = tries - 1
       vim.defer_fn(try, 100)

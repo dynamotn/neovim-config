@@ -85,10 +85,12 @@ end
 local function persist(entry)
   local path = M.file()
   pcall(function()
-    vim.fn.mkdir(vim.fs.dirname(path), 'p')
-    local file = assert(io.open(path, 'a'))
-    file:write(vim.json.encode(entry), '\n')
-    file:close()
+    -- It names sensitive files and when they were reached for: this user's
+    -- business only, whatever the umask says
+    vim.fn.mkdir(vim.fs.dirname(path), 'p', '0700')
+    local fd = assert(vim.uv.fs_open(path, 'a', tonumber('600', 8)))
+    vim.uv.fs_write(fd, vim.json.encode(entry) .. '\n')
+    vim.uv.fs_close(fd)
     rotate(path)
   end)
 end
@@ -134,7 +136,12 @@ end
 ---@return boolean logged
 function M.record_buffer(integration, action, bufnr, detail)
   if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
-  if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= '' then
+  -- `acwrite` is a file too, written by a handler of its own: a decrypted
+  -- one, the most worth tracing of all
+  if
+    not vim.api.nvim_buf_is_valid(bufnr)
+    or not vim.list_contains({ '', 'acwrite' }, vim.bo[bufnr].buftype)
+  then
     return false
   end
   return M.record(integration, action, M.describe_buffer(bufnr), detail)

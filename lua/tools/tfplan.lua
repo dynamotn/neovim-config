@@ -16,7 +16,7 @@ local ns = vim.api.nvim_create_namespace('dy_tfplan')
 --- Milliseconds a plan may run before it is stopped
 M.TIMEOUT = 15 * 60 * 1000
 
----@alias DyTfAction 'create'|'update'|'replace'|'destroy'|'read'
+---@alias DyTfAction 'create'|'update'|'replace'|'destroy'|'read'|'forget'
 
 ---@class DyTfChange
 ---@field action DyTfAction
@@ -36,6 +36,8 @@ local function action_of(actions)
   if joined == 'update' then return 'update' end
   if joined == 'delete' then return 'destroy' end
   if joined == 'read' then return 'read' end
+  -- A `removed` block (Terraform 1.7): out of the state, left in place
+  if joined == 'forget' then return 'forget' end
   if joined == 'delete,create' or joined == 'create,delete' then
     return 'replace'
   end
@@ -132,10 +134,15 @@ local ACTIONS = {
     word = 'destroy',
     severity = vim.diagnostic.severity.WARN,
   },
+  forget = {
+    sign = '.',
+    word = 'forget (removed from state)',
+    severity = vim.diagnostic.severity.WARN,
+  },
 }
 
 --- The order the actions of one block are listed in, loudest first
-local ORDER = { 'destroy', 'replace', 'update', 'create', 'read' }
+local ORDER = { 'destroy', 'forget', 'replace', 'update', 'create', 'read' }
 
 ---@class DyTfEntry
 ---@field file? string
@@ -217,21 +224,29 @@ end
 ---@param changes DyTfChange[]
 ---@return string
 function M.summary(changes)
-  local counts = { create = 0, update = 0, destroy = 0, replace = 0 }
+  local counts =
+    { create = 0, update = 0, destroy = 0, replace = 0, forget = 0 }
   for _, change in ipairs(changes) do
     if counts[change.action] then
       counts[change.action] = counts[change.action] + 1
     end
   end
-  if counts.create + counts.update + counts.destroy + counts.replace == 0 then
-    return 'No changes'
-  end
-  return ('Plan: %d to add, %d to change, %d to destroy, %d to replace'):format(
+  local total = counts.create
+    + counts.update
+    + counts.destroy
+    + counts.replace
+    + counts.forget
+  if total == 0 then return 'No changes' end
+  local line = ('Plan: %d to add, %d to change, %d to destroy, %d to replace'):format(
     counts.create,
     counts.update,
     counts.destroy,
     counts.replace
   )
+  if counts.forget > 0 then
+    line = line .. (', %d to forget'):format(counts.forget)
+  end
+  return line
 end
 
 --- Forget the plan shown, in every buffer

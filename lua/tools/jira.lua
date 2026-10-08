@@ -108,9 +108,20 @@ function M.branch_name(issue)
 end
 
 --- The issue key a branch is named after, if any
+---
+--- Only where `branch_name` puts it: opening the branch or a part of it,
+--- whole or followed by its slug. Anywhere else, `fix/CVE-2024-3094-xz`
+--- would name issue `CVE-2024`, and `feat/myABC-1` issue `ABC-1`.
 ---@param branch string
 ---@return string?
-function M.key_of(branch) return branch:match(M.KEY_PATTERN) end
+function M.key_of(branch)
+  for part in branch:gmatch('[^/]+') do
+    local key = part:match('^(' .. M.KEY_PATTERN .. ')$')
+      -- A slug, not more digits: `CVE-2024-3094` is no key
+      or part:match('^(' .. M.KEY_PATTERN .. ')%-[^%d]')
+    if key then return key end
+  end
+end
 
 --- The repository the current buffer is in, or the working directory
 ---@return string
@@ -435,9 +446,12 @@ end
 ---@param action DyJiraAction
 ---@param key? string Given on the command line
 function M.on_issue(action, key)
+  local from_branch = key == nil
   key = key or M.current_key()
   if key then
-    if action == 'branch' then
+    -- Only the branch checked out says there is one already: a key given on
+    -- the command line is the issue to start one for
+    if action == 'branch' and from_branch then
       return notify('Already on a branch of ' .. key, vim.log.levels.WARN)
     end
     return M.act(action, { key = key, type = '', status = '', summary = '' })

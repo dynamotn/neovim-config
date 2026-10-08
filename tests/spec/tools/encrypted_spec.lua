@@ -160,6 +160,61 @@ describe('tools.encrypted', function()
     )
   end)
 
+  it('gives up at once when sops rejects what it got back', function()
+    -- sops asks the editor again when it cannot parse the result
+    tool('sops', {
+      'case "$1" in',
+      '  decrypt) sed -n "s/^plain: //p" "$2";;',
+      '  edit) t=$(mktemp); $SOPS_EDITOR "$t" || exit 9',
+      '        $SOPS_EDITOR "$t" || { rm -f "$t"; exit 128; }',
+      '        exit 0;;',
+      'esac',
+    })
+    local file = dir .. '/values.yaml'
+    h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+    local bufnr = open(file)
+    local started = vim.uv.hrtime()
+    assert.is_false(encrypted.write(bufnr))
+    assert.is_true((vim.uv.hrtime() - started) / 1e6 < 5000)
+    assert.is_truthy(notes[#notes]:find('Not written', 1, true))
+    -- Nothing of the copy and its editor left in the temporary directory
+    local leftovers =
+      vim.fn.glob(vim.fs.dirname(vim.fn.tempname()) .. '/*', false, true)
+    for _, left in ipairs(leftovers) do
+      assert.is_nil(left:find('%.editor$'), left)
+      assert.is_nil(left:find('%.used$'), left)
+    end
+  end)
+
+  it('encrypts once per write, however often the file was opened', function()
+    local file = dir .. '/values.yaml'
+    h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+    local bufnr = open(file)
+    vim.cmd('bdelete')
+    vim.cmd.edit(file)
+    encrypted.open(bufnr)
+    vim.fn.writefile({}, log)
+    vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { 'a: 2' })
+    vim.cmd('write')
+    local edits = vim.tbl_filter(
+      function(line) return line:find('^sops edit') ~= nil end,
+      calls()
+    )
+    assert.equals(1, #edits)
+  end)
+
+  it('keeps the clear text out of the system clipboard', function()
+    local saved = vim.o.clipboard
+    vim.o.clipboard = 'unnamedplus'
+    local file = dir .. '/values.yaml'
+    h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+    open(file)
+    assert.equals('', vim.o.clipboard)
+    vim.cmd.enew()
+    assert.equals('unnamedplus', vim.o.clipboard)
+    vim.o.clipboard = saved
+  end)
+
   it('keeps the vault id of an Ansible Vault', function()
     local file = dir .. '/vault.yml'
     h.write(file, { '$ANSIBLE_VAULT;1.2;AES256;prod', 'enc:db_password: x' })

@@ -250,4 +250,14 @@ describe('tools.tfplan', function()
       )
     end)
   end)
+
+  it(
+    'counts what a removed block forgets',
+    function()
+      assert.equals(
+        'Plan: 0 to add, 0 to change, 0 to destroy, 0 to replace, 1 to forget',
+        tfplan.summary({ { action = 'forget' } })
+      )
+    end
+  )
 end)
