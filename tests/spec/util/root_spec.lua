@@ -50,6 +50,51 @@ describe('util.root', function()
     assert.are.equal('/cached', root.get())
   end)
 
+  it('tells a directory from a sibling sharing its prefix', function()
+    assert.is_true(root.contains('/x/proj', '/x/proj'))
+    assert.is_true(root.contains('/x/proj', '/x/proj/f.lua'))
+    assert.is_true(root.contains('/', '/x/f.lua'))
+    assert.is_false(root.contains('/x/proj', '/x/proj-other/f.lua'))
+    assert.is_false(root.contains('/x/proj', '/x/pro'))
+  end)
+
+  describe('lsp detector', function()
+    local restore_clients
+    after_each(function() restore_clients() end)
+
+    --- Stub the clients of every buffer
+    local function clients(list)
+      restore_clients = h.stub(
+        vim.lsp,
+        'get_clients',
+        function() return list end
+      )
+    end
+
+    it('skips a client rooted at a sibling of the file', function()
+      h.write(dir .. '/proj-other/f.lua', { '' })
+      vim.cmd.edit(dir .. '/proj-other/f.lua')
+      clients({ { name = 'lua_ls', root_dir = dir .. '/proj', config = {} } })
+      assert.same({}, root.detectors.lsp(0))
+    end)
+
+    it('takes the workspace folders added since the client started', function()
+      h.write(dir .. '/ws/added/f.lua', { '' })
+      vim.cmd.edit(dir .. '/ws/added/f.lua')
+      clients({
+        {
+          name = 'lua_ls',
+          root_dir = dir .. '/elsewhere',
+          workspace_folders = {
+            { uri = vim.uri_from_fname(dir .. '/ws/added'), name = 'added' },
+          },
+          config = { workspace_folders = {} },
+        },
+      })
+      assert.same({ dir .. '/ws/added' }, root.detectors.lsp(0))
+    end)
+  end)
+
   it('gives the git work tree around the root', function()
     h.write(dir .. '/repo/.git/HEAD', { '' })
     h.write(dir .. '/repo/sub/lua/mod.lua', { '' })

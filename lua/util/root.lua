@@ -19,6 +19,17 @@ M.detectors = {}
 
 function M.detectors.cwd() return { vim.uv.cwd() } end
 
+--- Whether `path` is `dir` or lies under it: `/x/proj` holds `/x/proj/f`
+--- but not `/x/proj-other/f`
+---@param dir string
+---@param path string
+---@return boolean
+function M.contains(dir, path)
+  if path == dir then return true end
+  local prefix = dir:sub(-1) == '/' and dir or dir .. '/'
+  return path:sub(1, #prefix) == prefix
+end
+
 function M.detectors.lsp(buf)
   local bufpath = M.bufpath(buf)
   if not bufpath then return {} end
@@ -30,14 +41,18 @@ function M.detectors.lsp(buf)
     vim.lsp.get_clients({ bufnr = buf })
   ) --[[@as vim.lsp.Client[] ]]
   for _, client in pairs(clients) do
-    for _, ws in pairs(client.config.workspace_folders or {}) do
+    -- The client's own list takes in the folders added since it started
+    local folders = client.workspace_folders
+      or client.config.workspace_folders
+      or {}
+    for _, ws in pairs(folders) do
       roots[#roots + 1] = vim.uri_to_fname(ws.uri)
     end
     if client.root_dir then roots[#roots + 1] = client.root_dir end
   end
   return vim.tbl_filter(function(path)
     path = Plugin.norm(path)
-    return path and bufpath:find(path, 1, true) == 1
+    return path and M.contains(path, bufpath)
   end, roots)
 end
 
