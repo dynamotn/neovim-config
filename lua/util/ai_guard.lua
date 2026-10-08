@@ -56,6 +56,50 @@ end
 --- with them because a linter run ends in a burst of them.
 local RECHECK_DELAY = 200
 
+--- Detach Copilot from a buffer, and remember this guard is why
+---@param bufnr integer
+M.detach_copilot = function(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  local clients = vim.lsp.get_clients({ bufnr = bufnr, name = 'copilot' })
+  if #clients == 0 then return end
+  for _, client in ipairs(clients) do
+    vim.lsp.buf_detach_client(bufnr, client.id)
+  end
+  vim.b[bufnr].dy_ai_guard_detached = true
+  refuse('Copilot')
+end
+
+--- Methods that carry a buffer's text to the server
+local CONTENT_METHODS = {
+  ['textDocument/didOpen'] = true,
+  ['textDocument/didChange'] = true,
+}
+
+--- Drop every notification that would carry a sensitive buffer's text to a
+--- Copilot client, and detach it from that buffer
+---
+--- Detaching flushes the pending change first, through this same `notify`,
+--- so that change is dropped too. The check is cached per change of the
+--- buffer, which makes it cheap enough to ask on every notification.
+---@param client vim.lsp.Client
+M.filter_copilot = function(client)
+  if rawget(client, 'dy_ai_guard') then return end
+  rawset(client, 'dy_ai_guard', true)
+  local notify = client.notify
+  rawset(client, 'notify', function(self, method, params, bufnr)
+    if
+      bufnr
+      and CONTENT_METHODS[method]
+      and vim.api.nvim_buf_is_valid(bufnr)
+      and sensitive.is_sensitive(bufnr)
+    then
+      vim.schedule(function() M.detach_copilot(bufnr) end)
+      return true
+    end
+    return notify(self, method, params, bufnr)
+  end)
+end
+
 --- Detach Copilot from a buffer that becomes sensitive, and offer it back
 ---
 --- `:saveas`, `:file` and `:set filetype` change what a buffer is without
@@ -103,14 +147,19 @@ M.watch_copilot = function()
       return
     end
 
-    local clients = vim.lsp.get_clients({ bufnr = bufnr, name = 'copilot' })
-    if #clients == 0 then return end
-    for _, client in ipairs(clients) do
-      vim.lsp.buf_detach_client(bufnr, client.id)
-    end
-    vim.b[bufnr].dy_ai_guard_detached = true
-    refuse('Copilot')
+    M.detach_copilot(bufnr)
   end
+
+  -- The content check above runs after the buffer settles; by then Neovim
+  -- has sent the change already. Each Copilot client is filtered as well,
+  -- so what turns a buffer sensitive is never sent in the first place.
+  vim.api.nvim_create_autocmd('LspAttach', {
+    group = group,
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      if client and client.name == 'copilot' then M.filter_copilot(client) end
+    end,
+  })
 
   vim.api.nvim_create_autocmd({ 'BufFilePost', 'FileType' }, {
     group = group,
@@ -241,6 +290,24 @@ M.guard_sidekick = function()
   )
 end
 
+--- Whether a Claude Code selection comes from a sensitive file or buffer
+---@param sel table?
+---@return boolean
+local function selection_is_sensitive(sel)
+  if type(sel) ~= 'table' then return false end
+  local path = sel.filePath
+  if type(path) ~= 'string' or path == '' then
+    return sensitive.is_sensitive(0)
+  end
+  if sensitive.is_sensitive_path(path) then return true end
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_get_name(bufnr) == path then
+      return sensitive.is_sensitive(bufnr)
+    end
+  end
+  return false
+end
+
 --- Keep Claude Code's view of the editor off sensitive buffers
 ---
 --- The selection is pushed to Claude Code on every cursor move, text and all,
@@ -255,6 +322,30 @@ M.guard_claudecode = function()
     function(update, ...)
       if sensitive.is_sensitive(0) then return end
       return update(...)
+    end
+  )
+
+  -- Leaving visual mode flushes the selection straight to this sink, past
+  -- `update_selection`, and Claude Code's selection tools read it back
+  -- through `get_latest_selection`: both are checked against the file the
+  -- selection came from.
+  wrap(
+    ok and selection or nil,
+    'send_selection_update',
+    'claudecode selection flush',
+    function(send, sel, ...)
+      if selection_is_sensitive(sel) then return end
+      return send(sel, ...)
+    end
+  )
+  wrap(
+    ok and selection or nil,
+    'get_latest_selection',
+    'claudecode latest selection',
+    function(get, ...)
+      local sel = get(...)
+      if selection_is_sensitive(sel) then return nil end
+      return sel
     end
   )
 

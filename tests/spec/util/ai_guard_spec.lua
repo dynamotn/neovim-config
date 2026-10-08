@@ -194,11 +194,14 @@ describe('util.ai_guard', function()
   end)
 
   describe('guard_claudecode', function()
-    local selection, claudecode, update_calls, mention_calls
+    local selection, claudecode, update_calls, mention_calls, send_calls
+    local latest
 
     before_each(function()
       selection, claudecode = {}, {}
       selection.update_selection, update_calls = fn()
+      selection.send_selection_update, send_calls = fn()
+      selection.get_latest_selection = function() return latest end
       claudecode.send_at_mention, mention_calls = fn(true)
       package.loaded['claudecode.selection'] = selection
       package.loaded['claudecode'] = claudecode
@@ -212,6 +215,29 @@ describe('util.ai_guard', function()
       edit(plain)
       selection.update_selection()
       assert.equals(1, #update_calls)
+    end)
+
+    it('drops the selection flushed on leaving visual mode', function()
+      selection.send_selection_update({ filePath = secret, text = 'TOKEN=x' })
+      assert.equals(0, #send_calls)
+      selection.send_selection_update({ filePath = plain, text = 'x' })
+      assert.equals(1, #send_calls)
+    end)
+
+    it('checks the content of the buffer a selection came from', function()
+      h.buffer({
+        name = plain,
+        lines = { 'token = "ghp_0123456789abcdefghij"' },
+      })
+      selection.send_selection_update({ filePath = plain, text = 'token' })
+      assert.equals(0, #send_calls)
+    end)
+
+    it('hides a sensitive selection from the selection tools', function()
+      latest = { filePath = secret, text = 'TOKEN=x' }
+      assert.is_nil(selection.get_latest_selection())
+      latest = { filePath = plain, text = 'x' }
+      assert.same(latest, selection.get_latest_selection())
     end)
 
     it('refuses to mention a sensitive file', function()
@@ -244,6 +270,51 @@ describe('util.ai_guard', function()
     after_each(function()
       restore_clients()
       restore_detach()
+    end)
+
+    describe('filter_copilot', function()
+      local sent, client
+      before_each(function()
+        sent = {}
+        client = setmetatable({ name = 'copilot' }, {
+          __index = {
+            notify = function(_, method)
+              table.insert(sent, method)
+              return true
+            end,
+          },
+        })
+        ai_guard.filter_copilot(client)
+      end)
+
+      it('sends an ordinary change', function()
+        local buf = h.buffer({ name = plain, lines = { 'local a = 1' } })
+        client:notify('textDocument/didChange', {}, buf)
+        assert.same({ 'textDocument/didChange' }, sent)
+      end)
+
+      it('drops the change that carries a credential, and detaches', function()
+        local buf = h.buffer({
+          name = plain,
+          lines = { 'local token = "ghp_0123456789abcdefghij"' },
+        })
+        assert.is_true(client:notify('textDocument/didChange', {}, buf))
+        assert.same({}, sent)
+        vim.wait(500, function() return #detached > 0 end, 10)
+        assert.same({ { buf, 42 } }, detached)
+      end)
+
+      it('lets the close through', function()
+        local buf = h.buffer({ name = secret })
+        client:notify('textDocument/didClose', {}, buf)
+        assert.same({ 'textDocument/didClose' }, sent)
+      end)
+
+      it('wraps a client once', function()
+        local wrapped = rawget(client, 'notify')
+        ai_guard.filter_copilot(client)
+        assert.are.equal(wrapped, rawget(client, 'notify'))
+      end)
     end)
 
     it('detaches Copilot once a buffer turns sensitive', function()
