@@ -97,7 +97,7 @@ if target then
     local opened = vim.uv.hrtime()
     vim.wait(settle)
     local ms = function(at) return (at - started) / 1e6 end
-    return ms(opened), last > 0 and ms(last) or ms(opened)
+    return ms(opened), math.max(ms(opened), ms(last))
   end
 
   local escaped = vim.fn.fnameescape(target)

@@ -113,7 +113,7 @@ local function check_installs()
   local ok, registry = pcall(require, 'mason-registry')
   -- Without a registry on disk every name would look unknown, so the Mason
   -- half is only checked where there is one to ask.
-  if ok and #registry.get_all_package_names() > 0 then
+  if ok and registry.sources:is_all_installed() then
     for _, name in ipairs(LazyVim.dedup(installs.mason)) do
       if not registry.has_package(name) then
         report(string.format('no Mason package `%s` to install', name))
