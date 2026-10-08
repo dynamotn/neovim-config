@@ -1,4 +1,10 @@
+:AiGuardAllow	dyneo.txt	/*:AiGuardAllow*
+:AiGuardCheck	dyneo.txt	/*:AiGuardCheck*
+:DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
+:DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
+:DyNeoRoot	dyneo.txt	/*:DyNeoRoot*
 :DySpell	dyneo.txt	/*:DySpell*
+:LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
 :YamlSchema	dyneo.txt	/*:YamlSchema*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*
 DyNeo.completion_sources	dyneo.txt	/*DyNeo.completion_sources*

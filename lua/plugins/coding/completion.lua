@@ -187,12 +187,6 @@ return {
           lsp = {
             score_offset = 20,
           },
-          lazydev = {
-            name = 'LazyDev',
-            module = 'lazydev.integrations.blink',
-            -- Above the LSP's own items
-            score_offset = 100,
-          },
           snippets = {
             score_offset = 19,
           },
@@ -201,9 +195,7 @@ return {
           },
         },
         default = function() return require('util.cmp').setup_default_sources() end,
-        per_filetype = {
-          lua = { inherit_defaults = true, 'lazydev' },
-        },
+        per_filetype = {},
       },
       -- No typos allowed, as fzf does; blink's default forgives one for every
       -- four characters typed

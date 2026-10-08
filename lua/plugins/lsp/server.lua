@@ -436,6 +436,7 @@ return {
         end
         if server_opts.enabled == false then
           table.insert(mason_exclude, server)
+          return
         end
         -- Merged into what was set for the server so far, not into its
         -- resolved config: resolving it here would search the runtimepath
@@ -460,6 +461,18 @@ return {
             server = lsp_server
             configure(server, nil, name, language)
           end
+        end
+      end
+
+      -- Servers turned off in `opts.servers` alone, such as `stylua`, which
+      -- Mason installs as a formatter and mason-lspconfig would start as a
+      -- server
+      for server, server_opts in pairs(opts.servers) do
+        if
+          server_opts == false
+          or (type(server_opts) == 'table' and server_opts.enabled == false)
+        then
+          table.insert(mason_exclude, server)
         end
       end
 

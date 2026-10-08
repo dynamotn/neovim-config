@@ -152,6 +152,8 @@ M.cache = {}
 
 --- Add `:DyNeoRoot`, and forget a buffer's root whenever it may have moved
 function M.setup()
+  -- Roots asked for while starting were worked out before any file was read
+  M.cache = {}
   vim.api.nvim_create_user_command(
     'DyNeoRoot',
     function() M.info() end,

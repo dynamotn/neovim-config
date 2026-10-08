@@ -52,6 +52,29 @@ describe('util.format', function()
     )
   end)
 
+  it('adds its commands and the format-on-save autocmd', function()
+    format.setup()
+    local commands = vim.api.nvim_get_commands({})
+    assert.is_not_nil(commands.DyNeoFormat)
+    assert.is_not_nil(commands.DyNeoFormatInfo)
+    assert.equals(1, #vim.api.nvim_get_autocmds({
+      group = 'dyneo_format',
+      event = 'BufWritePre',
+    }))
+  end)
+
+  it('formats only when enabled, unless forced', function()
+    local ran = 0
+    local f = formatter('one', 1, { 'x' })
+    f.format = function() ran = ran + 1 end
+    format.register(f)
+    vim.g.autoformat = false
+    format.format({ buf = 0 })
+    assert.equals(0, ran)
+    format.format({ buf = 0, force = true })
+    assert.equals(1, ran)
+  end)
+
   it('takes the buffer setting over the global one', function()
     assert.is_true(format.enabled())
     vim.g.autoformat = false

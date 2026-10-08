@@ -37,10 +37,6 @@ local function install_agy_acp()
   vim.fn.delete(zip)
 end
 
--- Native inline completions cannot be shown as completion items, so blink
--- shows them as ghost text instead
-vim.g.ai_cmp = false
-
 return {
   {
     -- Copilot with native LSP, its inline suggestions shown as ghost text

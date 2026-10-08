@@ -18,6 +18,9 @@
 -- `keymaps-doc.sh` points at it
 local root = vim.uv.fs_realpath(vim.fn.stdpath('config')) --[[@as string]]
 local output = vim.fs.joinpath(root, 'doc', 'dyneo-keymaps.txt')
+-- Modules may be named by the link or by the tree it points at, depending on
+-- which loader found them
+local roots = { root, vim.fs.normalize(vim.fn.stdpath('config')) }
 
 -- Every plugin, whatever this machine turns off
 package.preload['per_machine'] = function() DyNeo.used_full_plugins = true end
@@ -79,7 +82,13 @@ vim.keymap.set = function(mode, lhs, rhs, opts)
     local info = debug.getinfo(level, 'S')
     if not info then break end
     local source = info.source:gsub('^@', '')
-    local file = source:sub(1, #root) == root and source:sub(#root + 2) or nil
+    local file
+    for _, prefix in ipairs(roots) do
+      if source:sub(1, #prefix + 1) == prefix .. '/' then
+        file = source:sub(#prefix + 2)
+        break
+      end
+    end
     -- lazy.nvim's own `keys` stubs come through `config.lazy`, and the
     -- wrappers of `util.plugin` pass on what they were given
     if

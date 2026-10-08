@@ -9,7 +9,9 @@ return {
     ---@type overseer.TaskDefinition
     return {
       cmd = { 'bash', file },
+      -- `default` sets the status from the exit code
       components = {
+        'default',
         'output',
       },
     }

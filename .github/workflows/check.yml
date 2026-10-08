@@ -72,7 +72,7 @@ jobs:
           ln -s "$GITHUB_WORKSPACE" "$HOME/.config/nvim"
       - name: Choose channel
         if: matrix.channel != 'latest'
-        run: printf "_G.plugin_channel = '%s'\n" "$CHANNEL" > lua/per_machine/config.lua
+        run: printf "DyNeo.plugin_channel = '%s'\n" "$CHANNEL" > lua/per_machine/config.lua
         env:
           CHANNEL: ${{ matrix.channel }}
       # Restored and saved as two steps: `actions/cache` alone only saves when

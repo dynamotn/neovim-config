@@ -46,7 +46,9 @@ return {
       -- `ansible.cfg` is read from the working directory
       cwd = vim.fs.root(file, { 'ansible.cfg', '.git' })
         or vim.fs.dirname(file),
+      -- `default` sets the status from the exit code
       components = {
+        'default',
         'output',
       },
     }

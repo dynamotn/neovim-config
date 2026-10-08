@@ -145,7 +145,7 @@ function M.setup()
   vim.api.nvim_create_user_command(
     'DyNeoFormat',
     function() M.format({ force = true }) end,
-    { desc = 'Format selection or buffer' }
+    { desc = 'Format the buffer' }
   )
   vim.api.nvim_create_user_command(
     'DyNeoFormatInfo',

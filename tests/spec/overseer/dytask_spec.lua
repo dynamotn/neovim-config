@@ -47,7 +47,7 @@ describe('overseer.template.dytask', function()
     it('runs a shell script with bash', function()
       local task = build('bash', 'run.sh')
       assert.are.same({ 'bash', dir .. '/run.sh' }, task.cmd)
-      assert.are.same({ 'output' }, task.components)
+      assert.are.same({ 'default', 'output' }, task.components)
     end)
 
     it('runs a go file with go run', function()
@@ -58,13 +58,14 @@ describe('overseer.template.dytask', function()
     it('compiles C++ before running the executable', function()
       local task = build('cpp', 'main.cpp')
       assert.are.equal(dir .. '/main', task.cmd)
-      local deps = task.components[1]
+      assert.are.equal('default', task.components[1])
+      local deps = task.components[2]
       assert.are.equal('dependencies', deps[1])
       assert.are.same(
         { cmd = 'g++', args = { dir .. '/main.cpp', '-o', dir .. '/main' } },
         deps.task_names[1]
       )
-      assert.are.equal('output', task.components[2])
+      assert.are.equal('output', task.components[3])
     end)
 
     it('runs a playbook with ansible-playbook', function()

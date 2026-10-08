@@ -10,7 +10,9 @@ return {
     ---@type overseer.TaskDefinition
     return {
       cmd = executable,
+      -- `default` sets the status from the exit code
       components = {
+        'default',
         {
           'dependencies',
           task_names = {

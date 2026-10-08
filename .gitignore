@@ -2,5 +2,5 @@
 /.tests/
 
 # The help tags are generated, but committed all the same, so `:help
-# neovim-config` works in a fresh clone. The global ignore drops every `tags`.
+# dyneo` works in a fresh clone. The global ignore drops every `tags`.
 !/doc/tags

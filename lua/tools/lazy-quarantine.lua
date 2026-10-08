@@ -31,7 +31,7 @@ local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 --- in force rather than what was in force when this module first loaded.
 ---@return integer
 function M.window()
-  local configured = DyNeo.quarantine_window
+  local configured = (rawget(_G, 'DyNeo') or {}).quarantine_window
   return type(configured) == 'number' and configured or DEFAULT_WINDOW
 end
 

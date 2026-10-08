@@ -452,10 +452,29 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         it for this session only.
 :YamlSchema reset       Hand detection back the wheel.
                         See |dyneo-schema|.
-:DyNeoFormat            Format the buffer, or the selection.
+
+                                                                *:DyNeoFormat*
+:DyNeoFormat            Format the buffer, whether or not it formats on save.
+                        `<leader>cf` formats the selection in Visual mode.
+
+                                                            *:DyNeoFormatInfo*
 :DyNeoFormatInfo        Which formatters would run, and whether the buffer
-                        formats on save.
+                        formats on save.  `<leader>uf` and `<leader>uF` turn
+                        formatting on save off, globally or for the buffer.
+
+                                                                  *:DyNeoRoot*
 :DyNeoRoot              The roots found for this buffer, the one in use first.
+
+                                                              *:LazyQuarantine*
+:LazyQuarantine         Plugins the release quarantine is holding back, and
+                        for how much longer.  See |dyneo-quarantine|.
+
+                                                  *:AiGuardCheck* *:AiGuardAllow*
+:AiGuardCheck           Why this buffer is kept from the AI integrations.
+:AiGuardAllow[!]        Let this buffer past the content check, for as long
+                        as it is open; with [!], put it back under the check.
+                        Refused for a file the name rules hold back.  See
+                        |dyneo-ai-guard|.
 
 The plugins' own commands are unchanged: `:Lazy`, `:Mason`, `:ConformInfo`,
 and the rest.

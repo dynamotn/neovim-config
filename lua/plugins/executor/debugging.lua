@@ -73,10 +73,8 @@ return {
         })
       end
 
-      -- Read `.vscode/launch.json` with its comments
-      require('dap.ext.vscode').json_decode = function(str)
-        return vim.json.decode(str, { skip_comments = true })
-      end
+      -- Read `.vscode/launch.json` with its comments and trailing commas
+      require('dap.ext.vscode').json_decode = require('util.jsonc').decode
     end,
   },
   {

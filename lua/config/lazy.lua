@@ -28,12 +28,18 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local Plugin = require('util.plugin')
+local try = require('lazy.core.util').try
 -- Hold notifications back until noice has replaced `vim.notify`, so the ones
 -- sent while starting are not lost
 Plugin.lazy_notify()
--- Options and leaders go in ahead of every plugin spec
-require('config.options')
+-- Options and leaders go in ahead of every plugin spec. A mistake in them is
+-- reported, and the plugins still load.
+try(
+  function() require('config.options') end,
+  { msg = 'Failed loading config.options' }
+)
 Plugin.snapshot_options()
+if vim.g.deprecation_warnings == false then vim.deprecate = function() end end
 -- Reaching the system clipboard can take a while, and nothing needs it before
 -- `VeryLazy`
 local clipboard = vim.o.clipboard
@@ -82,6 +88,14 @@ local stale_specs = vim.tbl_map(
 -- `setup`, which installs what is missing as it runs.
 require('tools.lazy-quarantine').setup()
 
+-- The project's own `.nvim` folder, when it is trusted. Worked out here: the
+-- runtimepath lazy.nvim builds has to name it.
+local project_path = nil
+try(
+  function() project_path = require('util.project_rtp').startup_path() end,
+  { msg = 'Failed checking the project .nvim folder' }
+)
+
 -- Setup lazy
 require('lazy').setup({
   spec = {
@@ -120,6 +134,9 @@ require('lazy').setup({
       enabled = true,
     },
     rtp = {
+      -- The project's trusted `.nvim` folder survives the reset, and its
+      -- `plugin/` is sourced with the rest
+      paths = { project_path },
       -- disable some rtp plugins
       disabled_plugins = {
         'gzip',
@@ -153,20 +170,37 @@ require('lazy').setup({
   },
 })
 
--- A colorscheme that fails to load leaves the built-in one
+-- Follow the project's `.nvim` folder as the working directory moves
+try(
+  function() require('util.project_rtp').setup() end,
+  { msg = 'Failed following the project .nvim folder' }
+)
+
+-- A colorscheme that fails to load (not cloned yet, held back by the
+-- quarantine) leaves a built-in one rather than stopping startup here
 if not pcall(vim.cmd.colorscheme, defaults.colorscheme) then
-  vim.cmd.colorscheme('catppuccin')
+  Plugin.warn(
+    ('Colorscheme `%s` not found, using `habamax`'):format(defaults.colorscheme)
+  )
+  vim.cmd.colorscheme('habamax')
 end
 
 -- Opening files from the command line needs the autocmds from the start;
 -- otherwise they wait with the keymaps for `VeryLazy`
 local lazy_autocmds = vim.fn.argc(-1) == 0
-if not lazy_autocmds then require('config.autocmds') end
+local function load(name)
+  try(function() require(name) end, { msg = 'Failed loading ' .. name })
+end
+if not lazy_autocmds then load('config.autocmds') end
 Plugin.on_very_lazy(function()
-  if lazy_autocmds then require('config.autocmds') end
-  require('config.keymaps')
+  -- The clipboard and the helpers first, so a mistake in the keymaps cannot
+  -- take format-on-save and the clipboard down with it
   vim.o.clipboard = clipboard
   require('util.format').setup()
   require('util.root').setup()
   require('util.rename').setup()
+  if lazy_autocmds then load('config.autocmds') end
+  load('config.keymaps')
+  -- Spec fields of this configuration's own, for `:checkhealth lazy`
+  vim.list_extend(require('lazy.health').valid, { 'vscode' })
 end)

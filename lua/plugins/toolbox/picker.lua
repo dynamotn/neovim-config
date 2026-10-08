@@ -1,15 +1,5 @@
 local pick = require('util.pick')
 
--- With the `gh` CLI, Octo takes these keys over (`plugins.toolbox.git`)
--- stylua: ignore
-local gh_keys = vim.fn.executable('gh') == 1 and {}
-  or {
-    { '<leader>gi', function() Snacks.picker.gh_issue() end, desc = 'GitHub Issues (open)' },
-    { '<leader>gI', function() Snacks.picker.gh_issue({ state = 'all' }) end, desc = 'GitHub Issues (all)' },
-    { '<leader>gp', function() Snacks.picker.gh_pr() end, desc = 'GitHub Pull Requests (open)' },
-    { '<leader>gP', function() Snacks.picker.gh_pr({ state = 'all' }) end, desc = 'GitHub Pull Requests (all)' },
-  }
-
 return {
   {
     -- Picker for files, grep, git, LSP and most lists of Neovim
@@ -70,7 +60,7 @@ return {
       explorer = {},
     },
     -- stylua: ignore
-    keys = vim.list_extend({
+    keys = {
       { '<leader>,', function() Snacks.picker.buffers() end, desc = 'Buffers' },
       { '<leader>/', pick('grep'), desc = 'Grep (Root Dir)' },
       { '<leader>:', function() Snacks.picker.command_history() end, desc = 'Command History' },
@@ -125,7 +115,7 @@ return {
       { '<leader>su', function() Snacks.picker.undo() end, desc = 'Undotree' },
       -- ui
       { '<leader>uC', function() Snacks.picker.colorschemes() end, desc = 'Colorschemes' },
-    }, gh_keys),
+    },
   },
   {
     -- LSP lists through the picker, for every server

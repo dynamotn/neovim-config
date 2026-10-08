@@ -390,6 +390,7 @@ one of the same keys in those buffers.
 `<leader>uI`           n      Inspect Tree
 `<leader>uK`           n      Toggle Camouflage Reveal Under Cursor
 `<leader>uL`           n      Toggle Relative Number
+`<leader>uN`           n      Toggle Sidekick NES
 `<leader>uS`           n      Toggle Smooth Scroll
 `<leader>uT`           n      Toggle Treesitter Highlight
 `<leader>uZ`           n      Toggle Zoom Mode
@@ -526,6 +527,29 @@ g  goto
 `gP`                   nx     Put Text Before Selection
 `gR`                   n      File References  (LSP: vtsls)
 `gS`                   n      Split or join block
+`g[`                   nox    Move to left "around"
+`g]`                   nox    Move to right "around"
+`gaC`                  n      LSP rename toCamelCase
+`gaD`                  n      LSP rename to-dash-case
+`gaL`                  n      LSP rename to lower case
+`gaN`                  n      LSP rename TO_CONSTANT_CASE
+`gaP`                  n      LSP rename ToPascalCase
+`gaS`                  n      LSP rename to_snake_case
+`gaU`                  n      LSP rename TO UPPER CASE
+`gac`                  nx     Convert toCamelCase
+`gad`                  nx     Convert to-dash-case
+`gal`                  nx     Convert to lower case
+`gan`                  nx     Convert TO_CONSTANT_CASE
+`gaoc`                 n      toCamelCase
+`gaod`                 n      to-dash-case
+`gaol`                 n      to lower case
+`gaon`                 n      TO_CONSTANT_CASE
+`gaop`                 n      ToPascalCase
+`gaos`                 n      to_snake_case
+`gaou`                 n      TO UPPER CASE
+`gap`                  nx     Convert ToPascalCase
+`gas`                  nx     Convert to_snake_case
+`gau`                  nx     Convert TO UPPER CASE
 `gcO`                  n      Add Comment Above
 `gco`                  n      Add Comment Below
 `gd`                   n      Goto Definition  (LSP)
@@ -625,11 +649,17 @@ Other keys
 `R`                    ox     Treesitter Search
 `S`                    nox    Flash Treesitter
 `X`                    nv     Smart delete
+`a`                    ox     Around textobject
+`al`                   ox     Around last textobject
+`an`                   ox     Around next textobject
 `b`                    nox    Previous subword
 `c`                    nv     Smart delete
 `cw`                   n      Change to end of subword
 `d`                    nv     Smart delete
 `e`                    nox    End of subword
+`i`                    ox     Inside textobject
+`il`                   ox     Inside last textobject
+`in`                   ox     Inside next textobject
 `j`                    nx     Down
 `k`                    nx     Up
 `n`                    nox    Next Search Result
