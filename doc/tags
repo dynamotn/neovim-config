@@ -4,6 +4,7 @@
 :DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
 :DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
 :DyNeoRoot	dyneo.txt	/*:DyNeoRoot*
+:DySbom	dyneo.txt	/*:DySbom*
 :DySpell	dyneo.txt	/*:DySpell*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
 :YamlSchema	dyneo.txt	/*:YamlSchema*

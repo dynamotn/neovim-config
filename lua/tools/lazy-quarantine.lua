@@ -240,13 +240,97 @@ function M.held(now)
   return rows
 end
 
---- `:LazyQuarantine`
+---@class DyPendingUpdate
+---@field name string
+---@field dir string
+---@field from string The commit checked out
+---@field to string The commit lazy.nvim would update to
+---@field held boolean Whether the quarantine is holding it back
+---@field clears integer Seconds until it no longer is
+
+--- Every plugin whose checkout is behind what lazy.nvim would update it to
+---
+--- Held back or not: a commit out of quarantine lands on the next `:Lazy
+--- update` as unread as one still in it, so `:LazyQuarantine review` reads
+--- both. `to` is lazy.nvim's own target, not the window's -- the review is
+--- of everything on its way, before the window lets it through.
+---@param now? integer Seconds since the epoch, for the specs
+---@return DyPendingUpdate[]
+function M.pending(now)
+  now = now or os.time()
+  if not resolve then return {} end
+  local ok_config, Config = pcall(require, 'lazy.core.config')
+  if not ok_config then return {} end
+
+  ---@type DyPendingUpdate[]
+  local rows = {}
+  for name, plugin in pairs(Config.plugins or {}) do
+    local state = plugin._ or {}
+    if state.installed and not state.is_local then
+      local ok, target = pcall(resolve, plugin)
+      local head = ok
+        and target
+        and target.commit
+        and git(plugin.dir, { 'rev-parse', 'HEAD' })
+      if head and head ~= target.commit then
+        local held = M.target(plugin, target, releases_of(plugin), now)
+        local committed = committed_at(plugin.dir, target.commit) or now
+        table.insert(rows, {
+          name = name,
+          dir = plugin.dir,
+          from = head,
+          to = target.commit,
+          held = held ~= nil and held.commit ~= target.commit,
+          clears = math.max(0, math.floor(committed + M.window() - now + 0.5)),
+        })
+      end
+    end
+  end
+  table.sort(rows, function(a, b) return a.name < b.name end)
+  return rows
+end
+
+--- What `:LazyQuarantine` completes its first argument with
+local SUBCOMMANDS = { 'review' }
+
+--- What `:LazyQuarantine` completes the word being typed with
+---@param line string The command line so far
+---@return string[]
+local function complete(_, line)
+  local words = vim.split(line, '%s+', { trimempty = true })
+  -- The word being typed counts once something of it is there
+  local done = #words - (line:sub(-1) == ' ' and 0 or 1)
+  if done <= 1 then return SUBCOMMANDS end
+  if words[2] == 'review' and done == 2 then
+    local ok, Config = pcall(require, 'lazy.core.config')
+    local names = ok and vim.tbl_keys(Config.plugins or {}) or {}
+    table.sort(names)
+    return names
+  end
+  return {}
+end
+
+--- `:LazyQuarantine`, and `:LazyQuarantine review [{plugin}]`
 ---
 --- The window is otherwise invisible: `:Lazy` shows a plugin as up to date
 --- when it is a week behind on purpose, and nothing says which plugins those
---- are or how long is left.
+--- are or how long is left. `review` reads what the updates on their way
+--- would bring in, see `tools.plugin-review`.
 function M.command()
-  vim.api.nvim_create_user_command('LazyQuarantine', function()
+  vim.api.nvim_create_user_command('LazyQuarantine', function(args)
+    if args.fargs[1] == 'review' then
+      return require('tools.plugin-review').show(
+        M.pending(),
+        M.window(),
+        args.fargs[2]
+      )
+    elseif args.fargs[1] then
+      return vim.notify(
+        'Unknown subcommand: ' .. args.fargs[1],
+        vim.log.levels.ERROR,
+        { title = 'Quarantine' }
+      )
+    end
     local rows = M.held()
     if #rows == 0 then
       return vim.notify(
@@ -272,7 +356,12 @@ function M.command()
       vim.log.levels.INFO,
       { title = 'Quarantine' }
     )
-  end, { desc = 'Plugins the release quarantine is holding back' })
+  end, {
+    nargs = '*',
+    complete = complete,
+    desc = 'Plugins the release quarantine is holding back, or a review of '
+      .. 'what the updates bring',
+  })
 end
 
 --- Put the window in front of lazy.nvim's target resolution

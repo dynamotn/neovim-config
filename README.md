@@ -394,6 +394,24 @@ long is left. It asks git once per plugin, about a second for the whole set.
 `:checkhealth dyneo` answers the other half, whether the window is in place at
 all.
 
+A week of waiting only helps if someone looks, so `:LazyQuarantine review`
+reads every update on its way, held or already through: the commits each
+plugin would move across, and the lines they add that do what a plugin rarely
+needs to and an attacker always does — start a process, load code at runtime,
+reach the network, touch a credential, delete files, carry an encoded blob,
+change the build, add a binary. Prose, CI and tests are left out, since none
+of it runs in the editor, and a flag raised many times in one file is said
+once. `<CR>` on a plugin opens its full diff. A flag is a reason to read the
+diff, not a verdict ([lua/tools/plugin-review.lua](./lua/tools/plugin-review.lua)).
+
+What is already installed is the other half of the supply chain. `:DySbom`
+lists the plugins at their lockfile commits and the Mason packages at the
+versions of their receipts as a CycloneDX 1.5 document — shown, or written to
+a path given — and `:DySbom osv` asks [OSV](https://osv.dev) about all of them
+in one request: a package by its purl, a plugin by its commit. That request
+carries the names, versions and commits and nothing else of the machine
+([lua/tools/sbom.lua](./lua/tools/sbom.lua)).
+
 ### Files that never reach an AI
 
 A language server is handed the whole text of every buffer it attaches to,
@@ -597,6 +615,8 @@ ones worth knowing before which-key gets a chance to tell you:
 | ------- | ---- |
 | `:DySpell {lang}` | Rebuild a spell file from its word lists |
 | `:LazyQuarantine` | Plugins the release quarantine is holding back, and for how much longer |
+| `:LazyQuarantine review [{plugin}]` | What the updates on their way bring in, flagged; or the full diff of one plugin |
+| `:DySbom [{path}]`, `:DySbom osv` | Plugins and Mason packages as a CycloneDX SBOM; the vulnerabilities OSV knows in them |
 | `:AiGuardCheck`, `:AiGuardAllow[!]` | Why this buffer is kept from the AI integrations, the way past the content check, and the way back |
 | `:AiGuardLog[!]` | What the AI integrations were handed or refused: paths and times, never the text |
 | `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |

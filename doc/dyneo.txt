@@ -316,6 +316,20 @@ commit for commit, and a pinned plugin stays where it is.  A repository
 younger than the window is installed as lazy.nvim resolved it, since the
 alternative is not installing it at all.
 
+A week of waiting only helps if someone looks.  |:LazyQuarantine| `review`
+reads every update on its way, held or already through: the commits each
+plugin would move across, and the lines they add that start a process, load
+code at runtime, reach the network, touch a credential, delete files, carry an
+encoded blob, change the build or add a binary.  Prose, CI and tests are left
+out, and a flag raised many times in one file is said once.  A flag is a
+reason to read the diff, not a verdict.
+
+What is already installed is the other half.  |:DySbom| lists the plugins at
+their lockfile commits and the Mason packages at the versions of their
+receipts as a CycloneDX 1.5 document, and `:DySbom osv` asks OSV
+(https://osv.dev) about them in one request -- names, versions and commits,
+nothing else of the machine.
+
 5.3 Files kept from AI                                        *dyneo-ai-guard*
 
 A language server is handed the whole text of every buffer it attaches to,
@@ -489,6 +503,18 @@ Command-line abbreviations, which only fire as a whole command line, so a
                                                              *:LazyQuarantine*
 :LazyQuarantine         Plugins the release quarantine is holding back, and
                         for how much longer.  See |dyneo-quarantine|.
+:LazyQuarantine review  Every update on its way, held or not: its commits,
+                        and the lines it adds flagged.  `<CR>` on a plugin
+                        opens its diff.
+:LazyQuarantine review {plugin}
+                        The full diff of the update of {plugin}.
+
+                                                                     *:DySbom*
+:DySbom [{path}]        The plugins and Mason packages installed, as a
+                        CycloneDX 1.5 SBOM: shown in a tab, or written to
+                        {path}.
+:DySbom osv             Ask OSV about every one of them, and list the known
+                        vulnerabilities.  See |dyneo-quarantine|.
 
                                                *:AiGuardCheck* *:AiGuardAllow*
 :AiGuardCheck           Why this buffer is kept from the AI integrations.

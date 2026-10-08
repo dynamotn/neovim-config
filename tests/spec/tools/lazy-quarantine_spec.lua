@@ -287,6 +287,123 @@ describe('tools.lazy-quarantine', function()
     end)
   end)
 
+  describe('pending', function()
+    local Config, Git, restore_plugins, restore_target
+
+    before_each(function()
+      Config = require('lazy.core.config')
+      Git = require('lazy.manage.git')
+      restore_plugins = h.stub(Config, 'plugins', {})
+      restore_target = h.stub(Git, 'get_target', Git.get_target)
+    end)
+    after_each(function()
+      restore_plugins()
+      restore_target()
+      h.unload('tools.lazy-quarantine')
+    end)
+
+    --- Set the quarantine up over a lazy.nvim resolving every plugin to
+    --- `commit` of branch `main`
+    ---@param commit string
+    local function resolving_to(commit)
+      Git.get_target = function() return { branch = 'main', commit = commit } end
+      h.unload('tools.lazy-quarantine')
+      require('tools.lazy-quarantine').setup()
+    end
+
+    it('lists a plugin behind its target, held or not', function()
+      local dir, commits, cleanup = repository({ 30 * DAY, 8 * DAY, 2 * DAY })
+      git(dir, { 'checkout', '--quiet', '--detach', commits[1] })
+      Config.plugins = {
+        ['spec.nvim'] = {
+          name = 'spec.nvim',
+          dir = dir,
+          _ = { installed = true },
+        },
+      }
+
+      resolving_to(commits[3])
+      local rows = require('tools.lazy-quarantine').pending(now)
+      assert.are.equal(1, #rows)
+      assert.are.same({
+        name = 'spec.nvim',
+        dir = dir,
+        from = commits[1],
+        to = commits[3],
+        held = true,
+      }, {
+        name = rows[1].name,
+        dir = rows[1].dir,
+        from = rows[1].from,
+        to = rows[1].to,
+        held = rows[1].held,
+      })
+      assert.are.equal(5, math.floor(rows[1].clears / DAY))
+
+      resolving_to(commits[2])
+      rows = require('tools.lazy-quarantine').pending(now)
+      cleanup()
+      assert.is_false(rows[1].held)
+      assert.are.equal(0, rows[1].clears)
+    end)
+
+    it('leaves out a plugin already on its target', function()
+      local dir, commits, cleanup = repository({ 30 * DAY, 2 * DAY })
+      Config.plugins = {
+        ['spec.nvim'] = {
+          name = 'spec.nvim',
+          dir = dir,
+          _ = { installed = true },
+        },
+      }
+      resolving_to(commits[2])
+      local rows = require('tools.lazy-quarantine').pending(now)
+      cleanup()
+      assert.are.same({}, rows)
+    end)
+  end)
+
+  describe(':LazyQuarantine', function()
+    after_each(function()
+      pcall(vim.api.nvim_del_user_command, 'LazyQuarantine')
+      h.unload('tools.lazy-quarantine', 'tools.plugin-review')
+    end)
+
+    it('completes its subcommand, then the plugin to review', function()
+      h.unload('tools.lazy-quarantine')
+      require('tools.lazy-quarantine').command()
+      local Config = require('lazy.core.config')
+      local restore = h.stub(Config, 'plugins', {
+        ['b.nvim'] = {},
+        ['a.nvim'] = {},
+      })
+      assert.are.same(
+        { 'review' },
+        vim.fn.getcompletion('LazyQuarantine ', 'cmdline')
+      )
+      assert.are.same(
+        { 'a.nvim', 'b.nvim' },
+        vim.fn.getcompletion('LazyQuarantine review ', 'cmdline')
+      )
+      restore()
+    end)
+
+    it('hands review its plugin', function()
+      h.unload('tools.lazy-quarantine', 'tools.plugin-review')
+      local review = require('tools.plugin-review')
+      local shown
+      local restore = h.stub(
+        review,
+        'show',
+        function(rows, window, name) shown = { rows, window, name } end
+      )
+      require('tools.lazy-quarantine').command()
+      vim.cmd('LazyQuarantine review spec.nvim')
+      restore()
+      assert.are.same({ {}, 7 * DAY, 'spec.nvim' }, shown)
+    end)
+  end)
+
   it('copes with a directory that is not a repository', function()
     local dir, cleanup = h.tmpdir()
     local picked = target(dir, 'deadbeef')
