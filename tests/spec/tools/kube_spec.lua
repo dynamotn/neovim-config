@@ -176,8 +176,22 @@ describe('tools.kube', function()
       assert.equals('stdin: kind: Service', calls[3])
     end)
 
+    --- A kubectl whose context is `prod-cluster`, namespace `web`
+    local function kubectl()
+      h.write(dir .. '/bin/kubectl', {
+        '#!/bin/sh',
+        'echo "kubectl $*" >> "' .. log .. '"',
+        'case "$*" in',
+        '  *current-context*) echo prod-cluster ;;',
+        '  *jsonpath*) echo web ;;',
+        '  *) echo applied ;;',
+        'esac',
+      })
+      vim.fn.setfperm(dir .. '/bin/kubectl', 'rwxr-xr-x')
+    end
+
     it('applies only once told to, naming the context', function()
-      fake('kubectl', 'prod-cluster', 0)
+      kubectl()
       vim.cmd.edit(dir .. '/app/deploy.yaml')
       local asked
       local restore = h.stub(vim.fn, 'confirm', function(msg)
@@ -186,8 +200,46 @@ describe('tools.kube', function()
       end)
       kube.apply()
       restore()
-      assert.equals('Apply deploy.yaml to context prod-cluster?', asked)
-      assert.same({ 'kubectl config current-context' }, logged())
+      assert.equals(
+        'Apply deploy.yaml to context prod-cluster, namespace web by default?',
+        asked
+      )
+      assert.is_nil(
+        vim
+          .iter(logged())
+          :find(function(l) return l:find(' apply', 1, true) end)
+      )
+    end)
+
+    it('applies to the context it named, whatever comes after', function()
+      kubectl()
+      vim.cmd.edit(dir .. '/app/deploy.yaml')
+      local restore = h.stub(vim.fn, 'confirm', function() return 1 end)
+      kube.apply()
+      restore()
+      settle(1)
+      assert.equals(
+        'kubectl --context=prod-cluster apply -f ' .. dir .. '/app/deploy.yaml',
+        logged()[#logged()]
+      )
+    end)
+
+    it('applies no chart with kubectl', function()
+      kubectl()
+      vim.cmd.edit(dir .. '/chart/templates/svc.yaml')
+      kube.apply()
+      assert.is_truthy(notes[1]:find('helm upgrade', 1, true))
+      assert.equals(0, vim.fn.filereadable(log))
+    end)
+
+    it('acts on no buffer with changes not written', function()
+      kubectl()
+      vim.cmd.edit(dir .. '/app/deploy.yaml')
+      vim.api.nvim_buf_set_lines(0, 0, 1, false, { 'kind: Changed' })
+      kube.diff()
+      kube.apply()
+      assert.is_truthy(notes[1]:find('Write the buffer first', 1, true))
+      assert.equals(0, vim.fn.filereadable(log))
     end)
   end)
 end)

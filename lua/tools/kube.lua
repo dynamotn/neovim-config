@@ -150,11 +150,21 @@ local function show(text, filetype, name)
 end
 
 --- The target of the current buffer, or nil when it holds no file
+---
+--- kubectl and helm read the file on disk: a buffer with changes not yet
+--- written would be judged, or applied, by what it no longer says.
 ---@return DyKubeTarget?
 local function current()
   local file = vim.api.nvim_buf_get_name(0)
   if file == '' then
     notify('This buffer holds no file', vim.log.levels.WARN)
+    return nil
+  end
+  if vim.bo.modified then
+    notify(
+      'Write the buffer first: kubectl reads the file on disk',
+      vim.log.levels.WARN
+    )
     return nil
   end
   return M.target(file)
@@ -222,20 +232,54 @@ function M.current_context()
   return context ~= '' and context or nil
 end
 
---- Apply it, once told to, to the context named
+--- The namespace the current context puts an object without one in
+---@return string
+function M.current_namespace()
+  local result = vim
+    .system({
+      'kubectl',
+      'config',
+      'view',
+      '--minify',
+      '-o',
+      'jsonpath={..namespace}',
+    }, { text = true })
+    :wait(5000)
+  local namespace = result.code == 0 and vim.trim(result.stdout or '') or ''
+  return namespace ~= '' and namespace or 'default'
+end
+
+--- Apply it, once told to, to the context named -- and to that one only,
+--- however the current context changes in the meantime
 function M.apply()
   local target = current()
   if not target then return end
-  local context = M.current_context() or '(no context)'
+  if target.kind == 'helm' then
+    -- `kubectl apply` of a render creates the objects outside of Helm, under
+    -- a release name guessed from the directory: the next `helm upgrade`
+    -- then fails on their ownership
+    return notify(
+      'A chart is applied with `helm upgrade`, not kubectl',
+      vim.log.levels.WARN
+    )
+  end
+  local context = M.current_context()
+  if not context then
+    return notify('No current kubectl context', vim.log.levels.ERROR)
+  end
   local answer = vim.fn.confirm(
-    ('Apply %s to context %s?'):format(vim.fs.basename(target.file), context),
+    ('Apply %s to context %s, namespace %s by default?'):format(
+      vim.fs.basename(target.file),
+      context,
+      M.current_namespace()
+    ),
     '&Apply\n&Cancel',
     2
   )
   if answer ~= 1 then return end
   rendered(target, function(stdin)
     run(
-      M.kubectl_command({ 'apply' }, target),
+      M.kubectl_command({ '--context=' .. context, 'apply' }, target),
       target.dir,
       stdin,
       function(result)
