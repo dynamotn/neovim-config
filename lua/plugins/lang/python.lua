@@ -32,16 +32,18 @@ return vim.list_contains(_G.enabled_languages, 'python')
               desc = 'Debug Class',
             },
           },
-          config = function()
-            local registry = require('mason-registry')
-            local dap_mapping = require('mason-nvim-dap.mappings.source')
-            if
-              registry.is_installed(dap_mapping.nvim_dap_to_package['python'])
-            then
-              require('dap-python').setup('debugpy-adapter')
-            end
-          end,
+          -- `debugpy-adapter` is looked up on `$PATH` as a session starts, so
+          -- this holds before Mason has installed it too
+          config = function() require('dap-python').setup('debugpy-adapter') end,
         },
+      },
+      {
+        -- The adapter is nvim-dap-python's, which finds the project's own
+        -- interpreter; mason-nvim-dap's would replace it with one that runs
+        -- under debugpy's venv, and list its configurations a second time
+        'jay-babu/mason-nvim-dap.nvim',
+        optional = true,
+        opts = { handlers = { python = function() end } },
       },
       {
         -- Test adapter
