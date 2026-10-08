@@ -157,7 +157,7 @@ describe('config.keymaps', function()
     it('expands a whole command', function()
       assert.are.equal('w', expand('W', ':', 'W'))
       assert.are.equal('wq', expand('WQ', ':', 'WQ'))
-      assert.are.equal('w ! sudo tee % > /dev/null', expand('ww', ':', 'ww'))
+      assert.are.equal('SudoWrite', expand('ww', ':', 'ww'))
     end)
 
     it('leaves the word inside a longer command', function()
@@ -169,6 +169,30 @@ describe('config.keymaps', function()
       'leaves a search alone',
       function() assert.are.equal('ww', expand('ww', '/', 'ww')) end
     )
+  end)
+
+  it('writes through sudo into the file, leaving it unmodified', function()
+    local dir, cleanup = h.tmpdir()
+    local target = dir .. '/root-owned.conf'
+    vim.fn.writefile({ 'old' }, target)
+    local restore_job = h.stub(vim.fn, 'jobstart', function(cmd, opts)
+      assert.are.equal('sudo', cmd[1])
+      -- Stands in for `sudo cp`
+      vim.fn.writefile(vim.fn.readfile(cmd[3]), cmd[4])
+      opts.on_exit(0, 0)
+      return 1
+    end)
+    vim.cmd.edit(target)
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { 'new' })
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.cmd('SudoWrite')
+    vim.cmd.stopinsert()
+    vim.wait(500, function() return not vim.bo[bufnr].modified end)
+    restore_job()
+    assert.are.same({ 'new' }, vim.fn.readfile(target))
+    assert.is_false(vim.bo[bufnr].modified)
+    vim.cmd('silent! %bwipeout!')
+    cleanup()
   end)
 
   it('leaves a key claimed by a plugin spec to it', function()
