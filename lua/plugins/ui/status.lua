@@ -76,7 +76,7 @@ return {
             },
             -- stylua: ignore
             {
-              function() return '  ' .. require('dap').status() end,
+              function() return '  ' .. require('dap').status() end,
               cond = function() return package.loaded['dap'] and require('dap').status() ~= '' end,
               color = function() return { fg = Snacks.util.color('Debug') } end,
             },
@@ -110,7 +110,7 @@ return {
             { 'location', padding = { left = 0, right = 1 } },
           },
           lualine_z = {
-            function() return ' ' .. os.date('%R') end,
+            function() return ' ' .. os.date('%R') end,
           },
         },
         extensions = { 'neo-tree', 'lazy', 'fzf' },
