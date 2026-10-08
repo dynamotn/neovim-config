@@ -112,7 +112,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
             local mason_registry = require('mason-registry')
             if
               opts.dap
-              and LazyVim.has('mfussenegger/nvim-dap')
+              and LazyVim.has('nvim-dap')
               and mason_registry.is_installed('java-debug-adapter')
             then
               bundles = vim.fn.glob(
@@ -226,7 +226,7 @@ return vim.list_contains(_G.enabled_languages, 'java')
                   local mason_registry = require('mason-registry')
                   if
                     opts.dap
-                    and LazyVim.has('mfussenegger/nvim-dap')
+                    and LazyVim.has('nvim-dap')
                     and mason_registry.is_installed('java-debug-adapter')
                   then
                     -- custom init for Java debugger

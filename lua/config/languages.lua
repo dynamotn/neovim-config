@@ -811,7 +811,8 @@ return {
     -- `jdtls` can format, but only after a project is imported and its
     -- settings resolved; a formatter works on the buffer from the start.
     formatters = { 'google-java-format' },
-    dap = { 'javadbg' },
+    -- `java-test` is a bundle nvim-jdtls hands jdtls, for the test keys
+    dap = { 'javadbg', 'javatest' },
     test = { 'neotest-java' },
     dial = function(augend)
       return {
@@ -1097,6 +1098,8 @@ return {
     lsp_servers = { 'ruby_lsp', 'harper_ls' },
     linters = { 'rubocop' },
     formatters = { 'rubocop' },
+    -- nvim-dap-ruby brings the adapter; `rdbg` is the debugger it runs
+    dap = { { 'ruby', mason = { package = 'rdbg' } } },
     test = { 'neotest-rspec', 'vim-test' },
     endwise = true,
   },
