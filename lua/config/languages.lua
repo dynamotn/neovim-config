@@ -53,11 +53,13 @@
 --- is `executable()`, so `lua` still asks for an interpreter on `$PATH`; only
 --- the tools of `*`, and conform's `injected`, are handed out without asking.
 ---
---- A tool Mason has no package for -- one that ships with the language's
---- toolchain (`mix`, `zig`, `dart`), with the system (`clang-tidy`), or from
---- a package manager Mason does not speak (CPAN) -- still names a package:
---- one of `tools.mason-registry` whose source is `dytoy:<tool>`, so dytoy
---- installs it the way it does on the rest of the machine.
+--- A tool Mason has no package for still names a package, one of
+--- `tools.mason-registry`. It is built from a release or a language registry
+--- where one exists, and otherwise -- a tool that ships with the language's
+--- toolchain (`mix`, `zig`, `dart`), with the system (`clang-tidy`), or from a
+--- package manager Mason does not speak (CPAN) -- its source is
+--- `dytoy:<tool>`, so dytoy installs it the way it does on the rest of the
+--- machine.
 ---
 --- `mason.enabled = false` is left for what nothing needs to install: a tool
 --- that runs inside Neovim (`lua`) or a command every system has (`sed`,

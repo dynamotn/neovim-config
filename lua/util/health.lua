@@ -306,8 +306,8 @@ end
 ---
 --- `mason.enabled = false` is left for a command every system is expected to
 --- have (`sed`, `git`, `curl`) or one that runs inside Neovim (`lua`): a tool
---- Mason lacks is a `dytoy:<tool>` package of `tools.mason-registry` instead,
---- and is installed like any other. A missing one is not an error -- the
+--- Mason lacks is a package of `tools.mason-registry` instead, handed to
+--- dytoy when nothing else ships it, and is installed like any other. A missing one is not an error -- the
 --- formatter or linter is simply skipped -- so it is reported as what it is: a
 --- command this machine does not have.
 ---@return DyHealthEntry[]
