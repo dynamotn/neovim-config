@@ -85,7 +85,11 @@ describe('tools.runbook', function()
   )
 
   it('asks before what deletes, destroys or reaches for root', function()
-    assert.equals('sudo', runbook.danger('sudo systemctl restart x'))
+    -- The line it found, to show in the question
+    assert.equals(
+      'sudo systemctl restart x',
+      runbook.danger('sudo systemctl restart x')
+    )
     assert.is_truthy(runbook.danger('rm -rf ./build'))
     assert.is_truthy(runbook.danger('kubectl delete pod web-0'))
     assert.is_truthy(runbook.danger('tofu destroy -auto-approve'))
@@ -93,6 +97,25 @@ describe('tools.runbook', function()
     assert.is_truthy(runbook.danger('psql -c "drop table users"'))
     assert.is_nil(runbook.danger('kubectl get pods'))
     assert.is_nil(runbook.danger('echo pseudo; firmware'))
+    -- Flags before the verb, other spellings, other cases
+    for _, code in ipairs({
+      'kubectl -n prod delete pod web-0',
+      'kubectl --context prod delete ns app',
+      'rm --recursive --force /srv/data',
+      'helm -n app uninstall web',
+      'terraform -chdir=infra destroy -auto-approve',
+      'terraform apply -destroy',
+      'git push origin +main',
+      'psql -c "DELETE FROM users"',
+      'TRUNCATE users;',
+      'find /var/data -delete',
+      'kubectl scale deploy/web --replicas=0',
+      'echo ok\nsudo reboot',
+    }) do
+      assert.is_truthy(runbook.danger(code), code)
+    end
+    assert.is_nil(runbook.danger('kubectl scale deploy/web --replicas=10'))
+    assert.is_nil(runbook.danger('git push origin main'))
   end)
 
   describe('output', function()
@@ -147,6 +170,8 @@ describe('tools.runbook', function()
     local function buffer(lines)
       local bufnr = h.buffer({ name = dir .. '/runbook.md', lines = lines })
       vim.api.nvim_set_current_buf(bufnr)
+      -- Agreed to already, as `allowed` asks the first time
+      vim.b[bufnr].dy_runbook_allowed = true
       return bufnr
     end
 
@@ -206,8 +231,10 @@ describe('tools.runbook', function()
         'notify',
         function(msg) table.insert(notes, msg) end
       )
+      local restore_confirm = h.stub(vim.fn, 'confirm', function() return 1 end)
       runbook.run_all()
       settle(function() return #notes > 0 end)
+      restore_confirm()
       restore()
       local text =
         table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), '\n')
@@ -242,6 +269,51 @@ describe('tools.runbook', function()
       restore()
       assert.is_false(finished)
       assert.equals(3, vim.api.nvim_buf_line_count(bufnr))
+    end)
+
+    it('asks once before running the blocks of a file', function()
+      local bufnr = buffer({ '```sh', 'echo hi', '```' })
+      vim.b[bufnr].dy_runbook_allowed = nil
+      local asked = 0
+      local restore = h.stub(vim.fn, 'confirm', function()
+        asked = asked + 1
+        return 2
+      end)
+      local finished
+      runbook.run_block(
+        bufnr,
+        runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2),
+        function(ok) finished = ok end
+      )
+      restore()
+      assert.equals(1, asked)
+      assert.is_false(finished)
+      assert.equals(3, vim.api.nvim_buf_line_count(bufnr))
+    end)
+
+    it('runs nothing of a buffer that is no file', function()
+      local bufnr = h.buffer({ lines = { '```sh', 'echo hi', '```' } })
+      vim.bo[bufnr].buftype = 'nofile'
+      assert.is_false(runbook.allowed(bufnr))
+    end)
+
+    it('stops what a block started, not only its shell', function()
+      local bufnr = buffer({ '```sh', 'sleep 30 &', 'sleep 30', '```' })
+      local finished
+      runbook.run_block(
+        bufnr,
+        runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2),
+        function(ok) finished = ok end
+      )
+      vim.wait(200)
+      runbook.stop()
+      settle(function() return finished ~= nil end)
+      assert.is_false(finished)
+    end)
+
+    it('does not take a line opening with inline code for a fence', function()
+      local lines = { '```js``` is inline', 'text', '```sh', 'ls', '```' }
+      assert.equals('sh', runbook.block_at(lines, 4).lang)
     end)
 
     it('sets its mappings on a buffer', function()

@@ -8,8 +8,10 @@
 --- fence, replaced on the next run, so the file is the record of what was
 --- done and what came back.
 ---
---- A block that deletes, destroys or reaches for root asks first: a runbook
---- is read in a hurry, and `<localleader>r` is a short key.
+--- A file is asked about once before any of its blocks runs: Markdown is
+--- also the README of a repository just cloned, whose blocks are somebody
+--- else's commands. A block that deletes, destroys or reaches for root asks
+--- again: a runbook is read in a hurry, and `<localleader>r` is a short key.
 local M = {}
 
 --- The command a block of each language runs with, its code appended
@@ -30,23 +32,36 @@ M.RUNNERS = {
 --- Milliseconds a block may run before it is stopped
 M.TIMEOUT = 5 * 60 * 1000
 
---- What a block is asked about before it runs, by Lua pattern
+--- What a block is asked about before it runs, by Lua pattern, matched
+--- against each line in lower case. Flags may come before the verb
+--- (`kubectl -n prod delete`), so the verb is looked for anywhere after the
+--- command on its line.
 M.DANGEROUS = {
   '%f[%w]sudo%f[%W]',
-  '%f[%w]rm%s+%-%a*[rRf]',
+  '%f[%w]doas%f[%W]',
+  '%f[%w]rm%f[%W].-%s%-%a*[rf]',
+  '%f[%w]rm%f[%W].-%-%-recursive',
+  '%f[%w]rm%f[%W].-%-%-force',
   '%f[%w]mkfs',
-  '%f[%w]dd%s+if=',
-  'kubectl%s+delete',
-  'kubectl%s+drain',
-  'helm%s+uninstall',
-  'terraform%s+destroy',
-  'tofu%s+destroy',
-  'terragrunt%s+destroy',
-  'git%s+push%s+.*%-%-force',
-  'git%s+push%s+.*%-f%f[%W]',
-  'git%s+reset%s+%-%-hard',
-  '[Dd][Rr][Oo][Pp]%s+[Tt][Aa][Bb][Ll][Ee]',
-  '[Dd][Rr][Oo][Pp]%s+[Dd][Aa][Tt][Aa][Bb][Aa][Ss][Ee]',
+  '%f[%w]dd%f[%W].-of=',
+  '%f[%w]find%f[%W].-%-delete',
+  'kubectl%f[%W].-%f[%w]delete%f[%W]',
+  'kubectl%f[%W].-%f[%w]drain%f[%W]',
+  'kubectl%f[%W].-%-%-replicas[=%s]+0%f[%D]',
+  'helm%f[%W].-%f[%w]uninstall%f[%W]',
+  'helm%f[%W].-%f[%w]delete%f[%W]',
+  '%f[%w]destroy%f[%W]',
+  '%f[%w]apply%f[%W].-%-destroy',
+  'git%f[%W].-%f[%w]push%f[%W].-%-%-force',
+  'git%f[%W].-%f[%w]push%f[%W].-%s%-f%f[%W]',
+  'git%f[%W].-%f[%w]push%f[%W].-%s%+',
+  'git%f[%W].-%f[%w]reset%f[%W].-%-%-hard',
+  'git%f[%W].-%f[%w]clean%f[%W].-%s%-%a*f',
+  '%f[%w]drop%s+table',
+  '%f[%w]drop%s+database',
+  '%f[%w]drop%s+schema',
+  '%f[%w]truncate%f[%W]',
+  '%f[%w]delete%s+from%f[%W]',
 }
 
 ---@class DyRunbookBlock
@@ -66,6 +81,9 @@ function M.block_at(lines, row)
   for index, line in ipairs(lines) do
     if not open then
       local i, f, info = line:match('^(%s*)(```+)%s*([^%s`]*)')
+      -- ```js``` opening a prose line is inline code, not a fence: a
+      -- backtick fence's info string has no backtick
+      if f and line:sub(#i + #f + 1):find('`', 1, true) then f = nil end
       if not f then
         i, f, info = line:match('^(%s*)(~~~+)%s*(%S*)')
       end
@@ -123,14 +141,51 @@ function M.code_of(block)
   return table.concat(commands, '\n')
 end
 
---- The first dangerous pattern `code` matches, or nil
+--- The first line of `code` a dangerous pattern matches, trimmed, or nil
 ---@param code string
 ---@return string?
 function M.danger(code)
-  for _, pattern in ipairs(M.DANGEROUS) do
-    local found = code:match(pattern)
-    if found then return found end
+  for _, line in ipairs(vim.split(code, '\n', { plain = true })) do
+    local lower = line:lower()
+    for _, pattern in ipairs(M.DANGEROUS) do
+      if lower:find(pattern) then return vim.trim(line) end
+    end
   end
+end
+
+--- Whether the blocks of `bufnr` may run: a file of its own, which can take
+--- the output, and that was agreed to once for this session
+---@param bufnr integer
+---@return boolean
+function M.allowed(bufnr)
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  if name == '' or vim.bo[bufnr].buftype ~= '' then
+    vim.notify(
+      'Only the blocks of a Markdown file run',
+      vim.log.levels.WARN,
+      { title = 'Runbook' }
+    )
+    return false
+  end
+  if not vim.bo[bufnr].modifiable then
+    vim.notify(
+      'The buffer cannot take the output',
+      vim.log.levels.WARN,
+      { title = 'Runbook' }
+    )
+    return false
+  end
+  if vim.b[bufnr].dy_runbook_allowed then return true end
+  local answer = vim.fn.confirm(
+    ('Run the code blocks of %s?\nThey run as you, from its directory.'):format(
+      vim.fn.fnamemodify(name, ':~:.')
+    ),
+    '&Run\n&Cancel',
+    2
+  )
+  if answer ~= 1 then return false end
+  vim.b[bufnr].dy_runbook_allowed = true
+  return true
 end
 
 --- The `output` fence that follows the block closing at `close`, if any:
@@ -201,6 +256,41 @@ local ns = vim.api.nvim_create_namespace('dy_runbook')
 ---@type table<integer, vim.SystemObj[]>
 local running = {}
 
+--- Stop `process` and whatever it started: a block runs in a session of its
+--- own (`detach`), so its whole process group is signalled. Signalling the
+--- shell alone leaves `kubectl logs -f` running, holding the pipes open, and
+--- the run never ends.
+---@param process vim.SystemObj
+local function kill(process)
+  if not process.pid then return end
+  if not pcall(vim.uv.kill, -process.pid, 'sigterm') then
+    pcall(process.kill, process, 'sigterm')
+  end
+end
+
+--- Stop every block a buffer is running
+---@param bufnr integer
+local function stop_buffer(bufnr)
+  for _, process in ipairs(running[bufnr] or {}) do
+    kill(process)
+  end
+end
+
+-- A buffer wiped, or the editor quitting, takes its runs along
+vim.api.nvim_create_autocmd({ 'BufWipeout', 'VimLeavePre' }, {
+  group = vim.api.nvim_create_augroup('dy_runbook', { clear = true }),
+  callback = function(event)
+    if event.event == 'VimLeavePre' then
+      for bufnr in pairs(running) do
+        stop_buffer(bufnr)
+      end
+    else
+      stop_buffer(event.buf)
+      running[event.buf] = nil
+    end
+  end,
+})
+
 --- Put `output` under the block whose closing fence the extmark `mark`
 --- follows, replacing what an earlier run left there
 ---@param bufnr integer
@@ -251,6 +341,7 @@ function M.run_block(bufnr, block, on_done)
     )
     return on_done(false)
   end
+  if not M.allowed(bufnr) then return on_done(false) end
 
   local code = M.code_of(block)
   local danger = M.danger(code)
@@ -271,25 +362,31 @@ function M.run_block(bufnr, block, on_done)
   local cwd = name ~= '' and vim.fs.dirname(name) or vim.uv.cwd()
   local command = vim.list_extend(vim.deepcopy(runner), { code })
 
+  local timer = assert(vim.uv.new_timer())
   local ok, process = pcall(vim.system, command, {
     cwd = cwd,
     text = true,
-    timeout = M.TIMEOUT,
+    -- A session of its own, so stopping it reaches what it started
+    detach = true,
   }, function(result)
     vim.schedule(function()
+      timer:stop()
+      timer:close()
       running[bufnr] = vim.tbl_filter(
         function(p) return p.pid ~= result.pid end,
         running[bufnr] or {}
       )
-      place(bufnr, mark, block.indent, M.render(result))
-      on_done(result.code == 0 and (result.signal or 0) == 0)
+      local done = pcall(place, bufnr, mark, block.indent, M.render(result))
+      on_done(done and result.code == 0 and (result.signal or 0) == 0)
     end)
   end)
   if not ok then
+    timer:close()
     vim.api.nvim_buf_del_extmark(bufnr, ns, mark)
     vim.notify(tostring(process), vim.log.levels.ERROR, { title = 'Runbook' })
     return on_done(false)
   end
+  timer:start(M.TIMEOUT, 0, function() kill(process) end)
   running[bufnr] = running[bufnr] or {}
   table.insert(running[bufnr], process)
 end
@@ -316,6 +413,19 @@ end
 --- one before has moved everything below it.
 function M.run_all()
   local bufnr = vim.api.nvim_get_current_buf()
+  local count = #M.blocks(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
+  if count == 0 then
+    return vim.notify('No block to run', vim.log.levels.WARN, {
+      title = 'Runbook',
+    })
+  end
+  if not M.allowed(bufnr) then return end
+  local answer = vim.fn.confirm(
+    ('Run all %d blocks, one after the other?'):format(count),
+    '&Run\n&Cancel',
+    2
+  )
+  if answer ~= 1 then return end
   local index = 0
   local function next_block()
     if not vim.api.nvim_buf_is_valid(bufnr) then return end
@@ -356,12 +466,7 @@ function M.clear()
 end
 
 --- Stop whatever the buffer is running; its output so far is shown as usual
-function M.stop()
-  local bufnr = vim.api.nvim_get_current_buf()
-  for _, process in ipairs(running[bufnr] or {}) do
-    process:kill('sigterm')
-  end
-end
+function M.stop() stop_buffer(vim.api.nvim_get_current_buf()) end
 
 --- `:Runbook [run|all|clear|stop]`
 ---@param args { fargs: string[] }
