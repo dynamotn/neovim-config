@@ -231,10 +231,10 @@ local js_autopairs = function(filetypes, rule)
     -- e.g., () => { | }
     rule('=>', ' {  }', filetypes)
       :replace_endpair(function(opts)
-        local prev_3char = opts.line:sub(opts.col - 3, opts.col - 2)
-        local next_char = opts.line:sub(opts.col, opts.col)
-        if prev_3char:match('%)$') then
-          return '<BS><BS> => {  }' .. next_char
+        -- `opts.line` does not hold the `>` yet, so this is the character
+        -- before the `=`
+        if opts.line:sub(opts.col - 2, opts.col - 2) == ')' then
+          return '<BS><BS> => {  }'
         end
         return ' {  }'
       end)
