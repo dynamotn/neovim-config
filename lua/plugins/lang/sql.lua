@@ -4,7 +4,7 @@ local cmp_util = require('util.cmp')
 vim.g.omni_sql_default_compl_type = 'syntax'
 vim.g.loaded_sql_completion = true
 
-return vim.list_contains(_G.enabled_languages, 'sql')
+return vim.list_contains(DyNeo.enabled_languages, 'sql')
     and {
       {
         -- Engine
@@ -45,8 +45,8 @@ return vim.list_contains(_G.enabled_languages, 'sql')
         'kristijanhusak/vim-dadbod-completion',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               Dadbod = '「DB」',
             })
         end,
@@ -56,8 +56,8 @@ return vim.list_contains(_G.enabled_languages, 'sql')
         'ray-x/cmp-sql',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               sql = '「SQL」',
             })
         end,

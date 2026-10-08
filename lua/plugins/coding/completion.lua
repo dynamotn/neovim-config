@@ -101,7 +101,7 @@ return {
             score_offset = -20,
             opts = {
               dictionary_directories = {
-                vim.fn.expand(_G.dictionaries_path),
+                vim.fn.expand(DyNeo.dictionaries_path),
               },
             },
           },
@@ -317,9 +317,9 @@ return {
                   if
                     vim.tbl_contains({ 'Path', 'fuzzy_path' }, ctx.source_name)
                   then
-                    return _G.completion_sources['Path']
+                    return DyNeo.completion_sources['Path']
                   end
-                  return _G.completion_sources[ctx.source_name]
+                  return DyNeo.completion_sources[ctx.source_name]
                     or ctx.source_name
                 end,
               },
@@ -378,23 +378,24 @@ return {
       require('blink.cmp').setup(opts)
     end,
     init = function()
-      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-        Path = '「PATH」',
-        project_path = '「PROJ」',
-        Snippets = '「SNIP」',
-        LSP = '「LSP」',
-        Buffer = '「BUF」',
-        ripgrep = '「FILE」',
-        dictionary = '「DICT」',
-        calc = '「CALC」',
-        tmux = '「MUX」',
-        zellij = '「MUX」',
-        kitty = '「TERM」',
-        dynamic = '「MISC」',
-        Cmdline = '「CMD」',
-        emoji = '「EMOJI」',
-        nerdfont = '「NERD」',
-      })
+      DyNeo.completion_sources =
+        vim.tbl_extend('force', DyNeo.completion_sources, {
+          Path = '「PATH」',
+          project_path = '「PROJ」',
+          Snippets = '「SNIP」',
+          LSP = '「LSP」',
+          Buffer = '「BUF」',
+          ripgrep = '「FILE」',
+          dictionary = '「DICT」',
+          calc = '「CALC」',
+          tmux = '「MUX」',
+          zellij = '「MUX」',
+          kitty = '「TERM」',
+          dynamic = '「MISC」',
+          Cmdline = '「CMD」',
+          emoji = '「EMOJI」',
+          nerdfont = '「NERD」',
+        })
     end,
   },
   {

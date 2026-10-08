@@ -4,31 +4,31 @@ describe('config.globals', function()
   before_each(function() h.globals() end)
 
   it('sets the documented defaults', function()
-    assert.is_true(_G.dark_mode)
+    assert.is_true(DyNeo.dark_mode)
     assert.are.same(
       { enabled = false, day_start = 6, night_start = 18 },
-      _G.day_night
+      DyNeo.day_night
     )
-    assert.is_false(_G.is_gentoo)
-    assert.is_false(_G.used_full_plugins)
-    assert.are.equal('latest', _G.plugin_channel)
+    assert.is_false(DyNeo.is_gentoo)
+    assert.is_false(DyNeo.used_full_plugins)
+    assert.are.equal('latest', DyNeo.plugin_channel)
     assert.are.same({
       obsidian = false,
       leetcode = false,
       otter = false,
       firenvim = false,
       chezmoi = false,
-    }, _G.enabled_plugins)
-    assert.are.same({}, _G.bundle_languages)
-    assert.are.same({}, _G.completion_sources)
-    assert.are.same({}, _G.yaml_schema_dirs)
-    assert.are.same({}, _G.firenvim_site_settings)
+    }, DyNeo.enabled_plugins)
+    assert.are.same({}, DyNeo.bundle_languages)
+    assert.are.same({}, DyNeo.completion_sources)
+    assert.are.same({}, DyNeo.yaml_schema_dirs)
+    assert.are.same({}, DyNeo.firenvim_site_settings)
   end)
 
   it('enables every language of config.languages', function()
     local expected = vim.tbl_keys(require('config.languages'))
     table.sort(expected)
-    local actual = vim.deepcopy(_G.enabled_languages)
+    local actual = vim.deepcopy(DyNeo.enabled_languages)
     table.sort(actual)
     assert.are.same(expected, actual)
   end)
@@ -37,10 +37,10 @@ describe('config.globals', function()
     local zellij = vim.env.ZELLIJ
     vim.env.ZELLIJ = nil
     h.globals()
-    assert.are.equal('toggleterm', _G.test_strategy)
+    assert.are.equal('toggleterm', DyNeo.test_strategy)
     vim.env.ZELLIJ = '0'
     h.globals()
-    assert.are.equal('zellij', _G.test_strategy)
+    assert.are.equal('zellij', DyNeo.test_strategy)
     vim.env.ZELLIJ = zellij
   end)
 
@@ -48,10 +48,10 @@ describe('config.globals', function()
     local saved = vim.env.NVIM_DEV_PLUGINS
     vim.env.NVIM_DEV_PLUGINS = nil
     h.globals()
-    assert.are.equal('~/Working/community/nvim', _G.dev_plugins_path)
+    assert.are.equal('~/Working/community/nvim', DyNeo.dev_plugins_path)
     vim.env.NVIM_DEV_PLUGINS = '/elsewhere'
     h.globals()
-    assert.are.equal('/elsewhere', _G.dev_plugins_path)
+    assert.are.equal('/elsewhere', DyNeo.dev_plugins_path)
     vim.env.NVIM_DEV_PLUGINS = saved
   end)
 
@@ -59,14 +59,14 @@ describe('config.globals', function()
     local saved = vim.env.XDG_CONFIG_HOME
     vim.env.XDG_CONFIG_HOME = '/xdg'
     h.globals()
-    assert.are.equal('/xdg/dictionaries', _G.dictionaries_path)
+    assert.are.equal('/xdg/dictionaries', DyNeo.dictionaries_path)
     vim.env.XDG_CONFIG_HOME = saved
   end)
 
   describe('obsidian', function()
     it('lists every vault by name and path', function()
-      _G.obsidian.paths = { personal = '/a', work = '/b' }
-      local vaults = _G.obsidian.vaults()
+      DyNeo.obsidian.paths = { personal = '/a', work = '/b' }
+      local vaults = DyNeo.obsidian.vaults()
       table.sort(vaults, function(x, y) return x.name < y.name end)
       assert.are.same({
         { name = 'personal', path = '/a' },
@@ -75,8 +75,8 @@ describe('config.globals', function()
     end)
 
     it('reads the TODO note from the personal vault', function()
-      _G.obsidian.paths.personal = '/notes'
-      assert.are.equal('/notes/01_Fleeting/TODO.md', _G.obsidian.todo_path())
+      DyNeo.obsidian.paths.personal = '/notes'
+      assert.are.equal('/notes/01_Fleeting/TODO.md', DyNeo.obsidian.todo_path())
     end)
   end)
 

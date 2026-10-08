@@ -212,9 +212,10 @@ return {
       filetypes = { 'gitcommit', 'gitrebase', 'octo', 'NeogitCommitMessage' },
     },
     init = function()
-      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-        git = '「GIT」',
-      })
+      DyNeo.completion_sources =
+        vim.tbl_extend('force', DyNeo.completion_sources, {
+          git = '「GIT」',
+        })
     end,
   },
   {

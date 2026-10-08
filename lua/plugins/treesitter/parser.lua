@@ -91,12 +91,12 @@ return {
           local injected_parsers = language.injected_parsers or {}
 
           -- install parser of language in bundle languages
-          if vim.list_contains(_G.bundle_languages, name) then
+          if vim.list_contains(DyNeo.bundle_languages, name) then
             table.insert(opts.ensure_installed, parser_name)
             vim.list_extend(opts.ensure_installed, injected_parsers)
           end
           -- lazy install parser of language not in bundle languages
-          if vim.list_contains(_G.enabled_languages, name) then
+          if vim.list_contains(DyNeo.enabled_languages, name) then
             local wanted = { parser_name }
             vim.list_extend(wanted, injected_parsers)
             require('util.lazy_install').on_filetype(

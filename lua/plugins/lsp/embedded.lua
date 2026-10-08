@@ -39,7 +39,7 @@ return {
   {
     -- LSP for embedded language
     'jmbuhr/otter.nvim',
-    enabled = _G.used_full_plugins or _G.enabled_plugins.otter,
+    enabled = DyNeo.used_full_plugins or DyNeo.enabled_plugins.otter,
     ft = supported_filetypes,
     keys = {
       {

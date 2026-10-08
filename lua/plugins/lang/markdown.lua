@@ -1,7 +1,7 @@
 local language = require('config.languages').markdown
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'markdown')
+return vim.list_contains(DyNeo.enabled_languages, 'markdown')
     and {
       {
         -- LSP config
@@ -21,7 +21,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         -- its ftplugins and syntax files and starting its servers twice.
         'toppair/peek.nvim',
         build = 'deno task --quiet build:fast',
-        enabled = _G.used_full_plugins or vim.fn.executable('deno') == 1,
+        enabled = DyNeo.used_full_plugins or vim.fn.executable('deno') == 1,
         keys = {
           {
             '<leader>cp',
@@ -38,16 +38,16 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
         -- Obsidian
         'obsidian-nvim/obsidian.nvim',
         ft = language.filetypes,
-        enabled = #_G.obsidian.vaults() > 0
-          and (_G.used_full_plugins or _G.enabled_plugins.obsidian),
+        enabled = #DyNeo.obsidian.vaults() > 0
+          and (DyNeo.used_full_plugins or DyNeo.enabled_plugins.obsidian),
         opts = {
-          workspaces = _G.obsidian.vaults(),
+          workspaces = DyNeo.obsidian.vaults(),
           ui = { enable = false },
           legacy_commands = false,
         },
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               obsidian = '「NOTE」',
             })
         end,
@@ -79,7 +79,7 @@ return vim.list_contains(_G.enabled_languages, 'markdown')
                 icon = ' ',
                 name = 'Todo',
                 ft = 'markdown',
-                file = _G.obsidian.todo_path(),
+                file = DyNeo.obsidian.todo_path(),
               })
             end,
             desc = 'Todo List',

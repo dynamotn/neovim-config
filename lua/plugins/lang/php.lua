@@ -1,6 +1,6 @@
 local language = require('config.languages').php
 
-return vim.list_contains(_G.enabled_languages, 'php')
+return vim.list_contains(DyNeo.enabled_languages, 'php')
     and {
       {
         -- LSP config

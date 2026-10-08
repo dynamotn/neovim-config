@@ -327,7 +327,7 @@ local function system_tools()
     return { entry('error', 'config.languages cannot be loaded') }
   end
 
-  local wanted = _G.enabled_languages or vim.tbl_keys(languages)
+  local wanted = DyNeo.enabled_languages or vim.tbl_keys(languages)
   local missing, seen = {}, {}
   for _, name in ipairs(vim.list_extend({ '*' }, wanted)) do
     for _, field in ipairs({

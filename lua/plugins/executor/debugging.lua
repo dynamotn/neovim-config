@@ -133,7 +133,9 @@ return {
     init = function()
       local dap_util = require('util.dap')
       for name, language in pairs(require('config.languages')) do
-        if language.dap and vim.list_contains(_G.enabled_languages, name) then
+        if
+          language.dap and vim.list_contains(DyNeo.enabled_languages, name)
+        then
           require('util.lazy_install').on_filetype(
             language.filetypes,
             function()
@@ -157,7 +159,7 @@ return {
       opts.handlers = opts.handlers or {}
       opts.ensure_installed = opts.ensure_installed or {}
       for name, language in pairs(require('config.languages')) do
-        if language.dap and vim.list_contains(_G.bundle_languages, name) then
+        if language.dap and vim.list_contains(DyNeo.bundle_languages, name) then
           for _, spec in ipairs(language.dap) do
             if dap_util.is_mapped(spec) then
               table.insert(opts.ensure_installed, spec)
@@ -224,9 +226,10 @@ return {
     'rcarriga/cmp-dap',
     ft = 'dap-repl',
     init = function()
-      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-        dap = '「DAP」',
-      })
+      DyNeo.completion_sources =
+        vim.tbl_extend('force', DyNeo.completion_sources, {
+          dap = '「DAP」',
+        })
     end,
   },
   {

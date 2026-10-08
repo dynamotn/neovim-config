@@ -127,7 +127,7 @@ describe('util.yaml_schema', function()
     }
     package.loaded['lualine'] = nil
     package.loaded['snacks'] = nil
-    _G.yaml_schema_dirs = nil
+    DyNeo.yaml_schema_dirs = nil
     h.unload('util.yaml_schema')
     yaml_schema = require('util.yaml_schema')
   end)
@@ -139,7 +139,7 @@ describe('util.yaml_schema', function()
     package.loaded['schemastore'] = nil
     package.loaded['snacks'] = nil
     _G.Snacks = nil
-    _G.yaml_schema_dirs = nil
+    DyNeo.yaml_schema_dirs = nil
     pcall(vim.api.nvim_clear_autocmds, { group = 'util.yaml_schema' })
     cleanup()
   end)
@@ -850,7 +850,7 @@ describe('util.yaml_schema', function()
       h.write(project .. '/schemas/readme.md', { '' })
       h.write(project .. '/node_modules/x/schema.json', { '{}' })
       h.write(dir .. '/shared/any.json', { '{}' })
-      _G.yaml_schema_dirs = { dir .. '/shared', dir .. '/does-not-exist' }
+      DyNeo.yaml_schema_dirs = { dir .. '/shared', dir .. '/does-not-exist' }
       write_crds({ 'cert-manager.io/certificate_v1.json', 'bad-path.json' })
       stub(
         vim.ui,

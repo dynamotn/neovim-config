@@ -398,11 +398,11 @@ return {
         -- automatic install lsp servers
         if mason_configs[server] then
           -- install server of language in bundle languages
-          if vim.list_contains(_G.bundle_languages, name) then
+          if vim.list_contains(DyNeo.bundle_languages, name) then
             table.insert(ensure_installed, server)
           end
           -- lazy install server of language not in bundle languages
-          if vim.list_contains(_G.enabled_languages, name) then
+          if vim.list_contains(DyNeo.enabled_languages, name) then
             require('util.lazy_install').on_filetype(
               language.filetypes,
               function(args)

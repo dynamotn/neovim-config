@@ -1,4 +1,4 @@
-return vim.list_contains(_G.enabled_languages, 'dockerfile')
+return vim.list_contains(DyNeo.enabled_languages, 'dockerfile')
     and {
       {
         -- LSP config

@@ -88,13 +88,13 @@ describe('tools.mason-quarantine', function()
   )
 
   it('follows the window a global sets', function()
-    local before = _G.quarantine_window
-    _G.quarantine_window = 14 * DAY
+    local before = DyNeo.quarantine_window
+    DyNeo.quarantine_window = 14 * DAY
     local kept_wide =
       kept({ release('ten', 10 * DAY), release('old', 20 * DAY) })
-    _G.quarantine_window = 0
+    DyNeo.quarantine_window = 0
     local kept_off = kept({ release('fresh', 60) })
-    _G.quarantine_window = before
+    DyNeo.quarantine_window = before
     assert.are.same({ 'old' }, kept_wide)
     assert.are.same({ 'fresh' }, kept_off)
   end)

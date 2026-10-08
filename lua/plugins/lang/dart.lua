@@ -1,6 +1,6 @@
 local language = require('config.languages').dart
 
-return vim.list_contains(_G.enabled_languages, 'dart')
+return vim.list_contains(DyNeo.enabled_languages, 'dart')
     and {
       {
         -- Flutter toolbox: runner, devices, outline, and the Dart LSP

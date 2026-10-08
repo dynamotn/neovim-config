@@ -54,6 +54,8 @@ vim.opt.runtimepath = {
   vim.env.VIMRUNTIME,
 }
 vim.opt.packpath = {}
+-- `config.globals` declares it; specs that stub one setting need the table
+_G.DyNeo = {}
 vim.opt.swapfile = false
 vim.opt.shadafile = 'NONE'
 

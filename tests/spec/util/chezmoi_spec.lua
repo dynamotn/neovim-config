@@ -22,8 +22,8 @@ describe('util.chezmoi', function()
       ),
       function()
         restore = {
-          h.stub(_G, 'used_full_plugins', case.full),
-          h.stub(_G, 'enabled_plugins', { chezmoi = case.plugin }),
+          h.stub(DyNeo, 'used_full_plugins', case.full),
+          h.stub(DyNeo, 'enabled_plugins', { chezmoi = case.plugin }),
         }
         assert.equals(case.expected, chezmoi.enabled() and true or false)
       end

@@ -10,11 +10,11 @@ local js_filetypes = vim
   })
   :flatten()
   :totable()
-local condition = vim.list_contains(_G.enabled_languages, 'typescript')
-  or vim.list_contains(_G.enabled_languages, 'javascript')
-  or vim.list_contains(_G.enabled_languages, 'tsx')
-  or vim.list_contains(_G.enabled_languages, 'angular')
-  or vim.list_contains(_G.enabled_languages, 'vue')
+local condition = vim.list_contains(DyNeo.enabled_languages, 'typescript')
+  or vim.list_contains(DyNeo.enabled_languages, 'javascript')
+  or vim.list_contains(DyNeo.enabled_languages, 'tsx')
+  or vim.list_contains(DyNeo.enabled_languages, 'angular')
+  or vim.list_contains(DyNeo.enabled_languages, 'vue')
 return condition
     and {
       {

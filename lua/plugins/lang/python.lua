@@ -1,6 +1,6 @@
 local language = require('config.languages').python
 
-return vim.list_contains(_G.enabled_languages, 'python')
+return vim.list_contains(DyNeo.enabled_languages, 'python')
     and {
       {
         -- LSP config

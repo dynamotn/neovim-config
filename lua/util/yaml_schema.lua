@@ -9,7 +9,7 @@
 -- content (Kubernetes manifests, cloud-init), and a picker sets a schema for
 -- the buffer or writes it as a `# yaml-language-server: $schema=` modeline.
 -- Besides the catalogs, it offers the schema files of the project and of
--- `_G.yaml_schema_dirs`, and any other file of this machine by its path.
+-- `DyNeo.yaml_schema_dirs`, and any other file of this machine by its path.
 local M = {}
 
 local CRDS_CATALOG =
@@ -396,7 +396,7 @@ local function relative_path(from, path)
 end
 
 --- Schema files on this machine: those of the project of the buffer, and
---- every JSON or YAML file under the directories of `_G.yaml_schema_dirs`
+--- every JSON or YAML file under the directories of `DyNeo.yaml_schema_dirs`
 ---@param bufnr integer
 ---@param callback fun(paths: string[], root: string)
 local function find_local(bufnr, callback)
@@ -405,7 +405,7 @@ local function find_local(bufnr, callback)
     function(dir) return vim.fn.isdirectory(dir) == 1 end,
     vim.tbl_map(
       function(dir) return vim.fs.normalize(dir) end,
-      _G.yaml_schema_dirs or {}
+      DyNeo.yaml_schema_dirs or {}
     )
   )
   local function finish(paths)

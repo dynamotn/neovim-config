@@ -1,7 +1,7 @@
 local language = require('config.languages').typst
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'typst')
+return vim.list_contains(DyNeo.enabled_languages, 'typst')
     and {
       {
         -- LSP config

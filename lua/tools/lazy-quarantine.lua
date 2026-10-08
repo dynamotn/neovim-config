@@ -20,7 +20,7 @@
 --- lazy.nvim resolved it, since the alternative is not installing it at all.
 local M = {}
 
---- The wait when `_G.quarantine_window` says nothing, the same week the npm,
+--- The wait when `DyNeo.quarantine_window` says nothing, the same week the npm,
 --- bun, pnpm and uv configurations give the rest of these dotfiles
 local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 
@@ -31,7 +31,7 @@ local DEFAULT_WINDOW = 7 * 24 * 60 * 60
 --- in force rather than what was in force when this module first loaded.
 ---@return integer
 function M.window()
-  local configured = _G.quarantine_window
+  local configured = DyNeo.quarantine_window
   return type(configured) == 'number' and configured or DEFAULT_WINDOW
 end
 

@@ -4,8 +4,8 @@
 --- `vim.o.background` while it loads and picks latte or macchiato from it.
 --- So the whole job here is to keep that one option honest: work out whether
 --- it is day, set it, and ask for the colorscheme again when the answer
---- changes. `_G.dark_mode` stays the manual override it always was -- with
---- `_G.day_night.enabled` off, it is the only thing consulted.
+--- changes. `DyNeo.dark_mode` stays the manual override it always was -- with
+--- `DyNeo.day_night.enabled` off, it is the only thing consulted.
 
 local M = {}
 
@@ -17,7 +17,7 @@ local timer
 ---@return boolean
 function M.is_dark(hour)
   local day_start, night_start =
-    _G.day_night.day_start, _G.day_night.night_start
+    DyNeo.day_night.day_start, DyNeo.day_night.night_start
   if day_start == night_start then return true end
   if day_start < night_start then
     return hour < day_start or hour >= night_start
@@ -26,16 +26,16 @@ function M.is_dark(hour)
   return hour >= night_start and hour < day_start
 end
 
---- Resolve `_G.dark_mode` and put it on `vim.o.background`
+--- Resolve `DyNeo.dark_mode` and put it on `vim.o.background`
 ---
 --- Called once from `config.options`, before any plugin has loaded, so that
 --- the colorscheme comes up in the right half straight away instead of
 --- flipping a moment later.
 function M.init()
-  if _G.day_night.enabled then
-    _G.dark_mode = M.is_dark(tonumber(os.date('%H')) --[[@as integer]])
+  if DyNeo.day_night.enabled then
+    DyNeo.dark_mode = M.is_dark(tonumber(os.date('%H')) --[[@as integer]])
   end
-  vim.o.background = _G.dark_mode and 'dark' or 'light'
+  vim.o.background = DyNeo.dark_mode and 'dark' or 'light'
 end
 
 --- Re-resolve, and reload the colorscheme if the half of the day changed
@@ -50,10 +50,10 @@ end
 
 --- Start watching the clock
 ---
---- `enabled` is read once, here: a `per_machine` that pins `_G.dark_mode`
+--- `enabled` is read once, here: a `per_machine` that pins `DyNeo.dark_mode`
 --- turns this off and nothing below ever runs.
 function M.setup()
-  if not _G.day_night.enabled then return end
+  if not DyNeo.day_night.enabled then return end
 
   if timer then timer:stop() end
   timer = vim.uv.new_timer()

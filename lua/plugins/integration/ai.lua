@@ -486,8 +486,8 @@ return {
     'Kaiser-Yang/blink-cmp-avante',
     ft = 'AvanteInput',
     init = function()
-      _G.completion_sources =
-        vim.tbl_extend('force', _G.completion_sources or {}, {
+      DyNeo.completion_sources =
+        vim.tbl_extend('force', DyNeo.completion_sources or {}, {
           Avante = '「AI」',
         })
     end,

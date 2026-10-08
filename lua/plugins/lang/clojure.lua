@@ -1,7 +1,7 @@
 local language = require('config.languages').clojure
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'clojure')
+return vim.list_contains(DyNeo.enabled_languages, 'clojure')
     and {
       {
         -- S-expression editing
@@ -62,8 +62,8 @@ return vim.list_contains(_G.enabled_languages, 'clojure')
         'PaterJason/cmp-conjure',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               conjure = '「REPL」',
             })
         end,

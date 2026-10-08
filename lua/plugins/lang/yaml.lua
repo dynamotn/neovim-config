@@ -1,6 +1,6 @@
 local language = require('config.languages').yaml
-local condition = vim.list_contains(_G.enabled_languages, 'yaml')
-  or vim.list_contains(_G.enabled_languages, 'ansible')
+local condition = vim.list_contains(DyNeo.enabled_languages, 'yaml')
+  or vim.list_contains(DyNeo.enabled_languages, 'ansible')
 local icons = require('config.defaults').icons
 
 return condition

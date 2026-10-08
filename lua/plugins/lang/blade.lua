@@ -4,7 +4,7 @@ local cmp_util = require('util.cmp')
 -- Laravel's tooling reaches across the whole project, not just the templates
 local filetypes = vim.list_extend(vim.deepcopy(language.filetypes), { 'php' })
 
-return vim.list_contains(_G.enabled_languages, 'blade')
+return vim.list_contains(DyNeo.enabled_languages, 'blade')
     and {
       {
         -- Artisan, routes, views and the rest of the project, as pickers
@@ -66,8 +66,8 @@ return vim.list_contains(_G.enabled_languages, 'blade')
         -- Kept off the `blink.cmp` spec: lazy.nvim keeps a single `init` per
         -- plugin, and this one would replace the labels set in completion.lua
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               ['blade-nav'] = '「BLADE」',
               laravel = '「LARAVEL」',
             })

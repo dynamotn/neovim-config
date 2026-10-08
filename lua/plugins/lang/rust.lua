@@ -1,6 +1,6 @@
 local language = require('config.languages').rust
 
-return vim.list_contains(_G.enabled_languages, 'rust')
+return vim.list_contains(DyNeo.enabled_languages, 'rust')
     and {
       {
         -- LSP config

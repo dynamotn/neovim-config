@@ -94,7 +94,7 @@ four languages; what differs is a handful of globals, see
 >   `latest` channel, or < 0.12 on `stable`.
 > - The `latest` channel follows the newest Neovim and the newest plugin
 >   commits, so an upstream break can land with any `:Lazy update`. Set
->   `_G.plugin_channel = 'stable'` on a machine that should not ride along.
+>   `DyNeo.plugin_channel = 'stable'` on a machine that should not ride along.
 > - Used on Linux and macOS.
 
 ## Quick start
@@ -180,41 +180,41 @@ globals there. `init.lua` loads it before anything else, so every global below
 is still open to it:
 
 ```lua
-_G.dark_mode = false
-_G.plugin_channel = 'stable'
-_G.enabled_languages = { 'lua', 'bash', 'markdown' }
-_G.enabled_plugins.obsidian = true
-_G.obsidian.paths.personal = vim.fn.expand('~/Notes')
-_G.dictionaries_path = vim.fn.expand('~/.local/share/dictionaries')
+DyNeo.dark_mode = false
+DyNeo.plugin_channel = 'stable'
+DyNeo.enabled_languages = { 'lua', 'bash', 'markdown' }
+DyNeo.enabled_plugins.obsidian = true
+DyNeo.obsidian.paths.personal = vim.fn.expand('~/Notes')
+DyNeo.dictionaries_path = vim.fn.expand('~/.local/share/dictionaries')
 ```
 
 An error raised inside that file is reported; only its absence is silent.
 
 ### Globals
 
-Every global is declared, typed and defaulted in
-[lua/config/globals.lua](./lua/config/globals.lua).
+Every global is a field of the one global table `DyNeo`, declared, typed and
+defaulted in [lua/config/globals.lua](./lua/config/globals.lua).
 
 | Global | Default | What it does |
 | ------ | ------- | ------------ |
-| `_G.dark_mode` | `true` | Background to use, whenever the clock is not in charge |
-| `_G.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode`, and the colorscheme with it |
-| `_G.plugin_channel` | `'latest'` | `latest` or `stable`, see [Plugin channels](#plugin-channels) |
-| `_G.quarantine_window` | `7 * 24 * 60 * 60` | How long a release waits before Mason or lazy.nvim may install it; `0` turns the wait off |
-| `_G.enabled_languages` | every supported language | Which languages get plugins, parsers and tools at all |
-| `_G.bundle_languages` | `{}` | Languages whose tooling is installed up front, for containers and prebuilt images |
-| `_G.enabled_plugins` | all `false` | `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi` |
-| `_G.used_full_plugins` | `false` | Install every plugin, to refresh the lockfile |
-| `_G.is_gentoo` | `false` | Add the Gentoo ebuild syntax |
-| `_G.obsidian.paths` | `{ personal = '~/Documents/Notes' }` | Vault name to folder |
-| `_G.yaml_schema_dirs` | `{}` | Local schema folders offered by the YAML schema picker |
-| `_G.dictionaries_path` | `$XDG_CONFIG_HOME/dictionaries` | Word lists for completion and `:DySpell` |
-| `_G.dev_plugins_path` | `$NVIM_DEV_PLUGINS`, else `~/Working/community/nvim` | Where `dev = true` plugin specs are looked for |
-| `_G.firenvim_site_settings` | `{}` | Per-site takeover rules for the browser embedding |
-| `_G.test_strategy` | `'toggleterm'`, `'zellij'` inside zellij | How vim-test runs a test |
-| `_G.completion_sources` | `{}` | Completion sources named in the completion menu |
+| `DyNeo.dark_mode` | `true` | Background to use, whenever the clock is not in charge |
+| `DyNeo.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode`, and the colorscheme with it |
+| `DyNeo.plugin_channel` | `'latest'` | `latest` or `stable`, see [Plugin channels](#plugin-channels) |
+| `DyNeo.quarantine_window` | `7 * 24 * 60 * 60` | How long a release waits before Mason or lazy.nvim may install it; `0` turns the wait off |
+| `DyNeo.enabled_languages` | every supported language | Which languages get plugins, parsers and tools at all |
+| `DyNeo.bundle_languages` | `{}` | Languages whose tooling is installed up front, for containers and prebuilt images |
+| `DyNeo.enabled_plugins` | all `false` | `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi` |
+| `DyNeo.used_full_plugins` | `false` | Install every plugin, to refresh the lockfile |
+| `DyNeo.is_gentoo` | `false` | Add the Gentoo ebuild syntax |
+| `DyNeo.obsidian.paths` | `{ personal = '~/Documents/Notes' }` | Vault name to folder |
+| `DyNeo.yaml_schema_dirs` | `{}` | Local schema folders offered by the YAML schema picker |
+| `DyNeo.dictionaries_path` | `$XDG_CONFIG_HOME/dictionaries` | Word lists for completion and `:DySpell` |
+| `DyNeo.dev_plugins_path` | `$NVIM_DEV_PLUGINS`, else `~/Working/community/nvim` | Where `dev = true` plugin specs are looked for |
+| `DyNeo.firenvim_site_settings` | `{}` | Per-site takeover rules for the browser embedding |
+| `DyNeo.test_strategy` | `'toggleterm'`, `'zellij'` inside zellij | How vim-test runs a test |
+| `DyNeo.completion_sources` | `{}` | Completion sources named in the completion menu |
 
-A plugin spec marked `dev = true` is looked for under `_G.dev_plugins_path`
+A plugin spec marked `dev = true` is looked for under `DyNeo.dev_plugins_path`
 first; one missing from there is cloned from its git remote as usual, so the
 folder need not exist.
 
@@ -328,7 +328,7 @@ a few hundred patterns to walk on every `FileType` event, and make the augroup
 name the only thing keeping two handlers apart — a name two languages can
 collide on, in which case one silently clears the other.
 
-`_G.bundle_languages` is the other end of the same dial: the languages listed
+`DyNeo.bundle_languages` is the other end of the same dial: the languages listed
 there are installed up front, which is what a container image or a prebuilt
 development environment wants.
 
@@ -348,7 +348,7 @@ Anything freshly published is held back for a week before it may be installed
 — the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm) and
 `exclude-newer` (uv) give the rest of these dotfiles, so a compromised release
 has time to be caught and pulled before it lands on this machine. Both sides
-read `_G.quarantine_window`, so a machine can wait longer, or not at all.
+read `DyNeo.quarantine_window`, so a machine can wait longer, or not at all.
 
 Neither Mason nor lazy.nvim has a setting for it, and each needs a different
 answer:
@@ -450,7 +450,7 @@ rather than silent.
 YAML schemas are detected from the content of the buffer — Kubernetes
 manifests, CRDs, cloud-init — and `<leader>cy` (or `:YamlSchema`) opens a
 picker to set one for the buffer or write it in as a modeline. Candidates come
-from the public catalogs, from the project, from `_G.yaml_schema_dirs`, and
+from the public catalogs, from the project, from `DyNeo.yaml_schema_dirs`, and
 from any path typed in. `:YamlSchema reset` hands detection back the wheel.
 
 ### What is attached to this buffer
@@ -471,7 +471,7 @@ formatters only ever run when they are actually installed.
 ### Spelling, in several languages at once
 
 `:DySpell {lang}` rebuilds a spell file with `mkspell` from the word lists
-under `_G.dictionaries_path` and `spell/`: Vietnamese, Chinese, plus the
+under `DyNeo.dictionaries_path` and `spell/`: Vietnamese, Chinese, plus the
 `proper` and `technical` lists kept in this repository. Comments are
 spell-checked as well as prose — through
 [ltcc](https://github.com/dynamotn/languagetool-code-comments) — and the word
@@ -513,12 +513,12 @@ with a spec of its own:
 
 ### Integrations
 
-- [Obsidian](https://obsidian.md/) — vaults from `_G.obsidian.paths`.
+- [Obsidian](https://obsidian.md/) — vaults from `DyNeo.obsidian.paths`.
 - [chezmoi](https://www.chezmoi.io/) — templates edited with the target
   language injected, not as plain text.
 - **Firefox** and **Chrome** — Neovim embedded in a textarea with
   [firenvim](https://github.com/glacambre/firenvim), tuned per site through
-  `_G.firenvim_site_settings`.
+  `DyNeo.firenvim_site_settings`.
 - [zellij](https://zellij.dev/) — test runner, terminal integration, and the
   pane sources for completion.
 - [AI CLI tools](https://github.com/folke/sidekick.nvim#default-cli-tools) —

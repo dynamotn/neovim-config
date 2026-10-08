@@ -13,7 +13,7 @@ local function extend_or_override(config, custom, ...)
   return config
 end
 
-return vim.list_contains(_G.enabled_languages, 'java')
+return vim.list_contains(DyNeo.enabled_languages, 'java')
     and {
       {
         -- LSP config

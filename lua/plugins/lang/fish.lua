@@ -1,7 +1,7 @@
 local language = require('config.languages').fish
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'fish')
+return vim.list_contains(DyNeo.enabled_languages, 'fish')
     and {
       {
         -- LSP config
@@ -19,8 +19,8 @@ return vim.list_contains(_G.enabled_languages, 'fish')
         'mtoohey31/cmp-fish',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               fish = '「FISH」',
             })
         end,

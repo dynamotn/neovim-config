@@ -1,4 +1,4 @@
-return vim.list_contains(_G.enabled_languages, 'perl')
+return vim.list_contains(DyNeo.enabled_languages, 'perl')
     and {
       {
         -- Debug adapter & configurations. mason-nvim-dap does not know

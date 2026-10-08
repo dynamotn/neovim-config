@@ -1,7 +1,7 @@
 ---@diagnostic disable-next-line: unused-local
 local language = require('config.languages').hyprlang
 
-return vim.list_contains(_G.enabled_languages, 'hyprlang')
+return vim.list_contains(DyNeo.enabled_languages, 'hyprlang')
     and {
       {
         -- LSP config

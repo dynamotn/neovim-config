@@ -9,7 +9,7 @@ describe('util.languages', function()
   local function load(list, enabled)
     h.unload('util.languages')
     package.loaded['config.languages'] = list
-    table.insert(restore, h.stub(_G, 'enabled_languages', enabled))
+    table.insert(restore, h.stub(DyNeo, 'enabled_languages', enabled))
     languages = require('util.languages')
   end
 
@@ -216,7 +216,7 @@ describe('util.languages', function()
       table.insert(
         restore,
         h.stub(
-          _G,
+          DyNeo,
           'enabled_languages',
           vim.tbl_keys(require('config.languages'))
         )

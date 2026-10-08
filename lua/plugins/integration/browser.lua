@@ -6,7 +6,7 @@ local site_settings = vim.tbl_extend('force', {
     selector = 'textarea:not([readonly]):not([class="handsontableInput"]), div[role="textbox"], div[role="presentation"]',
     takeover = 'always',
   },
-}, _G.firenvim_site_settings)
+}, DyNeo.firenvim_site_settings)
 vim.g.firenvim_config = {
   globalSettings = { alt = 'all' },
   localSettings = site_settings,
@@ -20,7 +20,7 @@ return {
       require('lazy').load({ plugins = { 'firenvim' }, wait = true })
       vim.fn['firenvim#install'](0)
     end,
-    enabled = _G.used_full_plugins or _G.enabled_plugins.firenvim,
+    enabled = DyNeo.used_full_plugins or DyNeo.enabled_plugins.firenvim,
     lazy = not vim.g.started_by_firenvim,
     config = function(_, _)
       vim.o.laststatus = 0

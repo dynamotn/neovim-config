@@ -9,6 +9,7 @@
   "diagnostics": {
     "globals": [
       "vim",
+      "DyNeo",
       "Snacks"
     ],
     "groupSeverity": {

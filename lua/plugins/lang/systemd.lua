@@ -1,7 +1,7 @@
 ---@diagnostic disable-next-line: unused-local
 local language = require('config.languages').systemd
 
-return vim.list_contains(_G.enabled_languages, 'systemd')
+return vim.list_contains(DyNeo.enabled_languages, 'systemd')
     and {
       {
         -- LSP config

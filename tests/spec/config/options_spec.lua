@@ -47,10 +47,10 @@ describe('config.options', function()
   end)
 
   it('sets the background from dark_mode', function()
-    _G.dark_mode = false
+    DyNeo.dark_mode = false
     load()
     assert.are.equal('light', vim.o.background)
-    _G.dark_mode = true
+    DyNeo.dark_mode = true
     load()
     assert.are.equal('dark', vim.o.background)
   end)

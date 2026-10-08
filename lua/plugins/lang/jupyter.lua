@@ -1,6 +1,6 @@
 local language = require('config.languages').jupyter
 
-return vim.list_contains(_G.enabled_languages, 'jupyter')
+return vim.list_contains(DyNeo.enabled_languages, 'jupyter')
     and {
       {
         'sheng-tse/jupynvim',

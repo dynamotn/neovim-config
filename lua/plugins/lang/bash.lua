@@ -218,7 +218,7 @@ local function generate_annotation(convention)
   })
 end
 
-return vim.list_contains(_G.enabled_languages, 'bash')
+return vim.list_contains(DyNeo.enabled_languages, 'bash')
     and {
       {
         -- LSP config

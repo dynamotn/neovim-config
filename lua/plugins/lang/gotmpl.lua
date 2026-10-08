@@ -22,7 +22,7 @@ if require('util.chezmoi').enabled() then
   injections = vim.tbl_map(function() return false end, injections)
 end
 
-return vim.list_contains(_G.enabled_languages, 'gotmpl')
+return vim.list_contains(DyNeo.enabled_languages, 'gotmpl')
     and {
       {
         -- Filetype icons

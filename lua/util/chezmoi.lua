@@ -6,6 +6,8 @@ local M = {}
 --- once it is installed, so `plugins.lang.gotmpl` asks this before adding its
 --- own injections by file name: both at once would parse each one twice.
 ---@return boolean
-M.enabled = function() return _G.used_full_plugins or _G.enabled_plugins.chezmoi end
+M.enabled = function()
+  return DyNeo.used_full_plugins or DyNeo.enabled_plugins.chezmoi
+end
 
 return M

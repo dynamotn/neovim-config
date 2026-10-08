@@ -6,7 +6,7 @@ local filetypes = vim.list_extend(vim.deepcopy(language.filetypes), {
   'java',
 })
 
-return vim.list_contains(_G.enabled_languages, 'scala')
+return vim.list_contains(DyNeo.enabled_languages, 'scala')
     and {
       {
         -- metals, driven by its own plugin rather than by lspconfig

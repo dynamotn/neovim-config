@@ -1,7 +1,7 @@
 local language = require('config.languages').julia
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'julia')
+return vim.list_contains(DyNeo.enabled_languages, 'julia')
     and {
       {
         -- LSP config
@@ -28,8 +28,8 @@ return vim.list_contains(_G.enabled_languages, 'julia')
         'kdheepak/cmp-latex-symbols',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               latex_symbols = '「TEX」',
             })
         end,

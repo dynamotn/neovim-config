@@ -1,6 +1,6 @@
 local language = require('config.languages').c_sharp
 
-return vim.list_contains(_G.enabled_languages, 'c_sharp')
+return vim.list_contains(DyNeo.enabled_languages, 'c_sharp')
     and {
       {
         -- Extended LSP

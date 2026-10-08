@@ -1,6 +1,6 @@
 local language = require('config.languages').cpp
 
-return vim.list_contains(_G.enabled_languages, 'cpp')
+return vim.list_contains(DyNeo.enabled_languages, 'cpp')
     and {
       {
         -- Toolbox for clang

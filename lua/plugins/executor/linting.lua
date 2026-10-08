@@ -229,14 +229,14 @@ return {
           if is_mason_tool then
             -- install the linters of bundle languages, `*` and `_` up front
             if
-              vim.list_contains(_G.bundle_languages, name)
+              vim.list_contains(DyNeo.bundle_languages, name)
               or name == '*'
               or name == '_'
             then
               table.insert(opts.ensure_installed, tool_package)
             end
             -- and the others once a buffer of their language opens
-            if vim.list_contains(_G.enabled_languages, name) then
+            if vim.list_contains(DyNeo.enabled_languages, name) then
               require('util.lazy_install').on_filetype(
                 language.filetypes,
                 function()

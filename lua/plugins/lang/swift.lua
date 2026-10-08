@@ -1,6 +1,6 @@
 local language = require('config.languages').swift
 
-return vim.list_contains(_G.enabled_languages, 'swift')
+return vim.list_contains(DyNeo.enabled_languages, 'swift')
     and {
       {
         -- LSP config

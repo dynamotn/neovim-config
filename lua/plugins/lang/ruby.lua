@@ -1,6 +1,6 @@
 local language = require('config.languages').ruby
 
-return vim.list_contains(_G.enabled_languages, 'ruby')
+return vim.list_contains(DyNeo.enabled_languages, 'ruby')
     and {
       {
         -- LSP config

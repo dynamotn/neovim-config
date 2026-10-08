@@ -1,7 +1,7 @@
 -- Globals shared across the configuration, with their defaults and types
 require('config.globals')
 -- Load specific configurations per machine. It runs ahead of the version
--- check because it is where `_G.plugin_channel` is chosen, and the channel
+-- check because it is where `DyNeo.plugin_channel` is chosen, and the channel
 -- decides which Neovim is new enough.
 require('per_machine')
 
@@ -11,7 +11,7 @@ require('per_machine')
 -- rustaceanvim, avante, native Copilot through
 -- `vim.lsp.inline_completion`), and every 0.13 check found in them has a
 -- fallback.
-local version = _G.plugin_channel == 'stable' and '0.12.0' or '0.13.0'
+local version = DyNeo.plugin_channel == 'stable' and '0.12.0' or '0.13.0'
 if vim.fn.has('nvim-' .. version) == 1 then
   -- Load lazy.nvim and the plugins
   require('config.lazy')

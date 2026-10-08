@@ -42,7 +42,7 @@ vim.o.clipboard = ''
 Plugin.lazy_file()
 
 local defaults = require('config.defaults')
-local stable = _G.plugin_channel == 'stable'
+local stable = DyNeo.plugin_channel == 'stable'
 
 -- Plugins still developed on their branch but whose newest release is more
 -- than two years old (as of 2026-10). `version = '*'` would take them back to
@@ -76,7 +76,7 @@ local stale_specs = vim.tbl_map(
   function(repo) return { repo, optional = true, version = false } end,
   stable and stale_releases or {}
 )
--- Hold a plugin back for `_G.quarantine_window` (a week unless a machine says
+-- Hold a plugin back for `DyNeo.quarantine_window` (a week unless a machine says
 -- otherwise) after a commit or a release, the quarantine the npm, bun, pnpm,
 -- uv and Mason sides of these dotfiles already apply. It goes in ahead of
 -- `setup`, which installs what is missing as it runs.
@@ -139,7 +139,7 @@ require('lazy').setup({
     },
   },
   dev = {
-    path = _G.dev_plugins_path,
+    path = DyNeo.dev_plugins_path,
     patterns = {},
     -- Without a fallback, a `dev = true` plugin with no checkout under `path`
     -- is treated as a local plugin that is never cloned, so it fails to load

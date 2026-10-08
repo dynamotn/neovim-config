@@ -2,7 +2,7 @@ return {
   {
     -- For gentoo filetypes
     'gentoo/gentoo-syntax',
-    enabled = _G.used_full_plugins or _G.is_gentoo,
+    enabled = DyNeo.used_full_plugins or DyNeo.is_gentoo,
   },
   {
     -- Comment strings by treesitter language, for files mixing several of

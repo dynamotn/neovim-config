@@ -1,8 +1,8 @@
--- Paths come from `stdpath` and `_G.dictionaries_path` rather than
+-- Paths come from `stdpath` and `DyNeo.dictionaries_path` rather than
 -- `~/.config/...`, so `:DySpell` writes into the configuration actually in use
 -- under a different `XDG_CONFIG_HOME` or `NVIM_APPNAME`.
 local spell_dir = vim.fs.joinpath(vim.fn.stdpath('config'), 'spell')
-local dictionaries = vim.fn.expand(_G.dictionaries_path)
+local dictionaries = vim.fn.expand(DyNeo.dictionaries_path)
 
 local spell_files = {
   vi = { vim.fs.joinpath(dictionaries, 'vietnamese.txt') },

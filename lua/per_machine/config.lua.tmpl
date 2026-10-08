@@ -1,19 +1,18 @@
-_G.dark_mode = {{ .darkMode }}
-_G.is_gentoo = {{ and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "gentoo") }}
-_G.is_gentoo = {{ eq .osid "linux-gentoo" }}
-_G.enabled_plugins.obsidian = {{ or (eq .kind "pc" "laptop") (eq .chezmoi.os "android") }}
-_G.enabled_plugins.leetcode = {{ eq .kind "pc" "laptop" }}
-_G.enabled_plugins.firenvim = {{ eq .kind "pc" "laptop" }}
-_G.enabled_plugins.otter = {{ eq .kind "pc" "laptop" }}
-_G.enabled_plugins.chezmoi = true
+DyNeo.dark_mode = {{ .darkMode }}
+DyNeo.is_gentoo = {{ eq .osid "linux-gentoo" }}
+DyNeo.enabled_plugins.obsidian = {{ or (eq .kind "pc" "laptop") (eq .chezmoi.os "android") }}
+DyNeo.enabled_plugins.leetcode = {{ eq .kind "pc" "laptop" }}
+DyNeo.enabled_plugins.firenvim = {{ eq .kind "pc" "laptop" }}
+DyNeo.enabled_plugins.otter = {{ eq .kind "pc" "laptop" }}
+DyNeo.enabled_plugins.chezmoi = true
 {{- if eq .kind "container" }}
-_G.enabled_languages = { 'gitcommit', 'gitrebase', 'bash', 'sql' }
-_G.bundle_languages = { 'gitcommit', 'bash', 'sql' }
+DyNeo.enabled_languages = { 'gitcommit', 'gitrebase', 'bash', 'sql' }
+DyNeo.bundle_languages = { 'gitcommit', 'bash', 'sql' }
 {{- end }}
 {{- if eq .chezmoi.os "android" }}
-_G.obsidian.paths.personal = '~/storage/shared/Documents/Notes'
+DyNeo.obsidian.paths.personal = '~/storage/shared/Documents/Notes'
 {{- end }}
-_G.firenvim_site_settings = {
+DyNeo.firenvim_site_settings = {
   [ [[.*google\.com.*]] ] = {
     priority = 9,
     takeover = 'never',
@@ -71,8 +70,8 @@ _G.firenvim_site_settings = {
 require('per_machine.F1')
 {{- end }}
 {{- if eq .code "l30n4rd0d4v1nc1" }}
-_G.used_full_plugins = true
+DyNeo.used_full_plugins = true
 {{- end }}
 {{- if .blockedGitlab }}
-_G.obsidian.vaults = function() return {} end
+DyNeo.obsidian.vaults = function() return {} end
 {{- end }}

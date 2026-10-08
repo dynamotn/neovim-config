@@ -16,7 +16,7 @@ local function mason_ansible_python()
   return vim.uv.fs_stat(python) and python or nil
 end
 
-return vim.list_contains(_G.enabled_languages, 'ansible')
+return vim.list_contains(DyNeo.enabled_languages, 'ansible')
     and {
       {
         -- LSP config

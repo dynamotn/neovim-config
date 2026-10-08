@@ -8,11 +8,11 @@ describe('util.day_night', function()
     day_night = require('util.day_night')
     restore = {
       h.stub(
-        _G,
+        DyNeo,
         'day_night',
         { enabled = false, day_start = 6, night_start = 18 }
       ),
-      h.stub(_G, 'dark_mode', true),
+      h.stub(DyNeo, 'dark_mode', true),
     }
   end)
   after_each(function()
@@ -33,14 +33,14 @@ describe('util.day_night', function()
     end)
 
     it('is always dark when both hours are the same', function()
-      _G.day_night.day_start, _G.day_night.night_start = 8, 8
+      DyNeo.day_night.day_start, DyNeo.day_night.night_start = 8, 8
       for hour = 0, 23 do
         assert.is_true(day_night.is_dark(hour))
       end
     end)
 
     it('handles a light stretch running past midnight', function()
-      _G.day_night.day_start, _G.day_night.night_start = 22, 6
+      DyNeo.day_night.day_start, DyNeo.day_night.night_start = 22, 6
       assert.is_false(day_night.is_dark(23))
       assert.is_false(day_night.is_dark(3))
       assert.is_true(day_night.is_dark(6))
@@ -51,28 +51,29 @@ describe('util.day_night', function()
   end)
 
   describe('init', function()
-    it('follows _G.dark_mode when disabled', function()
-      _G.dark_mode = false
+    it('follows DyNeo.dark_mode when disabled', function()
+      DyNeo.dark_mode = false
       day_night.init()
       assert.equals('light', vim.o.background)
-      _G.dark_mode = true
+      DyNeo.dark_mode = true
       day_night.init()
       assert.equals('dark', vim.o.background)
     end)
 
     it('lets the clock decide when enabled', function()
-      _G.day_night.enabled = true
+      DyNeo.day_night.enabled = true
       local hour = tonumber(os.date('%H'))
       -- Make the current hour light, then dark.
-      _G.day_night.day_start, _G.day_night.night_start = hour, (hour + 1) % 24
-      _G.dark_mode = true
+      DyNeo.day_night.day_start, DyNeo.day_night.night_start =
+        hour, (hour + 1) % 24
+      DyNeo.dark_mode = true
       day_night.init()
-      assert.is_false(_G.dark_mode)
+      assert.is_false(DyNeo.dark_mode)
       assert.equals('light', vim.o.background)
 
-      _G.day_night.day_start, _G.day_night.night_start = hour, hour
+      DyNeo.day_night.day_start, DyNeo.day_night.night_start = hour, hour
       day_night.init()
-      assert.is_true(_G.dark_mode)
+      assert.is_true(DyNeo.dark_mode)
       assert.equals('dark', vim.o.background)
     end)
   end)
@@ -95,7 +96,7 @@ describe('util.day_night', function()
 
     it('reloads the colorscheme when the background changes', function()
       vim.o.background = 'dark'
-      _G.dark_mode = false
+      DyNeo.dark_mode = false
       day_night.apply()
       assert.equals('light', vim.o.background)
       assert.equals(1, calls)
@@ -103,7 +104,7 @@ describe('util.day_night', function()
 
     it('leaves the colorscheme alone when nothing changed', function()
       vim.o.background = 'dark'
-      _G.dark_mode = true
+      DyNeo.dark_mode = true
       day_night.apply()
       assert.equals(0, calls)
     end)
@@ -118,7 +119,7 @@ describe('util.day_night', function()
     end)
 
     it('watches focus and resume when enabled', function()
-      _G.day_night.enabled = true
+      DyNeo.day_night.enabled = true
       day_night.setup()
       day_night.setup() -- a second call replaces the first
       local events = {}

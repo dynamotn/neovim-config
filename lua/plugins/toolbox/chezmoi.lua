@@ -252,9 +252,10 @@ return {
     optional = true,
     opts = function(_, opts)
       if not enabled then return end
-      _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
-        chezmoi = '「CZ」',
-      })
+      DyNeo.completion_sources =
+        vim.tbl_extend('force', DyNeo.completion_sources, {
+          chezmoi = '「CZ」',
+        })
       opts.sources = opts.sources or {}
       opts.sources.providers = opts.sources.providers or {}
       opts.sources.per_filetype = opts.sources.per_filetype or {}

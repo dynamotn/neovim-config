@@ -1,7 +1,7 @@
 local language = require('config.languages').gitcommit
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'gitcommit')
+return vim.list_contains(DyNeo.enabled_languages, 'gitcommit')
     and {
       {
         -- LSP config
@@ -17,8 +17,8 @@ return vim.list_contains(_G.enabled_languages, 'gitcommit')
         'petertriho/cmp-git',
         ft = language.filetypes,
         init = function()
-          _G.completion_sources =
-            vim.tbl_extend('force', _G.completion_sources, {
+          DyNeo.completion_sources =
+            vim.tbl_extend('force', DyNeo.completion_sources, {
               git = '「GIT」',
             })
         end,

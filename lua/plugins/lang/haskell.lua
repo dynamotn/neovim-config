@@ -6,7 +6,7 @@ local filetypes = vim.list_extend(vim.deepcopy(language.filetypes), {
   'cabalproject',
 })
 
-return vim.list_contains(_G.enabled_languages, 'haskell')
+return vim.list_contains(DyNeo.enabled_languages, 'haskell')
     and {
       {
         -- Toolbox: REPL, hoogle, codelens, and the Haskell LSP

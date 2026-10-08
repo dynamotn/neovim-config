@@ -1,7 +1,7 @@
 local language = require('config.languages').r
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'r')
+return vim.list_contains(DyNeo.enabled_languages, 'r')
     and {
       {
         -- R console in a split, and everything that talks to it

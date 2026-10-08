@@ -129,7 +129,7 @@ return {
           },
           config = function(_, _)
             -- Run zellij floating pane
-            if _G.test_strategy == 'zellij' then
+            if DyNeo.test_strategy == 'zellij' then
               vim.cmd([[
                 function! ZellijStrategy(cmd)
                   execute "!zellij run --floating -- " . a:cmd
@@ -139,7 +139,7 @@ return {
                 [[ let g:test#custom_strategies = {'zellij': function('ZellijStrategy')} ]]
               )
             end
-            vim.g['test#strategy'] = _G.test_strategy
+            vim.g['test#strategy'] = DyNeo.test_strategy
           end,
         },
       },

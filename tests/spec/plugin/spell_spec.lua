@@ -8,7 +8,7 @@ describe('plugin/spell', function()
     -- `spell/` ships with the repository, the word lists need not
     vim.fn.mkdir(dir .. '/spell', 'p')
     commands, messages, executed = {}, {}, {}
-    _G.dictionaries_path = dir .. '/dictionaries'
+    DyNeo.dictionaries_path = dir .. '/dictionaries'
     local stdpath = vim.fn.stdpath
     restores = {
       -- Point the word lists at a scratch copy, never at the real `spell/`

@@ -6,7 +6,7 @@ local M = {}
 --- tools, worked out once. The statusline asks on every redraw, and walking
 --- every filetype of every language each time adds up. Built on first use
 --- rather than on `require`, so `per_machine` has had its say over
---- `_G.enabled_languages` by then.
+--- `DyNeo.enabled_languages` by then.
 ---@type table<string, string>?
 local language_of
 ---@type table<string, string[]>
@@ -41,7 +41,7 @@ end
 M.get_language_from_filetype = function(filetype)
   if not language_of then
     language_of = {}
-    for _, name in ipairs(_G.enabled_languages) do
+    for _, name in ipairs(DyNeo.enabled_languages) do
       for _, ft in ipairs((languages_list[name] or {}).filetypes or {}) do
         language_of[ft] = name
       end

@@ -1,6 +1,6 @@
 local language = require('config.languages').json
 
-return vim.list_contains(_G.enabled_languages, 'json')
+return vim.list_contains(DyNeo.enabled_languages, 'json')
     and {
       {
         -- Schema

@@ -2,7 +2,7 @@
 local language = require('config.languages').gitrebase
 local cmp_util = require('util.cmp')
 
-return vim.list_contains(_G.enabled_languages, 'gitrebase')
+return vim.list_contains(DyNeo.enabled_languages, 'gitrebase')
     and {
       {
         -- Completion source, on this filetype too. Not a dependency of

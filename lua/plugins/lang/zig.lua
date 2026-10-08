@@ -1,6 +1,6 @@
 local language = require('config.languages').zig
 
-return vim.list_contains(_G.enabled_languages, 'zig')
+return vim.list_contains(DyNeo.enabled_languages, 'zig')
     and {
       {
         -- LSP config

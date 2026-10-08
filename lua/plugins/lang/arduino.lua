@@ -1,4 +1,4 @@
-return vim.list_contains(_G.enabled_languages, 'arduino')
+return vim.list_contains(DyNeo.enabled_languages, 'arduino')
     and {
       {
         -- LSP config
