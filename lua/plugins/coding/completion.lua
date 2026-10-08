@@ -258,14 +258,10 @@ return {
                   return icon .. ctx.icon_gap
                 end,
 
-                -- Optionally, use the highlight groups from nvim-web-devicons
-                -- You can also add the same function for `kind.highlight` if you want to
-                -- keep the highlight groups in sync with the icons.
+                -- The kind's group, which blink swaps for the colour itself on
+                -- a Tailwind class, or the file's devicon group on a path
                 highlight = function(ctx)
-                  local hl = 'BlinkCmpKind' .. ctx.kind
-                    or require('blink.cmp.completion.windows.render.tailwind').get_hl(
-                      ctx
-                    )
+                  local hl = ctx.kind_hl
                   if
                     vim.tbl_contains(
                       { 'Path', 'project_path', 'fuzzy_path' },
