@@ -172,20 +172,24 @@ return {
             end
             return ''
           end,
-          color = { fg = Snacks.util.color('String') },
+          color = function() return { fg = Snacks.util.color('String') } end,
         },
         {
           -- Counts only; a click lists every server with its state
           function() return require('util.statusline').lsp_status(icons.lsp) end,
           on_click = function() require('util.statusline').pick_lsp() end,
-          color = { fg = Snacks.util.color('Label'), gui = 'bold' },
+          color = function()
+            return { fg = Snacks.util.color('Label'), gui = 'bold' }
+          end,
         },
         {
           function()
             return require('util.statusline').tools_status(icons.null_ls)
           end,
           on_click = function() require('util.statusline').pick_tools() end,
-          color = { fg = Snacks.util.color('Statement'), gui = 'bold' },
+          color = function()
+            return { fg = Snacks.util.color('Statement'), gui = 'bold' }
+          end,
         },
       }
       opts.special_filetypes = {
