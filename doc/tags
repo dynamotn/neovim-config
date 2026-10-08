@@ -22,6 +22,7 @@ DyNeo.firenvim_site_settings	dyneo.txt	/*DyNeo.firenvim_site_settings*
 DyNeo.is_gentoo	dyneo.txt	/*DyNeo.is_gentoo*
 DyNeo.obsidian	dyneo.txt	/*DyNeo.obsidian*
 DyNeo.plugin_channel	dyneo.txt	/*DyNeo.plugin_channel*
+DyNeo.quarantine_window	dyneo.txt	/*DyNeo.quarantine_window*
 DyNeo.test_strategy	dyneo.txt	/*DyNeo.test_strategy*
 DyNeo.used_full_plugins	dyneo.txt	/*DyNeo.used_full_plugins*
 DyNeo.yaml_schema_dirs	dyneo.txt	/*DyNeo.yaml_schema_dirs*

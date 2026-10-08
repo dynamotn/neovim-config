@@ -135,6 +135,11 @@ defaulted in `lua/config/globals.lua`.
 `DyNeo.plugin_channel`         (default `'latest'`)
         `'latest'` or `'stable'`, see |dyneo-channels|.
 
+                                                     *DyNeo.quarantine_window*
+`DyNeo.quarantine_window`      (default: one week, in seconds)
+        How long a release waits before Mason or lazy.nvim may install it;
+        `0` turns the wait off.  See |dyneo-quarantine|.
+
                                                      *DyNeo.enabled_languages*
 `DyNeo.enabled_languages`      (default: every supported language)
         Which languages get plugins, parsers and tools at all.
