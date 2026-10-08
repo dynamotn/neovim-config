@@ -9,13 +9,19 @@
 [![Built on lazy.nvim](https://img.shields.io/badge/built%20on-lazy.nvim-blueviolet.svg?style=flat-square)](https://lazy.folke.io)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 
+The name reads two ways. Said aloud, *DyNeo* is a playful spelling of the
+Vietnamese *đi nào* — "let's go", the cute way of saying it. Written down, it
+is *Dy*, from dynamo, the author's handle (and the prefix of this setup's own
+tools, `:DySpell` and the rest), plus *Neo*vim.
+
 This is DyNeo, a standalone [lazy.nvim](https://lazy.folke.io) configuration,
-not a distribution to install over yours. Every language it knows about is one declarative entry
-in [lua/config/languages.lua](./lua/config/languages.lua) — its Treesitter
-parser, LSP servers, linters, formatters, debug adapters and test runners —
-and a single `FileType` dispatcher installs that entry the first time a file
-of the language is opened. Starting Neovim stays in the tens of milliseconds
-because nothing above `init.lua` runs until a buffer asks for it.
+not a distribution to install over yours. Every language it knows about is one
+declarative entry in [lua/config/languages.lua](./lua/config/languages.lua) —
+its Treesitter parser, LSP servers, linters, formatters, debug adapters and
+test runners — and a single `FileType` dispatcher installs that entry the
+first time a file of the language is opened. Starting Neovim stays in the tens
+of milliseconds because nothing above `init.lua` runs until a buffer asks for
+it.
 
 The same tree runs on a laptop with everything enabled and in a container with
 four languages; what differs is a handful of globals, see

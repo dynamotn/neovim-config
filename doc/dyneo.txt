@@ -2,9 +2,13 @@
 
                                                                        *dyneo*
 
+The name reads two ways.  Said aloud, DyNeo is a playful spelling of the
+Vietnamese "đi nào" -- "let's go", the cute way of saying it.  Written down,
+it is Dy, from dynamo, the author's handle (and the prefix of this setup's own
+tools, |:DySpell| and the rest), plus Neovim.
+
 This is DyNeo, a standalone lazy.nvim configuration, not a distribution to
-install over yours.
-Every language it knows about is one declarative entry in
+install over yours.  Every language it knows about is one declarative entry in
 `lua/config/languages.lua` -- its Treesitter parser, LSP servers, linters,
 formatters, debug adapters and test runners -- and a single |FileType|
 dispatcher installs that entry the first time a file of the language is
