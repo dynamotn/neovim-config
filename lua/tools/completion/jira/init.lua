@@ -1,22 +1,48 @@
 local h = require('null-ls.helpers')
 local methods = require('null-ls.methods')
 
---- Run `jira` and hand back the lines it printed
+--- Milliseconds a `jira` command is given before it is killed
+---
+--- jira-cli waits on the network for as long as it takes, and with no server
+--- to reach -- offline, a VPN down, `jira init` never run -- that is forever.
+--- null-ls answers a completion request once every source has, so one hung
+--- search left the whole request, harper's words and all, unanswered.
+local TIMEOUT = 5000
+
+--- Milliseconds the source stays quiet after a search hung
+---
+--- A hang is not about the word: the next search would wait out the same
+--- timeout, once per word typed, two processes at a time. A query that fails
+--- outright -- `project = AB` while no project is called that -- is about
+--- the word, and the next one is tried as usual.
+local BACKOFF = 5 * 60 * 1000
+
+--- `vim.uv.now()` before which the source answers nothing, without asking
+local quiet_until = 0
+
+--- Run `jira` and hand back the lines it printed, and whether it hung
 ---
 --- `vim.system` rather than `plenary.job`: plenary calls `on_exit` as soon as
 --- the process is gone and stops reading, so output still sitting in the pipe
 --- was lost and a query dropped its rows every few runs.
 ---@param args string[]
----@param on_output fun(lines: string[])
+---@param on_output fun(lines: string[], hung: boolean)
 local function jira(args, on_output)
-  vim.system(
+  local ok = pcall(
+    vim.system,
     vim.list_extend({ 'jira' }, args),
-    { text = true },
+    { text = true, timeout = TIMEOUT },
     function(result)
-      if result.code ~= 0 then return on_output({}) end
-      on_output(vim.split(result.stdout or '', '\n', { trimempty = true }))
+      -- Killed for the timeout: a signal, and 124 as `timeout(1)` reports it
+      local hung = (result.signal or 0) ~= 0 or result.code == 124
+      if result.code ~= 0 then return on_output({}, hung) end
+      on_output(
+        vim.split(result.stdout or '', '\n', { trimempty = true }),
+        false
+      )
     end
   )
+  if not ok then on_output({}, true) end
 end
 
 --- Split one `--plain` row into the two columns the candidate is built from
@@ -134,9 +160,10 @@ local function search(word, on_items)
       '--jql',
       query,
     }
-    jira(args, function(lines)
+    jira(args, function(lines, hung)
       -- A query that fails contributes nothing, rather than holding the
-      -- whole request back
+      -- whole request back; one that hung keeps the next ones from trying
+      if hung then quiet_until = vim.uv.now() + BACKOFF end
       rows[kind] = lines
       pending_searches = pending_searches - 1
       if pending_searches > 0 then return end
@@ -175,7 +202,6 @@ return h.make_builtin({
         done({ { items = {}, isIncomplete = false } })
         return
       end
-
       -- Each search starts up to 22 `jira` processes: a word typed again
       -- (backspace, a second commit) is answered from what was found, and
       -- only the word the typing settles on is searched at all
@@ -183,6 +209,13 @@ return h.make_builtin({
       if cached and vim.uv.now() - cached.time < CACHE_TTL then
         local items = vim.deepcopy(cached.items)
         return done({ { items = items, isIncomplete = #items == 0 } })
+      end
+
+      -- Nothing to ask, or a search just hung: answered at once, and as
+      -- complete, so the typing that follows does not ask again
+      if vim.fn.executable('jira') ~= 1 or vim.uv.now() < quiet_until then
+        done({ { items = {}, isIncomplete = false } })
+        return
       end
       generation = generation + 1
       local mine = generation
