@@ -1,4 +1,3 @@
-vim.g.do_filetype_lua = 1
 
 vim.filetype.add({
   extension = {
@@ -54,7 +53,7 @@ vim.filetype.add({
     ['openapi.*%.json'] = 'json.openapi',
 
     ['.*%.gitlab%-ci%.ya?ml'] = 'yaml.gitlab',
-    ['.*%.github/workflows/.*.ya?ml'] = 'yaml.gh-action',
+    ['.*%.github/workflows/.*%.ya?ml'] = 'yaml.gh-action',
 
     ['.*%.component%.html'] = 'htmlangular',
     ['.*%.container%.html'] = 'htmlangular',
@@ -68,7 +67,7 @@ vim.filetype.add({
     ['.*/templates/.*%.tpl'] = 'helm',
     ['.*/templates/.*%.ya?ml'] = 'helm',
     ['helmfile.*%.ya?ml'] = 'helm',
-    ['values.*%.yaml'] = 'yaml.helm-values',
+    ['values.*%.ya?ml'] = 'yaml.helm-values',
 
     ['.*/hypr/.*%.conf'] = 'hyprlang',
 
