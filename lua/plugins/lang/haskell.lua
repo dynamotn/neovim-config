@@ -18,7 +18,7 @@ return vim.list_contains(_G.enabled_languages, 'haskell')
         keys = {
           {
             '<localleader>e',
-            '<cmd>HlsEvalAll<cr>',
+            '<cmd>Haskell hls evalAll<cr>',
             ft = language.filetypes,
             desc = 'Evaluate All',
           },
