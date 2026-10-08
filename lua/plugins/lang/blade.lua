@@ -88,7 +88,7 @@ return vim.list_contains(_G.enabled_languages, 'blade')
               ['blade-nav'] = {
                 name = 'blade-nav',
                 -- ships a blink source of its own, so no compat shim
-                module = 'blade-nav.blink',
+                module = 'blade-nav.integrations.blink',
               },
               laravel = {
                 name = 'laravel',
