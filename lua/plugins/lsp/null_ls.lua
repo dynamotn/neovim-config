@@ -85,7 +85,7 @@ return {
             is_mason_tool = tool.mason.enabled ~= false
           end
           if is_mason_tool then
-            -- install server of language in bundle languages
+            -- install the tools of bundle languages, `*` and `_` up front
             if
               vim.list_contains(_G.bundle_languages, name)
               or name == '*'
@@ -93,7 +93,7 @@ return {
             then
               table.insert(opts.ensure_installed, tool_package)
             end
-            -- lazy install server of language not in bundle languages
+            -- and the others once a buffer of their language opens
             if vim.list_contains(_G.enabled_languages, name) then
               vim.api.nvim_create_autocmd({ 'FileType' }, {
                 pattern = language.filetypes,

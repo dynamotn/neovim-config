@@ -41,6 +41,9 @@ local auto_relative_number = function()
       callback = function() vim.wo[win].relativenumber = true end,
     })
   end
+  -- Absolute numbers while a command is typed, so a range like `:12,20d` can
+  -- be read straight off the gutter. Entering the command line does not
+  -- repaint the window, hence the `redraw`.
   vim.api.nvim_create_autocmd('CmdlineEnter', {
     group = group,
     callback = function()

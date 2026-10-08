@@ -62,9 +62,10 @@ local stale_specs = vim.tbl_map(
   function(repo) return { repo, optional = true, version = false } end,
   stable and stale_releases or {}
 )
--- Hold a plugin back for a week after a commit or a release, the quarantine
--- the npm, bun, pnpm, uv and Mason sides of these dotfiles already apply. It
--- goes in ahead of `setup`, which installs what is missing as it runs.
+-- Hold a plugin back for `_G.quarantine_window` (a week unless a machine says
+-- otherwise) after a commit or a release, the quarantine the npm, bun, pnpm,
+-- uv and Mason sides of these dotfiles already apply. It goes in ahead of
+-- `setup`, which installs what is missing as it runs.
 require('tools.lazy-quarantine').setup()
 
 -- Setup lazy

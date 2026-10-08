@@ -17,6 +17,7 @@ return {
     -- Render `:help` pages: headings, tables, code blocks, tags and links
     'OXY2DEV/helpview.nvim',
     -- Loads itself on a help buffer; lazy-loading it only delays the first
+    -- help page
     lazy = false,
   },
 }

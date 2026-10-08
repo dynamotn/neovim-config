@@ -10,8 +10,9 @@ local languages = require('util.languages')
 
 local M = {}
 
---- Tools that come with the system rather than being installed for a
---- language, so neither counted nor listed
+--- Commands that run inside Neovim (`lua`) or come with every system, the
+--- ones `config.languages` marks `mason.enabled = false`: nothing installs
+--- them, so they are neither counted nor listed
 local ignored_tools = { 'lua', 'git', 'curl', 'sed' }
 
 ---@class DyLspCandidate

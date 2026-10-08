@@ -108,6 +108,8 @@ return condition
               },
               filetypes = language.filetypes,
             },
+            -- One server per YAML dialect, each held to its own filetype,
+            -- picked by position from the list in `config.languages`
             gitlab_ci_ls = {
               filetypes = { language.filetypes[2] },
             },

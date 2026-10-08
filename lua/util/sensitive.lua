@@ -110,8 +110,8 @@ local function secrets_in_buffer(bufnr)
   local bytes = vim.api.nvim_buf_get_offset(bufnr, lines)
   local partial = bytes > config.content_max_bytes
   if partial then
-    -- The offset of a line is where it starts, so this is the last line that
-    -- begins inside the budget.
+    -- The offset of a line is where it starts, and so where the one before it
+    -- ends: this counts the lines that end inside the budget.
     local low, high = 1, lines
     while low < high do
       local middle = math.floor((low + high + 1) / 2)

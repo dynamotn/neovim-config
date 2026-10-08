@@ -12,9 +12,8 @@
 --- over whatever the parser returned. It keeps the upstream definition's
 --- shape: a table stays a table, so a language's `opts` can still set `args`
 --- on it, and a function is still only called at lint time. A mapper that
---- finds nothing hands the diagnostic back
---- untouched: a tool that changes the shape of its output loses the ignore
---- comment again and nothing else.
+--- finds nothing hands the diagnostic back untouched: a tool that changes the
+--- shape of its output loses the ignore comment again and nothing else.
 
 local M = {}
 

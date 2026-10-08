@@ -11,7 +11,8 @@ M.root = vim.fs
   )
   :gsub('/$', '')
 
---- Drop `modules` from `package.loaded`, so the next `require` reads them anew
+--- Drop the named modules from `package.loaded`, so the next `require` reads
+--- them anew
 ---@param ... string Module names
 M.unload = function(...)
   for _, name in ipairs({ ... }) do

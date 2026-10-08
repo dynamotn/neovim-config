@@ -8,8 +8,9 @@ return vim.list_contains(_G.enabled_languages, 'swift')
         opts = {
           servers = {
             sourcekit = {
-              -- an Xcode project, a build server description or a package
-              -- manifest each mark the root of a Swift project
+              -- a build server description (what `xcode-build-server` writes
+              -- for an Xcode project) or a package manifest marks the root of
+              -- a Swift project
               root_markers = {
                 'buildServer.json',
                 'Package.swift',

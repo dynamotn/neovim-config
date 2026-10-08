@@ -5,8 +5,8 @@
 --- they cannot see is this machine: whether the quarantine in front of Mason
 --- and lazy.nvim is the one actually running, whether the windows it is held
 --- to still agree with the ones bun and uv read, which guard of `util.ai_guard`
---- found nothing to wrap, and which of the tools that never come from Mason
---- are missing here.
+--- found nothing to wrap, and which of the commands no package installs are
+--- missing here.
 ---
 --- Every check hands back a level and a line, and `check()` only prints them,
 --- so the specs can read the same answers without a health buffer.
@@ -302,12 +302,14 @@ local function ai_guard()
   return entries
 end
 
---- Tools that never come from Mason, and whether this machine has them
+--- Commands no package installs, and whether this machine has them
 ---
---- `mason.enabled = false` says the tool ships with a language toolchain, the
---- system or a package manager Mason does not speak. A missing one is not an
---- error -- the formatter or linter is simply skipped -- so it is reported as
---- what it is: a tool this machine does not have.
+--- `mason.enabled = false` is left for a command every system is expected to
+--- have (`sed`, `git`, `curl`) or one that runs inside Neovim (`lua`): a tool
+--- Mason lacks is a `dytoy:<tool>` package of `tools.mason-registry` instead,
+--- and is installed like any other. A missing one is not an error -- the
+--- formatter or linter is simply skipped -- so it is reported as what it is: a
+--- command this machine does not have.
 ---@return DyHealthEntry[]
 local function system_tools()
   local ok, languages = pcall(require, 'config.languages')

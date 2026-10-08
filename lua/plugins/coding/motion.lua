@@ -1,5 +1,5 @@
 return {
-  -- Create key strokes
+  -- Pin files and jump between them
   { import = 'lazyvim.plugins.extras.editor.harpoon2' },
   -- Action for surrounding
   { import = 'lazyvim.plugins.extras.coding.mini-surround' },

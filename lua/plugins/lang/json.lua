@@ -40,6 +40,8 @@ return vim.list_contains(_G.enabled_languages, 'json')
                 },
               },
             },
+            -- An OpenAPI linter, so `json.openapi` only (the fourth filetype
+            -- `config.languages` lists for JSON)
             vacuum = {
               filetypes = { language.filetypes[4] },
             },

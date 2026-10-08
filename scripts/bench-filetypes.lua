@@ -78,8 +78,9 @@ if target then
 
   local settle = tonumber(vim.env.BENCH_FT_SETTLE) or 400
   -- The last moment the file was still busy. `LazyLoad` is lazy.nvim loading
-  -- a plugin this buffer asked for, `LspAttach` a server arriving; both land
-  -- from callbacks, after the `:edit` has returned.
+  -- a plugin this buffer asked for, `LspAttach` a server arriving. A plugin
+  -- loaded on `FileType` fires inside the `:edit`; a server, and anything
+  -- loaded from a scheduled callback, lands after it has returned.
   local last = 0
   local function mark() last = vim.uv.hrtime() end
   vim.api.nvim_create_autocmd('User', { pattern = 'LazyLoad', callback = mark })

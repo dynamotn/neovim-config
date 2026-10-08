@@ -50,7 +50,9 @@ local needs = {
 ---
 --- Read straight off this tree instead of through `require`: the module picks
 --- its folder with `stdpath('config')`, which is the configuration in use and
---- not necessarily the one being checked.
+--- not necessarily the one being checked. A package handed to dytoy
+--- (`dytoy:<tool>`) counts as soon as its file is here: whether dytoy knows
+--- that tool is not checked.
 ---@return table<string, true>
 local function own_registry()
   local names = {}

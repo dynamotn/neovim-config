@@ -200,6 +200,8 @@ local function kubernetes_uri(client, gvk)
   local version = vim.tbl_get(client.settings, 'yaml', 'kubernetesVersion')
   local dir = (version and 'v' .. version:gsub('^v', '') or 'master')
     .. '-standalone-strict'
+  -- kubernetes-json-schema names a file after the first label of the group
+  -- only: `networking.k8s.io/v1` `Ingress` is `ingress-networking-v1.json`.
   local group = gvk.group == '' and '' or '-' .. gvk.group:match('^[^.]+')
   return ('%s/%s/%s%s-%s.json'):format(
     KUBERNETES_SCHEMAS,
@@ -460,6 +462,7 @@ local function find_local(bufnr, callback)
     for name, type in
       vim.fs.dir(dir, {
         depth = 8,
+        -- Despite its name, `skip` answers whether to descend into a directory
         skip = function(n) return n ~= '.git' and n ~= 'node_modules' end,
       })
     do

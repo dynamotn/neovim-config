@@ -14,10 +14,11 @@ local config = {
 local preview_buf = nil
 local preview_win = nil
 
---- Throw away renders nothing points at any more
+--- Throw away renders more than a week old
 ---
 --- The cache key follows the contents of a diagram, so every edit leaves the
---- previous render behind. Nothing else ever removes them.
+--- previous render behind. Nothing else ever removes them. Age is the only
+--- test: a render still in use is dropped as well, and simply drawn again.
 local function prune_cache()
   local week = 7 * 24 * 60 * 60
   local now = os.time()
@@ -99,10 +100,12 @@ local function svg_to_png(svg_path, png_path, on_done)
   end
 end
 
---- Hash the diagram together with the d2 files it can import
+--- Hash the diagram together with the d2 files beside and below it, which is
+--- where its imports usually live
 ---
 --- Only the opened file used to go into the key, so editing an imported file
---- kept serving the stale picture.
+--- kept serving the stale picture. An import reaching up with `../` is still
+--- not covered.
 ---@param source_path string
 ---@return string
 local function content_hash(source_path)

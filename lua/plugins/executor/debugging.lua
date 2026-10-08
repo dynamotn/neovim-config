@@ -66,7 +66,7 @@ return {
       local languages = require('config.languages')
       for name, language in pairs(languages) do
         if language.dap then
-          -- install server of language in bundle languages: mason-nvim-dap
+          -- install the adapters of bundle languages up front: mason-nvim-dap
           -- takes the adapters it knows by name, the rest are installed here
           if vim.list_contains(_G.bundle_languages, name) then
             for _, spec in ipairs(language.dap) do
@@ -80,7 +80,7 @@ return {
               end
             end
           end
-          -- lazy install server of language not in bundle languages
+          -- and the others once a buffer of their language opens
           if vim.list_contains(_G.enabled_languages, name) then
             require('util.lazy_install').on_filetype(
               language.filetypes,

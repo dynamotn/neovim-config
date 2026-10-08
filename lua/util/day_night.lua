@@ -4,7 +4,7 @@
 --- `vim.o.background` while it loads and picks latte or macchiato from it.
 --- So the whole job here is to keep that one option honest: work out whether
 --- it is day, set it, and ask for the colorscheme again when the answer
---- changes. `_G.dark_mode` stays the manual override it always was --- with
+--- changes. `_G.dark_mode` stays the manual override it always was -- with
 --- `_G.day_night.enabled` off, it is the only thing consulted.
 
 local M = {}

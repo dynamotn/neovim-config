@@ -41,9 +41,10 @@ return vim.list_contains(_G.enabled_languages, 'rust')
                     enable = true,
                   },
                 },
-                -- Add clippy lints for Rust if using rust-analyzer
+                -- Run the check on save; rustaceanvim makes it `clippy` when
+                -- `cargo-clippy` is on `$PATH`
                 checkOnSave = true,
-                -- Enable diagnostics if using rust-analyzer
+                -- rust-analyzer's own diagnostics, on top of the check's
                 diagnostics = {
                   enable = true,
                 },

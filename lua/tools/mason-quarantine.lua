@@ -81,9 +81,9 @@ end
 --- Releases per page, and how many pages are read at most
 ---
 --- mason-org/mason-registry cuts a release per merged pull request, a dozen
---- and more a day, so a week of them does not fit in one page -- and a repo
---- that has not released in the five pages this reads is one whose releases
---- are old enough to be on the first page anyway.
+--- and more a day, so a week of them need not fit in one page. Five pages is
+--- five hundred releases, more than any repository Mason installs from cuts
+--- in a week; past that, the lookup fails rather than reading on.
 local PER_PAGE = 100
 local MAX_PAGES = 5
 

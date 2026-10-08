@@ -11,7 +11,8 @@ return vim.list_contains(_G.enabled_languages, 'haskell')
       {
         -- Toolbox: REPL, hoogle, codelens, and the Haskell LSP
         'mrcjkb/haskell-tools.nvim',
-        -- the plugin's own advice: follow the branch, not the tags
+        -- Follow the branch on either channel, not the newest tag `stable`
+        -- would pick. The plugin's README advises a `^10` range instead.
         version = false,
         ft = filetypes,
         keys = {

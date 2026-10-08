@@ -175,7 +175,8 @@ return {
         default = function() return require('util.cmp').setup_default_sources() end,
         per_filetype = {},
       },
-      -- enable fuzzy for input words with every length
+      -- No typos allowed, as fzf does; blink's default forgives one for every
+      -- four characters typed
       fuzzy = {
         max_typos = function() return 0 end,
       },

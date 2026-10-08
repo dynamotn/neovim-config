@@ -19,7 +19,7 @@ end
 -- into a `sudo tee`.
 cabbrev('ww', 'w ! sudo tee % > /dev/null')
 
--- No one is really happy until you have this shortcuts
+-- No one is really happy until you have these shortcuts
 cabbrev('W!', 'w!')
 cabbrev('Q!', 'q!')
 cabbrev('Qa!', 'qa!')
@@ -34,15 +34,17 @@ cabbrev('Qa', 'qa')
 -- Change word faster
 vim.keymap.set('n', '<C-c>', 'ciw', { desc = 'Change word' })
 
--- Smart delete
+-- Smart delete: on a blank line the text goes to the black-hole register, so
+-- clearing empty lines does not overwrite what was yanked
 local smart_delete = function(key)
   local l = vim.api.nvim_win_get_cursor(0)[1]
   local line = vim.api.nvim_buf_get_lines(0, l - 1, l, true)[1]
   return (line:match('^%s*$') and '"_' or '') .. key
 end
 
--- `dd` needs no entry of its own: the `d` mapping already returns `"_d`, and
--- the second `d` doubles that operator, which is the same thing.
+-- `dd` needs no entry of its own: on a blank line the `d` mapping already
+-- returns `"_d`, and the second `d` doubles that operator, which is the same
+-- thing.
 -- `s` and `S` are left alone, they belong to `flash.nvim`.
 local keys = { 'd', 'x', 'c', 'C', 'X' }
 for _, key in pairs(keys) do

@@ -19,8 +19,11 @@ local shellcheck_disable_pattern = '^%s*#%s*shellcheck%s+disable=([^%s]*)%s*$'
 -- If `regex` doesn't match a line and `continue_regex` is not nil, the line is
 -- tested against `continue_regex`; if the line doesn't match, the search halts.
 --
+-- With `invert`, the first line that does *not* match `regex` is the one
+-- returned.
+--
 -- The first return value is the matching line and the second return value is
--- the line number.
+-- its line number, 1-based, unlike the 0-based `row_start` and `row_end`.
 -- nil is returned for no match.
 local search_region = function(
   bufnr,
@@ -142,6 +145,9 @@ end
 
 local generate_line_disable_action = function(bufnr, row, code, indentation)
   if get_first_non_comment_row(bufnr, row) == row then return end
+  -- A directive applies to a whole command, so it goes above the first line
+  -- of one continued with backslashes: walk up past every line above that
+  -- ends in one
   local _, match_row =
     search_region(bufnr, multiline_command_regex, row - 1, 0, nil, true)
   if match_row == nil then return end

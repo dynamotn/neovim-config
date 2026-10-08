@@ -49,8 +49,9 @@
 --- `command` doubles as the availability probe: a filetype is only given a
 --- tool whose command is executable. A formatter that is really a subcommand
 --- of a larger binary (`ruff_format` -> `ruff`, `tofu_fmt` -> `tofu`) names
---- that binary, and one that runs inside Neovim itself names `lua`, which is
---- always there.
+--- that binary, and one that runs inside Neovim itself names `lua`. The probe
+--- is `executable()`, so `lua` still asks for an interpreter on `$PATH`; only
+--- the tools of `*`, and conform's `injected`, are handed out without asking.
 ---
 --- A tool Mason has no package for -- one that ships with the language's
 --- toolchain (`mix`, `zig`, `dart`), with the system (`clang-tidy`), or from
@@ -224,7 +225,9 @@ local jinja_autopairs = function(filetypes, rule, cond)
 end
 local js_autopairs = function(filetypes, rule)
   return vim.list_extend(block_comment_autopairs(filetypes, rule), {
-    -- Add parentheses in arrow function
+    -- Add a body to an arrow function, spacing out an arrow typed right
+    -- after `)`
+    -- e.g., () => { | }
     rule('=>', ' {  }', filetypes)
       :replace_endpair(function(opts)
         local prev_3char = opts.line:sub(opts.col - 3, opts.col - 2)
@@ -1336,7 +1339,7 @@ return {
     formatters = { 'beautysh' },
     endwise = true,
   },
-  ------------------------------------ {
+  ------------------------------------ }
 
   -- Tools & Markup {
   ansible = { -- See `yaml`
@@ -1514,7 +1517,9 @@ return {
     },
     autopairs = function(filetypes, rule)
       return {
-        -- Add parentheses in function
+        -- Add spaces in an action, and expand `{-` and `{/` into one that
+        -- trims the whitespace before it, the second holding a comment
+        -- e.g., {{ | }}, {{- | }}, {{- /* | */ }}
         rule('{{', '  }', filetypes):set_end_pair_length(2),
         rule('{-', '{-  }', filetypes)
           :replace_endpair(function(_) return '<BS><BS>{{-  }' end)
@@ -1548,7 +1553,9 @@ return {
     },
     autopairs = function(filetypes, rule)
       return {
-        -- Add parentheses in function
+        -- Add spaces in an action, and expand `{-` into one that trims the
+        -- whitespace before it
+        -- e.g., {{ | }}, {{- | }}
         rule('{{', '  }', filetypes):set_end_pair_length(2),
         rule('{-', '{-  }', filetypes)
           :replace_endpair(function(_) return '<BS><BS>{{-  }' end)

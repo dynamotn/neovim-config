@@ -29,8 +29,11 @@ vim.filetype.add({
     ['PKGBUILD'] = 'sh.PKGBUILD',
   },
   pattern = {
-    -- git's per-user ignore file; a `filename` key with a slash in it is
-    -- never matched, so it takes a pattern over the full path
+    -- An `ignore` file kept in a repository's `.git` directory. A `filename`
+    -- key is matched only against the full path and the tail, so one with a
+    -- slash in it never matches, and this takes a pattern instead. git's
+    -- per-user ignore file, `$XDG_CONFIG_HOME/git/ignore`, Neovim detects
+    -- on its own.
     ['.*/%.git/ignore'] = 'gitignore',
 
     ['.*%.hcl'] = 'terragrunt',

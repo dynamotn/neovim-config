@@ -27,8 +27,9 @@ end
 --- Whether mason-nvim-dap knows the adapter of `spec` by name
 ---
 --- Only such an adapter can go to its `ensure_installed`, and only such an
---- adapter is set up by it once installed; any other is installed here and
---- set up by the language's own plugin file.
+--- adapter is set up by it once installed; any other is installed by
+--- `plugins.executor.debugging` itself and set up by the language's own plugin
+--- file.
 ---@param spec string|DyDapSpec
 ---@return boolean
 M.is_mapped = function(spec) return type(spec) == 'string' end

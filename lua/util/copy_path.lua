@@ -13,7 +13,7 @@ end
 function M.absolute()
   local p = M.bufpath()
   if not p then return nil end
-  -- Expand to absolute (handles ~, .git worktrees, etc.) and normalize
+  -- Expand `~` and environment variables, and normalize
   return LazyVim.norm(vim.fn.expand(p)) or p
 end
 
@@ -39,7 +39,7 @@ function M.relative()
   -- Ensure root ends with / for consistent string matching
   if root:sub(-1) ~= '/' then root = root .. '/' end
   if abs:find(root, 1, true) == 1 then return abs:sub(#root + 1) end
-  -- Not under project root — fall back to absolute
+  -- Not under project root -- fall back to absolute
   return abs
 end
 
@@ -97,7 +97,8 @@ function M.with_line(path)
   return path .. ':' .. M.line_number()
 end
 
---- Append ":line:column" to the given path.
+--- Append ":column" to the given path, which `with_line` has already given
+--- its line.
 --- Returns nil when there is no path, so `copy` can warn about it.
 ---@param path string|nil
 ---@return string|nil
