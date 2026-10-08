@@ -1,4 +1,3 @@
-
 vim.filetype.add({
   extension = {
     envrc = 'sh',

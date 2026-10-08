@@ -1,4 +1,3 @@
-
 return {
   cmd = { 'termux-language-server' },
   filetypes = {
