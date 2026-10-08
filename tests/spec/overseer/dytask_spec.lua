@@ -143,10 +143,14 @@ describe('overseer.template.dytask', function()
       local task = c['c build and run'].builder()
       assert.are.same({ dir .. '/main' }, task.cmd)
       assert.are.equal('default', task.components[1])
-      assert.are.same({
-        'dependencies',
-        tasks = { { cmd = { 'cc', dir .. '/main.c', '-o', dir .. '/main' } } },
-      }, task.components[2])
+      local build = task.components[2].tasks[1]
+      assert.are.equal('dependencies', task.components[2][1])
+      assert.are.same(
+        { 'cc', dir .. '/main.c', '-o', dir .. '/main' },
+        build.cmd
+      )
+      -- A failed build shows its own output, the run never starting
+      assert.are.equal('failure', build.components[2].on_complete)
       assert.are.equal('output', task.components[3])
 
       local cpp = templates('main.cpp', 'cpp')['g++ build and run'].builder()
@@ -154,6 +158,49 @@ describe('overseer.template.dytask', function()
         { 'g++', dir .. '/main.cpp', '-o', dir .. '/main' },
         cpp.components[2].tasks[1].cmd
       )
+    end)
+
+    it('builds no header as a program', function()
+      assert.is_nil(templates('x.h', 'c')['c build and run'])
+      assert.is_nil(templates('x.hpp', 'cpp')['g++ build and run'])
+    end)
+
+    it('compiles a rust file with a current edition', function()
+      local task = templates('main.rs', 'rust')['rustc build and run'].builder()
+      local cmd = task.components[2].tasks[1].cmd
+      assert.are.same({ '--edition', '2024' }, vim.list_slice(cmd, 2, 3))
+    end)
+
+    it('runs the package of a go file inside a module', function()
+      h.write(dir .. '/go.mod', { 'module x' })
+      local list = templates('cmd/x/main.go', 'go')
+      assert.is_nil(list['go run'])
+      local task = list['go run package'].builder()
+      assert.are.same({ 'go', 'run', '.' }, task.cmd)
+      assert.are.equal(dir .. '/cmd/x', task.cwd)
+      assert.is_nil(templates('cmd/x/main_test.go', 'go')['go run package'])
+    end)
+
+    it('runs a script from its own directory', function()
+      local task = templates('sub/run.sh', 'sh')['bash run'].builder()
+      assert.are.equal(dir .. '/sub', task.cwd)
+    end)
+
+    it('leaves headers, configs and drop-ins out', function()
+      assert.is_nil(templates('rebar.config', 'erlang')['erlang build and run'])
+      assert.is_nil(
+        templates('a.service.d/override.conf', 'systemd')['systemd-analyze verify']
+      )
+    end)
+
+    it('gives overseer conditions it can match', function()
+      -- overseer splits the buffer's filetype on `.` and compares the parts
+      local tsx = templates('x.tsx', 'typescript.tsx')['typescript run']
+      for _, ft in ipairs(tsx.condition.filetype) do
+        assert.is_nil(ft:find('.', 1, true), ft)
+      end
+      local ansible = require('overseer.template.dytask.ansible')
+      assert.are.equal('ansible', ansible.condition.filetype)
     end)
 
     it('falls back to the next executable', function()

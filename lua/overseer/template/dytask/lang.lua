@@ -15,6 +15,20 @@ local function matches(filetypes, filetype)
   return vim.list_contains(filetypes, filetype)
 end
 
+--- Filetypes as overseer's condition reads them: it splits the buffer's
+--- filetype on `.` and looks for an entry among the parts, so a compound one
+--- (`typescript.tsx`) never matches whole and is named by its last part
+---@param filetypes string[]
+---@return string[]
+local function condition_filetypes(filetypes)
+  local ret = {}
+  for _, ft in ipairs(filetypes) do
+    local part = ft:match('[^.]+$') or ft
+    if not vim.list_contains(ret, part) then table.insert(ret, part) end
+  end
+  return ret
+end
+
 --- The first candidate that is executable
 ---@param exe string|string[]|fun(ctx: DyTaskContext): string?
 ---@param ctx DyTaskContext
@@ -58,7 +72,23 @@ M.to_template = function(lang, runner, file)
       if runner.build then
         table.insert(components, {
           'dependencies',
-          tasks = { { cmd = runner.build(ctx) } },
+          tasks = {
+            {
+              cmd = runner.build(ctx),
+              cwd = ctx.root or ctx.dir,
+              -- A failed build never starts the run, whose output would
+              -- otherwise be the only one shown: the compiler's errors are
+              components = {
+                'default',
+                {
+                  'open_output',
+                  on_complete = 'failure',
+                  direction = 'dock',
+                  focus = true,
+                },
+              },
+            },
+          },
         })
       end
       table.insert(components, 'output')
@@ -66,14 +96,16 @@ M.to_template = function(lang, runner, file)
       ---@type overseer.TaskDefinition
       return {
         cmd = runner.cmd(ctx),
-        cwd = runner.cwd and runner.cwd(ctx) or ctx.root,
+        -- Where the file is, as when it is run by hand from there
+        cwd = runner.cwd and runner.cwd(ctx) or ctx.root or ctx.dir,
         -- `default` sets the status from the exit code
         components = components,
       }
     end,
     condition = {
-      filetype = runner.filetypes
-        or require('config.languages')[lang].filetypes,
+      filetype = condition_filetypes(
+        runner.filetypes or require('config.languages')[lang].filetypes
+      ),
     },
   }
 end

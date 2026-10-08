@@ -273,6 +273,8 @@ return {
       name = 'erlang build and run',
       desc = 'Compile the module and call its main/0',
       exe = 'erl',
+      -- `rebar.config`, `*.hrl` and `*.app.src` are `erlang` too
+      when = named('%.erl$'),
       build = function(ctx) return { 'erlc', '-o', ctx.dir, ctx.file } end,
       cmd = function(ctx)
         return {
@@ -510,6 +512,8 @@ return {
       desc = 'Compile C to executable and run',
       exe = { 'cc', 'gcc', 'clang' },
       filetypes = { 'c' },
+      -- A `.h` is `c` too, and compiles into a precompiled header
+      when = named('%.c$'),
       build = function(ctx) return { ctx.exe, ctx.file, '-o', ctx.stem } end,
       cmd = function(ctx) return { ctx.stem } end,
     },
@@ -518,6 +522,7 @@ return {
       desc = 'Compile C++ to executable and run',
       exe = { 'g++', 'clang++' },
       filetypes = { 'cpp' },
+      when = function(ctx) return not ctx.file:match('%.h[hpx+]*$') end,
       build = function(ctx) return { ctx.exe, ctx.file, '-o', ctx.stem } end,
       cmd = function(ctx) return { ctx.stem } end,
     },
@@ -528,12 +533,35 @@ return {
       desc = 'Compile a rust file outside a cargo project and run it',
       exe = 'rustc',
       when = function(ctx) return not vim.fs.root(ctx.file, 'Cargo.toml') end,
-      build = function(ctx) return { ctx.exe, ctx.file, '-o', ctx.stem } end,
+      -- rustc defaults to the 2015 edition
+      build = function(ctx)
+        return { ctx.exe, '--edition', '2024', ctx.file, '-o', ctx.stem }
+      end,
       cmd = function(ctx) return { ctx.stem } end,
     },
   },
   go = {
-    { name = 'go run', desc = 'Run go file', exe = 'go', cmd = on_file('run') },
+    {
+      name = 'go run',
+      desc = 'Run go file',
+      exe = 'go',
+      when = function(ctx)
+        return not ctx.file:match('_test%.go$')
+          and not vim.fs.root(ctx.file, 'go.mod')
+      end,
+      cmd = on_file('run'),
+    },
+    {
+      -- Inside a module, the file alone misses what the rest of its package
+      -- declares
+      name = 'go run package',
+      desc = 'Run the package of the file',
+      exe = 'go',
+      root = { 'go.mod' },
+      when = function(ctx) return not ctx.file:match('_test%.go$') end,
+      cwd = in_dir,
+      cmd = exe('run', '.'),
+    },
     {
       name = 'go build',
       desc = 'Build every package of the module',
@@ -787,6 +815,8 @@ return {
       name = 'systemd-analyze verify',
       desc = 'Verify the unit file',
       exe = 'systemd-analyze',
+      -- A drop-in (`foo.service.d/override.conf`) is no unit of its own
+      when = function(ctx) return not ctx.file:match('%.conf$') end,
       cmd = on_file('verify'),
     },
   },

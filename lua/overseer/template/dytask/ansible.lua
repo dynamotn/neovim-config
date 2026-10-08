@@ -6,7 +6,8 @@
 ---@return boolean
 local function has_become(file)
   for _, line in ipairs(vim.fn.readfile(file)) do
-    if line:find('become:%s*true') then return true end
+    -- `true`, `yes`, `True`, or a template that may well say so
+    if line:find('become:%s*["\']?[TtYy{]') then return true end
   end
   return false
 end
@@ -53,8 +54,13 @@ return {
       },
     }
   end,
+  -- overseer splits the buffer's filetype on `.`: `yaml.ansible` is matched
+  -- by its `ansible` part, never whole
   condition = {
-    filetype = require('config.languages').ansible.filetypes,
+    filetype = 'ansible',
+    callback = function()
+      return vim.list_contains(DyNeo.enabled_languages or {}, 'ansible')
+    end,
   },
   priority = -1,
 }
