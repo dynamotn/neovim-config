@@ -61,7 +61,7 @@ end
 return h.make_builtin({
   name = 'jira',
   meta = {
-    description = 'My custom sources to complete JIRA issue ',
+    description = 'My custom source to complete JIRA issues',
     url = 'https://github.com/ankitpokhrel/jira-cli',
   },
   method = methods.internal.COMPLETION,

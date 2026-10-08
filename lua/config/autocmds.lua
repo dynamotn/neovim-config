@@ -33,7 +33,7 @@ end
 
 local auto_relative_number = function()
   local group =
-    vim.api.nvim_create_augroup('auto_relative_number', { clear = false })
+    vim.api.nvim_create_augroup('auto_relative_number', {})
   local function set_relnum_back(win)
     vim.api.nvim_create_autocmd('CmdlineLeave', {
       group = group,
