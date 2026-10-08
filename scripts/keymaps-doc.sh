@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # @file keymaps-doc.sh
-# @brief Regenerate doc/neovim-config-keymaps.txt
+# @brief Regenerate doc/dyneo-keymaps.txt
 # @description
 #   Loads this tree in a headless Neovim through keymaps-doc.lua, which writes
 #   every mapping it sets into the help file, then refreshes the help tags.

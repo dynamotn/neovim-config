@@ -44,7 +44,7 @@ repos:
         pass_filenames: false
       - id: keymaps-doc
         name: Keymap reference
-        description: Regenerates doc/neovim-config-keymaps.txt, so the help lists the mappings the configuration actually sets.
+        description: Regenerates doc/dyneo-keymaps.txt, so the help lists the mappings the configuration actually sets.
         entry: scripts/keymaps-doc.sh
         language: script
         files: \.lua$

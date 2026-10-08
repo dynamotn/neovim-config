@@ -1,6 +1,6 @@
-*neovim-config.txt*   DyNeo, a Neovim configuration for DevOps and SA work
+*dyneo.txt*   DyNeo, a Neovim configuration for DevOps and SA work
 
-                                                              *neovim-config*
+                                                                       *dyneo*
 
 This is DyNeo, a standalone lazy.nvim configuration, not a distribution to
 install over yours.
@@ -12,37 +12,37 @@ opened.
 
 The same tree runs on a laptop with everything enabled and in a container with
 four languages; what differs is a handful of globals, see
-|neovim-config-per-machine|.
+|dyneo-per-machine|.
 
 ------------------------------------------------------------------------------
-CONTENTS                                             *neovim-config-contents*
+CONTENTS                                                      *dyneo-contents*
 
-    1. Requirements .......................... |neovim-config-requirements|
-    2. Install ............................... |neovim-config-install|
-    3. Configuration ......................... |neovim-config-configuration|
-       3.1 Per machine settings .............. |neovim-config-per-machine|
-       3.2 Globals ........................... |neovim-config-globals|
-       3.3 Plugin channels ................... |neovim-config-channels|
-       3.4 Updating plugins .................. |neovim-config-update|
-    4. Language support ...................... |neovim-config-languages|
-    5. Beyond the defaults ................... |neovim-config-features|
-       5.1 Tooling that installs itself ...... |neovim-config-lazy-install|
-       5.2 Quarantine ........................ |neovim-config-quarantine|
-       5.3 Files kept from AI ................ |neovim-config-ai-guard|
-       5.4 YAML and JSON schemas ............. |neovim-config-schema|
-       5.5 Buffer servers and tools .......... |neovim-config-statusline|
-       5.6 Spelling .......................... |neovim-config-spell|
-       5.7 Diagrams .......................... |neovim-config-diagram|
-       5.8 Workspace diagnostics ............. |neovim-config-workspace|
-       5.9 Integrations ...................... |neovim-config-integrations|
-    6. Mappings .............................. |neovim-config-mappings|
-    7. Commands .............................. |neovim-config-commands|
-    8. Layout ................................ |neovim-config-layout|
-    9. Development ........................... |neovim-config-development|
-   10. Troubleshooting ....................... |neovim-config-troubleshooting|
+    1. Requirements ..................................... |dyneo-requirements|
+    2. Install ............................................... |dyneo-install|
+    3. Configuration ................................... |dyneo-configuration|
+       3.1 Per machine settings .......................... |dyneo-per-machine|
+       3.2 Globals ........................................... |dyneo-globals|
+       3.3 Plugin channels .................................. |dyneo-channels|
+       3.4 Updating plugins ................................... |dyneo-update|
+    4. Language support .................................... |dyneo-languages|
+    5. Beyond the defaults .................................. |dyneo-features|
+       5.1 Tooling that installs itself ................. |dyneo-lazy-install|
+       5.2 Quarantine ..................................... |dyneo-quarantine|
+       5.3 Files kept from AI ............................... |dyneo-ai-guard|
+       5.4 YAML and JSON schemas .............................. |dyneo-schema|
+       5.5 Buffer servers and tools ....................... |dyneo-statusline|
+       5.6 Spelling ............................................ |dyneo-spell|
+       5.7 Diagrams .......................................... |dyneo-diagram|
+       5.8 Workspace diagnostics ........................... |dyneo-workspace|
+       5.9 Integrations ................................. |dyneo-integrations|
+    6. Mappings ............................................. |dyneo-mappings|
+    7. Commands ............................................. |dyneo-commands|
+    8. Layout ................................................. |dyneo-layout|
+    9. Development ....................................... |dyneo-development|
+   10. Troubleshooting ............................... |dyneo-troubleshooting|
 
 ------------------------------------------------------------------------------
-1. REQUIREMENTS                                  *neovim-config-requirements*
+1. REQUIREMENTS                                           *dyneo-requirements*
 
 Running at all          Neovim 0.13+ (nightly), or 0.12+ on the `stable`
                         channel.  An older Neovim stops at an error message
@@ -65,10 +65,10 @@ skipped, not reported as an error.
 
 Optional: `pngpaste` (macOS) or `wl-paste`/`xclip` (Linux) to paste images,
 `fcitx5-remote` to switch input method, and `d2` with one of `rsvg-convert`,
-`resvg` or `magick` on a kitty-graphics terminal for |neovim-config-diagram|.
+`resvg` or `magick` on a kitty-graphics terminal for |dyneo-diagram|.
 
 ------------------------------------------------------------------------------
-2. INSTALL                                            *neovim-config-install*
+2. INSTALL                                                     *dyneo-install*
 
 Back up whatever is there and clone the repository to `~/.config/nvim`: >sh
 
@@ -89,9 +89,9 @@ that language's parser, servers and tools.  `:Lazy` shows the first half,
 are missing.
 
 ------------------------------------------------------------------------------
-3. CONFIGURATION                                *neovim-config-configuration*
+3. CONFIGURATION                                         *dyneo-configuration*
 
-3.1 Per machine settings                           *neovim-config-per-machine*
+3.1 Per machine settings                                   *dyneo-per-machine*
 
 chezmoi is not needed.  It renders `lua/per_machine/config.lua.tmpl` into
 `lua/per_machine/config.lua` on my machines; in a plain clone that file does
@@ -100,7 +100,7 @@ not exist, the loader stays quiet about it, and the defaults in
 
 To change them, write `lua/per_machine/config.lua` by hand and assign the
 globals there.  `init.lua` loads it before anything else, so every global in
-|neovim-config-globals| is still open to it: >lua
+|dyneo-globals| is still open to it: >lua
 
     DyNeo.dark_mode = false
     DyNeo.plugin_channel = 'stable'
@@ -110,7 +110,7 @@ globals there.  `init.lua` loads it before anything else, so every global in
 <
 An error raised inside that file is reported; only its absence is silent.
 
-3.2 Globals                                           *neovim-config-globals*
+3.2 Globals                                                    *dyneo-globals*
 
 Every global is a field of the one global table `DyNeo`, declared, typed and
 defaulted in `lua/config/globals.lua`.
@@ -128,7 +128,7 @@ defaulted in `lua/config/globals.lua`.
 
                                                         *DyNeo.plugin_channel*
 `DyNeo.plugin_channel`         (default `'latest'`)
-        `'latest'` or `'stable'`, see |neovim-config-channels|.
+        `'latest'` or `'stable'`, see |dyneo-channels|.
 
                                                      *DyNeo.enabled_languages*
 `DyNeo.enabled_languages`      (default: every supported language)
@@ -159,7 +159,7 @@ defaulted in `lua/config/globals.lua`.
 
                                                       *DyNeo.yaml_schema_dirs*
 `DyNeo.yaml_schema_dirs`       (default `{}`)
-        Local schema folders offered by |neovim-config-schema|, next to the
+        Local schema folders offered by |dyneo-schema|, next to the
         ones found in the project.
 
                                                      *DyNeo.dictionaries_path*
@@ -186,7 +186,7 @@ defaulted in `lua/config/globals.lua`.
 `DyNeo.completion_sources`     (default `{}`)
         Completion sources named in the completion menu.
 
-3.3 Plugin channels                                  *neovim-config-channels*
+3.3 Plugin channels                                           *dyneo-channels*
 
                 `latest` (default)        `stable`
 Plugins         newest commit           newest release, or their branch
@@ -201,12 +201,12 @@ machine on `latest` never rewrite each other's pins.
 upstream break can land with any `:Lazy update`.  Set
 `DyNeo.plugin_channel` to `'stable'` on a machine that should not ride along.
 
-3.4 Updating plugins                                   *neovim-config-update*
+3.4 Updating plugins                                            *dyneo-update*
 
 An update is a week behind on purpose: the quarantine only lets `:Lazy update`
 move to a commit, or a release, that has been out for seven days.  `:Lazy
 restore` and a pinned plugin are not touched by it, see
-|neovim-config-quarantine|.
+|dyneo-quarantine|.
 
 The lockfile is the snapshot to roll back to, and both live in the
 repository, so:
@@ -223,7 +223,7 @@ repository, so:
        line in `:Lazy`.
 
 ------------------------------------------------------------------------------
-4. LANGUAGE SUPPORT                                 *neovim-config-languages*
+4. LANGUAGE SUPPORT                                          *dyneo-languages*
 
 103 entries over 126 filetypes: 42 languages, 13 frameworks, 38 tools and
 markup languages.  The authoritative list is `lua/config/languages.lua`, and
@@ -250,9 +250,9 @@ reads it, and `scripts/validate-tools.lua` checks every name in it against
 conform, nvim-lint, lspconfig and Mason.
 
 ------------------------------------------------------------------------------
-5. BEYOND THE DEFAULTS                               *neovim-config-features*
+5. BEYOND THE DEFAULTS                                        *dyneo-features*
 
-5.1 Tooling that installs itself                  *neovim-config-lazy-install*
+5.1 Tooling that installs itself                          *dyneo-lazy-install*
 
 One |FileType| autocmd, one table of handlers (`lua/util/lazy_install.lua`).
 Opening a Go file installs the Go parser, `gopls`, its linters, its formatters
@@ -277,7 +277,7 @@ without dytoy.  When the package manager needs `sudo`, the password is asked
 for in Neovim, with |inputsecret()|, and handed to sudo through
 `SUDO_ASKPASS`.
 
-5.2 Quarantine                                      *neovim-config-quarantine*
+5.2 Quarantine                                              *dyneo-quarantine*
 
 Anything freshly published is held back for a week before it may be installed
 -- the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm)
@@ -303,7 +303,7 @@ commit for commit, and a pinned plugin stays where it is.  A repository
 younger than the window is installed as lazy.nvim resolved it, since the
 alternative is not installing it at all.
 
-5.3 Files kept from AI                                *neovim-config-ai-guard*
+5.3 Files kept from AI                                        *dyneo-ai-guard*
 
 A language server is handed the whole text of every buffer it attaches to,
 before a single suggestion is asked for.  Opening a `.env` or a private key is
@@ -319,7 +319,7 @@ its way out.
 A wrapper that no longer finds what it wraps leaves the plugin as it is and
 says so, rather than breaking it on an upstream rename.
 
-5.4 YAML and JSON schemas                              *neovim-config-schema*
+5.4 YAML and JSON schemas                                       *dyneo-schema*
 
 YAML schemas are detected from the content of the buffer -- Kubernetes
 manifests, CRDs, cloud-init.  `<leader>cys`, or |:YamlSchema|, opens a picker
@@ -327,7 +327,7 @@ to set one for the buffer or write it in as a modeline.  Candidates come from
 the public catalogs, from the project, from |DyNeo.yaml_schema_dirs|, and from
 any path typed in.
 
-5.5 Buffer servers and tools                       *neovim-config-statusline*
+5.5 Buffer servers and tools                                *dyneo-statusline*
 
 The statusline counts the language servers and the tools that are up rather
 than spelling them out; the full list is one key or one click away.
@@ -339,7 +339,7 @@ Each entry says whether the tool is installed, running, or missing, so a
 formatter that quietly never fires stops being a mystery.  Linters and
 formatters only ever run when they are actually installed.
 
-5.6 Spelling                                            *neovim-config-spell*
+5.6 Spelling                                                     *dyneo-spell*
 
 |:DySpell| rebuilds a spell file with |:mkspell| from the word lists under
 |DyNeo.dictionaries_path| and `spell/`: Vietnamese, Chinese, plus the `proper`
@@ -350,13 +350,13 @@ Comments are spell-checked as well as prose, through `ltcc`
 under the cursor, or a Visual selection for anything with an apostrophe or a
 dot in it -- `<cword>` stops at both -- can be added to a list from a mapping.
 
-5.7 Diagrams                                          *neovim-config-diagram*
+5.7 Diagrams                                                   *dyneo-diagram*
 
 D2 diagrams render inline on kitty-graphics terminals, zellij included.
 `<leader>cp` previews the diagram under the cursor; Markdown and Typst get
 their own preview on the same key.
 
-5.8 Workspace diagnostics                           *neovim-config-workspace*
+5.8 Workspace diagnostics                                    *dyneo-workspace*
 
 `<leader>xw` asks a language server about the whole project, not only the
 files that happen to be open, by handing it every file with
@@ -367,7 +367,7 @@ main loop, so a big repository does not freeze the editor, and each document
 is closed again before Neovim opens the same file for real, so no server ever
 sees two `didOpen` for one URI.
 
-5.9 Integrations                                 *neovim-config-integrations*
+5.9 Integrations                                          *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
 chezmoi             Templates edited with the target language injected, not
@@ -376,7 +376,7 @@ Firefox, Chrome     Neovim embedded in a textarea with firenvim, tuned per
                     site through |DyNeo.firenvim_site_settings|.
 zellij              Test runner, terminal integration, and the pane sources
                     for completion.
-AI CLI tools        Through sidekick, behind |neovim-config-ai-guard|.
+AI CLI tools        Through sidekick, behind |dyneo-ai-guard|.
 
 Smaller gaps filled in `lua/tools` and `lua/lint`, each with a spec of its
 own: `jira` issue completion in commit messages, `shellcheck` code actions,
@@ -388,7 +388,7 @@ build an ignore comment for `markdownlint`, `ansible-lint`, `swiftlint` and
 friends.
 
 ------------------------------------------------------------------------------
-6. MAPPINGS                                          *neovim-config-mappings*
+6. MAPPINGS                                                   *dyneo-mappings*
 
 The leader key is `<Space>`.  Press it and wait: which-key lists every mapping
 under it, and `<Space>sk` searches all of them.  Custom mappings live in
@@ -398,7 +398,7 @@ diagnostics, `<leader>u` toggles, git -- at the top of
 `lua/config/keymaps.lua`.
 
 Every mapping, grouped the way which-key shows them, is listed in
-|neovim-config-keymaps|.  The ones worth knowing before which-key gets a
+|dyneo-keymaps|.  The ones worth knowing before which-key gets a
 chance to tell you:
 
     `<leader>fy`       n      Copy the path of the file: relative or
@@ -435,13 +435,13 @@ Command-line abbreviations, which only fire as a whole command line, so a
     `:ww`                           save through `sudo tee`
 
 ------------------------------------------------------------------------------
-7. COMMANDS                                          *neovim-config-commands*
+7. COMMANDS                                                   *dyneo-commands*
 
                                                                     *:DySpell*
 :DySpell {lang}         Rebuild the spell file of {lang} with |:mkspell| from
                         its word lists.  {lang} is one of `vi`, `zh`, `proper`
                         or `technical`; an unknown one is reported, not
-                        raised.  See |neovim-config-spell|.
+                        raised.  See |dyneo-spell|.
 
                                                                  *:YamlSchema*
 :YamlSchema             Open the schema picker for this YAML buffer.  Only
@@ -451,7 +451,7 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         Write the schema in as a modeline instead of setting
                         it for this session only.
 :YamlSchema reset       Hand detection back the wheel.
-                        See |neovim-config-schema|.
+                        See |dyneo-schema|.
 :DyNeoFormat            Format the buffer, or the selection.
 :DyNeoFormatInfo        Which formatters would run, and whether the buffer
                         formats on save.
@@ -461,7 +461,7 @@ The plugins' own commands are unchanged: `:Lazy`, `:Mason`, `:ConformInfo`,
 and the rest.
 
 ------------------------------------------------------------------------------
-8. LAYOUT                                              *neovim-config-layout*
+8. LAYOUT                                                       *dyneo-layout*
 
 `init.lua`            Globals, per-machine overrides, the version gate,
                     lazy.nvim
@@ -485,10 +485,10 @@ and the rest.
 `colors/` `ftdetect/`
 `scripts/`            Benchmarks, checks, the test runner
 `tests/`              plenary-busted specs
-`doc/`                This file, and |neovim-config-keymaps|
+`doc/`                This file, and |dyneo-keymaps|
 
 ------------------------------------------------------------------------------
-9. DEVELOPMENT                                    *neovim-config-development*
+9. DEVELOPMENT                                             *dyneo-development*
 
 41 spec files under `tests/spec` run with plenary-busted in a headless Neovim
 that loads only the module each spec requires: >sh
@@ -525,13 +525,13 @@ After editing this help file, regenerate its tags with: >vim
     :helptags doc
 <
 ------------------------------------------------------------------------------
-10. TROUBLESHOOTING                            *neovim-config-troubleshooting*
+10. TROUBLESHOOTING                                    *dyneo-troubleshooting*
 
 Neovim says it is too old ~
     The version gate in `init.lua` wants 0.13 on the `latest` channel and 0.12
     on `stable`.  Either update Neovim, or set
     `DyNeo.plugin_channel = 'stable'` in `lua/per_machine/config.lua`, see
-    |neovim-config-per-machine|.
+    |dyneo-per-machine|.
 
 A formatter or linter never fires ~
     `<leader>cT` lists every one the filetype expects, with its state.  A tool
@@ -544,7 +544,7 @@ A language brings nothing at all ~
 
 An update broke something ~
     Restore the lockfile and run `:Lazy restore`, see
-    |neovim-config-update|.
+    |dyneo-update|.
 
 Startup got slow ~
     `nvim --clean --headless -l scripts/bench.lua` prints the slowest steps.
@@ -553,7 +553,7 @@ Startup got slow ~
 
 Something is missing from the system ~
     `:checkhealth dyneo` for this configuration's view, `:Mason` for the
-    tools, and |neovim-config-requirements| for what has to be there first.
+    tools, and |dyneo-requirements| for what has to be there first.
 
 ------------------------------------------------------------------------------
 vim:tw=78:ts=8:noet:ft=help:norl:
