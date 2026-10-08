@@ -50,7 +50,6 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
                 'compile_flags.txt',
                 'configure.ac', -- AutoTools
                 'Makefile',
-                'configure.ac',
                 'configure.in',
                 'config.h.in',
                 'meson.build',

@@ -7,7 +7,7 @@ return vim.list_contains(_G.enabled_languages, 'gitcommit')
         -- LSP config
         'neovim/nvim-lspconfig',
         opts = {
-          harper_ls = {},
+          servers = { harper_ls = {} },
         },
       },
       {

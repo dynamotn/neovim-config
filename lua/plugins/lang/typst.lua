@@ -23,7 +23,6 @@ return vim.list_contains(_G.enabled_languages, 'typst')
                   desc = 'Pin main file',
                 },
               },
-              single_file_support = true, -- Fixes LSP attachment in non-Git directories
               settings = {
                 formatterMode = 'typstyle',
               },
