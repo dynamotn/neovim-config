@@ -85,7 +85,7 @@ return {
         copilot = function()
           vim.schedule(function() vim.lsp.inline_completion.enable() end)
           -- Accept inline suggestions or next edits
-          require('util.blink').actions.ai_accept = function()
+          require('util.cmp').actions.ai_accept = function()
             return vim.lsp.inline_completion.get()
           end
         end,
@@ -97,7 +97,7 @@ return {
     'folke/sidekick.nvim',
     opts = function(_, opts)
       -- Jump to or apply the next edit
-      require('util.blink').actions.ai_nes = function()
+      require('util.cmp').actions.ai_nes = function()
         local Nes = require('sidekick.nes')
         if Nes.have() and (Nes.jump() or Nes.apply()) then return true end
       end
@@ -139,7 +139,7 @@ return {
       -- NES is also useful in normal mode
       {
         '<tab>',
-        function() return require('util.blink').map({ 'ai_nes' }, '<tab>')() end,
+        function() return require('util.cmp').map({ 'ai_nes' }, '<tab>')() end,
         mode = { 'n' },
         expr = true,
       },
