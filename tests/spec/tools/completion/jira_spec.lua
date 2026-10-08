@@ -2,22 +2,31 @@ local h = require('helpers')
 local stub = require('spec.tools.null_ls_stub')
 
 describe('tools.completion.jira', function()
-  local builtin, commands, replies, restore
+  local builtin, commands, options, replies, restore, restore_executable
+  local installed
 
   before_each(function()
     stub.install('tools.completion.jira')
     builtin = require('tools.completion.jira')
-    commands, replies = {}, {}
+    commands, options, replies = {}, {}, {}
+    installed = true
     -- Answers by the first argument after `jira issue`, or by the JQL
-    restore = h.stub(vim, 'system', function(cmd, _, on_exit)
+    restore = h.stub(vim, 'system', function(cmd, opts, on_exit)
       table.insert(commands, cmd)
+      table.insert(options, opts)
       local reply = replies[cmd[#cmd]] or replies[cmd[3]] or { code = 1 }
       on_exit(reply)
       return {}
     end)
+    local executable = vim.fn.executable
+    restore_executable = h.stub(vim.fn, 'executable', function(name)
+      if name == 'jira' then return installed and 1 or 0 end
+      return executable(name)
+    end)
   end)
   after_each(function()
     restore()
+    restore_executable()
     stub.uninstall()
   end)
 
@@ -134,5 +143,37 @@ describe('tools.completion.jira', function()
   it('answers incomplete when every search fails', function()
     local response = complete('AB')
     assert.are.same({ { items = {}, isIncomplete = true } }, response)
+  end)
+
+  it('gives a jira that hangs a few seconds, not forever', function()
+    complete('AB')
+    assert.is_true(#options > 0)
+    for _, opts in ipairs(options) do
+      assert.is_true(opts.timeout > 0 and opts.timeout <= 10000)
+    end
+  end)
+
+  it('stops searching for a while once a search hung', function()
+    local killed = { code = 124, signal = 15 }
+    replies['project = AB'], replies['text ~ "*AB*"'] = killed, killed
+    complete('AB')
+    local spawned = #commands
+    local response = complete('ABC')
+    assert.are.same({ { items = {}, isIncomplete = false } }, response)
+    assert.are.equal(spawned, #commands)
+  end)
+
+  it('keeps searching after a query that merely failed', function()
+    complete('AB')
+    local spawned = #commands
+    complete('ABC')
+    assert.is_true(#commands > spawned)
+  end)
+
+  it('asks nothing when jira-cli is not installed', function()
+    installed = false
+    local response = complete('AB')
+    assert.are.same({ { items = {}, isIncomplete = false } }, response)
+    assert.are.same({}, commands)
   end)
 end)

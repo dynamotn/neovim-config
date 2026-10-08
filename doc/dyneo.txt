@@ -33,13 +33,12 @@ CONTENTS                                                      *dyneo-contents*
        5.1 Tooling that installs itself ................. |dyneo-lazy-install|
        5.2 Quarantine ..................................... |dyneo-quarantine|
        5.3 Files kept from AI ............................... |dyneo-ai-guard|
-       5.4 YAML and JSON schemas .............................. |dyneo-schema|
+       5.4 Infrastructure ...................................... |dyneo-infra|
        5.5 Buffer servers and tools ....................... |dyneo-statusline|
        5.6 Spelling ............................................ |dyneo-spell|
        5.7 Diagrams .......................................... |dyneo-diagram|
        5.8 Workspace diagnostics ........................... |dyneo-workspace|
-       5.9 Runbooks .......................................... |dyneo-runbook|
-       5.10 Integrations ................................ |dyneo-integrations|
+       5.9 Integrations ................................. |dyneo-integrations|
     6. Mappings ............................................. |dyneo-mappings|
     7. Commands ............................................. |dyneo-commands|
     8. Layout ................................................. |dyneo-layout|
@@ -360,13 +359,77 @@ range are kept, never the text.  |:AiGuardLog| lists this session, and
 The same handover is logged once a minute at most, since Claude Code is handed
 the selection on every cursor move.
 
-5.4 YAML and JSON schemas                                       *dyneo-schema*
+5.4 Infrastructure                                               *dyneo-infra*
+
+The files an operator edits, and what to do with them without leaving
+the editor: the schema a YAML file is checked against, the cluster a
+manifest goes to, the plan a Terraform module would apply, the runbook
+whose steps are run where they are written, and the secrets kept encrypted
+beside them.
+
+YAML and JSON schemas                                           *dyneo-schema*
 
 YAML schemas are detected from the content of the buffer -- Kubernetes
 manifests, CRDs, cloud-init.  `<leader>cys`, or |:YamlSchema|, opens a picker
 to set one for the buffer or write it in as a modeline.  Candidates come from
 the public catalogs, from the project, from |DyNeo.yaml_schema_dirs|, and from
 any path typed in.
+
+Kubernetes                                                        *dyneo-kube*
+
+A YAML buffer a cluster would take -- a manifest with `apiVersion` and
+`kind`, a `kustomization.yaml`, or any file of a Helm chart -- gets mappings
+under `<localleader>k`, and |:Kube| does the same from the command line:
+
+    `<localleader>kd`  Diff with the cluster (`kubectl diff`)
+    `<localleader>kv`  Validate with a server-side dry run
+    `<localleader>ka`  Apply, after a confirmation naming the context
+    `<localleader>kr`  Render the chart (`helm template`) or kustomization
+    `<localleader>kc`  Switch the context
+    `<localleader>kn`  Switch the namespace of the context
+
+A manifest goes to `kubectl -f`, a kustomization to `kubectl -k`, and a file
+of a chart is rendered first and piped in, with the values file being edited
+as its values.  A diff or a render can hold Secret data, so its buffer is
+kept from every AI integration.
+
+Terraform plan                                                  *dyneo-tfplan*
+
+In a Terraform buffer, `<localleader>p` (or |:TfPlan|) runs `tofu plan`,
+or `terraform plan` without OpenTofu, in the directory of the file, and
+shows what it would do on the blocks that ask for it: `+ create`,
+`~ update in place`, `-/+ replace` with the attributes forcing it, and
+`- destroy`, as diagnostics walked with `]d`, and all of it in the quickfix
+list.  A module call carries every change below it.  The plan runs with
+`-lock=false`, and its file -- every planned value in plain text -- is
+deleted once read.  `<localleader>P` clears it.
+
+Runbooks                                                       *dyneo-runbook*
+
+In a Markdown file, `<localleader>r` runs the fenced block under the cursor
+from the directory of the file, and puts what it printed right under it in an
+`output` fence, replaced on the next run.  `sh`, `bash`, `shell`, `zsh`,
+`fish`, `python` and `js` blocks run as they are; a `console` block runs only
+its `$ ` lines.  `<localleader>R` runs every block in turn and stops at the
+first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
+what is running.  A block that deletes, destroys or reaches for root asks
+first.  See |:Runbook|.
+
+Encrypted files                                              *dyneo-encrypted*
+
+A SOPS file, an Ansible Vault, or an `encrypted_*.age` / `encrypted_*.asc`
+file of a chezmoi source opens decrypted, and `:w` encrypts it again: SOPS
+through `sops edit`, which keeps the data key and the recipients of the
+file, Ansible Vault through `ansible-vault encrypt` with its vault id, and
+chezmoi through `chezmoi encrypt`, to the recipients of its configuration.
+The clear text never reaches the file it came from, and a failed encryption
+writes nothing.
+
+The buffer is held back from every AI integration before the clear text goes
+in (|dyneo-ai-guard|), keeps no swap or undo file, and cannot be undone back
+to the ciphertext.  Ansible Vault cannot ask for a password inside Neovim:
+give it `ANSIBLE_VAULT_PASSWORD_FILE`, or `vault_password_file` in
+`ansible.cfg`.
 
 5.5 Buffer servers and tools                                *dyneo-statusline*
 
@@ -408,18 +471,7 @@ main loop, so a big repository does not freeze the editor, and each document
 is closed again before Neovim opens the same file for real, so no server ever
 sees two `didOpen` for one URI.
 
-5.9 Runbooks                                                   *dyneo-runbook*
-
-In a Markdown file, `<localleader>r` runs the fenced block under the cursor
-from the directory of the file, and puts what it printed right under it in an
-`output` fence, replaced on the next run.  `sh`, `bash`, `shell`, `zsh`,
-`fish`, `python` and `js` blocks run as they are; a `console` block runs only
-its `$ ` lines.  `<localleader>R` runs every block in turn and stops at the
-first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
-what is running.  A block that deletes, destroys or reaches for root asks
-first.  See |:Runbook|.
-
-5.10 Integrations                                         *dyneo-integrations*
+5.9 Integrations                                          *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
 chezmoi             Templates edited with the target language injected, not
@@ -560,6 +612,21 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :Runbook clear          Remove every `output` fence.
 :Runbook stop           Stop what the buffer is running.
                         See |dyneo-runbook|.
+
+                                                                     *:TfPlan*
+:TfPlan                 Plan the module of this buffer and show it on its
+                        blocks.
+:TfPlan clear           Clear the plan shown.  See |dyneo-tfplan|.
+
+                                                                       *:Kube*
+:Kube [diff]            Diff this manifest, kustomization or chart with the
+                        cluster.
+:Kube dryrun            Validate it with a server-side dry run.
+:Kube apply             Apply it, after a confirmation naming the context.
+:Kube render            Render the chart or the kustomization.
+:Kube context           Switch the current context.
+:Kube namespace         Switch the namespace of the current context.
+                        See |dyneo-kube|.
 
                                                                        *:Jira*
 :Jira                   Pick among the issues assigned to you, then choose

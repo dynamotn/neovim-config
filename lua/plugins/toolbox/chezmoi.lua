@@ -148,7 +148,9 @@ return {
       -- rather than every keystroke or every write
       preview = { live = false },
       diagnostics = { enabled = false },
-      -- Never decrypt `*.age` files on open
+      -- `encrypted_*.age` files are opened and written by `tools.encrypted`,
+      -- which keeps the clear text from the AI integrations and off the
+      -- disk; two decryptions of one buffer would fight over it
       encryption = { enabled = false },
       inject = {
         -- Seeding the target language costs a `chezmoi managed` spawn, and

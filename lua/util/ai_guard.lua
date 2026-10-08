@@ -485,6 +485,14 @@ M.commands = function()
         { title = 'AI guard' }
       )
     end
+    local marked = sensitive.marked(bufnr)
+    if marked then
+      return vim.notify(
+        'Refused: this buffer is sensitive as ' .. marked,
+        vim.log.levels.ERROR,
+        { title = 'AI guard' }
+      )
+    end
     sensitive.allow(bufnr)
     vim.notify(
       'This buffer may now be sent to the AI integrations; :AiGuardAllow! '

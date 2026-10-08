@@ -7,8 +7,10 @@
 :DySbom	dyneo.txt	/*:DySbom*
 :DySpell	dyneo.txt	/*:DySpell*
 :Jira	dyneo.txt	/*:Jira*
+:Kube	dyneo.txt	/*:Kube*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
 :Runbook	dyneo.txt	/*:Runbook*
+:TfPlan	dyneo.txt	/*:TfPlan*
 :YamlSchema	dyneo.txt	/*:YamlSchema*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*
 DyNeo.completion_sources	dyneo.txt	/*DyNeo.completion_sources*
@@ -34,12 +36,15 @@ dyneo-configuration	dyneo.txt	/*dyneo-configuration*
 dyneo-contents	dyneo.txt	/*dyneo-contents*
 dyneo-development	dyneo.txt	/*dyneo-development*
 dyneo-diagram	dyneo.txt	/*dyneo-diagram*
+dyneo-encrypted	dyneo.txt	/*dyneo-encrypted*
 dyneo-features	dyneo.txt	/*dyneo-features*
 dyneo-globals	dyneo.txt	/*dyneo-globals*
+dyneo-infra	dyneo.txt	/*dyneo-infra*
 dyneo-install	dyneo.txt	/*dyneo-install*
 dyneo-integrations	dyneo.txt	/*dyneo-integrations*
 dyneo-keymaps	dyneo-keymaps.txt	/*dyneo-keymaps*
 dyneo-keymaps.txt	dyneo-keymaps.txt	/*dyneo-keymaps.txt*
+dyneo-kube	dyneo.txt	/*dyneo-kube*
 dyneo-languages	dyneo.txt	/*dyneo-languages*
 dyneo-layout	dyneo.txt	/*dyneo-layout*
 dyneo-lazy-install	dyneo.txt	/*dyneo-lazy-install*
@@ -51,6 +56,7 @@ dyneo-runbook	dyneo.txt	/*dyneo-runbook*
 dyneo-schema	dyneo.txt	/*dyneo-schema*
 dyneo-spell	dyneo.txt	/*dyneo-spell*
 dyneo-statusline	dyneo.txt	/*dyneo-statusline*
+dyneo-tfplan	dyneo.txt	/*dyneo-tfplan*
 dyneo-troubleshooting	dyneo.txt	/*dyneo-troubleshooting*
 dyneo-update	dyneo.txt	/*dyneo-update*
 dyneo-workspace	dyneo.txt	/*dyneo-workspace*
