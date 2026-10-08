@@ -67,7 +67,7 @@ return {
 
           -- install parser of language in bundle languages
           if vim.list_contains(_G.bundle_languages, name) then
-            table.insert(opts.ensure_installed, { parser_name })
+            table.insert(opts.ensure_installed, parser_name)
             vim.list_extend(opts.ensure_installed, injected_parsers)
           end
           -- lazy install parser of language not in bundle languages
