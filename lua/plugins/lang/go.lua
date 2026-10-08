@@ -12,7 +12,6 @@ return vim.list_contains(_G.enabled_languages, 'go')
                 gopls = {
                   gofumpt = true,
                   codelenses = {
-                    gc_details = false,
                     generate = true,
                     regenerate_cgo = true,
                     run_govulncheck = true,
@@ -34,7 +33,6 @@ return vim.list_contains(_G.enabled_languages, 'go')
                     nilness = true,
                     unusedparams = true,
                     unusedwrite = true,
-                    useany = true,
                   },
                   usePlaceholders = true,
                   completeUnimported = true,
@@ -104,7 +102,7 @@ return vim.list_contains(_G.enabled_languages, 'go')
         opts = {
           adapters = {
             ['neotest-golang'] = {
-              dap_go_enabled = true,
+              dap_mode = 'dap-go',
             },
           },
         },
