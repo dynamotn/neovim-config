@@ -8,7 +8,7 @@ return vim.list_contains(_G.enabled_languages, 'systemd')
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
-            systemd_ls = {},
+            systemd_lsp = {},
           },
         },
       },

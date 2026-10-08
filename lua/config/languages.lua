@@ -1018,8 +1018,9 @@ return {
     parser = 'python',
     injected_parsers = { 'printf' },
     ext = 'py',
+    -- The `ruff` server publishes ruff's diagnostics itself; running it as a
+    -- linter too listed each of them twice
     lsp_servers = { 'pyright', 'ruff', 'harper_ls' },
-    linters = { 'ruff' },
     formatters = {
       { 'ruff_fix', command = 'ruff' },
       { 'ruff_format', command = 'ruff' },
@@ -1068,12 +1069,7 @@ return {
   },
   rails = { -- See `ruby` and `html`
     filetypes = { 'eruby' },
-    parser = {
-      'embedded_template',
-      install_info = {
-        url = 'https://github.com/tree-sitter/tree-sitter-embedded-template',
-      },
-    },
+    parser = 'embedded_template',
     injected_parsers = { 'html', 'ruby' },
     ext = 'erb',
     lsp_servers = { 'ruby_lsp', 'tailwindcss', 'harper_ls' },
@@ -1382,12 +1378,7 @@ return {
   },
   awk = {
     filetypes = { 'awk' },
-    parser = {
-      'awk',
-      install_info = {
-        url = 'https://github.com/Beaglefoot/tree-sitter-awk',
-      },
-    },
+    parser = 'awk',
     injected_parsers = { 'printf' },
     lsp_servers = { 'awk_ls' },
     linters = {
@@ -1413,7 +1404,7 @@ return {
     },
   },
   bicep = {
-    filetypes = { 'bicep' },
+    filetypes = { 'bicep', 'bicep-params' },
     parser = 'bicep',
     lsp_servers = { 'bicep' },
     formatters = {

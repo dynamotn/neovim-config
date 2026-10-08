@@ -5,13 +5,9 @@ return vim.list_contains(_G.enabled_languages, 'vue')
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
-            vue_ls = {
-              init_options = {
-                vue = {
-                  hybridMode = true,
-                },
-              },
-            },
+            -- Hybrid mode is the only one since vue_ls 3, so it needs no
+            -- option: vtsls carries the TypeScript side
+            vue_ls = {},
             vtsls = {},
             tailwindcss = {},
             harper_ls = {},
