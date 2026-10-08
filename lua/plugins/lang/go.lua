@@ -88,6 +88,13 @@ return vim.list_contains(_G.enabled_languages, 'go')
         },
       },
       {
+        -- nvim-dap-go brings the adapter and its configurations; mason-nvim-dap
+        -- would add four `Delve:` ones of its own beside them
+        'jay-babu/mason-nvim-dap.nvim',
+        optional = true,
+        opts = { handlers = { delve = function() end } },
+      },
+      {
         -- Test adapter
         'nvim-neotest/neotest',
         dependencies = {
