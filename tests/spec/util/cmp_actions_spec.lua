@@ -1,37 +1,37 @@
 local h = require('helpers')
 
-describe('util.blink', function()
-  local blink
+describe('util.cmp actions and snippets', function()
+  local cmp
 
   before_each(function()
-    h.unload('util.blink')
-    blink = require('util.blink')
+    h.unload('util.cmp')
+    cmp = require('util.cmp')
   end)
 
   describe('map', function()
     it('runs the actions in turn until one handles the key', function()
       local ran = {}
-      blink.actions.first = function()
+      cmp.actions.first = function()
         table.insert(ran, 'first')
         return false
       end
-      blink.actions.second = function()
+      cmp.actions.second = function()
         table.insert(ran, 'second')
         return true
       end
-      blink.actions.third = function() table.insert(ran, 'third') end
-      assert.is_true(blink.map({ 'first', 'second', 'third' })())
+      cmp.actions.third = function() table.insert(ran, 'third') end
+      assert.is_true(cmp.map({ 'first', 'second', 'third' })())
       assert.are.same({ 'first', 'second' }, ran)
     end)
 
     it(
       'skips an action nothing has registered',
-      function() assert.are.equal('<tab>', blink.map({ 'ai_nes' }, '<tab>')()) end
+      function() assert.are.equal('<tab>', cmp.map({ 'ai_nes' }, '<tab>')()) end
     )
 
     it('calls a fallback function when no action handles the key', function()
       local called = false
-      blink.map({}, function()
+      cmp.map({}, function()
         called = true
         return 'fell back'
       end)()
@@ -43,24 +43,21 @@ describe('util.blink', function()
     it(
       'flattens nested placeholders',
       function()
-        assert.are.equal(
-          '${1:foo(bar)}',
-          blink.snippet_fix('${1:foo(${2:bar})}')
-        )
+        assert.are.equal('${1:foo(bar)}', cmp.snippet_fix('${1:foo(${2:bar})}'))
       end
     )
 
     it(
       'leaves a flat snippet alone',
       function()
-        assert.are.equal('print(${1:x})', blink.snippet_fix('print(${1:x})'))
+        assert.are.equal('print(${1:x})', cmp.snippet_fix('print(${1:x})'))
       end
     )
 
     it(
       'previews a snippet as the text it inserts',
       function()
-        assert.are.equal('foo(bar)', blink.snippet_preview('foo(${1:bar})$0'))
+        assert.are.equal('foo(bar)', cmp.snippet_preview('foo(${1:bar})$0'))
       end
     )
 
@@ -77,7 +74,7 @@ describe('util.blink', function()
           function(msg) table.insert(warned, msg) end
         ),
       }
-      blink.expand('${1:foo(${2:bar})}')
+      cmp.expand('${1:foo(${2:bar})}')
       for i = #restores, 1, -1 do
         restores[i]()
       end
