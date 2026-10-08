@@ -98,15 +98,6 @@ return {
         on_watch = false,
       },
     },
-    init = function()
-      -- Run `chezmoi edit --watch` on files opened from the source directory
-      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-        pattern = { vim.env.HOME .. '/.local/share/chezmoi/*' },
-        callback = function()
-          vim.schedule(require('chezmoi.commands.__edit').watch)
-        end,
-      })
-    end,
   },
   extra_specs,
   {

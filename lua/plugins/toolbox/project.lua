@@ -62,13 +62,25 @@ return {
         '<leader>pa',
         function() require('other-nvim').openVSplit() end,
         desc = 'Open alternative file',
-        mode = { 'n', 't' },
+        -- Not in a terminal: `<leader>` is a space there, typed all the time
       },
     },
   },
   {
     -- Devcontainer
     'esensar/nvim-dev-container',
+    -- The commands only exist once `setup` has run
+    cmd = {
+      'DevcontainerStart',
+      'DevcontainerAttach',
+      'DevcontainerExec',
+      'DevcontainerStop',
+      'DevcontainerStopAll',
+      'DevcontainerRemoveAll',
+      'DevcontainerLogs',
+      'DevcontainerEditNearestConfig',
+    },
+    opts = {},
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
       opts = function(_, opts)

@@ -112,12 +112,9 @@ return {
     'potamides/pantran.nvim',
     cmd = 'Pantran',
     keys = {
-      {
-        '<leader>ct',
-        function() vim.api.nvim_command('Pantran') end,
-        desc = 'Translate',
-        mode = { 'n', 'x' },
-      },
+      { '<leader>ct', '<cmd>Pantran<cr>', desc = 'Translate' },
+      -- The selection reaches `:Pantran` as its range
+      { '<leader>ct', ':Pantran<cr>', desc = 'Translate', mode = 'x' },
     },
     opts = {
       default_engine = 'google',

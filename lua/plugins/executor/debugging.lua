@@ -119,8 +119,9 @@ return {
     'jay-babu/mason-nvim-dap.nvim',
     dependencies = 'mason.nvim',
     cmd = { 'DapInstall', 'DapUninstall' },
-    -- Loaded and set up by nvim-dap
-    config = function() end,
+    -- Set up by nvim-dap. `:DapInstall` typed first loads only this plugin,
+    -- whose commands are otherwise made by that `setup`.
+    config = function() require('mason-nvim-dap.api.command') end,
     -- The adapters of a language are installed with its first buffer, from a
     -- handler registered at startup: nvim-dap itself only loads with the
     -- first `<leader>d` key, so one registered from there would miss the

@@ -1,3 +1,10 @@
+--- Close the tab of a bufferline element, by its tabpage handle
+---@param tabpage integer
+local function close_tab(tabpage)
+  if not vim.api.nvim_tabpage_is_valid(tabpage) then return end
+  pcall(vim.cmd.tabclose, vim.api.nvim_tabpage_get_number(tabpage))
+end
+
 return {
   {
     -- Status line: mode, branch, root, diagnostics, path, then the state of
@@ -224,37 +231,19 @@ return {
     -- Buffer and tab line, showing tabs
     'akinsho/bufferline.nvim',
     event = 'VeryLazy',
+    -- The line lists tabs (`mode = 'tabs'`), so its commands move between and
+    -- close tabs: the buffer keys of `config.keymaps` are left to Neovim's
+    -- own `:bnext` and `:bprevious`.
     keys = {
-      { '<leader>bp', '<Cmd>BufferLineTogglePin<CR>', desc = 'Toggle Pin' },
-      {
-        '<leader>bP',
-        '<Cmd>BufferLineGroupClose ungrouped<CR>',
-        desc = 'Delete Non-Pinned Buffers',
-      },
-      {
-        '<leader>br',
-        '<Cmd>BufferLineCloseRight<CR>',
-        desc = 'Delete Buffers to the Right',
-      },
-      {
-        '<leader>bl',
-        '<Cmd>BufferLineCloseLeft<CR>',
-        desc = 'Delete Buffers to the Left',
-      },
-      { '<S-h>', '<cmd>BufferLineCyclePrev<cr>', desc = 'Prev Buffer' },
-      { '<S-l>', '<cmd>BufferLineCycleNext<cr>', desc = 'Next Buffer' },
-      { '[b', '<cmd>BufferLineCyclePrev<cr>', desc = 'Prev Buffer' },
-      { ']b', '<cmd>BufferLineCycleNext<cr>', desc = 'Next Buffer' },
-      { '[B', '<cmd>BufferLineMovePrev<cr>', desc = 'Move buffer prev' },
-      { ']B', '<cmd>BufferLineMoveNext<cr>', desc = 'Move buffer next' },
-      { '<leader>bj', '<cmd>BufferLinePick<cr>', desc = 'Pick Buffer' },
+      { '[B', '<cmd>BufferLineMovePrev<cr>', desc = 'Move Tab Prev' },
+      { ']B', '<cmd>BufferLineMoveNext<cr>', desc = 'Move Tab Next' },
+      { '<leader>bj', '<cmd>BufferLinePick<cr>', desc = 'Pick Tab' },
     },
     opts = {
       options = {
-        -- stylua: ignore
-        close_command = function(n) Snacks.bufdelete(n) end,
-        -- stylua: ignore
-        right_mouse_command = function(n) Snacks.bufdelete(n) end,
+        -- Handed a tabpage handle, which is not the number `:tabclose` takes
+        close_command = close_tab,
+        right_mouse_command = close_tab,
         diagnostics = 'nvim_lsp',
         always_show_bufferline = false,
         diagnostics_indicator = function(_, _, diag)
@@ -349,7 +338,7 @@ return {
     opts = {
       icons = {
         kinds = {
-          symbol = require('config.defaults').icons.kinds,
+          symbols = require('config.defaults').icons.kinds,
         },
       },
     },

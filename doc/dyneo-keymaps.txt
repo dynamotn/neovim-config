@@ -105,15 +105,11 @@ one of the same keys in those buffers.
 <leader>b  buffer
 
 `<leader>bD`           n      Delete Buffer and Window
-`<leader>bP`           n      Delete Non-Pinned Buffers
 `<leader>bb`           n      Switch to Other Buffer
 `<leader>bd`           n      Delete Buffer
 `<leader>bi`           n      Delete Invisible Buffers
-`<leader>bj`           n      Pick Buffer
-`<leader>bl`           n      Delete Buffers to the Left
+`<leader>bj`           n      Pick Tab
 `<leader>bo`           n      Delete Other Buffers
-`<leader>bp`           n      Toggle Pin
-`<leader>br`           n      Delete Buffers to the Right
 
 ==============================================================================
 <leader>c  code
@@ -265,7 +261,7 @@ one of the same keys in those buffers.
 ==============================================================================
 <leader>p  project
 
-`<leader>pa`           nt     Open alternative file
+`<leader>pa`           n      Open alternative file
 
 ==============================================================================
 <leader>pc  codesettings
@@ -484,7 +480,7 @@ one of the same keys in those buffers.
 ==============================================================================
 [  prev
 
-`[B`                   n      Move buffer prev
+`[B`                   n      Move Tab Prev
 `[P`                   n      Put Indented Before Cursor (Linewise)
 `[[`                   n      Prev Reference  (LSP)
 `[b`                   n      Prev Buffer
@@ -500,7 +496,7 @@ one of the same keys in those buffers.
 ==============================================================================
 ]  next
 
-`]B`                   n      Move buffer next
+`]B`                   n      Move Tab Next
 `]P`                   n      Put Indented After Cursor (Linewise)
 `]]`                   n      Next Reference  (LSP)
 `]b`                   n      Next Buffer
@@ -586,7 +582,7 @@ Other keys
 `<C-LeftRelease>`      n      Add cursors
 `<C-Right>`            n      Resize window right
 `<C-Up>`               n      Resize window up
-`<C-\>`                nt     Navigate to previous window
+`<C-\>`                n      Navigate to previous window
 `<C-a>`                nv     Increment
 `<C-c>`                n      Change word
 `<C-f>`                x      Search selected text

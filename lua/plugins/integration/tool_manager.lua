@@ -54,6 +54,12 @@ return {
     ---@param opts MasonSettings|{ ensure_installed: string[] }
     config = function(_, opts)
       require('mason').setup(opts)
+      -- swapson routes npm and pip through bun and uv, and only patches mason
+      -- once it is itself loaded: as a dependency of nvim-lspconfig alone,
+      -- an install from `:Mason` or the dashboard went around it
+      if require('util.plugin').has('swapson.nvim') then
+        require('lazy').load({ plugins = { 'swapson.nvim' } })
+      end
       local mr = require('mason-registry')
       mr:on('package:install:success', function()
         vim.defer_fn(function()

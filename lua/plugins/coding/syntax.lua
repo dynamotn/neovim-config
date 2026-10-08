@@ -3,6 +3,10 @@ return {
     -- For gentoo filetypes
     'gentoo/gentoo-syntax',
     enabled = DyNeo.used_full_plugins or DyNeo.is_gentoo,
+    -- Its `ftdetect/`, `syntax/` and `ftplugin/` are all it is, and lazy.nvim
+    -- sources none of them for a plugin that never loads: no `ft` can name
+    -- the filetypes it is the one to detect
+    lazy = false,
   },
   {
     -- Comment strings by treesitter language, for files mixing several of

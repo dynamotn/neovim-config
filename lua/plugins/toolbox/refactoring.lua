@@ -6,7 +6,8 @@ return {
     -- Its debug-print keys are left to debugprint.nvim (`plugins.executor`),
     -- whose prints the other's cleanup would not find.
     'ThePrimeagen/refactoring.nvim',
-    event = { 'BufReadPre', 'BufNewFile' },
+    -- Loaded by its keys or `:Refactor`, not with every file
+    cmd = 'Refactor',
     keys = {
       { '<leader>r', '', desc = '+refactor', mode = { 'n', 'x' } },
       {

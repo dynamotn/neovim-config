@@ -1,3 +1,6 @@
+-- Set while the editor is quitting, see `QuitPre` below
+local leaving = false
+
 return {
   {
     -- Linters
@@ -113,7 +116,6 @@ return {
       -- only arrives once Neovim is back to waiting for input, and never when it
       -- is really on its way out.
       local group = vim.api.nvim_create_augroup('dy_lint', { clear = true })
-      local leaving = false
       vim.api.nvim_create_autocmd({ 'QuitPre', 'VimLeavePre' }, {
         group = group,
         callback = function()
@@ -133,21 +135,15 @@ return {
           vim.defer_fn(function()
             if leaving or vim.v.exiting ~= vim.NIL then return end
             if not vim.api.nvim_buf_is_valid(args.buf) then return end
-            vim.api.nvim_buf_call(args.buf, function()
-              local lint = require('lint')
-              -- The same fallback the `config` lint applies: a filetype
-              -- left with no linter of its own gets the `_` ones. A run
-              -- still in flight from there is cancelled, not doubled.
-              local names = lint._resolve_linter_by_ft(vim.bo.filetype)
-              if #names == 0 then names = lint.linters_by_ft['_'] or {} end
-              if #names > 0 then lint.try_lint(names) end
-              -- `vale` looks for its config next to the file and upwards from
-              -- there, so asking the working directory answers the wrong
-              -- question the moment a buffer lives outside it.
-              if has_vale_config(args.buf) then
-                require('lint').try_lint({ 'vale' })
-              end
-            end)
+            -- The other linters run from `config`, which asks each one's
+            -- `condition`. `vale` looks for its config next to the file and
+            -- upwards from there, so asking the working directory answers
+            -- the wrong question the moment a buffer lives outside it.
+            if not has_vale_config(args.buf) then return end
+            vim.api.nvim_buf_call(
+              args.buf,
+              function() require('lint').try_lint({ 'vale' }) end
+            )
           end, 100)
         end,
       })
@@ -171,6 +167,8 @@ return {
       lint.linters_by_ft = opts.linters_by_ft
 
       local function run()
+        -- A linter job started while `:wq` is quitting dies mid-write
+        if leaving or vim.v.exiting ~= vim.NIL then return end
         -- nvim-lint's own resolution first: the full filetype, else each
         -- part of a dotted one
         local names =

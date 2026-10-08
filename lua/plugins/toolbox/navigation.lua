@@ -62,7 +62,8 @@ return {
         '<C-\\>',
         function() require('smart-splits').move_cursor_previous() end,
         desc = 'Navigate to previous window',
-        mode = { 'n', 't' },
+        -- Not in a terminal, where `<C-\><C-n>` leaves terminal mode
+        mode = 'n',
       },
       -- Resize past Neovim's own edge, into the multiplexer's panes
       {

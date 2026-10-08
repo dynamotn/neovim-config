@@ -91,8 +91,11 @@ return {
     },
     config = function(_, opts)
       local neotest_ns = vim.api.nvim_create_namespace('neotest')
+      -- tiny-inline-diagnostic draws every namespace already; virtual text of
+      -- its own would show each failure twice
+      local tiny = require('util.plugin').has('tiny-inline-diagnostic.nvim')
       vim.diagnostic.config({
-        virtual_text = {
+        virtual_text = not tiny and {
           format = function(diagnostic)
             -- Keep the message on one line
             local message = diagnostic.message
