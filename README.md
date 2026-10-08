@@ -9,769 +9,313 @@
 [![Built on lazy.nvim](https://img.shields.io/badge/built%20on-lazy.nvim-blueviolet.svg?style=flat-square)](https://lazy.folke.io)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 
-The name reads two ways. Said aloud, *DyNeo* is a playful spelling of the
-Vietnamese *đi nào* — "let's go", the cute way of saying it. Written down, it
-is *Dy*, from dynamo, the author's handle (and the prefix of this setup's own
-tools, `:DySpell` and the rest), plus *Neo*vim.
-
-This is DyNeo, a standalone [lazy.nvim](https://lazy.folke.io) configuration,
-not a distribution to install over yours. Every language it knows about is one
-declarative entry in [lua/config/languages.lua](./lua/config/languages.lua) —
-its Treesitter parser, LSP servers, linters, formatters, debug adapters and
-test runners — and a single `FileType` dispatcher installs that entry the
-first time a file of the language is opened. Starting Neovim stays in the tens
-of milliseconds because nothing above `init.lua` runs until a buffer asks for
-it.
-
-The same tree runs on a laptop with everything enabled and in a container with
-four languages; what differs is a handful of globals, see
-[Per machine settings](#per-machine-settings).
+*DyNeo* is *đi nào* — Vietnamese for "let's go" — and *Dy* (from dynamo, the
+author's handle) plus *Neo*vim. It is a standalone
+[lazy.nvim](https://lazy.folke.io) configuration, not a distribution. The same
+tree runs on a laptop with everything on and in a container with four
+languages; only a few globals differ.
 
 <!-- toc -->
 
-- [Why this configuration](#why-this-configuration)
+- [Highlights](#highlights)
 - [Quick start](#quick-start)
-  - [Requirements](#requirements)
-  - [Install](#install)
-  - [First start](#first-start)
 - [Configuration](#configuration)
-  - [Per machine settings](#per-machine-settings)
-  - [Globals](#globals)
-  - [Plugin channels](#plugin-channels)
-  - [Updating plugins](#updating-plugins)
 - [Languages, Frameworks, or Tools support](#languages-frameworks-or-tools-support)
-  - [Languages](#languages)
-  - [Frameworks](#frameworks)
-  - [Tools & Markup](#tools--markup)
-- [Beyond the defaults](#beyond-the-defaults)
-  - [Tooling that installs itself](#tooling-that-installs-itself)
-  - [A quarantine in front of Mason and lazy.nvim](#a-quarantine-in-front-of-mason-and-lazynvim)
-  - [Files that never reach an AI](#files-that-never-reach-an-ai)
-  - [Schemas for YAML and JSON](#schemas-for-yaml-and-json)
-  - [What is attached to this buffer](#what-is-attached-to-this-buffer)
-  - [Spelling, in several languages at once](#spelling-in-several-languages-at-once)
-  - [Diagrams in the terminal](#diagrams-in-the-terminal)
-  - [Workspace diagnostics](#workspace-diagnostics)
-  - [Tasks for each language](#tasks-for-each-language)
-  - [Runbooks that run](#runbooks-that-run)
-  - [Tools given what they lack](#tools-given-what-they-lack)
-  - [Integrations](#integrations)
+- [Features](#features)
 - [Key bindings](#key-bindings)
 - [Commands](#commands)
-- [Help inside Neovim](#help-inside-neovim)
 - [Repository layout](#repository-layout)
 - [Development](#development)
-  - [Tests](#tests)
-  - [Checks](#checks)
 - [Benchmark](#benchmark)
 
 <!-- tocstop -->
 
-## Why this configuration
+## Highlights
 
-- 🧩 **One entry per language.** Parser, servers, linters, formatters, debug
-  adapters, test runners, `dial` augends, autopairs rules — all of it in
-  [lua/config/languages.lua](./lua/config/languages.lua), one table per
-  language, nothing else to wire up.
-- 🪶 **Nothing eager.** Treesitter parsers, LSP servers, linters, formatters
-  and debug adapters are installed by Mason the first time one of their
-  filetypes shows up, through a single `FileType` dispatcher rather than a few
-  hundred autocmds.
-- 🔒 **Supply-chain aware.** Every tool Mason installs, and every plugin update
-  lazy.nvim offers, is held back for a week after its release — the same
-  quarantine the surrounding dotfiles put on npm, bun, pnpm and uv.
-- 🤖 **AI with a guard rail.** `.env` files, private keys and credential stores
-  are kept out of every AI integration — not only Copilot's `root_dir`, but
-  chats handed a file, selections following the cursor, and prompts on their
-  way to a CLI tool.
-- 🎛 **One tree, many machines.** A laptop, a workstation and a container run
-  the same checkout and differ only in a few globals.
-- 🛟 **Two speeds.** `latest` rides plugin `main` branches on a Neovim
-  nightly; `stable` takes tagged releases on a released Neovim. Each keeps its
-  own lockfile, so the two never overwrite each other's pins.
-- 🧪 **Checked, not hoped for.** 42 plenary-busted spec files, a startup check
-  that opens a file of every language, a tool-name validator, and CI that runs
-  all of it on both channels.
-- 📈 **Measured.** Two benchmarks — one for starting Neovim, one for opening a
-  file — rewrite the [Benchmark](#benchmark) section themselves when a number
-  really moves.
+- 🧩 **One entry per language** in
+  [lua/config/languages.lua](./lua/config/languages.lua): parser, servers,
+  linters, formatters, debug adapters, test runners.
+- 🪶 **Nothing eager.** A single `FileType` dispatcher installs a language's
+  tooling the first time one of its files is opened; startup stays in the
+  tens of milliseconds.
+- 🔒 **Supply-chain aware.** Mason packages and plugin updates wait a week
+  after release, updates can be reviewed before they land, and what is
+  installed can be exported as an SBOM and checked against OSV.
+- 🤖 **AI with a guard rail.** Secrets are kept from every AI integration, and
+  what each one was handed is logged.
+- 🛟 **Two channels.** `latest` follows plugin `main` on Neovim nightly;
+  `stable` takes tagged releases. Each has its own lockfile.
+- 🧪 **Tested.** plenary-busted specs, a startup check that opens a file of
+  every language, and CI on both channels.
 
 > [!CAUTION]
 >
-> - Neovim only. Not vim, at any version; not Neovim < 0.13 on the default
->   `latest` channel, or < 0.12 on `stable`.
-> - The `latest` channel follows the newest Neovim and the newest plugin
->   commits, so an upstream break can land with any `:Lazy update`. Set
->   `DyNeo.plugin_channel = 'stable'` on a machine that should not ride along.
-> - Used on Linux and macOS.
+> Neovim only: 0.13+ on `latest`, 0.12+ on `stable`. `latest` can break with
+> any `:Lazy update`; use `DyNeo.plugin_channel = 'stable'` where it must not.
+> Used on Linux and macOS.
 
 ## Quick start
 
-### Requirements
-
 | Needed for | Programs |
 | ---------- | -------- |
-| Running at all | **Neovim 0.13+** (nightly), or 0.12+ on the `stable` channel |
-| Bootstrapping plugins | **git** |
-| Icons | a [Nerd Font](https://www.nerdfonts.com/) in the terminal |
+| Running at all | **Neovim 0.13+** (nightly), or 0.12+ on `stable` |
+| Plugins | **git** |
+| Icons | a [Nerd Font](https://www.nerdfonts.com/) |
 | Mason downloads | **curl**, **tar**, **unzip**, **gzip** |
-| Treesitter parsers | a **C compiler**, and the [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/tree/master/crates/cli) |
+| Treesitter parsers | a **C compiler**, the [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/tree/master/crates/cli) |
 | Pickers and completion | **ripgrep**, **fd** |
 
-Everything else is installed lazily. Many Mason packages are built by a
-language toolchain, so what Mason can install depends on what is on `PATH`:
-**node**/**npm** (or **bun**), **python3**/**pip** (or **uv**), **go**,
-**cargo**, **java**, and so on. `bun` and `uv` are used in place of `npm` and
-`pip` when they are installed.
-
-Some tools are never installed by Mason and must come from the system (or the
-language's own toolchain) to be used: `bean-check`/`bean-format` (Beancount),
-`bicep`, `clang-tidy` (C/C++, Arduino), `cmake-format`, `dart`, `erlfmt`,
-`fish`/`fish_indent`, `forge` (Solidity), `gawk`, `gleam`, `hurlfmt`, `just`,
-`mix` (Elixir, HEEx), `nginxfmt.py`, `nix`, `statix`, `nufmt`, `perlcritic`,
-`perltidy`, `prisma-lint`, `qmlformat`, `rustfmt`, `scalafmt`, `terragrunt`,
-`tofu` (Terraform), `zig`, `zsh`, plus `curl`, `sed` and `git` for the generic
-sources. They are the entries marked `mason = { enabled = false }` in
-[lua/config/languages.lua](./lua/config/languages.lua); a missing one is
-skipped, not reported as an error.
-
-Optional extras:
-
-- Pasting images: `pngpaste` on macOS, `wl-paste` or `xclip` on Linux.
-- Input method switching on Linux: `fcitx5-remote` (skipped without it).
-- D2 diagrams: `d2`, plus one of `rsvg-convert`, `resvg` or `magick`, and a
-  kitty-graphics terminal.
-
-### Install
-
-Back up whatever is there and clone this repository to `~/.config/nvim`:
+Everything else is installed lazily, through whichever toolchains are on
+`PATH` (node or bun, python or uv, go, cargo, java…). Tools marked
+`mason = { enabled = false }` in `languages.lua` (`rustfmt`, `tofu`, `zig`,
+`nix`…) must come from the system; a missing one is skipped. Optional:
+`pngpaste`/`wl-paste`/`xclip` to paste images, `fcitx5-remote` for input
+methods, `d2` and a kitty-graphics terminal for diagrams.
 
 ```sh
 mv ~/.config/nvim ~/.config/nvim.bak
 git clone https://gitlab.com/dynamo-config/neovim.git ~/.config/nvim --single-branch --depth 1
-```
-
-To try it beside an existing configuration instead of replacing it, clone
-anywhere and run it under its own name:
-
-```sh
+# or beside an existing config:
 git clone https://gitlab.com/dynamo-config/neovim.git ~/.config/dynamo --single-branch --depth 1
 NVIM_APPNAME=dynamo nvim
 ```
 
-### First start
-
-The first `nvim` clones the plugins; the first file of a language installs
-that language's parser, servers and tools. Both report progress, and neither
-blocks the editor beyond the lazy.nvim bootstrap.
-
-Worth opening right away:
-
-- `:Lazy` — what is installed, what loaded, and how long each took.
-- `:Mason` — the tool side of the same question.
-- `:checkhealth dyneo` — what of the requirements above is missing.
-- `<Space>` — hold it and [which-key](https://github.com/folke/which-key.nvim)
-  lists everything underneath.
+The first start clones the plugins; the first file of a language installs its
+tooling. Then try `:Lazy`, `:Mason`, `:checkhealth dyneo`, and `<Space>` to
+let which-key list everything.
 
 ## Configuration
 
-### Per machine settings
-
-[chezmoi](https://www.chezmoi.io/) is not needed. It renders
-[lua/per_machine/config.lua.tmpl](./lua/per_machine/config.lua.tmpl) into
-`lua/per_machine/config.lua` on my machines; in a plain clone that file does
-not exist, the loader stays quiet about it, and the defaults in
-[lua/config/globals.lua](./lua/config/globals.lua) stand.
-
-To change them, write `lua/per_machine/config.lua` by hand and assign the
-globals there. `init.lua` loads it before anything else, so every global below
-is still open to it:
+Override the defaults of [lua/config/globals.lua](./lua/config/globals.lua) in
+`lua/per_machine/config.lua`, loaded before anything else (chezmoi renders it
+from `config.lua.tmpl` on my machines; without it the defaults stand):
 
 ```lua
-DyNeo.dark_mode = false
 DyNeo.plugin_channel = 'stable'
 DyNeo.enabled_languages = { 'lua', 'bash', 'markdown' }
 DyNeo.enabled_plugins.obsidian = true
-DyNeo.obsidian.paths.personal = vim.fn.expand('~/Notes')
-DyNeo.dictionaries_path = vim.fn.expand('~/.local/share/dictionaries')
 ```
-
-An error raised inside that file is reported; only its absence is silent.
-
-### Globals
-
-Every global is a field of the one global table `DyNeo`, declared, typed and
-defaulted in [lua/config/globals.lua](./lua/config/globals.lua).
 
 | Global | Default | What it does |
 | ------ | ------- | ------------ |
-| `DyNeo.dark_mode` | `true` | Background to use, whenever the clock is not in charge |
-| `DyNeo.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode`, and the colorscheme with it |
-| `DyNeo.plugin_channel` | `'latest'` | `latest` or `stable`, see [Plugin channels](#plugin-channels) |
-| `DyNeo.quarantine_window` | `7 * 24 * 60 * 60` | How long a release waits before Mason or lazy.nvim may install it; `0` turns the wait off |
-| `DyNeo.enabled_languages` | every supported language | Which languages get plugins, parsers and tools at all |
-| `DyNeo.bundle_languages` | `{}` | Languages whose tooling is installed up front, for containers and prebuilt images |
+| `DyNeo.dark_mode` | `true` | Background, when the clock is not in charge |
+| `DyNeo.day_night` | `{ enabled = false, day_start = 6, night_start = 18 }` | Let the clock drive `dark_mode` |
+| `DyNeo.plugin_channel` | `'latest'` | `latest` (newest commits, `lazy-lock.json`) or `stable` (releases, `lazy-lock.stable.json`) |
+| `DyNeo.quarantine_window` | one week | How long a release waits before it may be installed; `0` turns it off |
+| `DyNeo.enabled_languages` | all | Languages that get plugins, parsers and tools |
+| `DyNeo.bundle_languages` | `{}` | Languages installed up front, for containers |
 | `DyNeo.enabled_plugins` | all `false` | `obsidian`, `leetcode`, `otter`, `firenvim`, `chezmoi` |
 | `DyNeo.used_full_plugins` | `false` | Install every plugin, to refresh the lockfile |
-| `DyNeo.is_gentoo` | `false` | Add the Gentoo ebuild syntax |
+| `DyNeo.is_gentoo` | `false` | Gentoo ebuild syntax |
 | `DyNeo.obsidian.paths` | `{ personal = '~/Documents/Notes' }` | Vault name to folder |
-| `DyNeo.yaml_schema_dirs` | `{}` | Local schema folders offered by the YAML schema picker |
+| `DyNeo.yaml_schema_dirs` | `{}` | Local schema folders for the YAML schema picker |
 | `DyNeo.dictionaries_path` | `$XDG_CONFIG_HOME/dictionaries` | Word lists for completion and `:DySpell` |
-| `DyNeo.dev_plugins_path` | `$NVIM_DEV_PLUGINS`, else `~/Working/community/nvim` | Where `dev = true` plugin specs are looked for |
-| `DyNeo.firenvim_site_settings` | `{}` | Per-site takeover rules for the browser embedding |
+| `DyNeo.dev_plugins_path` | `$NVIM_DEV_PLUGINS` or `~/Working/community/nvim` | Where `dev = true` plugins are looked for |
+| `DyNeo.firenvim_site_settings` | `{}` | Per-site rules for firenvim |
 | `DyNeo.test_strategy` | `'toggleterm'`, `'zellij'` inside zellij | How vim-test runs a test |
-| `DyNeo.completion_sources` | `{}` | Completion sources named in the completion menu |
+| `DyNeo.completion_sources` | `{}` | Source names shown in the completion menu |
 
-A plugin spec marked `dev = true` is looked for under `DyNeo.dev_plugins_path`
-first; one missing from there is cloned from its git remote as usual, so the
-folder need not exist.
-
-### Plugin channels
-
-| | `latest` (default) | `stable` |
-| --- | --- | --- |
-| Plugins | newest commit | newest release, or their branch when they tag none |
-| Neovim | 0.13 nightly | 0.12 or newer |
-| Lockfile | `lazy-lock.json` | `lazy-lock.stable.json` |
-
-Each channel writes only its own lockfile, so a machine on `stable` and a
-machine on `latest` never rewrite each other's pins.
-
-### Updating plugins
-
-An update is a week behind on purpose: the quarantine in
-[lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua) only lets
-`:Lazy update` move to a commit, or a release, that has been out for seven
-days — the same window the npm, bun, pnpm, uv and Mason sides use. `:Lazy
-restore` and a pinned plugin are not touched by it. See
-[A quarantine in front of Mason and lazy.nvim](#a-quarantine-in-front-of-mason-and-lazynvim).
-
-The lockfile is the snapshot to roll back to, and both live in this
-repository, so:
-
-1. Commit the lockfile before `:Lazy update`, so the working pins are in git.
-2. Update, then commit the new lockfile once everything still works.
-3. If an update breaks something, put the previous lockfile back and check it
-   out again:
-
-   ```sh
-   git restore lazy-lock.json # or: git checkout <commit> -- lazy-lock.json
-   ```
-
-   then run `:Lazy restore` in Neovim. A single plugin can be restored from
-   its line in `:Lazy`.
+**Updating plugins.** Commit the lockfile, `:Lazy update`, commit again once
+everything works. To roll back, `git restore lazy-lock.json` and `:Lazy
+restore`.
 
 ## Languages, Frameworks, or Tools support
 
-103 entries over 126 filetypes. The authoritative list is
-[lua/config/languages.lua](./lua/config/languages.lua); what follows are its
-keys, grouped.
+103 entries over 126 filetypes; the list is
+[lua/config/languages.lua](./lua/config/languages.lua).
 
-### Languages
-
-<details open>
+<details>
 <summary>42 languages</summary>
 
-| | | | |
-| --- | --- | --- | --- |
-| Arduino | AWK | Bash¹ | C/C++ |
-| C# | Clojure | CSS/Less | Cucumber |
-| Dart | Elixir | Erlang | Fish |
-| GDScript (Godot) | GDShader (Godot) | Gleam | Go |
-| GraphQL | Haskell | HTML | Java |
-| Javascript/Typescript | Julia | Kotlin | LaTeX |
-| Lua | Nushell | OCaml | Perl |
-| PHP | Python | R | Ruby |
-| Rust | SASS/SCSS | Scala | Solidity |
-| SQL | Swift | Typst | Vimscript |
-| Zig | Zsh | | |
-
-¹ including the build-recipe filetypes for Arch and Gentoo.
+Arduino, AWK, Bash (with Arch and Gentoo build recipes), C/C++, C#, Clojure,
+CSS/Less, Cucumber, Dart, Elixir, Erlang, Fish, GDScript, GDShader, Gleam, Go,
+GraphQL, Haskell, HTML, Java, Javascript/Typescript, Julia, Kotlin, LaTeX,
+Lua, Nushell, OCaml, Perl, PHP, Python, R, Ruby, Rust, SASS/SCSS, Scala,
+Solidity, SQL, Swift, Typst, Vimscript, Zig, Zsh.
 
 </details>
 
-### Frameworks
-
-<details open>
+<details>
 <summary>13 frameworks</summary>
 
-| | | | |
-| --- | --- | --- | --- |
-| Angular | Astro | Django (templates) | Ember (Handlebars) |
-| Laravel (Blade) | Phoenix (HEEx) | Qt (QML) | Rails |
-| Rust | Svelte | Symfony (Twig) | Templ (Go) |
-| Vue | | | |
+Angular, Astro, Django templates, Ember (Handlebars), Laravel (Blade), Phoenix
+(HEEx), Qt (QML), Rails, Rust, Svelte, Symfony (Twig), Templ, Vue.
 
 </details>
 
-### Tools & Markup
-
-<details open>
+<details>
 <summary>38 tools and markup languages</summary>
 
-| | | | |
-| --- | --- | --- | --- |
-| Ansible | Beancount | Bicep | CMake |
-| CSV | CUE | D2 | DBML |
-| Dockerfile | Git (rebase, commit) | GoTemplate (Helm…) | Groovy (Jenkinsfile) |
-| HTTP Rest file | Hurl | Hyprlang | Jinja |
-| jq | JSON | Jsonnet | Just |
-| KDL (zellij) | Make (autoconf, automake) | Markdown | Mermaid |
-| Nginx | Nix | Prisma | PromQL (Prometheus) |
-| Protobuf | Rego | SystemD | Terraform |
-| Terragrunt | TOML | Treesitter | XML |
-| YAML | Yuck | | |
+Ansible, Beancount, Bicep, CMake, CSV, CUE, D2, DBML, Dockerfile, Git (rebase,
+commit), GoTemplate (Helm…), Groovy (Jenkinsfile), HTTP, Hurl, Hyprlang,
+Jinja, jq, JSON, Jsonnet, Just, KDL, Make (autoconf, automake), Markdown,
+Mermaid, Nginx, Nix, Prisma, PromQL, Protobuf, Rego, SystemD, Terraform,
+Terragrunt, TOML, Treesitter, XML, YAML, Yuck.
 
 </details>
 
-## Beyond the defaults
+## Features
 
-### Tooling that installs itself
+**Tooling that installs itself.** Opening a Go file installs the Go parser,
+`gopls`, its linters, formatters and `delve`, through one `FileType`
+dispatcher ([lua/util/lazy_install.lua](./lua/util/lazy_install.lua)). A tool
+Mason has no package for is installed by `dytoy` and linked in
+([lua/tools/mason-dytoy.lua](./lua/tools/mason-dytoy.lua)).
 
-One `FileType` autocmd, one table of handlers
-([lua/util/lazy_install.lua](./lua/util/lazy_install.lua)). Opening a Go file
-installs the Go parser, `gopls`, its linters, its formatters and `delve`;
-nothing else in the table runs. An autocmd per tool would instead leave Neovim
-a few hundred patterns to walk on every `FileType` event, and make the augroup
-name the only thing keeping two handlers apart — a name two languages can
-collide on, in which case one silently clears the other.
+**Quarantine.** Mason's registry snapshot and every plugin update are held to
+releases older than `DyNeo.quarantine_window`, like npm, bun, pnpm and uv
+elsewhere in these dotfiles; Mason's npm and PyPI installs also go through
+[Socket Firewall](https://socket.dev). `:LazyQuarantine` lists what is held
+back; `:LazyQuarantine review` shows the commits each update brings and flags
+added lines that run processes, load code, reach the network, touch
+credentials, delete files or change the build. `:DySbom` exports the plugins
+and Mason packages as CycloneDX, and `:DySbom osv` checks them against
+[OSV](https://osv.dev).
 
-`DyNeo.bundle_languages` is the other end of the same dial: the languages listed
-there are installed up front, which is what a container image or a prebuilt
-development environment wants.
+**Files that never reach an AI.** `.env` files, keys and credential stores
+([lua/config/sensitive.lua](./lua/config/sensitive.lua)), and any buffer whose
+text looks like a token (or that `betterleaks` flags), are kept from Copilot,
+Avante, sidekick and Claude Code. `camouflage.nvim` masks them on screen.
+`:AiGuardCheck` says why a buffer is held back, `:AiGuardAllow[!]` waives the
+content check or takes the waiver back, and `:AiGuardLog[!]` lists what each
+integration was handed or refused — paths and times, never the text.
 
-A tool Mason has no package for — one that comes from the system package
-manager, from mise or from a script — can still be installed the same way. A
-package of the repository's own registry with `source.id = 'dytoy:<tool>'`
-hands the install to `dytoy --tool <tool>`, and each of its `bin` entries
-becomes a link to the command wherever dytoy put it
-([lua/tools/mason-dytoy.lua](./lua/tools/mason-dytoy.lua)). A tool already on
-the machine is only linked, without dytoy. When the package manager needs
-`sudo`, the password is asked for in Neovim, with `inputsecret()`, and handed
-to sudo through `SUDO_ASKPASS`.
+**YAML and JSON schemas.** Detected from the buffer (Kubernetes, CRDs,
+cloud-init); `<leader>cys` or `:YamlSchema` picks one from the catalogs, the
+project or `DyNeo.yaml_schema_dirs`.
 
-### A quarantine in front of Mason and lazy.nvim
+**What is attached.** The statusline counts servers and tools;
+`<leader>cL` and `<leader>cT` list them and whether each is installed,
+running or missing.
 
-Anything freshly published is held back for a week before it may be installed
-— the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm) and
-`exclude-newer` (uv) give the rest of these dotfiles, so a compromised release
-has time to be caught and pulled before it lands on this machine. Both sides
-read `DyNeo.quarantine_window`, so a machine can wait longer, or not at all.
+**Spelling.** `:DySpell {lang}` builds Vietnamese, Chinese, `proper` and
+`technical` spell files; comments are checked through
+[ltcc](https://github.com/dynamotn/languagetool-code-comments).
 
-Neither Mason nor lazy.nvim has a setting for it, and each needs a different
-answer:
+**Previews.** `<leader>cp` renders the D2 diagram under the cursor inline on a
+kitty-graphics terminal, and previews Markdown and Typst.
 
-- **Mason** resolves no versions of its own — every package carries its
-  version in the registry snapshot. So there is nothing to do per package:
-  [lua/tools/mason-quarantine.lua](./lua/tools/mason-quarantine.lua) pins that
-  snapshot to the newest registry release older than the window, instead of to
-  the newest one.
-- **lazy.nvim** decides what to check out in one function, for `:Lazy update`,
-  for the hourly checker and for the update the UI offers alike.
-  [lua/tools/lazy-quarantine.lua](./lua/tools/lazy-quarantine.lua) wraps it and
-  hands back the newest commit, or the newest release, that has been out long
-  enough. What lazy.nvim then does with that target is untouched, so `:Lazy
-  restore` still puts the lockfile back commit for commit, and a pinned plugin
-  stays where it is. A repository younger than the window is installed as
-  lazy.nvim resolved it, since the alternative is not installing it at all.
+**Workspace diagnostics.** `<leader>xw` hands the language server every file
+of the project, read off the main loop.
 
-A plugin is as much of a supply chain as a package from npm or PyPI, and a
-bigger one: whatever is in it runs in this editor the next time Neovim starts.
+**Tasks.** `<leader>oo` offers overseer tasks for the current file in about 50
+languages ([lua/config/tasks.lua](./lua/config/tasks.lua)), plus the
+project's build and test tasks.
 
-Two edges the window alone leaves open are covered beside it. The bootstrap
-clone of lazy.nvim itself is walked back to an aged commit by hand, since the
-quarantine cannot hold back the clone that brings it in. And Mason runs its
-npm and PyPI installs through [Socket
-Firewall](https://socket.dev), which turns down a package known to be
-malicious — the half of the problem a week of waiting cannot answer, because a
-package can be caught after that week as easily as within it. `sfw` is a local
-proxy, so the installer it wraps trusts the proxy's certificate instead of the
-registry's: the verification moves to `sfw` rather than disappearing.
+**Runbooks.** In Markdown, `<localleader>r` runs the code block under the
+cursor (`sh`, `bash`, `zsh`, `fish`, `console`, `python`, `js`) and writes its
+output in an `output` fence below; `R` runs them all and stops at the first
+failure, `x` clears outputs, `s` stops. `sudo`, `rm -rf`, `kubectl delete`,
+`destroy` and the like ask first.
 
-The window is otherwise invisible — `:Lazy` shows a plugin as up to date when
-it is a week behind on purpose — so `:LazyQuarantine` lists what is being held
-back: the commit or release each plugin is on, the one waiting for it, and how
-long is left. It asks git once per plugin, about a second for the whole set.
-`:checkhealth dyneo` answers the other half, whether the window is in place at
-all.
+**Gaps filled** in [lua/tools](./lua/tools) and [lua/lint](./lua/lint): Jira
+completion in commit messages, shellcheck code actions, sonarlint connected
+mode, LanguageTool for comments, nvim-lint definitions for `betterleaks`,
+`dyshellint` and `d2`, `terragrunt validate`, and rule ids for
+`nvim-rulebook`.
 
-A week of waiting only helps if someone looks, so `:LazyQuarantine review`
-reads every update on its way, held or already through: the commits each
-plugin would move across, and the lines they add that do what a plugin rarely
-needs to and an attacker always does — start a process, load code at runtime,
-reach the network, touch a credential, delete files, carry an encoded blob,
-change the build, add a binary. Prose, CI and tests are left out, since none
-of it runs in the editor, and a flag raised many times in one file is said
-once. `<CR>` on a plugin opens its full diff. A flag is a reason to read the
-diff, not a verdict ([lua/tools/plugin-review.lua](./lua/tools/plugin-review.lua)).
+**Integrations.**
 
-What is already installed is the other half of the supply chain. `:DySbom`
-lists the plugins at their lockfile commits and the Mason packages at the
-versions of their receipts as a CycloneDX 1.5 document — shown, or written to
-a path given — and `:DySbom osv` asks [OSV](https://osv.dev) about all of them
-in one request: a package by its purl, a plugin by its commit. That request
-carries the names, versions and commits and nothing else of the machine
-([lua/tools/sbom.lua](./lua/tools/sbom.lua)).
-
-### Files that never reach an AI
-
-A language server is handed the whole text of every buffer it attaches to,
-before a single suggestion is asked for. Opening a `.env` or a private key is
-enough to upload it.
-
-Every rule about secrets in this configuration is listed once, in
-[lua/config/sensitive.lua](./lua/config/sensitive.lua) — dotenv and direnv
-files, private keys, credential stores — and
-[plugin/ai_guard.lua](./plugin/ai_guard.lua) guards every integration at the
-one place it reads a buffer or a path: Copilot's `root_dir`, a chat handed a
-file, a selection following the cursor into a CLI tool, a prompt on its way
-out. A wrapper that no longer finds what it wraps leaves the plugin as it is
-and says so, rather than breaking it on an upstream rename.
-
-A name only goes so far, though: a scratch buffer, a YAML of deployment values
-or a log pasted into a file carries credentials under a perfectly ordinary
-name. So the text is searched as well, for the formats a credential is
-recognisable by — a PEM header, `AKIA…`, `ghp_…`, a password in a URL — and a
-match holds the whole buffer back. Each pattern recognises a token format and
-nothing else: anything vaguer (`password = …`) would turn the guard off by
-crying wolf. The buffer is read once per change, not once per question, since
-the guards ask on every cursor move.
-
-A buffer that stops being sensitive is offered back: delete the token again,
-or waive the check, and Copilot is asked about the buffer once more — but only
-when this guard is what took it away, never when the buffer was left without
-it for a reason of its own.
-
-Behind those patterns stands `betterleaks`, which already lints every buffer
-here — from standard input, with `--redact` and its API validation off, so
-nothing leaves the machine. The guard reads the diagnostics it leaves rather
-than running it a second time: no extra process, and its whole rule set backs
-the check. It only answers once it has run, on a write, a read or leaving
-insert mode, which is what the built-in patterns are for — they answer the
-instant a key is pressed, and they answer on a machine where `betterleaks` is
-not installed yet.
-
-| Command | What |
-| ------- | ---- |
-| `:AiGuardCheck` | Why this buffer is held back, and on which line |
-| `:AiGuardAllow` | Waive the content check for this buffer, for as long as it is open |
-| `:AiGuardAllow!` | Take that waiver back |
-| `:AiGuardLog[!]` | What the AI integrations were handed or refused, this session or every session |
-
-The same lists do a second job: `camouflage.nvim` masks a value on screen when
-its key names a secret (`password`, `token`, `api_key`, …) or when the value
-itself has the shape of one, so a format worth keeping from an AI is also one
-worth keeping off the screen in a shared window. Every value of a file the
-rules name sensitive stays masked whatever it is called; everywhere else a
-Kubernetes manifest keeps reading like a Kubernetes manifest.
-
-`:AiGuardAllow` is the way past a pattern that matched something that is not a
-credential, and `:AiGuardAllow!` takes it back. It says nothing about the name
-rules: a `.env` stays sensitive however often it is allowed. A waived buffer
-says so in `:AiGuardCheck` and in `:checkhealth dyneo`, along with what it
-would otherwise be held back for, so a waiver left on by mistake is visible
-rather than silent.
-
-Every decision a guard makes is logged too, so what left the editor can be
-looked back on and not only what was kept in: which integration, which file,
-when, and whether it went out or was refused — Copilot attaching, a file added
-to an Avante chat, a tool reading a path, a prompt sent through sidekick, a
-selection or a mention reaching Claude Code. Only the path and a line range
-are kept, never the text, since a log of what reached an AI must not become
-one more copy of it. `:AiGuardLog` lists this session, `:AiGuardLog!` every
-session still in `stdpath('state')/dyneo/ai_audit.jsonl`, and the same
-handover is logged once a minute at most.
-
-### Schemas for YAML and JSON
-
-YAML schemas are detected from the content of the buffer — Kubernetes
-manifests, CRDs, cloud-init — and `<leader>cys` (or `:YamlSchema`) opens a
-picker to set one for the buffer or write it in as a modeline. Candidates come
-from the public catalogs, from the project, from `DyNeo.yaml_schema_dirs`, and
-from any path typed in. `:YamlSchema reset` hands detection back the wheel.
-
-### What is attached to this buffer
-
-The statusline counts the language servers and the tools that are up rather
-than spelling them out. The full list — every candidate, its state, and what
-can be done about it — is one key or one click away:
-
-| Key | What |
-| --- | ---- |
-| `<leader>cL` | Language servers of the buffer |
-| `<leader>cT` | Formatters and linters of the buffer |
-
-Each entry says whether the tool is installed, running, or missing, so a
-formatter that quietly never fires stops being a mystery. Linters and
-formatters only ever run when they are actually installed.
-
-### Spelling, in several languages at once
-
-`:DySpell {lang}` rebuilds a spell file with `mkspell` from the word lists
-under `DyNeo.dictionaries_path` and `spell/`: Vietnamese, Chinese, plus the
-`proper` and `technical` lists kept in this repository. Comments are
-spell-checked as well as prose — through
-[ltcc](https://github.com/dynamotn/languagetool-code-comments) — and the word
-under the cursor, or a selection for anything with an apostrophe in it, can be
-added to a list from a mapping.
-
-### Diagrams in the terminal
-
-D2 diagrams render inline on kitty-graphics terminals, `zellij` included.
-`<leader>cp` previews the diagram under the cursor
-([lua/tools/diagram/d2](./lua/tools/diagram/d2)); Markdown and Typst get their
-own preview on the same key.
-
-### Workspace diagnostics
-
-`<leader>xw` asks a language server about the whole project, not only the
-files that happen to be open, by handing it every file with
-`textDocument/didOpen`. Unlike the plugin it replaces, the file list and the
-contents are read off the main loop, so a big repository does not freeze the
-editor, and each document is closed again before Neovim opens the same file
-for real, so no server ever sees two `didOpen` for one URI.
-
-### Tasks for each language
-
-`<leader>oo` offers overseer tasks for the current file in about 50
-languages and tools, from [lua/config/tasks.lua](./lua/config/tasks.lua):
-run a script (`python run`, `lua run`, ...), compile and run a C, C++, Rust,
-Kotlin or Erlang file, or render and check with `typst compile`,
-`terraform plan`, `docker build`, `helm lint` and the like. Inside a project
-it adds that project's build and test tasks (`go test`, `dotnet build`,
-`gradle test`, `zig build`, `forge test`, ...), run from the project root.
-A task appears only when its language is in `DyNeo.enabled_languages` and its
-program is on `$PATH`. Project tooling overseer reads on its own (make, just,
-npm, cargo, mix, ...) is left to it.
-
-### Runbooks that run
-
-A runbook is a Markdown file of steps, each a fenced block of commands —
-`kubectl`, `helm`, `psql`, a `curl` against a health endpoint. `<localleader>r`
-runs the block under the cursor from the directory of the file, and what it
-printed lands right under it in an `output` fence, replaced on the next run,
-so the file is the record of what was done and what came back
-([lua/tools/runbook.lua](./lua/tools/runbook.lua)).
-
-`sh`, `bash`, `shell`, `zsh`, `fish`, `python` and `js` blocks run as they
-are; a `console` block runs only its `$ ` lines, since the rest is output it
-once printed. `<localleader>R` runs every block in turn and stops at the first
-that fails, `<localleader>x` clears the outputs, `<localleader>s` stops what
-is running. A block that deletes, destroys or reaches for root — `sudo`,
-`rm -rf`, `kubectl delete`, `tofu destroy`, a forced push, `DROP TABLE` —
-asks before it runs, since a runbook is read in a hurry. An output holding a
-credential is caught by the content check of the AI guard like any other
-text.
-
-### Tools given what they lack
-
-Small gaps filled in [lua/tools](./lua/tools) and [lua/lint](./lua/lint), each
-with a spec of its own:
-
-- **jira** — issue completion in commit messages.
-- **shellcheck** — code actions for the directives it suggests.
-- **sonarlint** — connected mode, for both SonarQube and SonarCloud.
-- **ltcc** — LanguageTool for code comments, as diagnostics and as code
-  actions.
-- **betterleaks**, **dyshellint**, **d2** — nvim-lint definitions that do not
-  ship with the plugin.
-- **terragrunt validate** — a diagnostic source of its own.
-- **rule ids** — put back into the diagnostics nvim-lint leaves them out of,
-  so `nvim-rulebook` can build an ignore comment for `markdownlint`,
-  `ansible-lint`, `swiftlint` and friends.
-
-### Integrations
-
-- [Obsidian](https://obsidian.md/) — vaults from `DyNeo.obsidian.paths`.
-- [chezmoi](https://www.chezmoi.io/) — templates edited with the target
-  language injected, not as plain text.
-- **Firefox** and **Chrome** — Neovim embedded in a textarea with
-  [firenvim](https://github.com/glacambre/firenvim), tuned per site through
-  `DyNeo.firenvim_site_settings`.
-- [zellij](https://zellij.dev/) — test runner, terminal integration, and the
-  pane sources for completion.
-- [AI CLI tools](https://github.com/folke/sidekick.nvim#default-cli-tools) —
-  through sidekick, behind the guard above.
-- **GitHub** and **GitLab** — pull requests and issues through
-  [Octo](https://github.com/pwntester/octo.nvim) when `gh` is installed, under
-  `<leader>ph`; merge requests through
+- [Obsidian](https://obsidian.md/) vaults, [chezmoi](https://www.chezmoi.io/)
+  templates with the target language injected,
+  [firenvim](https://github.com/glacambre/firenvim) in the browser, and
+  [zellij](https://zellij.dev/) for tests, terminals and completion.
+- AI CLIs through [sidekick](https://github.com/folke/sidekick.nvim), behind
+  the guard.
+- GitHub through [Octo](https://github.com/pwntester/octo.nvim) when `gh` is
+  installed; GitLab merge requests through
   [gitlab.nvim](https://github.com/harrisoncramer/gitlab.nvim) when `glab` is,
-  under `<leader>pl` — pick one, review its diff, comment, approve, merge, read
-  its pipeline. gitlab.nvim takes its token from a `.gitlab.nvim` file or
-  `GITLAB_TOKEN` as usual, and from `glab` when neither has one, and its
-  instance from the remote, so a self-hosted `origin` needs nothing set
-  ([lua/util/gitlab_auth.lua](./lua/util/gitlab_auth.lua)). A `.gitlab.nvim`
-  file holds a token, so it is one of the files kept from every AI. CI checks
-  of the branch, on GitHub, GitLab or Forgejo, are on `<leader>pc`.
-- [Jira](https://github.com/ankitpokhrel/jira-cli) — `:Jira` picks among the
-  issues assigned (or any JQL) and does the day's chores on one: start a
-  branch named after it (`fix/OPS-12-login-fails`, the prefix guessed from
-  its type and offered for editing), move it to another state, log work, view
-  it, open it, insert its key. With no issue picked, they act on the one the
-  current branch is named after. Everything goes through `jira-cli`, whose
-  own configuration holds the credentials ([lua/tools/jira.lua](./lua/tools/jira.lua)).
+  with the token from `.gitlab.nvim`, `GITLAB_TOKEN` or `glab`, and the
+  instance from the remote; CI checks on GitHub, GitLab or Forgejo.
+- Jira through [jira-cli](https://github.com/ankitpokhrel/jira-cli): `:Jira`
+  picks an issue to branch from, move, log work on, view or open; without one
+  picked, the issue in the branch name is used.
 
 ## Key bindings
 
-The leader key is `Space`. Press it and wait: which-key lists every mapping
-under it, and `<Space>sk` searches all of them.
-
-- Custom mappings live in [lua/config/keymaps.lua](./lua/config/keymaps.lua),
-  and plugin-specific ones in the `keys` of each spec under
-  [lua/plugins](./lua/plugins).
-- The general defaults — windows, buffers, tabs, diagnostics, `<leader>u`
-  toggles, git — sit at the top of the same file, ahead of the custom ones.
-
-Every mapping, grouped the way which-key shows them, is in
-[doc/dyneo-keymaps.txt](./doc/dyneo-keymaps.txt)
-(`:help dyneo-keymaps`), generated by `scripts/keymaps-doc.sh`. The
-ones worth knowing before which-key gets a chance to tell you:
+The leader is `Space`; which-key lists everything under it and `<Space>sk`
+searches it. Every mapping is in
+[doc/dyneo-keymaps.txt](./doc/dyneo-keymaps.txt) (`:help dyneo-keymaps`).
+The ones worth knowing:
 
 | Key | Mode | What |
 | --- | ---- | ---- |
-| `<leader>fy` | n | Copy the path of the file: relative or absolute, with line, with column, the directory, the project root, the file name |
-| `<leader>cL`, `<leader>cT` | n | Language servers, formatters and linters of this buffer |
-| `<leader>cys`, `<leader>cym` | n | Pick a YAML schema, or write it in as a modeline |
-| `<leader>cp` | n | Preview the diagram, Markdown or Typst under the cursor |
+| `<leader>fy` | n | Copy the file path: relative, absolute, with line or column, directory, root |
+| `<leader>cL`, `<leader>cT` | n | Servers, formatters and linters of the buffer |
+| `<leader>cys`, `<leader>cym` | n | Pick a YAML schema, or write it as a modeline |
+| `<leader>cp` | n | Preview the diagram, Markdown or Typst |
 | `<leader>xw` | n | Workspace diagnostics |
-| `<leader>ph` | n | GitHub (Octo): issues, pull requests, repositories, search |
-| `<leader>pl` | n | GitLab: choose and review a merge request, comment, approve, merge, pipeline |
-| `<leader>pj` | n | Jira: my issues, search, branch, move, log work, view, open |
-| `<leader>uk` | n | Camouflage: hide the values in a secret file |
-| `<leader>ct` | n | Translate |
-| `<leader>a` | n, x | AI CLIs through sidekick; Claude Code under `<leader>ac`, Avante under `<leader>av` |
-| `<leader>yh`, `<leader>yi` | n, x | Yank history, paste an image |
+| `<leader>pc` | n | CI checks of the branch |
+| `<leader>ph` | n | GitHub (Octo) |
+| `<leader>pl` | n | GitLab merge requests |
+| `<leader>pj` | n | Jira |
 | `<leader>ps` | n | Project LSP settings (codesettings) |
-| `<leader>pc` | n | CI checks of the branch (GitHub, GitLab, Forgejo) |
+| `<leader>a` | n, x | AI CLIs; Claude Code at `<leader>ac`, Avante at `<leader>av` |
+| `<leader>uk` | n | Mask the values of a secret file |
+| `<leader>ct` | n | Translate |
+| `<leader>yh`, `<leader>yi` | n, x | Yank history, paste an image |
 | `<leader>v` | n, x | Multiple cursors |
-| `<C-c>` | n | Change word |
-| `d`, `x`, `c`, `C`, `X` | n, v | Smart delete: a blank line goes to the black hole register |
-| `/` | x | Search inside the selection |
-| `<C-f>`, `<C-r>` | x | Search, replace the selected text |
-| `:W`, `:Q`, `:Wq`, `:Qa`, … | c | The typo you meant |
-| `:ww` | c | Save through `sudo tee` |
+| `d`, `x`, `c`, `C`, `X` | n, v | A blank line goes to the black hole register |
+| `/`, `<C-f>`, `<C-r>` | x | Search inside, search for, replace the selection |
+| `:W`, `:Q`, `:Wq`, `:Qa`, `:ww` | c | The typo you meant; `:ww` saves through `sudo tee` |
 
 ## Commands
 
 | Command | What |
 | ------- | ---- |
-| `:DySpell {lang}` | Rebuild a spell file from its word lists |
-| `:LazyQuarantine` | Plugins the release quarantine is holding back, and for how much longer |
-| `:LazyQuarantine review [{plugin}]` | What the updates on their way bring in, flagged; or the full diff of one plugin |
-| `:DySbom [{path}]`, `:DySbom osv` | Plugins and Mason packages as a CycloneDX SBOM; the vulnerabilities OSV knows in them |
-| `:AiGuardCheck`, `:AiGuardAllow[!]` | Why this buffer is kept from the AI integrations, the way past the content check, and the way back |
-| `:AiGuardLog[!]` | What the AI integrations were handed or refused: paths and times, never the text |
-| `:YamlSchema [modeline] [{path}]` | Pick the schema of this YAML buffer, or use the one at `{path}`; `modeline` writes it into the file instead |
-| `:YamlSchema reset` | Hand schema detection back the wheel |
-| `:DyNeoFormat`, `:DyNeoFormatInfo` | Format the buffer; which formatters would run, and whether it formats on save |
-| `:DyNeoRoot` | The roots found for this buffer, the one in use first |
-| `:Runbook [run\|all\|clear\|stop]` | Run the code block under the cursor, or every one, with the output under it |
-| `:Jira [search {jql}]` | Pick an issue assigned, or matching `{jql}`, and act on it |
-| `:Jira branch\|move\|worklog\|view\|open\|insert\|copy [{key}]` | Act on `{key}`, the issue of the branch, or one picked |
+| `:LazyQuarantine [review [{plugin}]]` | Plugins held back; or what their updates bring, flagged |
+| `:DySbom [{path}\|osv]` | Plugins and Mason packages as CycloneDX; or their known vulnerabilities |
+| `:AiGuardCheck`, `:AiGuardAllow[!]`, `:AiGuardLog[!]` | Why a buffer is kept from AI; waive it; what was sent |
+| `:YamlSchema [modeline\|reset] [{path}]` | Set the schema of a YAML buffer |
+| `:DyNeoFormat`, `:DyNeoFormatInfo` | Format; which formatters would run |
+| `:DyNeoRoot` | The roots found for this buffer |
+| `:DySpell {lang}` | Rebuild a spell file |
+| `:Runbook [run\|all\|clear\|stop]` | Run the Markdown code blocks |
+| `:Jira [search {jql}\|{action} [{key}]]` | Pick an issue, or `branch`, `move`, `worklog`, `view`, `open`, `insert`, `copy` |
 
-The plugins' own commands are unchanged.
-
-## Help inside Neovim
-
-The same ground, as a help file:
-
-```vim
-:help dyneo
-```
-
-Tags are committed, so `:help` works in a fresh clone; after editing
-[doc/dyneo.txt](./doc/dyneo.txt), regenerate them with
-`:helptags doc`.
+`:help dyneo` covers the same ground inside Neovim.
 
 ## Repository layout
 
 | Path | What it holds |
 | ---- | ------------- |
 | `init.lua` | Globals, per-machine overrides, the version gate, lazy.nvim |
-| `lua/config/` | `globals`, `languages`, `tasks`, `options`, `keymaps`, `autocmds`, `defaults`, `sensitive` |
-| `lua/plugins/` | Plugin specs by area: `coding`, `executor`, `integration`, `lang`, `lsp`, `toolbox`, `treesitter`, `ui` |
-| `lua/util/` | Shared helpers the specs call into |
-| `lua/tools/` | Features built here: the Mason and lazy.nvim quarantines, Mason registry entries, diagram rendering, workspace diagnostics, extra completion sources and code actions |
-| `lua/lint/linters/` | nvim-lint definitions the plugin does not ship |
-| `lua/overseer/` | Task templates: the provider for `config.tasks`, and Ansible |
-| `lua/per_machine/` | The per-machine overrides, rendered by chezmoi |
-| `lsp/`, `ftplugin/`, `after/`, `queries/` | Native Neovim configuration, filetype by filetype |
-| `plugin/` | `ai_guard`, `spell` |
-| `snippets/`, `spell/`, `colors/`, `ftdetect/` | The rest of the runtime path |
-| `scripts/` | Benchmarks, checks, the test runner |
-| `tests/` | plenary-busted specs |
-| `doc/` | The help file, and the mapping reference generated from the config |
+| `lua/config/` | `globals`, `languages`, `tasks`, `options`, `keymaps`, `autocmds`, `sensitive` |
+| `lua/plugins/` | Plugin specs by area |
+| `lua/util/` | Helpers the specs call into |
+| `lua/tools/` | Features built here: quarantines, plugin review, SBOM, Jira, runbooks, Mason registry, diagrams, workspace diagnostics |
+| `lua/lint/`, `lua/overseer/` | nvim-lint definitions, task templates |
+| `lua/per_machine/` | Per-machine overrides, rendered by chezmoi |
+| `plugin/` | Commands defined at startup: AI guard, `:DySpell`, `:DySbom`, `:Jira`, `:Runbook` |
+| `lsp/`, `ftplugin/`, `after/`, `queries/`, `snippets/`, `spell/`, `colors/`, `ftdetect/` | Runtime files |
+| `scripts/`, `tests/` | Checks, benchmarks, the test runner; plenary-busted specs |
+| `doc/` | Help file and generated mapping reference |
 
 ## Development
 
-### Tests
-
-58 spec files under `tests/spec` run with
-[plenary-busted](https://github.com/nvim-lua/plenary.nvim#plenarytest_harness)
-in a headless Neovim that loads only the module each spec requires:
-
 ```sh
-scripts/test.sh                                  # every spec
-scripts/test.sh tests/spec/util                  # one directory
-scripts/test.sh tests/spec/util/sensitive_spec.lua
+scripts/test.sh [path]                                 # unit tests, or one directory or spec
+scripts/check-startup.sh                               # load everything, open a file of each language
+nvim --clean --headless -l scripts/validate-tools.lua  # tool names against conform, nvim-lint, lspconfig, Mason
+scripts/keymaps-doc.sh                                 # regenerate doc/dyneo-keymaps.txt
+pre-commit run --all-files                             # all of it, plus stylua
 ```
 
-Plenary and lazy.nvim are taken from lazy.nvim's install directory, or cloned
-into `.tests/` when the configuration has never been started.
-
-### Checks
-
-```sh
-scripts/test.sh                                       # unit tests
-scripts/check-startup.sh                              # load everything, open a file of each language
-nvim --clean --headless -l scripts/validate-tools.lua  # every tool name, against conform, nvim-lint, lspconfig and Mason
-scripts/keymaps-doc.sh                                # rewrite doc/dyneo-keymaps.txt from the mappings set
-pre-commit run --all-files                            # the lot, plus stylua
-```
-
-What those cannot see is the machine the configuration is running on, so
-`:checkhealth dyneo` ([lua/dyneo/health.lua](./lua/dyneo/health.lua)) asks it:
-whether this Neovim is new enough for the plugin channel, what nvim-treesitter
-still needs to build parsers, whether the quarantine in front of Mason and lazy.nvim is the one actually
-running and how old the registry snapshot it settled on is, whether the
-windows bun and uv read still agree with it, which guard of `util.ai_guard`
-found nothing to wrap and what the current buffer would be held back for,
-which tools that never come from Mason are missing here, and whether the
-programs the quick start asks for are installed.
-
-All of it runs as pre-commit hooks and in CI
-([.github/workflows/check.yml](./.github/workflows/check.yml)), on both plugin
-channels.
+`:checkhealth dyneo` checks the machine itself: Neovim version, parser build
+tools, the quarantine, the AI guard, and missing programs. After editing
+[doc/dyneo.txt](./doc/dyneo.txt), run `:helptags doc`.
 
 ## Benchmark
 
-Two of them, because they measure different halves of the same editor:
-
 ```bash
 nvim --clean --headless -l scripts/bench.lua            # starting Neovim
-nvim --clean --headless -l scripts/bench-filetypes.lua  # opening a file
+nvim --clean --headless -l scripts/bench-filetypes.lua  # opening a file of each filetype
 ```
 
-Starting Neovim only reaches `init.lua`. The `FileType` dispatcher, the
-language servers, the linters and formatters, and every plugin that loads on a
-buffer event are left alone until a file is opened, so the second benchmark
-opens one file of every filetype in this configuration, each in a Neovim of its
-own. Neither installs anything.
-
-Both rewrite their own section below when a number moves by more than a
-threshold; `BENCH_FORCE=1` and `BENCH_FT_FORCE=1` rewrite it regardless, and
-`BENCH_FT_ONLY=lua,go` times just those filetypes without touching this file.
-
-Take the filetype milliseconds for what they are. Every run is a whole Neovim
-process, and on a laptop that is noisy in a way averaging does not remove: two
-sweeps of the same tree, nothing changed between them, put individual
-filetypes anywhere from 0.6x to 2.7x of each other. So a single row is an
-order of magnitude, the `plugins` column next to it is the figure that does
-not move, and the summary over all the filetypes is what the section is
-rewritten on. Measure a change by running the benchmark twice, before and
-after, the same way round — a sweep against a sweep, or `BENCH_FT_ONLY`
-against `BENCH_FT_ONLY`, never one against the other and never against the
-table below.
+Both rewrite their section below when a number moves past a threshold
+(`BENCH_FORCE=1`, `BENCH_FT_FORCE=1` to force; `BENCH_FT_ONLY=lua,go` to time
+a few). Single filetype rows are noisy, up to 2.7x between runs: compare
+before and after with the same command, not against this table.
 
 <!-- bench:start -->
 <!-- Generated by scripts/bench.lua; edit that, not this. -->
