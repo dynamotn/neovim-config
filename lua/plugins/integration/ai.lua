@@ -37,6 +37,38 @@ local function install_agy_acp()
   vim.fn.delete(zip)
 end
 
+--- Pick a model for Avante's current provider. An ACP agent lists its models
+--- only once the sidebar has connected to it, so the sidebar is opened first
+--- and the list waited for.
+local function avante_select_model()
+  local config = require('avante.config')
+  -- `:AvanteModels` only knows Avante's own providers, and fails on an ACP
+  -- one such as the default `claude-code`
+  if not config.acp_providers[config.provider] then
+    vim.cmd.AvanteModels()
+    return
+  end
+  local avante = require('avante')
+  if not avante.is_sidebar_open() then avante.open_sidebar({}) end
+  local tries = 150
+  local function try()
+    local sidebar = avante.get(false)
+    local client = sidebar and sidebar.acp_client
+    local session = sidebar
+      and sidebar.chat_history
+      and sidebar.chat_history.acp_session_id
+    if client and client.config_options and session then
+      require('avante.api').select_acp_model()
+    elseif tries > 0 then
+      tries = tries - 1
+      vim.defer_fn(try, 100)
+    else
+      vim.notify('Avante: the ACP agent did not connect', vim.log.levels.WARN)
+    end
+  end
+  try()
+end
+
 return {
   {
     -- Copilot with native LSP, its inline suggestions shown as ghost text
@@ -474,7 +506,7 @@ return {
       },
       {
         '<leader>avm',
-        '<cmd>AvanteModels<cr>',
+        avante_select_model,
         desc = 'Avante Select Model',
       },
       {
