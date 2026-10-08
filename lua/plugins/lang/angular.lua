@@ -3,9 +3,10 @@ local language = require('config.languages').angular
 return vim.list_contains(_G.enabled_languages, 'angular')
     and {
       {
-        -- Extended snippets for angular
-        'friendly-snippets',
-        config = function()
+        -- Extended snippets for angular. From LuaSnip's `opts`, which merge:
+        -- a `config` on friendly-snippets would replace the one that loads it
+        'L3MON4D3/LuaSnip',
+        opts = function()
           require('luasnip').filetype_extend('htmlangular', { 'angular' })
           require('luasnip').filetype_extend('typescript', { 'angular' })
         end,
