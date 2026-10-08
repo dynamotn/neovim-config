@@ -135,15 +135,19 @@ return {
       --- conform adds the `*` list to every filetype, and `lsp_format =
       --- 'fallback'` only asks the server when that whole list is empty --
       --- which, with `*` in it, it never is.
+      ---
+      --- `declared` holds the filetypes `config.languages` gives a formatter,
+      --- installed or not: while it is missing the server formats in its
+      --- place, and the blank lines are still not `*`'s to squeeze.
       ---@param by_ft table<string, string[]>
+      ---@param declared table<string, true>
       ---@return table<string, any>
-      finish_formatters_by_ft = function(by_ft)
+      finish_formatters_by_ft = function(by_ft, declared)
         local common = by_ft['*'] or {}
         by_ft['*'] = function(bufnr)
           local ft = vim.bo[bufnr].filetype
           local base = ft:match('^[^.]+') or ft
-          local own = by_ft[ft] or by_ft[base]
-          local has_own = type(own) == 'table' and #own > 0
+          local has_own = declared[ft] or declared[base] or false
           return vim.tbl_filter(function(name)
             if name == 'trim_whitespace' then
               return not keep_trailing_space[base]
@@ -170,7 +174,7 @@ return {
       -- once instead of each entry resetting the key it happens to touch.
       ---@return table<string, string[]>
       local function build_formatters_by_ft()
-        local by_ft = {}
+        local by_ft, declared = {}, {}
         for _, name in ipairs(language_names) do
           local language = languages[name]
           for _, ft in ipairs(language.filetypes) do
@@ -185,20 +189,25 @@ return {
               tool_name = tool[1]
               tool_command = tool.command or tool_name
             end
+            local fts = type(tool) == 'table' and tool.filetypes
+              or language.filetypes
+            if name ~= '*' and tool_name ~= 'injected' then
+              for _, ft in ipairs(fts) do
+                declared[ft] = true
+              end
+            end
             if
               require('util.languages').is_available(tool_command)
               or name == '*'
               or tool_name == 'injected'
             then
-              local fts = type(tool) == 'table' and tool.filetypes
-                or language.filetypes
               for _, ft in ipairs(fts) do
                 table.insert(by_ft[ft], tool_name)
               end
             end
           end
         end
-        return finish_formatters_by_ft(by_ft)
+        return finish_formatters_by_ft(by_ft, declared)
       end
 
       for ft, tools in pairs(build_formatters_by_ft()) do

@@ -2,15 +2,21 @@ local h = require('helpers')
 
 describe('plugins.executor.formatting', function()
   local by_ft
-  before_each(function()
-    h.globals()
+
+  ---@return table<string, any>
+  local function load()
     local conform
     for _, spec in
       ipairs(dofile(h.root .. '/lua/plugins/executor/formatting.lua'))
     do
       if spec[1] == 'stevearc/conform.nvim' then conform = spec end
     end
-    by_ft = conform.opts(nil, {}).formatters_by_ft
+    return conform.opts(nil, {}).formatters_by_ft
+  end
+
+  before_each(function()
+    h.globals()
+    by_ft = load()
   end)
 
   ---@param ft string
@@ -30,6 +36,21 @@ describe('plugins.executor.formatting', function()
   it('keeps the blank lines of a filetype with a formatter', function()
     assert.is_false(vim.list_contains(common('python'), 'condense_blank_lines'))
     assert.is_true(vim.list_contains(common('conf'), 'condense_blank_lines'))
+  end)
+
+  it('keeps the blank lines while the formatter is not installed', function()
+    local restore = h.stub(
+      require('util.languages'),
+      'is_available',
+      function() return false end
+    )
+    local ok, result = pcall(load)
+    restore()
+    assert(ok, result)
+    by_ft = result
+    -- The server formats in place of the missing `ruff`
+    assert.same({ lsp_format = 'last' }, by_ft.python)
+    assert.is_false(vim.list_contains(common('python'), 'condense_blank_lines'))
   end)
 
   it('keeps the trailing spaces that mean something', function()
