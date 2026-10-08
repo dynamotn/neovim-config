@@ -415,6 +415,12 @@ return {
           'write_to_file',
         },
       },
+      mappings = {
+        -- `<C-s>` is the Zellij prefix, so it never reaches Neovim
+        submit = {
+          insert = '<M-CR>',
+        },
+      },
       selection = {
         hint_display = 'none',
       },
