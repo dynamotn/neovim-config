@@ -884,7 +884,8 @@ return {
     parser = 'latex',
     injected_parsers = { 'python' },
     ext = 'tex',
-    lsp_servers = { 'ltex', 'texlab' },
+    -- `ltex` is archived; `ltex_plus` is its maintained fork
+    lsp_servers = { 'ltex_plus', 'texlab' },
     formatters = { 'tex-fmt' },
     autopairs = function(filetypes, rule, cond)
       return {

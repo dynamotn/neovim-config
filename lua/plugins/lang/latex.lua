@@ -10,7 +10,9 @@ return vim.list_contains(_G.enabled_languages, 'latex')
         'neovim/nvim-lspconfig',
         opts = {
           servers = {
-            ltex = {},
+            -- Grammar for LaTeX only: its shipped list reaches markdown and
+            -- git commits, which `harper_ls` already checks
+            ltex_plus = { filetypes = { 'tex', 'plaintex', 'bib' } },
             texlab = {},
           },
         },
