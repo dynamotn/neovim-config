@@ -74,23 +74,10 @@ return vim.list_contains(_G.enabled_languages, 'rust')
             },
           },
         },
+        -- No `dap.adapter`: rustaceanvim finds Mason's codelldb and its
+        -- liblldb itself as a session starts, where a path read here was
+        -- empty for good whenever codelldb was installed after startup
         config = function(_, opts)
-          if LazyVim.has('mason.nvim') then
-            local codelldb = vim.fn.exepath('codelldb')
-            -- `io.popen('uname')` forked a shell, never closed the handle
-            -- and blew up whenever the call itself failed
-            local codelldb_lib_ext = vim.uv.os_uname().sysname == 'Linux'
-                and '.so'
-              or '.dylib'
-            local library_path =
-              vim.fn.expand('$MASON/opt/lldb/lib/liblldb' .. codelldb_lib_ext)
-            opts.dap = {
-              adapter = require('rustaceanvim.config').get_codelldb_adapter(
-                codelldb,
-                library_path
-              ),
-            }
-          end
           vim.g.rustaceanvim =
             vim.tbl_deep_extend('keep', vim.g.rustaceanvim or {}, opts or {})
           if vim.fn.executable('rust-analyzer') == 0 then

@@ -41,7 +41,9 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
           if not dap.adapters['netcoredbg'] then
             require('dap').adapters['netcoredbg'] = {
               type = 'executable',
-              command = vim.fn.exepath('netcoredbg'),
+              -- Looked up on `$PATH` as a session starts, so a netcoredbg
+              -- Mason installs after startup is found too
+              command = 'netcoredbg',
               args = { '--interpreter=vscode' },
               options = {
                 detached = false,
