@@ -28,9 +28,11 @@ describe('tools.diagnostics.terragrunt_validate', function()
     end
   )
 
+  -- none-ls hands stdout to `on_output` only for an exit it was told is fine;
+  -- any other, with nothing on stderr, has its stdout taken for the error
   it('reads the output whatever the exit code', function()
-    assert.is_false(opts.check_exit_code(0, ''))
-    assert.is_false(opts.check_exit_code(1, 'boom'))
+    assert.is_true(opts.check_exit_code(0, ''))
+    assert.is_true(opts.check_exit_code(1, 'boom'))
   end)
 
   describe('on_output', function()
