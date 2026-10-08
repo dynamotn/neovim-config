@@ -28,37 +28,31 @@ return {
       -- catppuccin integration goes here too.
       auto_integrations = false,
       integrations = {
-        aerial = true,
-        alpha = true,
-        cmp = true,
+        avante = true,
+        blink_cmp = true,
         dadbod_ui = true,
         dap = true,
-        dashboard = true,
         dropbar = { enabled = true },
         flash = true,
-        fzf = true,
         gitsigns = true,
         grug_far = true,
         harpoon = true,
-        headlines = true,
-        illuminate = true,
-        indent_blankline = { enabled = true },
-        leap = true,
         lsp_trouble = true,
         markview = true,
         mason = true,
         mini = true,
-        navic = { enabled = true, custom_bg = 'lualine' },
         neotest = true,
-        neotree = true,
         noice = true,
-        notify = true,
+        octo = true,
+        overseer = true,
         rainbow_delimiters = true,
         snacks = true,
-        telescope = true,
         treesitter_context = true,
         which_key = true,
       },
+      -- The terminal's 16 colours from the flavour, so a `:terminal` or a
+      -- Snacks terminal follows the switch between day and night
+      term_colors = true,
       transparent_background = false,
       dim_inactive = {
         enabled = true,
@@ -77,116 +71,121 @@ return {
           DyTrailingWhitespace = { bg = colors.red },
           CurSearch = { fg = colors.mantle, bg = colors.peach },
           Search = { fg = colors.text, bg = colors.blue },
-          CmpItemAbbrMatch = { fg = colors.blue, bg = colors.none, bold = true },
-          CmpItemAbbrMatchFuzzy = {
+          -- The completion menu is blink's, whose groups only fall back on
+          -- nvim-cmp's under `use_nvim_cmp_as_default`
+          BlinkCmpLabelMatch = {
             fg = colors.blue,
             bg = colors.none,
             bold = true,
           },
-          CmpItemMenu = { fg = colors.sapphire, bg = colors.none, bold = true },
+          BlinkCmpSource = {
+            fg = colors.sapphire,
+            bg = colors.none,
+            bold = true,
+          },
 
-          CmpItemKindField = {
+          BlinkCmpKindField = {
             fg = util.lighten(colors.surface0, 0.9, colors.green),
             bg = colors.green,
           },
-          CmpItemKindProperty = {
+          BlinkCmpKindProperty = {
             fg = util.lighten(colors.surface0, 0.9, colors.green),
             bg = colors.green,
           },
-          CmpItemKindUnit = {
+          BlinkCmpKindUnit = {
             fg = util.lighten(colors.surface0, 0.9, colors.green),
             bg = colors.green,
           },
 
-          CmpItemKindText = {
+          BlinkCmpKindText = {
             fg = util.lighten(colors.surface0, 0.9, colors.teal),
             bg = colors.teal,
           },
-          CmpItemKindEnum = {
+          BlinkCmpKindEnum = {
             fg = util.lighten(colors.surface0, 0.9, colors.teal),
             bg = colors.teal,
           },
-          CmpItemKindKeyword = {
+          BlinkCmpKindKeyword = {
             fg = util.lighten(colors.surface0, 0.9, colors.teal),
             bg = colors.teal,
           },
 
-          CmpItemKindEvent = {
+          BlinkCmpKindEvent = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindFunction = {
+          BlinkCmpKindFunction = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindStruct = {
+          BlinkCmpKindStruct = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindConstructor = {
+          BlinkCmpKindConstructor = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindModule = {
+          BlinkCmpKindModule = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindOperator = {
+          BlinkCmpKindOperator = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindFile = {
+          BlinkCmpKindFile = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindFolder = {
+          BlinkCmpKindFolder = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindTypeParameter = {
+          BlinkCmpKindTypeParameter = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
-          CmpItemKindMethod = {
+          BlinkCmpKindMethod = {
             fg = util.lighten(colors.surface0, 0.9, colors.blue),
             bg = colors.blue,
           },
 
-          CmpItemKindConstant = {
+          BlinkCmpKindConstant = {
             fg = util.lighten(colors.surface0, 0.9, colors.peach),
             bg = colors.peach,
           },
-          CmpItemKindValue = {
+          BlinkCmpKindValue = {
             fg = util.lighten(colors.surface0, 0.9, colors.peach),
             bg = colors.peach,
           },
 
-          CmpItemKindReference = {
+          BlinkCmpKindReference = {
             fg = util.lighten(colors.surface0, 0.9, colors.red),
             bg = colors.red,
           },
-          CmpItemKindEnumMember = {
+          BlinkCmpKindEnumMember = {
             fg = util.lighten(colors.surface0, 0.9, colors.red),
             bg = colors.red,
           },
-          CmpItemKindColor = {
+          BlinkCmpKindColor = {
             fg = util.lighten(colors.surface0, 0.9, colors.red),
             bg = colors.red,
           },
 
-          CmpItemKindClass = {
+          BlinkCmpKindClass = {
             fg = util.lighten(colors.surface0, 0.9, colors.yellow),
             bg = colors.yellow,
           },
-          CmpItemKindInterface = {
+          BlinkCmpKindInterface = {
             fg = util.lighten(colors.surface0, 0.9, colors.yellow),
             bg = colors.yellow,
           },
-          CmpItemKindVariable = {
+          BlinkCmpKindVariable = {
             fg = util.lighten(colors.surface0, 0.9, colors.flamingo),
             bg = colors.flamingo,
           },
-          CmpItemKindSnippet = {
+          BlinkCmpKindSnippet = {
             fg = util.lighten(colors.surface0, 0.9, colors.mauve),
             bg = colors.mauve,
           },
