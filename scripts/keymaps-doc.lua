@@ -8,8 +8,9 @@
 --   a later spec overriding a key is what shows;
 -- - the `keys` of the language servers, from the merged nvim-lspconfig
 --   options, for the buffers a server attaches to;
--- - every other `vim.keymap.set` made from this tree: `config.keymaps` and
---   what plugin `config` functions map themselves.
+-- - every other `vim.keymap.set` made from this tree: `config.keymaps`, what
+--   plugin `opts` and `config` functions map themselves, and what an
+--   `on_attach` maps in the buffer it attaches to.
 --
 -- Groups come from which-key's `spec`. Mappings a plugin makes on its own,
 -- with no `keys` entry here, are left to `:help` of that plugin.
@@ -117,7 +118,12 @@ local function add_keys(keys, scope)
   local Keys = require('lazy.core.handler.keys')
   for _, key in pairs(Keys.resolve(keys)) do
     if key.rhs == '' and key.desc and vim.startswith(key.desc, '+') then
-      key_groups[normalize(key.lhs)] = key.desc:sub(2)
+      -- One prefix may be a group of several plugins, each in its own
+      -- filetypes: Laravel's `<localleader>l` and Octo's
+      local lhs, name = normalize(key.lhs), key.desc:sub(2)
+      local names = key_groups[lhs] and vim.split(key_groups[lhs], ' / ') or {}
+      if not vim.list_contains(names, name) then table.insert(names, name) end
+      key_groups[lhs] = table.concat(names, ' / ')
     elseif key.desc and key.desc ~= '' then
       table.insert(maps, {
         lhs = normalize(key.lhs),
@@ -145,6 +151,27 @@ local function groups()
   end
   walk(require('util.plugin').opts('which-key.nvim').spec)
   return ret
+end
+
+--- Call the `on_attach` of every loaded plugin on `bufnr`, for the keys it
+--- maps in the buffers it attaches to, such as gitsigns' hunk keys
+---@param bufnr integer
+local function attach(bufnr)
+  local Config = require('lazy.core.config')
+  local names = vim.tbl_keys(Config.plugins)
+  table.sort(names)
+  for _, name in ipairs(names) do
+    if Config.plugins[name]._.loaded then
+      local ok, opts = pcall(require('util.plugin').opts, name)
+      if
+        ok
+        and type(opts) == 'table'
+        and type(opts.on_attach) == 'function'
+      then
+        pcall(opts.on_attach, bufnr)
+      end
+    end
+  end
 end
 
 local function collect()
@@ -288,6 +315,8 @@ end
 
 vim.api.nvim_create_autocmd('VimEnter', {
   once = true,
+  -- For the file opened below to fire the events that load plugins
+  nested = true,
   callback = function()
     -- which-key takes its `spec` apart as it sets up, so the groups are read
     -- before `VeryLazy` loads it
@@ -295,6 +324,11 @@ vim.api.nvim_create_autocmd('VimEnter', {
     -- Headless there is no UI to enter, so `VeryLazy` is fired by hand: it
     -- is what loads `config.keymaps`
     vim.api.nvim_exec_autocmds('User', { pattern = 'VeryLazy' })
+    -- The plugins behind `LazyFile` map their toggles as they set up, so a
+    -- file is opened for them. It has no filetype, which keeps language
+    -- servers and parsers out of it.
+    pcall(vim.cmd.edit, vim.fn.fnameescape(vim.fn.tempname()))
+    attach(vim.api.nvim_get_current_buf())
     vim.defer_fn(function()
       local ok, err = pcall(function()
         collect()

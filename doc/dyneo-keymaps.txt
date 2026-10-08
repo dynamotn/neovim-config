@@ -265,6 +265,23 @@ one of the same keys in those buffers.
 `<leader>gv`           n      Review Changes (CodeDiff)
 
 ==============================================================================
+<leader>gh  hunks
+
+`<leader>ghB`          n      Blame Buffer  (buffer)
+`<leader>ghD`          n      Diff This ~  (buffer)
+`<leader>ghR`          n      Reset Buffer  (buffer)
+`<leader>ghS`          n      Stage Buffer  (buffer)
+`<leader>ghb`          n      Blame Line  (buffer)
+`<leader>ghd`          n      Diff This  (buffer)
+`<leader>ghp`          n      Preview Hunk Inline  (buffer)
+`<leader>ghq`          n      Hunks to Quickfix  (buffer)
+`<leader>ghr`          nx     Reset Hunk  (buffer)
+`<leader>ghs`          nx     Stage Hunk  (buffer)
+`<leader>ght`          n      Toggle Line Blame  (buffer)
+`<leader>ghu`          n      Undo Stage Hunk  (buffer)
+`<leader>ghw`          n      Toggle Word Diff  (buffer)
+
+==============================================================================
 <leader>o  overseer
 
 `<leader>ol`           n      Restart last task
@@ -447,10 +464,12 @@ one of the same keys in those buffers.
 <leader>u  ui
 
 `<leader>uA`           n      Toggle Tabline
+`<leader>uB`           n      Toggle Scrollbar
 `<leader>uC`           n      Colorschemes
 `<leader>uD`           n      Toggle Dimming
 `<leader>uE`           n      Edgy Select Window
 `<leader>uF`           n      Toggle Auto Format (Buffer)
+`<leader>uG`           n      Toggle Git Signs
 `<leader>uH`           n      Toggle Color Highlights
 `<leader>uI`           n      Inspect Tree
 `<leader>uK`           n      Toggle Camouflage Reveal Under Cursor
@@ -475,6 +494,7 @@ one of the same keys in those buffers.
 `<leader>un`           n      Dismiss All Notifications
 `<leader>ur`           n      Redraw / Clear hlsearch / Diff Update
 `<leader>us`           n      Toggle Spelling
+`<leader>ut`           n      Toggle Treesitter Context
 `<leader>uv`           n      Toggle Inline Diagnostics
 `<leader>uw`           n      Toggle Wrap
 `<leader>uz`           n      Toggle Zen Mode
@@ -543,7 +563,7 @@ one of the same keys in those buffers.
 `<leader>zz`           n      Spelling Suggestions
 
 ==============================================================================
-<localleader>l  label (Octo)
+<localleader>l  laravel / label (Octo)
 
 `<localleader>la`      n      Artisan picker  (ft: blade, php)
 `<localleader>lc`      n      Commands picker  (ft: blade, php)
@@ -567,11 +587,13 @@ one of the same keys in those buffers.
 [  prev
 
 `[B`                   n      Move Tab Prev
+`[H`                   n      First Hunk  (buffer)
 `[P`                   n      Put Indented Before Cursor (Linewise)
 `[[`                   n      Prev Reference  (LSP)
 `[b`                   n      Prev Buffer
 `[d`                   n      Prev Diagnostic
 `[e`                   n      Prev Error
+`[h`                   n      Prev Hunk  (buffer)
 `[n`                   n      Prev Failed Test
 `[p`                   n      Put Indented Before Cursor (Linewise)
 `[q`                   n      Previous Trouble/Quickfix Item
@@ -585,11 +607,13 @@ one of the same keys in those buffers.
 ]  next
 
 `]B`                   n      Move Tab Next
+`]H`                   n      Last Hunk  (buffer)
 `]P`                   n      Put Indented After Cursor (Linewise)
 `]]`                   n      Next Reference  (LSP)
 `]b`                   n      Next Buffer
 `]d`                   n      Next Diagnostic
 `]e`                   n      Next Error
+`]h`                   n      Next Hunk  (buffer)
 `]n`                   n      Next Failed Test
 `]p`                   n      Put Indented After Cursor (Linewise)
 `]q`                   n      Next Trouble/Quickfix Item
@@ -757,6 +781,7 @@ Other keys
 `dy`                   ia     dynamo
 `e`                    nox    End of subword
 `i`                    ox     Inside textobject
+`ih`                   ox     GitSigns Select Hunk  (buffer)
 `il`                   ox     Inside last textobject
 `in`                   ox     Inside next textobject
 `j`                    nx     Down
