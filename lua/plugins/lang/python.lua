@@ -18,15 +18,16 @@ return vim.list_contains(DyNeo.enabled_languages, 'python')
         'mfussenegger/nvim-dap',
         dependencies = {
           'mfussenegger/nvim-dap-python',
+          -- Not under `<leader>dP`, which is Pause and would wait for these
           keys = {
             {
-              '<leader>dPt',
+              '<leader>dm',
               function() require('dap-python').test_method() end,
               ft = language.filetypes,
               desc = 'Debug Method',
             },
             {
-              '<leader>dPc',
+              '<leader>dM',
               function() require('dap-python').test_class() end,
               ft = language.filetypes,
               desc = 'Debug Class',

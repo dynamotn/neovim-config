@@ -41,14 +41,17 @@ return {
     'jmbuhr/otter.nvim',
     enabled = DyNeo.used_full_plugins or DyNeo.enabled_plugins.otter,
     ft = supported_filetypes,
+    -- Under a group of its own: `<leader>co` is Organize Imports wherever a
+    -- language server offers it, and would hide these there
     keys = {
+      { '<leader>ce', '', desc = '+embedded' },
       {
-        '<leader>co',
+        '<leader>cea',
         function() require('otter').activate() end,
         desc = 'Activate Otter',
       },
       {
-        '<leader>cO',
+        '<leader>ced',
         function() require('otter').deactivate() end,
         desc = 'Deactivate Otter',
       },

@@ -65,6 +65,7 @@ one of the same keys in those buffers.
 `<leader><tab>f`       n      First Tab
 `<leader><tab>l`       n      Last Tab
 `<leader><tab>o`       n      Close Other Tabs
+`<leader><tab>p`       n      Pick Tab
 
 ==============================================================================
 <leader>a  ai
@@ -108,7 +109,6 @@ one of the same keys in those buffers.
 `<leader>bb`           n      Switch to Other Buffer
 `<leader>bd`           n      Delete Buffer
 `<leader>bi`           n      Delete Invisible Buffers
-`<leader>bj`           n      Pick Tab
 `<leader>bo`           n      Delete Other Buffers
 
 ==============================================================================
@@ -123,7 +123,6 @@ one of the same keys in those buffers.
 `<leader>cL`           n      Language servers of buffer
 `<leader>cM`           n      Add missing imports  (LSP: vtsls)
 `<leader>cN`           n      Generate Annotations (sh-docs)  (ft: sh, bats, sh.ebuild, sh.install, sh.PKGBUILD)
-`<leader>cO`           n      Deactivate Otter
 `<leader>cP`           n      Pin main file  (LSP: tinymist)
 `<leader>cR`           n      Rename File
 `<leader>cS`           n      LSP references/definitions/... (Trouble)
@@ -141,7 +140,6 @@ one of the same keys in those buffers.
 `<leader>cl`           n      Lsp Info  (LSP)
 `<leader>cm`           n      Mason
 `<leader>cn`           n      Generate Annotations (Neogen)
-`<leader>co`           n      Activate Otter
 `<leader>co`           n      Organize Imports  (LSP)
 `<leader>co`           n      Organize Imports  (LSP: vtsls)
 `<leader>cp`           n      Markdown Preview  (ft: markdown, markdown.mdx)
@@ -150,6 +148,12 @@ one of the same keys in those buffers.
 `<leader>cs`           n      Toggle Outline
 `<leader>ct`           nx     Translate
 `<leader>cu`           n      Remove unused imports  (LSP: vtsls)
+
+==============================================================================
+<leader>ce  embedded
+
+`<leader>cea`          n      Activate Otter
+`<leader>ced`          n      Deactivate Otter
 
 ==============================================================================
 <leader>ck  calls
@@ -168,10 +172,9 @@ one of the same keys in those buffers.
 
 `<leader>dB`           n      Breakpoint Condition
 `<leader>dC`           n      Run to Cursor
+`<leader>dM`           n      Debug Class  (ft: python)
 `<leader>dO`           n      Step Over
 `<leader>dP`           n      Pause
-`<leader>dPc`          n      Debug Class  (ft: python)
-`<leader>dPt`          n      Debug Method  (ft: python)
 `<leader>da`           n      Run with Args
 `<leader>db`           n      Toggle Breakpoint
 `<leader>dc`           n      Run/Continue
@@ -181,6 +184,7 @@ one of the same keys in those buffers.
 `<leader>dj`           n      Down
 `<leader>dk`           n      Up
 `<leader>dl`           n      Run Last
+`<leader>dm`           n      Debug Method  (ft: python)
 `<leader>dn`           n      Launch debug Neovim  (ft: lua)
 `<leader>do`           n      Step Out
 `<leader>dr`           n      Toggle REPL
@@ -503,13 +507,13 @@ one of the same keys in those buffers.
 ==============================================================================
 <localleader>l  label (Octo)
 
-`<localleader>la`      n      Artisan picker
-`<localleader>lc`      n      Commands picker
-`<localleader>lh`      n      Laravel documentation
-`<localleader>ll`      n      Laravel picker
-`<localleader>lm`      n      Make picker
-`<localleader>lo`      n      Resources picker
-`<localleader>lr`      n      Routes picker
+`<localleader>la`      n      Artisan picker  (ft: blade, php)
+`<localleader>lc`      n      Commands picker  (ft: blade, php)
+`<localleader>lh`      n      Laravel documentation  (ft: blade, php)
+`<localleader>ll`      n      Laravel picker  (ft: blade, php)
+`<localleader>lm`      n      Make picker  (ft: blade, php)
+`<localleader>lo`      n      Resources picker  (ft: blade, php)
+`<localleader>lr`      n      Routes picker  (ft: blade, php)
 
 ==============================================================================
 [  prev

@@ -21,41 +21,50 @@ return vim.list_contains(DyNeo.enabled_languages, 'blade')
             pickers = { provider = 'snacks' },
           },
         },
+        -- Only where Laravel is: elsewhere `<localleader>l` is Octo's labels
         keys = {
+          { '<localleader>l', '', desc = '+laravel', ft = filetypes },
           {
             '<localleader>ll',
             function() Laravel.pickers.laravel() end,
             desc = 'Laravel picker',
+            ft = filetypes,
           },
           {
             '<localleader>la',
             function() Laravel.pickers.artisan() end,
             desc = 'Artisan picker',
+            ft = filetypes,
           },
           {
             '<localleader>lr',
             function() Laravel.pickers.routes() end,
             desc = 'Routes picker',
+            ft = filetypes,
           },
           {
             '<localleader>lm',
             function() Laravel.pickers.make() end,
             desc = 'Make picker',
+            ft = filetypes,
           },
           {
             '<localleader>lc',
             function() Laravel.pickers.commands() end,
             desc = 'Commands picker',
+            ft = filetypes,
           },
           {
             '<localleader>lo',
             function() Laravel.pickers.resources() end,
             desc = 'Resources picker',
+            ft = filetypes,
           },
           {
             '<localleader>lh',
             function() Laravel.run('artisan docs') end,
             desc = 'Laravel documentation',
+            ft = filetypes,
           },
         },
       },

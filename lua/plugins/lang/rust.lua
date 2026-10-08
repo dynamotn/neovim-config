@@ -22,18 +22,17 @@ return vim.list_contains(DyNeo.enabled_languages, 'rust')
         opts = {
           server = {
             on_attach = function(_, bufnr)
-              vim.keymap.set(
-                'n',
-                '<leader>cR',
-                function() vim.cmd.RustLsp('codeAction') end,
-                { desc = 'Code Action', buffer = bufnr }
-              )
-              vim.keymap.set(
-                'n',
-                '<leader>dr',
-                function() vim.cmd.RustLsp('debuggables') end,
-                { desc = 'Rust Debuggables', buffer = bufnr }
-              )
+              local function map(lhs, cmd, desc)
+                vim.keymap.set(
+                  'n',
+                  lhs,
+                  function() vim.cmd.RustLsp(cmd) end,
+                  { desc = desc, buffer = bufnr }
+                )
+              end
+              map('<leader>cR', 'codeAction', 'Code Action')
+              -- Not `<leader>dr`, which is the dap REPL
+              map('<leader>dR', 'debuggables', 'Rust Debuggables')
             end,
             default_settings = {
               -- rust-analyzer language server configuration

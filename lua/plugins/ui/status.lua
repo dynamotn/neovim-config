@@ -237,7 +237,7 @@ return {
     keys = {
       { '[B', '<cmd>BufferLineMovePrev<cr>', desc = 'Move Tab Prev' },
       { ']B', '<cmd>BufferLineMoveNext<cr>', desc = 'Move Tab Next' },
-      { '<leader>bj', '<cmd>BufferLinePick<cr>', desc = 'Pick Tab' },
+      { '<leader><tab>p', '<cmd>BufferLinePick<cr>', desc = 'Pick Tab' },
     },
     opts = {
       options = {
