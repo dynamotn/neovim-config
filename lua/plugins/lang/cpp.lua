@@ -112,11 +112,15 @@ return vim.list_contains(_G.enabled_languages, 'cpp')
           'alfaix/neotest-gtest',
           ft = language.filetypes,
         },
-        opts = {
-          adapters = {
-            ['neotest-gtest'] = {},
-          },
-        },
+        -- neotest-gtest compiles a C++ query as it loads, so without the
+        -- `cpp` parser -- installed with the first C++ buffer -- its `require`
+        -- throws, and takes the setup of every other adapter down with it
+        opts = function(_, opts)
+          opts.adapters = opts.adapters or {}
+          opts.adapters['neotest-gtest'] = vim.treesitter.language.add('cpp')
+              and {}
+            or false
+        end,
       },
     }
   or {}
