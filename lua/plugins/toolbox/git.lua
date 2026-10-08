@@ -80,6 +80,11 @@ return {
     -- which would load it on the first `InsertEnter` of any buffer.
     'petertriho/cmp-git',
     ft = 'octo',
+    -- `setup` is what registers the source, and lazy.nvim only calls it for
+    -- a spec with `opts`; `gitrebase` is not among its default filetypes
+    opts = {
+      filetypes = { 'gitcommit', 'gitrebase', 'octo', 'NeogitCommitMessage' },
+    },
     init = function()
       _G.completion_sources = vim.tbl_extend('force', _G.completion_sources, {
         git = '「GIT」',
