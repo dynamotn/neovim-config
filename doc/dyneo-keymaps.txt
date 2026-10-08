@@ -554,6 +554,8 @@ g  goto
 `gd`                   n      Goto Definition  (LSP)
 `gd`                   n      Goto Definition  (LSP: omnisharp)
 `ge`                   nox    End of previous subword
+`gh`                   ia     https://github.com/
+`gl`                   ia     https://gitlab.com/
 `gl`                   nx     Align
 `gp`                   nx     Put Text After Selection
 `gr`                   n      References  (LSP)
@@ -653,10 +655,12 @@ Other keys
 `an`                   ox     Around next textobject
 `b`                    nox    Previous subword
 `c`                    x      Smart delete
+`cc`                   ia     CodeCompanion
 `cc`                   n      Smart delete
 `cw`                   n      Change to end of subword
 `d`                    x      Smart delete
 `dd`                   n      Smart delete
+`dy`                   ia     dynamo
 `e`                    nox    End of subword
 `i`                    ox     Inside textobject
 `il`                   ox     Inside last textobject
@@ -667,6 +671,7 @@ Other keys
 `p`                    nx     Put Text After Cursor
 `r`                    o      Remote Flash
 `s`                    nox    Flash
+`tklt`                 ia     takalinhtinh
 `w`                    nox    Next subword
 `x`                    nx     Smart delete
 `y`                    nx     Yank Text

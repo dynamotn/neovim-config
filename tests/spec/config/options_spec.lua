@@ -29,7 +29,7 @@ describe('config.options', function()
     load()
     assert.are.equal('80,120', vim.o.colorcolumn)
     assert.is_true(vim.o.backup)
-    assert.are.equal(vim.fn.stdpath('state') .. '/backup', vim.o.backupdir)
+    assert.are.equal(vim.fn.stdpath('state') .. '/backup//', vim.o.backupdir)
     assert.are.equal(2, vim.o.modelines)
     assert.is_true(vim.o.wrap)
     assert.is_nil(vim.o.mouse:find('a', 1, true))
@@ -57,9 +57,19 @@ describe('config.options', function()
 
   it('installs the insert mode abbreviations', function()
     load()
-    for abbr, text in pairs(require('config.defaults').abbreviations) do
-      local out = vim.api.nvim_exec2('iabbrev ' .. abbr, { output = true })
-      assert.truthy(out.output:find(text, 1, true), abbr)
+    for abbr in pairs(require('config.defaults').abbreviations) do
+      assert.is_not_nil(vim.fn.maparg(abbr, 'i', true, true).callback, abbr)
     end
+  end)
+
+  it('expands the abbreviations in prose only', function()
+    load()
+    local expand = vim.fn.maparg('gh', 'i', true, true).callback
+    local bufnr = h.buffer({ lines = { 'gh' } })
+    vim.api.nvim_set_current_buf(bufnr)
+    vim.bo[bufnr].filetype = 'markdown'
+    assert.are.equal('https://github.com/', expand())
+    vim.bo[bufnr].filetype = 'sh'
+    assert.are.equal('gh', expand())
   end)
 end)

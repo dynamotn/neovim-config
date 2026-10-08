@@ -91,7 +91,8 @@ opt.fileformat = 'unix'
 opt.modeline = true -- Accept modeline of each file
 opt.modelines = 2
 opt.backup = true -- Enable backup
-opt.backupdir = vim.fn.stdpath('state') .. '/backup'
+-- `//`: named after the whole path, so `init.lua~` of two directories differ
+opt.backupdir = vim.fn.stdpath('state') .. '/backup//'
 opt.showmatch = true -- Highlight matching parenthesis
 opt.backspace = 'indent,eol,start' -- Flexible backspace
 opt.mouse = '' -- Not use mouse
@@ -111,8 +112,32 @@ g.loaded_perl_provider = 0
 g.loaded_ruby_provider = 0
 g.loaded_node_provider = 0
 
--- Setup abbreviations
+-- Setup abbreviations. They expand in prose only -- a prose filetype, or a
+-- comment of code -- so `gh pr create` in a script or `CC = cc` in a Makefile
+-- are left as typed.
+local prose = {
+  codecompanion = true,
+  gitcommit = true,
+  markdown = true,
+  octo = true,
+  text = true,
+}
+local function in_prose()
+  if prose[vim.bo.filetype] then return true end
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local ok, captures =
+    pcall(vim.treesitter.get_captures_at_pos, 0, row - 1, math.max(col - 1, 0))
+  for _, capture in ipairs(ok and captures or {}) do
+    if capture.capture:find('^comment') then return true end
+  end
+  return false
+end
 local abbreviations = require('config.defaults').abbreviations
 for abbr, full_text in pairs(abbreviations) do
-  vim.cmd.inoreabbrev(abbr, full_text)
+  vim.keymap.set(
+    'ia',
+    abbr,
+    function() return in_prose() and full_text or abbr end,
+    { expr = true, desc = full_text }
+  )
 end

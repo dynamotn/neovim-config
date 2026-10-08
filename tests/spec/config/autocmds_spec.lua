@@ -46,4 +46,48 @@ describe('config.autocmds', function()
       assert.are.same({}, vim.api.nvim_get_autocmds({ event = 'VimResume' }))
     end
   )
+
+  describe('sensitive files', function()
+    local dir, cleanup
+    before_each(function()
+      dir, cleanup = h.tmpdir()
+    end)
+    after_each(function() cleanup() end)
+
+    it('keeps no undo or swap file of a sensitive file', function()
+      local path = dir .. '/.env'
+      vim.fn.writefile({ 'TOKEN=x' }, path)
+      vim.cmd.edit(path)
+      assert.is_false(vim.bo.undofile)
+      assert.is_false(vim.bo.swapfile)
+      vim.cmd('bwipeout!')
+    end)
+
+    it('turns backups off for the write only', function()
+      local saved = vim.o.backup
+      vim.o.backup = true
+      local path = dir .. '/.env'
+      vim.cmd.edit(path)
+      local during
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        once = true,
+        callback = function() during = vim.o.backup end,
+      })
+      vim.cmd.write()
+      assert.is_false(during)
+      assert.is_true(vim.o.backup)
+      vim.cmd('bwipeout!')
+      vim.o.backup = saved
+    end)
+  end)
+
+  describe('close with q', function()
+    it('leaves `q` alone in a help file open for editing', function()
+      local bufnr = h.buffer({ lines = { 'text' } })
+      vim.api.nvim_set_current_buf(bufnr)
+      vim.bo[bufnr].filetype = 'help'
+      vim.wait(50)
+      assert.same({}, vim.fn.maparg('q', 'n', false, true))
+    end)
+  end)
 end)
