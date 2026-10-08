@@ -510,11 +510,6 @@ return {
         desc = 'Avante Select Model',
       },
       {
-        '<leader>avM',
-        '<cmd>AvanteACPModels<cr>',
-        desc = 'Avante Select Agent Model',
-      },
-      {
         '<leader>avP',
         '<cmd>AvanteSwitchProvider<cr>',
         desc = 'Avante Switch Provider',

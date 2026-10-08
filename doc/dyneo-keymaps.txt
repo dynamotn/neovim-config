@@ -95,7 +95,6 @@ one of the same keys in those buffers.
 
 `<leader>avC`          n      Avante New Chat
 `<leader>avI`          nv     Avante Inline Edit
-`<leader>avM`          n      Avante Select Agent Model
 `<leader>avP`          n      Avante Switch Provider
 `<leader>ava`          v      Ask Avante about Selection
 `<leader>avc`          n      Avante Toggle Chat
