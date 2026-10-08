@@ -45,7 +45,20 @@ return vim.list_contains(DyNeo.enabled_languages, 'scala')
           vim.api.nvim_create_autocmd('FileType', {
             group = vim.api.nvim_create_augroup('dy_metals', { clear = true }),
             pattern = self.ft,
-            callback = function()
+            callback = function(event)
+              -- Java only in a Scala build: next to jdtls in a plain Maven or
+              -- Gradle project it would be a second JVM server
+              if
+                vim.bo[event.buf].filetype == 'java'
+                and not vim.fs.root(event.buf, {
+                  'build.sbt',
+                  'build.sc',
+                  'build.mill',
+                  '.scala-build',
+                })
+              then
+                return
+              end
               require('metals').initialize_or_attach(metals_config)
             end,
           })

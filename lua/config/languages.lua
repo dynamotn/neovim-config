@@ -75,6 +75,7 @@
 
 ---@class DyFormatterSpec
 ---@field [1] string
+---@field filetypes? string[] Only these filetypes of the language
 ---@field opts? table
 ---@field command? string
 ---@field mason? DyMasonSpec
@@ -571,12 +572,9 @@ return {
     filetypes = { 'c', 'cpp' },
     parser = 'cpp',
     injected_parsers = { 'doxygen', 'printf', 're2c' },
+    -- clang-tidy runs inside clangd (`--clang-tidy`); nvim-lint running it as
+    -- well reported every finding twice
     lsp_servers = { 'clangd', 'harper_ls' },
-    linters = {
-      -- nvim-lint drops the dash from the binary's name, and `clang-tidy`
-      -- comes with the system's clang, which dytoy installs.
-      { 'clangtidy', command = 'clang-tidy', mason = { package = 'clang' } },
-    },
     formatters = { 'clang-format' },
     dap = { 'codelldb' },
     test = { 'neotest-gtest', 'vim-test' },
@@ -765,7 +763,13 @@ return {
     parser = 'glimmer',
     injected_parsers = { 'css', 'javascript' },
     ext = 'hbs',
-    lsp_servers = { 'ember', 'tailwindcss', 'harper_ls' },
+    -- lspconfig hands `ember` TypeScript and JavaScript too, with `.git` for
+    -- a root: it would run in every repository once installed
+    lsp_servers = {
+      { 'ember', filetypes = { 'handlebars' } },
+      'tailwindcss',
+      'harper_ls',
+    },
     autopairs = mustache_autopairs,
     endwise = true,
   },
@@ -1145,7 +1149,8 @@ return {
     parser = 'scss',
     lsp_servers = { 'tailwindcss' },
     linters = { 'stylelint' },
-    formatters = { 'prettier' },
+    -- Prettier has no parser for the indented `.sass` syntax
+    formatters = { { 'prettier', filetypes = { 'scss' } } },
     dial = function(augend)
       return {
         augend.hexcolor.new({ case = 'lower' }),
@@ -1178,7 +1183,21 @@ return {
     parser = 'sql',
     linters = { 'sqlfluff' },
     formatters = {
-      { 'sqlfluff', opts = { args = { 'format', '--dialect=ansi', '-' } } },
+      {
+        'sqlfluff',
+        opts = {
+          -- A dialect on the command line beats the project's own `.sqlfluff`,
+          -- which the linter reads: given only when there is none
+          args = function(_, ctx)
+            if vim.fs.root(ctx.dirname, '.sqlfluff') then
+              return { 'format', '-' }
+            end
+            local dialects = { mysql = 'mysql', plsql = 'oracle' }
+            local dialect = dialects[vim.bo[ctx.buf].filetype] or 'ansi'
+            return { 'format', '--dialect=' .. dialect, '-' }
+          end,
+        },
+      },
     },
     null_ls = {
       ltcc_code_action,
@@ -1377,7 +1396,7 @@ return {
         command = 'ansible-lint',
         mason = { package = 'ansible-lint' },
       },
-      'yamllint',
+      -- No `yamllint`: ansible-lint runs it already, as its `yaml` rule
     },
     formatters = {
       'yamlfmt',
@@ -1588,7 +1607,12 @@ return {
     filetypes = { 'htmldjango' },
     parser = 'htmldjango',
     injected_parsers = { 'html' },
-    lsp_servers = { 'djlsp', 'tailwindcss', 'harper_ls' },
+    -- lspconfig hands `djlsp` every `html` buffer as well
+    lsp_servers = {
+      { 'djlsp', filetypes = { 'htmldjango' } },
+      'tailwindcss',
+      'harper_ls',
+    },
     formatters = { djlint_formatter },
     autopairs = function(filetypes, rule, cond)
       return vim.list_extend(
@@ -1641,11 +1665,9 @@ return {
   jq = {
     filetypes = { 'jq' },
     parser = 'jq',
-    -- The same `jq` binary that formats JSON elsewhere in this file also
-    -- formats and checks a `.jq` filter.
+    -- The `jq` linter and formatter read their input as JSON data, not as a
+    -- filter: every `.jq` file was a parse error. The server checks it.
     lsp_servers = { 'jqls' },
-    linters = { 'jq' },
-    formatters = { 'jq' },
   },
   json = {
     filetypes = { 'json', 'jsonc', 'json5', 'json.openapi' },

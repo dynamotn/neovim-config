@@ -44,17 +44,15 @@ return vim.list_contains(DyNeo.enabled_languages, 'cpp')
                   desc = 'Switch Source/Header (C/C++)',
                 },
               },
+              -- In order: the nearest `Makefile` or `meson.build` of a
+              -- recursive build sits in every subdirectory, and would start
+              -- a clangd -- and an index -- per directory, so they only count
+              -- outside a repository
               root_markers = {
-                'compile_commands.json',
-                'compile_flags.txt',
-                'configure.ac', -- AutoTools
-                'Makefile',
-                'configure.in',
-                'config.h.in',
-                'meson.build',
-                'meson_options.txt',
-                'build.ninja',
+                { '.clangd', 'compile_commands.json', 'compile_flags.txt' },
+                { 'configure.ac', 'configure.in', 'meson_options.txt' },
                 '.git',
+                { 'Makefile', 'config.h.in', 'meson.build', 'build.ninja' },
               },
               capabilities = {
                 offsetEncoding = { 'utf-16' },
