@@ -13,11 +13,8 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
         opts = {
           servers = {
             omnisharp = {
-              handlers = {
-                ['textDocument/definition'] = function(...)
-                  return require('omnisharp_extended').handler(...)
-                end,
-              },
+              -- `vim.lsp.buf.definition` no longer goes through a handler
+              -- since 0.11, so the decompiled sources come from this key
               keys = {
                 {
                   'gd',
@@ -25,9 +22,15 @@ return vim.list_contains(_G.enabled_languages, 'c_sharp')
                   desc = 'Goto Definition',
                 },
               },
-              enable_roslyn_analyzers = true,
-              organize_imports_on_format = true,
-              enable_import_completion = true,
+              -- The server's own settings; the snake_case options of the
+              -- old lspconfig framework are read by nothing any more
+              settings = {
+                FormattingOptions = { OrganizeImports = true },
+                RoslynExtensionsOptions = {
+                  EnableAnalyzersSupport = true,
+                  EnableImportCompletion = true,
+                },
+              },
             },
             harper_ls = {},
           },
