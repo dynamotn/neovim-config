@@ -89,25 +89,11 @@ return vim.list_contains(_G.enabled_languages, 'lua')
               host = conf.host or '127.0.0.1',
               port = conf.port or 8086,
             }
-            if conf.start_neovim then
-              local dap_run = dap.run
-              ---@diagnostic disable-next-line: duplicate-set-field
-              dap.run = function(c)
-                adapter.port = c.port
-                adapter.host = c.host
-              end
-              require('osv').run_this()
-              dap.run = dap_run
-            end
             callback(adapter)
           end
+          -- osv dropped `run_this`, which started a second Neovim on the
+          -- file; `<leader>dn` launches the server to attach to instead
           dap.configurations.lua = {
-            {
-              type = 'nlua',
-              request = 'attach',
-              name = 'Run this file',
-              start_neovim = {},
-            },
             {
               type = 'nlua',
               request = 'attach',
