@@ -52,6 +52,7 @@ four languages; what differs is a handful of globals, see
   - [Spelling, in several languages at once](#spelling-in-several-languages-at-once)
   - [Diagrams in the terminal](#diagrams-in-the-terminal)
   - [Workspace diagnostics](#workspace-diagnostics)
+  - [Tasks for each language](#tasks-for-each-language)
   - [Tools given what they lack](#tools-given-what-they-lack)
   - [Integrations](#integrations)
 - [Key bindings](#key-bindings)
@@ -500,6 +501,19 @@ contents are read off the main loop, so a big repository does not freeze the
 editor, and each document is closed again before Neovim opens the same file
 for real, so no server ever sees two `didOpen` for one URI.
 
+### Tasks for each language
+
+`<leader>oo` offers overseer tasks for the current file in about 50
+languages and tools, from [lua/config/tasks.lua](./lua/config/tasks.lua):
+run a script (`python run`, `lua run`, ...), compile and run a C, C++, Rust,
+Kotlin or Erlang file, or render and check with `typst compile`,
+`terraform plan`, `docker build`, `helm lint` and the like. Inside a project
+it adds that project's build and test tasks (`go test`, `dotnet build`,
+`gradle test`, `zig build`, `forge test`, ...), run from the project root.
+A task appears only when its language is in `DyNeo.enabled_languages` and its
+program is on `$PATH`. Project tooling overseer reads on its own (make, just,
+npm, cargo, mix, ...) is left to it.
+
 ### Tools given what they lack
 
 Small gaps filled in [lua/tools](./lua/tools) and [lua/lint](./lua/lint), each
@@ -597,12 +611,12 @@ Tags are committed, so `:help` works in a fresh clone; after editing
 | Path | What it holds |
 | ---- | ------------- |
 | `init.lua` | Globals, per-machine overrides, the version gate, lazy.nvim |
-| `lua/config/` | `globals`, `languages`, `options`, `keymaps`, `autocmds`, `defaults`, `sensitive` |
+| `lua/config/` | `globals`, `languages`, `tasks`, `options`, `keymaps`, `autocmds`, `defaults`, `sensitive` |
 | `lua/plugins/` | Plugin specs by area: `coding`, `executor`, `integration`, `lang`, `lsp`, `toolbox`, `treesitter`, `ui` |
 | `lua/util/` | Shared helpers the specs call into |
 | `lua/tools/` | Features built here: the Mason and lazy.nvim quarantines, Mason registry entries, diagram rendering, workspace diagnostics, extra completion sources and code actions |
 | `lua/lint/linters/` | nvim-lint definitions the plugin does not ship |
-| `lua/overseer/` | Task templates |
+| `lua/overseer/` | Task templates: the provider for `config.tasks`, and Ansible |
 | `lua/per_machine/` | The per-machine overrides, rendered by chezmoi |
 | `lsp/`, `ftplugin/`, `after/`, `queries/` | Native Neovim configuration, filetype by filetype |
 | `plugin/` | `ai_guard`, `spell` |

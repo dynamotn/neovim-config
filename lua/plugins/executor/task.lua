@@ -18,7 +18,6 @@ return {
     },
     opts = {
       dap = false,
-      templates = { 'builtin', 'dytask' },
       component_aliases = {
         output = {
           {

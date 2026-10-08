@@ -253,6 +253,15 @@ the parser, the servers and the tools are installed from it, the statusline
 reads it, and `scripts/validate-tools.lua` checks every name in it against
 conform, nvim-lint, lspconfig and Mason.
 
+The overseer tasks of each language live beside it, in `lua/config/tasks.lua`,
+keyed by the same names.  `<leader>oo` offers the ones for the current file:
+run a script, compile and run a C, C++, Rust, Kotlin or Erlang file, render or
+check with `typst`, `terraform`, `docker`, `helm` and the like, and inside a
+project its build and test tasks, run from the project root.  A task appears
+only when its language is in |DyNeo.enabled_languages| and its program is on
+`$PATH`; make, just, npm, cargo, mix and the rest of overseer's own templates
+are left to it.
+
 ------------------------------------------------------------------------------
 5. BEYOND THE DEFAULTS                                        *dyneo-features*
 
@@ -499,7 +508,8 @@ and the rest.
                     workspace diagnostics, extra completion sources and code
                     actions
 `lua/lint/linters/`   nvim-lint definitions the plugin does not ship
-`lua/overseer/`       Task templates
+`lua/overseer/`       Task templates: the provider for `config.tasks`, and
+                    Ansible
 `lua/per_machine/`    The per-machine overrides, rendered by chezmoi
 `lsp/` `ftplugin/`      Native Neovim configuration, filetype by filetype
 `after/` `queries/`
