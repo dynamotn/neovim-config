@@ -236,6 +236,10 @@ return vim.list_contains(_G.enabled_languages, 'bash')
                   -- `.vscode/settings.json`, which codesettings.nvim merges on
                   -- top of these defaults.
                   globPattern = '**/*@(.sh|.inc|.bash|.command)',
+                  -- dyshellint runs ShellCheck already, and the shellcheck
+                  -- null-ls source offers its fixes; the server's own run
+                  -- only listed every finding a second time
+                  shellcheckPath = '',
                 },
               },
             },
