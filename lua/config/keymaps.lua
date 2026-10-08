@@ -225,6 +225,14 @@ map(
   { desc = 'Format' }
 )
 
+-- Every file can be renamed, with or without a language server to tell
+map(
+  'n',
+  '<leader>cR',
+  function() require('util.rename').rename_file() end,
+  { desc = 'Rename File' }
+)
+
 -- diagnostic
 local diagnostic_goto = function(next, severity)
   return function()

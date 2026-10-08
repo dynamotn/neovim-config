@@ -130,7 +130,7 @@ one of the same keys in those buffers.
 `<leader>cN`           n      Generate Annotations (sh-docs)  (ft: sh, bats, sh.ebuild, sh.install, sh.PKGBUILD)
 `<leader>cO`           n      Deactivate Otter
 `<leader>cP`           n      Pin main file  (LSP: tinymist)
-`<leader>cR`           n      Rename File  (LSP)
+`<leader>cR`           n      Rename File
 `<leader>cS`           n      LSP references/definitions/... (Trouble)
 `<leader>cT`           n      Formatters and linters of buffer
 `<leader>cV`           n      Select TS workspace version  (LSP: vtsls)

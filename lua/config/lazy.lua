@@ -168,4 +168,5 @@ Plugin.on_very_lazy(function()
   vim.o.clipboard = clipboard
   require('util.format').setup()
   require('util.root').setup()
+  require('util.rename').setup()
 end)
