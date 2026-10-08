@@ -7,7 +7,7 @@ return h.make_builtin({
   name = 'terragrunt_validate',
   meta = {
     url = 'https://terragrunt.gruntwork.io/docs/reference/cli-options/#validate-inputs',
-    description = 'Terragrunt validate is is a subcommand of terragrunt to validate configuration files in a directory',
+    description = 'Terragrunt validate is a subcommand of terragrunt to validate configuration files in a directory',
   },
   method = DIAGNOSTICS_ON_SAVE,
   filetypes = {},
@@ -22,10 +22,10 @@ return h.make_builtin({
     multiple_files = true,
     ignore_stderr = true,
     format = 'json',
-    check_exit_code = function(_code, _stderr)
-      -- check for warnings even if there are no errors
-      return false
-    end,
+    -- `hcl validate` exits non-zero when it finds a problem, with the JSON on
+    -- stdout either way. Any other answer has none-ls move that output into
+    -- the error output, which `ignore_stderr` then throws away.
+    check_exit_code = function() return true end,
     on_output = function(params)
       local combined_diagnostics = {}
 
