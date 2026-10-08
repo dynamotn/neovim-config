@@ -572,6 +572,13 @@ with a spec of its own:
   pane sources for completion.
 - [AI CLI tools](https://github.com/folke/sidekick.nvim#default-cli-tools) —
   through sidekick, behind the guard above.
+- [Jira](https://github.com/ankitpokhrel/jira-cli) — `:Jira` picks among the
+  issues assigned (or any JQL) and does the day's chores on one: start a
+  branch named after it (`fix/OPS-12-login-fails`, the prefix guessed from
+  its type and offered for editing), move it to another state, log work, view
+  it, open it, insert its key. With no issue picked, they act on the one the
+  current branch is named after. Everything goes through `jira-cli`, whose
+  own configuration holds the credentials ([lua/tools/jira.lua](./lua/tools/jira.lua)).
 
 ## Key bindings
 
@@ -596,6 +603,7 @@ ones worth knowing before which-key gets a chance to tell you:
 | `<leader>cys`, `<leader>cym` | n | Pick a YAML schema, or write it in as a modeline |
 | `<leader>cp` | n | Preview the diagram, Markdown or Typst under the cursor |
 | `<leader>xw` | n | Workspace diagnostics |
+| `<leader>pj` | n | Jira: my issues, search, branch, move, log work, view, open |
 | `<leader>uk` | n | Camouflage: hide the values in a secret file |
 | `<leader>ct` | n | Translate |
 | `<leader>a` | n, x | AI CLIs through sidekick; Claude Code under `<leader>ac`, Avante under `<leader>av` |
@@ -623,6 +631,8 @@ ones worth knowing before which-key gets a chance to tell you:
 | `:YamlSchema reset` | Hand schema detection back the wheel |
 | `:DyNeoFormat`, `:DyNeoFormatInfo` | Format the buffer; which formatters would run, and whether it formats on save |
 | `:DyNeoRoot` | The roots found for this buffer, the one in use first |
+| `:Jira [search {jql}]` | Pick an issue assigned, or matching `{jql}`, and act on it |
+| `:Jira branch\|move\|worklog\|view\|open\|insert\|copy [{key}]` | Act on `{key}`, the issue of the branch, or one picked |
 
 The plugins' own commands are unchanged.
 

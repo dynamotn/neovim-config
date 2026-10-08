@@ -6,6 +6,7 @@
 :DyNeoRoot	dyneo.txt	/*:DyNeoRoot*
 :DySbom	dyneo.txt	/*:DySbom*
 :DySpell	dyneo.txt	/*:DySpell*
+:Jira	dyneo.txt	/*:Jira*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
 :YamlSchema	dyneo.txt	/*:YamlSchema*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*

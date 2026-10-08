@@ -291,6 +291,15 @@ map({"n", "x" }, "<leader>gY", function()
   Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
 end, { desc = "Git Browse (copy)" })
 
+-- jira, on the issue the branch is named after or one picked (`tools.jira`)
+map("n", "<leader>pjj", "<cmd>Jira<cr>", { desc = "My Issues" })
+map("n", "<leader>pjs", "<cmd>Jira search<cr>", { desc = "Search Issues (JQL)" })
+map("n", "<leader>pjb", "<cmd>Jira branch<cr>", { desc = "Branch From Issue" })
+map("n", "<leader>pjm", "<cmd>Jira move<cr>", { desc = "Move Issue" })
+map("n", "<leader>pjw", "<cmd>Jira worklog<cr>", { desc = "Log Work" })
+map("n", "<leader>pjv", "<cmd>Jira view<cr>", { desc = "View Issue" })
+map("n", "<leader>pjo", "<cmd>Jira open<cr>", { desc = "Open Issue in Browser" })
+
 -- quit
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 

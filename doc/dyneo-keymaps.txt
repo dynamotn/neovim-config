@@ -272,6 +272,17 @@ one of the same keys in those buffers.
 `<leader>pcs`          n      LSP settings of the clients
 
 ==============================================================================
+<leader>pj  jira
+
+`<leader>pjb`          n      Branch From Issue
+`<leader>pjj`          n      My Issues
+`<leader>pjm`          n      Move Issue
+`<leader>pjo`          n      Open Issue in Browser
+`<leader>pjs`          n      Search Issues (JQL)
+`<leader>pjv`          n      View Issue
+`<leader>pjw`          n      Log Work
+
+==============================================================================
 <leader>q  quit/session
 
 `<leader>qS`           n      Select Session

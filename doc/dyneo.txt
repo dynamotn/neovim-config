@@ -412,6 +412,9 @@ Firefox, Chrome     Neovim embedded in a textarea with firenvim, tuned per
 zellij              Test runner, terminal integration, and the pane sources
                     for completion.
 AI CLI tools        Through sidekick, behind |dyneo-ai-guard|.
+Jira                |:Jira|: the issues assigned, and the chores of one --
+                    a branch named after it, a move, a worklog -- through
+                    jira-cli, whose own configuration holds the credentials.
 
 Smaller gaps filled in `lua/tools` and `lua/lint`, each with a spec of its
 own: `jira` issue completion in commit messages, `shellcheck` code actions,
@@ -446,6 +449,8 @@ chance to tell you:
     `<leader>cp`       n      Preview the diagram, Markdown or Typst under
                             the cursor
     `<leader>xw`       n      Workspace diagnostics
+    `<leader>pj`       n      Jira: my issues, search, branch, move, log
+                            work, view, open
     `<leader>uk`       n      Camouflage: hide the values in a secret file
     `<leader>ct`       n      Translate
     `<leader>a`        n, x   AI CLIs through sidekick
@@ -522,6 +527,19 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         as it is open; with [!], put it back under the check.
                         Refused for a file the name rules hold back.  See
                         |dyneo-ai-guard|.
+
+                                                                       *:Jira*
+:Jira                   Pick among the issues assigned to you, then choose
+                        what to do with it.  In the picker, `<C-b>` starts a
+                        branch, `<C-o>` opens the issue, `<C-y>` inserts its
+                        key.
+:Jira search [{jql}]    The same, among the issues matching {jql}, asked for
+                        when not given.
+:Jira {action} [{key}]  Do {action} on {key}, on the issue the current branch
+                        is named after, or on one picked.  {action} is one of
+                        `branch`, `move`, `worklog`, `view`, `open`, `insert`
+                        or `copy`.  `branch` names the branch
+                        `<type>/<KEY>-<summary>` and offers it for editing.
 
                                                                  *:AiGuardLog*
 :AiGuardLog[!]          What the AI integrations were handed, and refused,
