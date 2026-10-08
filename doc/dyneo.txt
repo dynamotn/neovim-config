@@ -363,8 +363,9 @@ the selection on every cursor move.
 
 The files an operator edits, and what to do with them without leaving
 the editor: the schema a YAML file is checked against, the cluster a
-manifest goes to, the plan a Terraform module would apply, and the
-runbook whose steps are run where they are written.
+manifest goes to, the plan a Terraform module would apply, the runbook
+whose steps are run where they are written, and the secrets kept encrypted
+beside them.
 
 YAML and JSON schemas                                           *dyneo-schema*
 
@@ -413,6 +414,22 @@ its `$ ` lines.  `<localleader>R` runs every block in turn and stops at the
 first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
 what is running.  A block that deletes, destroys or reaches for root asks
 first.  See |:Runbook|.
+
+Encrypted files                                              *dyneo-encrypted*
+
+A SOPS file, an Ansible Vault, or an `encrypted_*.age` / `encrypted_*.asc`
+file of a chezmoi source opens decrypted, and `:w` encrypts it again: SOPS
+through `sops edit`, which keeps the data key and the recipients of the
+file, Ansible Vault through `ansible-vault encrypt` with its vault id, and
+chezmoi through `chezmoi encrypt`, to the recipients of its configuration.
+The clear text never reaches the file it came from, and a failed encryption
+writes nothing.
+
+The buffer is held back from every AI integration before the clear text goes
+in (|dyneo-ai-guard|), keeps no swap or undo file, and cannot be undone back
+to the ciphertext.  Ansible Vault cannot ask for a password inside Neovim:
+give it `ANSIBLE_VAULT_PASSWORD_FILE`, or `vault_password_file` in
+`ansible.cfg`.
 
 5.5 Buffer servers and tools                                *dyneo-statusline*
 

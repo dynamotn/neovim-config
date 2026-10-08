@@ -36,6 +36,7 @@ dyneo-configuration	dyneo.txt	/*dyneo-configuration*
 dyneo-contents	dyneo.txt	/*dyneo-contents*
 dyneo-development	dyneo.txt	/*dyneo-development*
 dyneo-diagram	dyneo.txt	/*dyneo-diagram*
+dyneo-encrypted	dyneo.txt	/*dyneo-encrypted*
 dyneo-features	dyneo.txt	/*dyneo-features*
 dyneo-globals	dyneo.txt	/*dyneo-globals*
 dyneo-infra	dyneo.txt	/*dyneo-infra*
