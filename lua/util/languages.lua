@@ -101,6 +101,23 @@ M.get_mason_package = function(tool)
   return (tool.mason and tool.mason.package) or tool.command or tool[1]
 end
 
+--- Return the Mason package of the tool of `filetype` that runs `command`
+---
+--- The reverse of `get_tools_by_filetype`, which hands out commands: what a
+--- missing command is installed from (`forge` -> `foundry`).
+---@param filetype string Filetype of buffer
+---@param command string
+---@return string?
+M.get_mason_package_by_command = function(filetype, command)
+  local language_name = M.get_language_from_filetype(filetype) or '_'
+  for _, field in ipairs({ 'formatters', 'linters', 'null_ls' }) do
+    for _, tool in ipairs(with_common(language_name, field)) do
+      local runs = type(tool) == 'string' and tool or (tool.command or tool[1])
+      if runs == command then return M.get_mason_package(tool) end
+    end
+  end
+end
+
 --- Whether the command a tool spec names can run here
 ---
 --- `lua` stands for a tool that runs inside Neovim itself, so it is there

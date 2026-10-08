@@ -130,6 +130,20 @@ describe('util.languages', function()
     end)
   end)
 
+  describe('get_mason_package_by_command', function()
+    it('finds the package of the tool running a command', function()
+      assert.equals(
+        'selene-bin',
+        languages.get_mason_package_by_command('lua', 'selene-bin')
+      )
+      assert.equals(
+        'stylua',
+        languages.get_mason_package_by_command('lua', 'stylua')
+      )
+      assert.is_nil(languages.get_mason_package_by_command('lua', 'nothing'))
+    end)
+  end)
+
   describe('is_available', function()
     it('counts lua as there without an interpreter on $PATH', function()
       local restore = h.stub(vim.fn, 'executable', function() return 0 end)

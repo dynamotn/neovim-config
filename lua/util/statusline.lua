@@ -21,7 +21,8 @@ local ignored_tools = { 'lua', 'git', 'curl', 'sed' }
 ---@field expected boolean Whether the filetype asks for it
 
 ---@class DyToolCandidate
----@field name string
+---@field name string The command the tool runs
+---@field package? string The Mason package that installs it
 ---@field path? string Where the executable is, if it is on `$PATH`
 
 --- Return the servers expected for `bufnr`, then the ones attached anyway
@@ -66,7 +67,11 @@ function M.tool_candidates(filetype)
   for _, tool in ipairs(languages.get_tools_by_filetype(filetype)) do
     if not vim.list_contains(ignored_tools, tool) then
       local path = vim.fn.exepath(tool)
-      table.insert(result, { name = tool, path = path ~= '' and path or nil })
+      table.insert(result, {
+        name = tool,
+        package = languages.get_mason_package_by_command(filetype, tool),
+        path = path ~= '' and path or nil,
+      })
     end
   end
   return result
@@ -358,7 +363,7 @@ function M.pick_tools(bufnr)
     end,
     confirm = function(item)
       if item.path then return vim.cmd.Mason() end
-      mason_install(item.name, item.name)
+      mason_install(item.name, item.package or item.name)
     end,
   })
 end

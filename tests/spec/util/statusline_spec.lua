@@ -45,6 +45,9 @@ describe('util.statusline', function()
     package.loaded['util.languages'] = {
       get_lsp_servers_by_filetype = function() return lang.lsp, lang.optional end,
       get_tools_by_filetype = function() return lang.tools end,
+      get_mason_package_by_command = function(_, command)
+        return (lang.packages or {})[command]
+      end,
     }
     package.loaded['lualine'] = { refresh = function() end }
     h.unload('util.statusline')
@@ -256,6 +259,18 @@ describe('util.statusline', function()
       confirm(item('stylua'))
       confirm(item('selene'))
       assert.same({ { 'Mason' }, { 'MasonInstall', 'selene' } }, commands)
+    end)
+
+    it('installs the package of a command, not the command', function()
+      lang.tools = { 'forge' }
+      lang.packages = { forge = 'foundry' }
+      package.loaded['mason-registry'] =
+        { has_package = function(p) return p == 'foundry' end }
+      statusline.pick_tools(0)
+
+      confirm(item('forge'))
+      assert.same({ { 'MasonInstall', 'foundry' } }, commands)
+      lang.packages = nil
     end)
   end)
 end)
