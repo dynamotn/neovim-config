@@ -1,3 +1,24 @@
+--- A filetype for files under a project that `markers` identify, upward
+--- from the file. A broad path such as `*/templates/*.yaml` names a Helm
+--- template only in a chart; anywhere else Neovim's own detection applies.
+---@param filetype string
+---@param markers string[]
+---@return fun(path: string): string?
+local function within(filetype, markers)
+  return function(path)
+    if vim.fs.root(path, markers) then return filetype end
+  end
+end
+
+local ansible = within('yaml.ansible', {
+  'ansible.cfg',
+  '.ansible-lint',
+  'galaxy.yml',
+  'roles',
+  'molecule',
+})
+local helm = within('helm', { 'Chart.yaml' })
+
 vim.filetype.add({
   extension = {
     envrc = 'sh',
@@ -8,7 +29,12 @@ vim.filetype.add({
     rofi = 'rasi',
     wofi = 'rasi',
     ebuild = 'sh.ebuild',
-    install = 'sh.install',
+    -- Neovim's own check for a PHP `.install` file (Drupal) comes first
+    install = function(_, bufnr)
+      local first = bufnr and vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+      if first and first:lower():find('<%?php') then return 'php' end
+      return 'sh.install'
+    end,
     promql = 'promql',
     bean = 'beancount',
     snippets = 'snippets',
@@ -26,6 +52,9 @@ vim.filetype.add({
     ['terragrunt.hcl'] = 'terragrunt',
     ['azure-pipelines.yml'] = 'yaml.az-pl',
     ['docker-compose.yml'] = 'yaml.docker-compose',
+    ['docker-compose.yaml'] = 'yaml.docker-compose',
+    ['compose.yml'] = 'yaml.docker-compose',
+    ['compose.yaml'] = 'yaml.docker-compose',
     ['PKGBUILD'] = 'sh.PKGBUILD',
   },
   pattern = {
@@ -36,18 +65,28 @@ vim.filetype.add({
     -- on its own.
     ['.*/%.git/ignore'] = 'gitignore',
 
-    ['.*%.hcl'] = 'terragrunt',
-    ['.*terraform/.*%.hcl'] = 'terragrunt',
+    -- The `.hcl` files a Terragrunt tree shares (`env.hcl`, `account.hcl`)
+    -- under its `root.hcl`. Packer, Nomad and the Terraform lock file keep
+    -- Neovim's `hcl`.
+    ['.*%.hcl'] = function(path)
+      local name = vim.fs.basename(path)
+      if name == '.terraform.lock.hcl' or name:find('%.pkr%.hcl$') then
+        return
+      end
+      if vim.fs.root(path, { 'root.hcl', 'terragrunt.hcl' }) then
+        return 'terragrunt'
+      end
+    end,
 
-    ['.*/defaults/.*%.ya?ml'] = 'yaml.ansible',
+    ['.*/defaults/.*%.ya?ml'] = ansible,
     ['.*/host_vars/.*%.ya?ml'] = 'yaml.ansible',
     ['.*/group_vars/.*%.ya?ml'] = 'yaml.ansible',
     ['.*/group_vars/.*/.*%.ya?ml'] = 'yaml.ansible',
-    ['.*/playbook.*%.ya?ml'] = 'yaml.ansible',
+    ['.*/playbook.*%.ya?ml'] = ansible,
     ['.*/playbooks/.*%.ya?ml'] = 'yaml.ansible',
     ['.*/roles/.*/tasks/.*%.ya?ml'] = 'yaml.ansible',
     ['.*/roles/.*/handlers/.*%.ya?ml'] = 'yaml.ansible',
-    ['.*/tasks/.*%.ya?ml'] = 'yaml.ansible',
+    ['.*/tasks/.*%.ya?ml'] = ansible,
     ['.*/molecule/.*%.ya?ml'] = 'yaml.ansible',
 
     ['openapi.*%.ya?ml'] = 'yaml.openapi',
@@ -55,18 +94,26 @@ vim.filetype.add({
 
     ['.*%.gitlab%-ci%.ya?ml'] = 'yaml.gitlab',
     ['.*%.github/workflows/.*%.ya?ml'] = 'yaml.gh-action',
+    ['.*%.forgejo/workflows/.*%.ya?ml'] = 'yaml.gh-action',
+    ['.*%.gitea/workflows/.*%.ya?ml'] = 'yaml.gh-action',
 
-    ['.*%.component%.html'] = 'htmlangular',
-    ['.*%.container%.html'] = 'htmlangular',
+    -- Ahead of the `templates/` rule below, which can match the same file
+    ['.*%.component%.html'] = { 'htmlangular', { priority = 10 } },
+    ['.*%.container%.html'] = { 'htmlangular', { priority = 10 } },
 
     ['.*%.tmpl'] = 'gotmpl',
 
-    -- where Django keeps its templates; a plain HTML file elsewhere in the
-    -- project is untouched
-    ['.*/templates/.*%.html'] = 'htmldjango',
+    -- where Django (or Flask, with Jinja) keeps its templates; a plain HTML
+    -- file elsewhere, or a Go `html/template`, is untouched
+    ['.*/templates/.*%.html'] = within('htmldjango', {
+      'manage.py',
+      'pyproject.toml',
+      'setup.py',
+      'requirements.txt',
+    }),
 
-    ['.*/templates/.*%.tpl'] = 'helm',
-    ['.*/templates/.*%.ya?ml'] = 'helm',
+    ['.*/templates/.*%.tpl'] = helm,
+    ['.*/templates/.*%.ya?ml'] = helm,
     ['helmfile.*%.ya?ml'] = 'helm',
     ['values.*%.ya?ml'] = 'yaml.helm-values',
 

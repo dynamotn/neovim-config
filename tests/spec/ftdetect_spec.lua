@@ -17,7 +17,6 @@ describe('ftdetect', function()
     { '/p/x.rofi', 'rasi' },
     { '/p/x.wofi', 'rasi' },
     { '/p/foo-1.0.ebuild', 'sh.ebuild' },
-    { '/p/foo.install', 'sh.install' },
     { '/p/query.promql', 'promql' },
     { '/p/ledger.bean', 'beancount' },
     { '/p/lua.snippets', 'snippets' },
@@ -33,14 +32,12 @@ describe('ftdetect', function()
     { '/p/terragrunt.hcl', 'terragrunt' },
     { '/p/azure-pipelines.yml', 'yaml.az-pl' },
     { '/p/docker-compose.yml', 'yaml.docker-compose' },
+    { '/p/compose.yaml', 'yaml.docker-compose' },
     { '/p/PKGBUILD', 'sh.PKGBUILD' },
     -- pattern
-    { '/p/live/vpc.hcl', 'terragrunt' },
-    { '/p/roles/web/defaults/main.yml', 'yaml.ansible' },
     { '/p/host_vars/web.yaml', 'yaml.ansible' },
     { '/p/group_vars/all.yml', 'yaml.ansible' },
     { '/p/group_vars/all/vars.yml', 'yaml.ansible' },
-    { '/p/playbook-site.yml', 'yaml.ansible' },
     { '/p/playbooks/site.yml', 'yaml.ansible' },
     { '/p/roles/web/tasks/main.yml', 'yaml.ansible' },
     { '/p/roles/web/handlers/main.yml', 'yaml.ansible' },
@@ -49,12 +46,10 @@ describe('ftdetect', function()
     { '/p/openapi-v2.json', 'json.openapi' },
     { '/p/.gitlab-ci.yml', 'yaml.gitlab' },
     { '/p/.github/workflows/ci.yml', 'yaml.gh-action' },
+    { '/p/.forgejo/workflows/ci.yml', 'yaml.gh-action' },
     { '/p/src/app.component.html', 'htmlangular' },
     { '/p/src/app.container.html', 'htmlangular' },
     { '/p/dot_bashrc.tmpl', 'gotmpl' },
-    { '/p/app/templates/index.html', 'htmldjango' },
-    { '/p/chart/templates/_helpers.tpl', 'helm' },
-    { '/p/chart/templates/deployment.yaml', 'helm' },
     { '/p/helmfile.yaml', 'helm' },
     { '/p/values-prod.yaml', 'yaml.helm-values' },
     { '/p/.config/hypr/hyprland.conf', 'hyprlang' },
@@ -82,6 +77,68 @@ describe('ftdetect', function()
     'leaves a plain HTML file outside templates alone',
     function() assert.are.equal('html', match('/p/static/index.html')) end
   )
+
+  describe('within a project', function()
+    local dir, cleanup
+    before_each(function()
+      dir, cleanup = h.tmpdir()
+    end)
+    after_each(function() cleanup() end)
+
+    ---@param files string[] Files to create, relative to the project
+    ---@param path string
+    local function match_in(files, path)
+      for _, file in ipairs(files) do
+        vim.fn.mkdir(vim.fs.dirname(dir .. '/' .. file), 'p')
+        vim.fn.writefile({}, dir .. '/' .. file)
+      end
+      return match(dir .. '/' .. path)
+    end
+
+    local anchored = {
+      { { 'root.hcl' }, 'live/vpc.hcl', 'terragrunt' },
+      { {}, 'live/vpc.hcl', 'hcl' },
+      { { 'root.hcl' }, '.terraform.lock.hcl', 'hcl' },
+      { { 'root.hcl' }, 'build.pkr.hcl', 'hcl' },
+      { { 'ansible.cfg' }, 'playbook-site.yml', 'yaml.ansible' },
+      { { 'ansible.cfg' }, 'roles/web/defaults/main.yml', 'yaml.ansible' },
+      {
+        { 'roles/web/tasks/main.yml' },
+        'roles/web/defaults/x.yml',
+        'yaml.ansible',
+      },
+      { {}, 'pipeline/tasks/build.yaml', 'yaml' },
+      { { 'manage.py' }, 'app/templates/index.html', 'htmldjango' },
+      { { 'go.mod' }, 'web/templates/index.html', 'html' },
+      { { 'manage.py' }, 'templates/app.component.html', 'htmlangular' },
+      { { 'chart/Chart.yaml' }, 'chart/templates/_helpers.tpl', 'helm' },
+      { { 'chart/Chart.yaml' }, 'chart/templates/deployment.yaml', 'helm' },
+      { {}, 'deploy/templates/pipeline.yaml', 'yaml' },
+    }
+    for _, case in ipairs(anchored) do
+      local files, path, ft = case[1], case[2], case[3]
+      it(
+        path .. ' beside ' .. vim.inspect(files) .. ' is ' .. ft,
+        function() assert.are.equal(ft, match_in(files, path)) end
+      )
+    end
+
+    it('reads a shell .install file as sh.install', function()
+      local path = dir .. '/foo.install'
+      vim.fn.writefile({ 'post_install() {', '}' }, path)
+      vim.cmd.edit(path)
+      assert.are.equal('sh.install', vim.bo.filetype)
+      vim.cmd('bwipeout!')
+    end)
+
+    it('keeps a PHP .install file as PHP', function()
+      local path = dir .. '/mod.install'
+      vim.fn.writefile({ '<?php' }, path)
+      vim.cmd.edit(path)
+      assert.are.equal('php', vim.bo.filetype)
+      vim.cmd('bwipeout!')
+    end)
+  end)
 
   it(
     'gives every filetype it adds to a language of the configuration',
