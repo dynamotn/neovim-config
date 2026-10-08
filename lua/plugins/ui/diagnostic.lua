@@ -4,10 +4,9 @@ return {
     'rachartier/tiny-inline-diagnostic.nvim',
     event = 'VeryLazy',
     priority = 1000,
-    config = function()
-      require('tiny-inline-diagnostic').setup()
-      vim.diagnostic.config({ virtual_text = false })
-    end,
+    -- The native virtual text it replaces is turned off with the rest of
+    -- the diagnostic options, in `plugins.lsp.server`
+    config = function() require('tiny-inline-diagnostic').setup() end,
   },
   {
     -- Act on the rule behind a diagnostic, whichever linter or server it is

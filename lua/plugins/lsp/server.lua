@@ -11,7 +11,11 @@ local function default_opts()
     diagnostics = {
       underline = true,
       update_in_insert = false,
-      virtual_text = {
+      -- tiny-inline-diagnostic draws the messages when it is in the spec.
+      -- Decided here, the one place diagnostics are configured: this spec
+      -- loads on the first file, so on a start without one it comes after
+      -- tiny-inline's `VeryLazy` and would turn the native text back on.
+      virtual_text = not Plugin.has('tiny-inline-diagnostic.nvim') and {
         spacing = 4,
         source = 'if_many',
         -- `icons` picks the icon of each severity
