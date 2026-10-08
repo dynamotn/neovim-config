@@ -20,6 +20,16 @@ return {
         mode = { 'n', 'x' },
         desc = 'Search and Replace',
       },
+      {
+        '<leader>sf',
+        function()
+          require('grug-far').open({
+            transient = true,
+            prefills = { paths = vim.fn.expand('%') },
+          })
+        end,
+        desc = 'Search and Replace (File)',
+      },
     },
   },
   {

@@ -11,6 +11,13 @@ return {
     -- next move.
     event = 'CursorHold',
     dependencies = { 'MunifTanjim/nui.nvim' },
+    keys = {
+      {
+        '<leader>uR',
+        '<cmd>RegexplainerToggle<cr>',
+        desc = 'Toggle Regexplainer',
+      },
+    },
     opts = {
       auto = true,
     },

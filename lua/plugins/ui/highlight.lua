@@ -14,6 +14,13 @@ return {
     -- is easy to read past in a diff full of them. A red background is not.
     'nvim-mini/mini.hipatterns',
     event = 'LazyFile',
+    keys = {
+      {
+        '<leader>uH',
+        function() require('mini.hipatterns').toggle() end,
+        desc = 'Toggle Color Highlights',
+      },
+    },
     init = function()
       vim.api.nvim_create_autocmd('InsertLeave', {
         group = vim.api.nvim_create_augroup(
@@ -123,6 +130,9 @@ return {
     -- Syntax highlight
     'OXY2DEV/markview.nvim',
     lazy = false,
+    keys = {
+      { '<leader>uM', '<cmd>Markview toggle<cr>', desc = 'Toggle Markview' },
+    },
     opts = {
       preview = {
         filetypes = markview_filetypes,

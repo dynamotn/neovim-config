@@ -215,6 +215,53 @@ describe('config.keymaps', function()
     assert.are.equal('kept', vim.fn.getreg('"'))
   end)
 
+  it('jumps between merge conflict markers, either way', function()
+    vim.api.nvim_set_current_buf(h.buffer({
+      lines = {
+        'text',
+        '<<<<<<< HEAD',
+        'ours',
+        '=======',
+        '======== not a marker',
+        'theirs',
+        '>>>>>>> branch',
+      },
+    }))
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    map('n', ']x').callback()
+    assert.are.equal(2, vim.fn.line('.'))
+    map('n', ']x').callback()
+    assert.are.equal(4, vim.fn.line('.'))
+    map('n', ']x').callback()
+    assert.are.equal(7, vim.fn.line('.'))
+    map('n', '[x').callback()
+    assert.are.equal(4, vim.fn.line('.'))
+  end)
+
+  it('copies the diagnostics of the cursor line', function()
+    local bufnr = h.buffer({ lines = { 'one', 'two' } })
+    vim.api.nvim_set_current_buf(bufnr)
+    local ns = vim.api.nvim_create_namespace('dy_test_copy_diagnostics')
+    vim.diagnostic.set(ns, bufnr, {
+      { lnum = 1, col = 0, message = 'first', source = 'lint' },
+      { lnum = 1, col = 1, message = 'second' },
+      { lnum = 0, col = 0, message = 'other line' },
+    })
+    local copied = {}
+    local restore_setreg = h.stub(
+      vim.fn,
+      'setreg',
+      function(reg, value) copied[reg] = value end
+    )
+    local restore_notify = h.stub(vim, 'notify', function() end)
+    vim.api.nvim_win_set_cursor(0, { 2, 0 })
+    map('n', ' xc').callback()
+    restore_notify()
+    restore_setreg()
+    vim.diagnostic.reset(ns, bufnr)
+    assert.are.equal('lint: first\nsecond', copied['+'])
+  end)
+
   it('keeps the command line of the search mappings in sight', function()
     for _, lhs in ipairs({ '/', '<C-f>', '<C-r>' }) do
       assert.are.equal(0, map('x', lhs).silent, lhs)

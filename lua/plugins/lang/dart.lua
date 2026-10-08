@@ -13,6 +13,13 @@ return vim.list_contains(DyNeo.enabled_languages, 'dart')
             or vim.fn.executable('dart') == 1
         end,
         dependencies = { 'nvim-lua/plenary.nvim' },
+        -- stylua: ignore
+        keys = {
+          { '<localleader>r', '<cmd>FlutterRun<cr>', desc = 'Flutter Run', ft = language.filetypes },
+          { '<localleader>R', '<cmd>FlutterRestart<cr>', desc = 'Flutter Restart', ft = language.filetypes },
+          { '<localleader>d', '<cmd>FlutterDevices<cr>', desc = 'Flutter Devices', ft = language.filetypes },
+          { '<localleader>q', '<cmd>FlutterQuit<cr>', desc = 'Flutter Quit', ft = language.filetypes },
+        },
         opts = {},
       },
       {

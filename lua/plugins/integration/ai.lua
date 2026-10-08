@@ -226,6 +226,11 @@ return {
         mode = { 'n', 'x' },
         desc = 'Sidekick Select Prompt',
       },
+      {
+        '<leader>aD',
+        function() require('sidekick.cli').send({ msg = '{diagnostics}' }) end,
+        desc = 'Send Diagnostics',
+      },
     },
   },
   {
@@ -328,6 +333,11 @@ return {
       -- Diff management
       { '<leader>aca', '<cmd>ClaudeCodeDiffAccept<cr>', desc = 'Accept diff' },
       { '<leader>acd', '<cmd>ClaudeCodeDiffDeny<cr>', desc = 'Deny diff' },
+      {
+        '<leader>acm',
+        '<cmd>ClaudeCodeSelectModel<cr>',
+        desc = 'Select model',
+      },
     },
   },
   {

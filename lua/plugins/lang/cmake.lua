@@ -16,6 +16,13 @@ return vim.list_contains(DyNeo.enabled_languages, 'cmake')
       {
         -- Powerful toolbox for CMake
         'Civitasv/cmake-tools.nvim',
+        -- stylua: ignore
+        keys = {
+          { '<localleader>b', '<cmd>CMakeBuild<cr>', desc = 'CMake Build', ft = { 'cmake', 'c', 'cpp' } },
+          { '<localleader>r', '<cmd>CMakeRun<cr>', desc = 'CMake Run', ft = { 'cmake', 'c', 'cpp' } },
+          { '<localleader>g', '<cmd>CMakeGenerate<cr>', desc = 'CMake Generate', ft = { 'cmake', 'c', 'cpp' } },
+          { '<localleader>t', '<cmd>CMakeSelectBuildType<cr>', desc = 'CMake Build Type', ft = { 'cmake', 'c', 'cpp' } },
+        },
         init = function()
           local loaded = false
           local function check()

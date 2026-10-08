@@ -70,6 +70,9 @@ return {
           map('n', '<leader>ghB', function() gs.blame() end, 'Blame Buffer')
           map('n', '<leader>ghd', gs.diffthis, 'Diff This')
           map('n', '<leader>ghD', function() gs.diffthis('~') end, 'Diff This ~')
+          map('n', '<leader>ghq', function() gs.setqflist('all') end, 'Hunks to Quickfix')
+          map('n', '<leader>ghw', gs.toggle_word_diff, 'Toggle Word Diff')
+          map('n', '<leader>ght', gs.toggle_current_line_blame, 'Toggle Line Blame')
           map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', 'GitSigns Select Hunk')
           -- stylua: ignore end
         end,

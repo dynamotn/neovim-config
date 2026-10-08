@@ -15,6 +15,16 @@ return {
       { '<leader>ow', '<cmd>OverseerToggle!<cr>', desc = 'Task list' },
       { '<leader>oo', '<cmd>OverseerRun<cr>', desc = 'Run task' },
       { '<leader>ot', '<cmd>OverseerTaskAction<cr>', desc = 'Task action' },
+      {
+        '<leader>ol',
+        function()
+          local overseer = require('overseer')
+          local task = overseer.list_tasks({ include_ephemeral = true })[1]
+          if not task then return vim.notify('No task to restart', vim.log.levels.WARN) end
+          overseer.run_action(task, 'restart')
+        end,
+        desc = 'Restart last task',
+      },
     },
     opts = {
       dap = false,

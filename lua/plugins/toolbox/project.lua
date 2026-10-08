@@ -69,6 +69,16 @@ return {
   {
     -- Devcontainer
     'esensar/nvim-dev-container',
+    -- stylua: ignore
+    keys = {
+      { '<leader>pd', '', desc = '+devcontainer' },
+      { '<leader>pds', '<cmd>DevcontainerStart<cr>', desc = 'Start Devcontainer' },
+      { '<leader>pda', '<cmd>DevcontainerAttach<cr>', desc = 'Attach to Devcontainer' },
+      { '<leader>pde', '<cmd>DevcontainerExec<cr>', desc = 'Exec in Devcontainer' },
+      { '<leader>pdl', '<cmd>DevcontainerLogs<cr>', desc = 'Devcontainer Logs' },
+      { '<leader>pdx', '<cmd>DevcontainerStop<cr>', desc = 'Stop Devcontainer' },
+      { '<leader>pdc', '<cmd>DevcontainerEditNearestConfig<cr>', desc = 'Edit Devcontainer Config' },
+    },
     -- The commands only exist once `setup` has run
     cmd = {
       'DevcontainerStart',

@@ -42,6 +42,8 @@ return {
       { '<leader>dj', function() require('dap').down() end, desc = 'Down' },
       { '<leader>dk', function() require('dap').up() end, desc = 'Up' },
       { '<leader>dl', function() require('dap').run_last() end, desc = 'Run Last' },
+      { '<leader>dL', function() require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end, desc = 'Log Point' },
+      { '<leader>dX', function() require('dap').clear_breakpoints() end, desc = 'Clear Breakpoints' },
       { '<leader>do', function() require('dap').step_out() end, desc = 'Step Out' },
       { '<leader>dO', function() require('dap').step_over() end, desc = 'Step Over' },
       { '<leader>dP', function() require('dap').pause() end, desc = 'Pause' },

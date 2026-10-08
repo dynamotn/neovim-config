@@ -335,6 +335,13 @@ return {
     'cubewhy/dropbar.nvim',
     branch = 'fix-event',
     event = 'UIEnter',
+    keys = {
+      {
+        '<leader>;',
+        function() require('dropbar.api').pick() end,
+        desc = 'Pick Winbar Symbol',
+      },
+    },
     opts = {
       icons = {
         kinds = {

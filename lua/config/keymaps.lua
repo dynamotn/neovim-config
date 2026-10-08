@@ -106,6 +106,22 @@ map(
   { desc = 'Delete Invisible Buffers' }
 )
 map('n', '<leader>bD', '<cmd>:bd<cr>', { desc = 'Delete Buffer and Window' })
+map('n', '<leader>by', '<cmd>%yank +<cr>', { desc = 'Yank Buffer' })
+map(
+  'n',
+  '<leader>bR',
+  '<cmd>edit!<cr>',
+  { desc = 'Reload Buffer (discard changes)' }
+)
+map('n', '<leader>bf', function()
+  vim.ui.select(
+    vim.fn.getcompletion('', 'filetype'),
+    { prompt = 'Filetype' },
+    function(filetype)
+      if filetype then vim.bo.filetype = filetype end
+    end
+  )
+end, { desc = 'Set Filetype' })
 
 -- Clear search and stop snippet on escape
 map({ 'i', 'n', 's' }, '<esc>', function()
@@ -251,6 +267,39 @@ map('n', '[e', diagnostic_goto(false, 'ERROR'), { desc = 'Prev Error' })
 map('n', ']w', diagnostic_goto(true, 'WARN'), { desc = 'Next Warning' })
 map('n', '[w', diagnostic_goto(false, 'WARN'), { desc = 'Prev Warning' })
 
+-- The diagnostics of the cursor line, to paste into an issue or a chat
+map('n', '<leader>xc', function()
+  local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local messages = vim.tbl_map(
+    function(diagnostic)
+      return diagnostic.source
+          and ('%s: %s'):format(diagnostic.source, diagnostic.message)
+        or diagnostic.message
+    end,
+    vim.diagnostic.get(0, { lnum = lnum })
+  )
+  if #messages == 0 then
+    return vim.notify('No diagnostics on this line', vim.log.levels.WARN)
+  end
+  vim.fn.setreg('+', table.concat(messages, '\n'))
+  vim.notify(('Copied %d diagnostics'):format(#messages))
+end, { desc = 'Copy Line Diagnostics' })
+
+-- Merge conflict markers, diff3's `|||||||` included
+local conflict_goto = function(next)
+  return function()
+    for _ = 1, vim.v.count1 do
+      local found = vim.fn.search(
+        [[^\(<<<<<<<\||||||||\|=======\|>>>>>>>\)\( \|$\)]],
+        next and 'W' or 'bW'
+      )
+      if found == 0 then return end
+    end
+  end
+end
+map('n', ']x', conflict_goto(true), { desc = 'Next Conflict Marker' })
+map('n', '[x', conflict_goto(false), { desc = 'Prev Conflict Marker' })
+
 -- stylua: ignore start
 
 -- toggle options
@@ -262,7 +311,8 @@ Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leade
 Snacks.toggle.diagnostics():map("<leader>ud")
 Snacks.toggle.line_number():map("<leader>ul")
 Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
-Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
+Snacks.toggle.option("colorcolumn", { off = "", on = vim.o.colorcolumn ~= "" and vim.o.colorcolumn or "+1", name = "Color Column" }):map("<leader>u|")
+Snacks.toggle.option("showtabline",{ off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
 Snacks.toggle.treesitter():map("<leader>uT")
 Snacks.toggle.option("background", { off = "light", on = "dark" , name = "Dark Background" }):map("<leader>ub")
 Snacks.toggle.dim():map("<leader>uD")

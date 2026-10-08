@@ -4,6 +4,13 @@ return {
     'rachartier/tiny-inline-diagnostic.nvim',
     event = 'VeryLazy',
     priority = 1000,
+    keys = {
+      {
+        '<leader>uv',
+        function() require('tiny-inline-diagnostic').toggle() end,
+        desc = 'Toggle Inline Diagnostics',
+      },
+    },
     -- The native virtual text it replaces is turned off with the rest of
     -- the diagnostic options, in `plugins.lsp.server`
     config = function() require('tiny-inline-diagnostic').setup() end,

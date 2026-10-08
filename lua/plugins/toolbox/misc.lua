@@ -48,6 +48,9 @@ return {
     -- Startup event timing
     'dstein64/vim-startuptime',
     cmd = 'StartupTime',
+    keys = {
+      { '<leader>dpS', '<cmd>StartupTime<cr>', desc = 'Startup Time' },
+    },
     config = function() vim.g.startuptime_tries = 10 end,
   },
 }

@@ -6,6 +6,26 @@ return {
     'nvim-treesitter/nvim-treesitter-textobjects',
     branch = 'main',
     event = 'VeryLazy',
+    keys = {
+      {
+        '<leader>c>',
+        function()
+          require('nvim-treesitter-textobjects.swap').swap_next(
+            '@parameter.inner'
+          )
+        end,
+        desc = 'Swap Next Parameter',
+      },
+      {
+        '<leader>c<',
+        function()
+          require('nvim-treesitter-textobjects.swap').swap_previous(
+            '@parameter.inner'
+          )
+        end,
+        desc = 'Swap Prev Parameter',
+      },
+    },
     opts = {
       move = {
         enable = true,

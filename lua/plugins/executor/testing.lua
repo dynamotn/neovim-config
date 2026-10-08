@@ -88,6 +88,8 @@ return {
       { '<leader>tO', function() require('neotest').output_panel.toggle() end, desc = 'Toggle Output Panel (Neotest)' },
       { '<leader>tS', function() require('neotest').run.stop() end, desc = 'Stop (Neotest)' },
       { '<leader>tw', function() require('neotest').watch.toggle(vim.fn.expand('%')) end, desc = 'Toggle Watch (Neotest)' },
+      { ']n', function() require('neotest').jump.next({ status = 'failed' }) end, desc = 'Next Failed Test' },
+      { '[n', function() require('neotest').jump.prev({ status = 'failed' }) end, desc = 'Prev Failed Test' },
     },
     config = function(_, opts)
       local neotest_ns = vim.api.nvim_create_namespace('neotest')

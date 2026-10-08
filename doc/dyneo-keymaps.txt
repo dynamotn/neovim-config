@@ -29,6 +29,7 @@ one of the same keys in those buffers.
 `<leader>8`            n      Harpoon to File 8
 `<leader>9`            n      Harpoon to File 9
 `<leader>:`            n      Command History
+`<leader>;`            n      Pick Winbar Symbol
 `<leader><space>`      n      Find Files (Root Dir)
 `<leader>?`            n      Buffer Keymaps (which-key)
 `<leader>D`            n      Toggle DBUI
@@ -70,6 +71,7 @@ one of the same keys in those buffers.
 ==============================================================================
 <leader>a  ai
 
+`<leader>aD`           n      Send Diagnostics
 `<leader>aV`           x      Send Visual Selection
 `<leader>aa`           n      Sidekick Toggle CLI
 `<leader>ad`           n      Detach a CLI Session
@@ -87,6 +89,7 @@ one of the same keys in those buffers.
 `<leader>acc`          n      Toggle Claude
 `<leader>acd`          n      Deny diff
 `<leader>acf`          n      Focus Claude
+`<leader>acm`          n      Select model
 `<leader>acr`          n      Resume Claude
 `<leader>acs`          v      Send to Claude
 `<leader>acs`          n      Add file  (ft: NvimTree, neo-tree, oil)
@@ -106,14 +109,19 @@ one of the same keys in those buffers.
 <leader>b  buffer
 
 `<leader>bD`           n      Delete Buffer and Window
+`<leader>bR`           n      Reload Buffer (discard changes)
 `<leader>bb`           n      Switch to Other Buffer
 `<leader>bd`           n      Delete Buffer
+`<leader>bf`           n      Set Filetype
 `<leader>bi`           n      Delete Invisible Buffers
 `<leader>bo`           n      Delete Other Buffers
+`<leader>by`           n      Yank Buffer
 
 ==============================================================================
 <leader>c  code
 
+`<leader>c<`           n      Swap Prev Parameter
+`<leader>c>`           n      Swap Next Parameter
 `<leader>cA`           n      Source Action  (LSP)
 `<leader>cC`           n      Toggle Codelens  (LSP)
 `<leader>cD`           n      Fix all diagnostics  (LSP: vtsls)
@@ -172,9 +180,11 @@ one of the same keys in those buffers.
 
 `<leader>dB`           n      Breakpoint Condition
 `<leader>dC`           n      Run to Cursor
+`<leader>dL`           n      Log Point
 `<leader>dM`           n      Debug Class  (ft: python)
 `<leader>dO`           n      Step Over
 `<leader>dP`           n      Pause
+`<leader>dX`           n      Clear Breakpoints
 `<leader>da`           n      Run with Args
 `<leader>db`           n      Toggle Breakpoint
 `<leader>dc`           n      Run/Continue
@@ -196,6 +206,7 @@ one of the same keys in those buffers.
 ==============================================================================
 <leader>dp  profiler
 
+`<leader>dpS`          n      Startup Time
 `<leader>dph`          n      Toggle Profiler Highlights
 `<leader>dpp`          n      Toggle Profiler
 `<leader>dps`          n      Profiler Scratch Buffer
@@ -210,9 +221,11 @@ one of the same keys in those buffers.
 `<leader>fT`           n      Terminal (cwd)
 `<leader>fb`           n      Buffers
 `<leader>fc`           n      Find Config File
+`<leader>fd`           n      Find Files (Buffer Dir)
 `<leader>fe`           n      Explorer Snacks (root dir)
 `<leader>ff`           n      Find Files (Root Dir)
 `<leader>fg`           n      Find Files (git-files)
+`<leader>fl`           n      Find Plugin Source File
 `<leader>fn`           n      New File
 `<leader>fp`           n      Projects
 `<leader>fr`           n      Recent
@@ -228,6 +241,7 @@ one of the same keys in those buffers.
 `<leader>fyl`          n      Path (relative, :line)
 `<leader>fyn`          n      Filename
 `<leader>fyy`          n      Path (relative)
+`<leader>fz`           n      Zoxide
 
 ==============================================================================
 <leader>g  git
@@ -245,12 +259,15 @@ one of the same keys in those buffers.
 `<leader>gf`           n      Git Current File History
 `<leader>gg`           n      Lazygit (Root Dir)
 `<leader>gl`           n      Git Log
+`<leader>gp`           n      Git Grep
+`<leader>gr`           n      Git Branches
 `<leader>gs`           n      Git Status
 `<leader>gv`           n      Review Changes (CodeDiff)
 
 ==============================================================================
 <leader>o  overseer
 
+`<leader>ol`           n      Restart last task
 `<leader>oo`           n      Run task
 `<leader>ot`           n      Task action
 `<leader>ow`           n      Task list
@@ -260,6 +277,16 @@ one of the same keys in those buffers.
 
 `<leader>pa`           n      Open alternative file
 `<leader>pc`           n      CI Checks
+
+==============================================================================
+<leader>pd  devcontainer
+
+`<leader>pda`          n      Attach to Devcontainer
+`<leader>pdc`          n      Edit Devcontainer Config
+`<leader>pde`          n      Exec in Devcontainer
+`<leader>pdl`          n      Devcontainer Logs
+`<leader>pds`          n      Start Devcontainer
+`<leader>pdx`          n      Stop Devcontainer
 
 ==============================================================================
 <leader>ph  github
@@ -352,12 +379,14 @@ one of the same keys in those buffers.
 <leader>s  search
 
 `<leader>s"`           n      Registers
+`<leader>s.`           n      All Pickers
 `<leader>s/`           n      Search History
 `<leader>sB`           n      Grep Open Buffers
 `<leader>sC`           n      Commands
 `<leader>sD`           n      Buffer Diagnostics
 `<leader>sG`           n      Grep (cwd)
 `<leader>sH`           n      Highlights
+`<leader>sL`           n      LSP Configs
 `<leader>sM`           n      Man Pages
 `<leader>sP`           n      Debug Prints
 `<leader>sR`           n      Resume
@@ -368,6 +397,7 @@ one of the same keys in those buffers.
 `<leader>sb`           n      Buffer Lines
 `<leader>sc`           n      Command History
 `<leader>sd`           n      Diagnostics
+`<leader>sf`           n      Search and Replace (File)
 `<leader>sg`           n      Grep (Root Dir)
 `<leader>sh`           n      Help Pages
 `<leader>si`           n      Icons
@@ -383,6 +413,7 @@ one of the same keys in those buffers.
 `<leader>st`           n      Todo
 `<leader>su`           n      Undotree
 `<leader>sw`           nx     Visual selection or word (Root Dir)
+`<leader>sx`           n      Treesitter Symbols
 `<leader>sz`           n      Chezmoi
 
 ==============================================================================
@@ -420,10 +451,13 @@ one of the same keys in those buffers.
 `<leader>uD`           n      Toggle Dimming
 `<leader>uE`           n      Edgy Select Window
 `<leader>uF`           n      Toggle Auto Format (Buffer)
+`<leader>uH`           n      Toggle Color Highlights
 `<leader>uI`           n      Inspect Tree
 `<leader>uK`           n      Toggle Camouflage Reveal Under Cursor
 `<leader>uL`           n      Toggle Relative Number
+`<leader>uM`           n      Toggle Markview
 `<leader>uN`           n      Toggle Sidekick NES
+`<leader>uR`           n      Toggle Regexplainer
 `<leader>uS`           n      Toggle Smooth Scroll
 `<leader>uT`           n      Toggle Treesitter Highlight
 `<leader>uZ`           n      Toggle Zoom Mode
@@ -441,8 +475,10 @@ one of the same keys in those buffers.
 `<leader>un`           n      Dismiss All Notifications
 `<leader>ur`           n      Redraw / Clear hlsearch / Diff Update
 `<leader>us`           n      Toggle Spelling
+`<leader>uv`           n      Toggle Inline Diagnostics
 `<leader>uw`           n      Toggle Wrap
 `<leader>uz`           n      Toggle Zen Mode
+`<leader>u|`           n      Toggle Color Column
 
 ==============================================================================
 <leader>v  multicursor
@@ -486,6 +522,7 @@ one of the same keys in those buffers.
 `<leader>xQ`           n      Quickfix List (Trouble)
 `<leader>xT`           n      Todo/Fix/Fixme (Trouble)
 `<leader>xX`           n      Buffer Diagnostics (Trouble)
+`<leader>xc`           n      Copy Line Diagnostics
 `<leader>xl`           n      Location List
 `<leader>xq`           n      Quickfix List
 `<leader>xt`           n      Todo (Trouble)
@@ -503,6 +540,7 @@ one of the same keys in those buffers.
 
 `<leader>zp`           nx     Add word to proper nouns
 `<leader>zt`           nx     Add word to technical
+`<leader>zz`           n      Spelling Suggestions
 
 ==============================================================================
 <localleader>l  label (Octo)
@@ -516,6 +554,16 @@ one of the same keys in those buffers.
 `<localleader>lr`      n      Routes picker  (ft: blade, php)
 
 ==============================================================================
+<localleader>o  obsidian
+
+`<localleader>oT`      n      Insert Template  (ft: markdown, markdown.mdx)
+`<localleader>ob`      n      Backlinks  (ft: markdown, markdown.mdx)
+`<localleader>on`      n      New Note  (ft: markdown, markdown.mdx)
+`<localleader>oo`      n      Quick Switch  (ft: markdown, markdown.mdx)
+`<localleader>os`      n      Search Notes  (ft: markdown, markdown.mdx)
+`<localleader>ot`      n      Today  (ft: markdown, markdown.mdx)
+
+==============================================================================
 [  prev
 
 `[B`                   n      Move Tab Prev
@@ -524,11 +572,13 @@ one of the same keys in those buffers.
 `[b`                   n      Prev Buffer
 `[d`                   n      Prev Diagnostic
 `[e`                   n      Prev Error
+`[n`                   n      Prev Failed Test
 `[p`                   n      Put Indented Before Cursor (Linewise)
 `[q`                   n      Previous Trouble/Quickfix Item
 `[t`                   n      Previous Todo Comment
 `[u`                   n      Prev Uncovered Line
 `[w`                   n      Prev Warning
+`[x`                   n      Prev Conflict Marker
 `[y`                   n      Cycle Forward Through Yank History
 
 ==============================================================================
@@ -540,11 +590,13 @@ one of the same keys in those buffers.
 `]b`                   n      Next Buffer
 `]d`                   n      Next Diagnostic
 `]e`                   n      Next Error
+`]n`                   n      Next Failed Test
 `]p`                   n      Put Indented After Cursor (Linewise)
 `]q`                   n      Next Trouble/Quickfix Item
 `]t`                   n      Next Todo Comment
 `]u`                   n      Next Uncovered Line
 `]w`                   n      Next Warning
+`]x`                   n      Next Conflict Marker
 `]y`                   n      Cycle Backward Through Yank History
 
 ==============================================================================
@@ -552,6 +604,7 @@ g  goto
 
 `g<C-a>`               nv     Increment
 `g<C-x>`               nv     Decrement
+`gC`                   n      Go to Context
 `gD`                   n      Goto Declaration  (LSP)
 `gD`                   n      Goto Source Definition  (LSP: vtsls)
 `gI`                   n      Goto Implementation  (LSP)
@@ -657,11 +710,18 @@ Other keys
 `<c-w><space>`         n      Window Hydra Mode (which-key)
 `<esc>`                ins    Escape and Clear hlsearch
 `<localleader>R`       n      REPL (Buffer)  (ft: haskell)
+`<localleader>U`       n      Upgrade All Crates  (ft: toml)
+`<localleader>b`       n      CMake Build  (ft: cmake, c, cpp)
 `<localleader>e`       n      Evaluate All  (ft: haskell)
+`<localleader>g`       n      CMake Generate  (ft: cmake, c, cpp)
 `<localleader>h`       n      Hoogle Signature  (ft: haskell)
 `<localleader>mc`      n      Metals compile cascade  (ft: scala)
 `<localleader>mh`      n      Metals hover worksheet  (ft: scala)
+`<localleader>p`       n      Crate Details  (ft: toml)
+`<localleader>r`       n      CMake Run  (ft: cmake, c, cpp)
 `<localleader>r`       n      REPL (Package)  (ft: haskell)
+`<localleader>t`       n      CMake Build Type  (ft: cmake, c, cpp)
+`<localleader>v`       n      Toggle Table View  (ft: csv)
 `<localleader>x`       n      Xcodebuild actions  (ft: swift)
 `<localleader>xT`      n      Run this test class  (ft: swift)
 `<localleader>xb`      n      Build project  (ft: swift)

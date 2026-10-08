@@ -76,6 +76,9 @@ return {
       { '<leader>fr', pick('oldfiles'), desc = 'Recent' },
       { '<leader>fR', function() Snacks.picker.recent({ filter = { cwd = true } }) end, desc = 'Recent (cwd)' },
       { '<leader>fp', function() Snacks.picker.projects() end, desc = 'Projects' },
+      { '<leader>fd', function() Snacks.picker.files({ cwd = vim.fn.expand('%:p:h') }) end, desc = 'Find Files (Buffer Dir)' },
+      { '<leader>fl', function() Snacks.picker.files({ cwd = vim.fs.joinpath(vim.fn.stdpath('data'), 'lazy') }) end, desc = 'Find Plugin Source File' },
+      { '<leader>fz', function() Snacks.picker.zoxide() end, desc = 'Zoxide' },
       -- explorer
       { '<leader>fe', function() Snacks.explorer({ cwd = require('util.root').get() }) end, desc = 'Explorer Snacks (root dir)' },
       { '<leader>fE', function() Snacks.explorer() end, desc = 'Explorer Snacks (cwd)' },
@@ -86,6 +89,8 @@ return {
       { '<leader>gD', function() Snacks.picker.git_diff({ base = 'origin', group = true }) end, desc = 'Git Diff (origin)' },
       { '<leader>gs', function() Snacks.picker.git_status() end, desc = 'Git Status' },
       { '<leader>gS', function() Snacks.picker.git_stash() end, desc = 'Git Stash' },
+      { '<leader>gr', function() Snacks.picker.git_branches() end, desc = 'Git Branches' },
+      { '<leader>gp', function() Snacks.picker.git_grep() end, desc = 'Git Grep' },
       -- grep
       { '<leader>sb', function() Snacks.picker.lines() end, desc = 'Buffer Lines' },
       { '<leader>sB', function() Snacks.picker.grep_buffers() end, desc = 'Grep Open Buffers' },
@@ -113,6 +118,11 @@ return {
       { '<leader>sR', function() Snacks.picker.resume() end, desc = 'Resume' },
       { '<leader>sq', function() Snacks.picker.qflist() end, desc = 'Quickfix List' },
       { '<leader>su', function() Snacks.picker.undo() end, desc = 'Undotree' },
+      { '<leader>s.', function() Snacks.picker.pickers() end, desc = 'All Pickers' },
+      { '<leader>sL', function() Snacks.picker.lsp_config() end, desc = 'LSP Configs' },
+      { '<leader>sx', function() Snacks.picker.treesitter() end, desc = 'Treesitter Symbols' },
+      -- dictionary
+      { '<leader>zz', function() Snacks.picker.spelling() end, desc = 'Spelling Suggestions' },
       -- ui
       { '<leader>uC', function() Snacks.picker.colorschemes() end, desc = 'Colorschemes' },
     },

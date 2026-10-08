@@ -33,6 +33,11 @@ return vim.list_contains(DyNeo.enabled_languages, 'rust')
               map('<leader>cR', 'codeAction', 'Code Action')
               -- Not `<leader>dr`, which is the dap REPL
               map('<leader>dR', 'debuggables', 'Rust Debuggables')
+              map('<localleader>e', 'explainError', 'Explain Error')
+              map('<localleader>m', 'expandMacro', 'Expand Macro')
+              map('<localleader>r', 'runnables', 'Runnables')
+              map('<localleader>t', 'testables', 'Testables')
+              map('<localleader>c', 'openCargo', 'Open Cargo.toml')
             end,
             default_settings = {
               -- rust-analyzer language server configuration

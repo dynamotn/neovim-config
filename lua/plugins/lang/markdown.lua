@@ -45,6 +45,16 @@ return vim.list_contains(DyNeo.enabled_languages, 'markdown')
           ui = { enable = false },
           legacy_commands = false,
         },
+        -- stylua: ignore
+        keys = {
+          { '<localleader>o', '', desc = '+obsidian', ft = language.filetypes },
+          { '<localleader>on', '<cmd>Obsidian new<cr>', desc = 'New Note', ft = language.filetypes },
+          { '<localleader>oo', '<cmd>Obsidian quick_switch<cr>', desc = 'Quick Switch', ft = language.filetypes },
+          { '<localleader>os', '<cmd>Obsidian search<cr>', desc = 'Search Notes', ft = language.filetypes },
+          { '<localleader>ob', '<cmd>Obsidian backlinks<cr>', desc = 'Backlinks', ft = language.filetypes },
+          { '<localleader>ot', '<cmd>Obsidian today<cr>', desc = 'Today', ft = language.filetypes },
+          { '<localleader>oT', '<cmd>Obsidian template<cr>', desc = 'Insert Template', ft = language.filetypes },
+        },
         init = function()
           DyNeo.completion_sources =
             vim.tbl_extend('force', DyNeo.completion_sources, {
