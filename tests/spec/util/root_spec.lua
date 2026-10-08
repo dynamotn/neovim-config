@@ -103,4 +103,49 @@ describe('util.root', function()
     assert.are.equal(dir .. '/repo/sub', root.get())
     assert.are.equal(dir .. '/repo', root.git())
   end)
+
+  it('takes the root of an attached client', function()
+    h.write(dir .. '/ws/src/a.lua', { '' })
+    vim.cmd.edit(dir .. '/ws/src/a.lua')
+    local restore = h.stub(vim.lsp, 'get_clients', function()
+      return {
+        { name = 'lua_ls', root_dir = dir .. '/ws', config = {} },
+        -- Ignored by `vim.g.root_lsp_ignore`
+        { name = 'copilot', root_dir = dir, config = {} },
+      }
+    end)
+    local ignore = h.stub(vim.g, 'root_lsp_ignore', { 'copilot' })
+    assert.are.same({ dir .. '/ws' }, root.detectors.lsp(0))
+    ignore()
+    restore()
+  end)
+
+  it('forgets a cached root once setup runs and a buffer is entered', function()
+    h.write(dir .. '/y/.git/HEAD', { '' })
+    h.write(dir .. '/y/z.lua', { '' })
+    vim.cmd.edit(dir .. '/y/z.lua')
+    local buf = vim.api.nvim_get_current_buf()
+    root.cache[buf] = '/stale'
+    root.setup()
+    assert.is_nil(root.cache[buf])
+    root.cache[buf] = '/stale'
+    vim.api.nvim_exec_autocmds('BufEnter', { buffer = buf })
+    assert.is_nil(root.cache[buf])
+    assert.is_not_nil(vim.api.nvim_get_commands({}).DyNeoRoot)
+  end)
+
+  it('reports every root found, the one in use first', function()
+    h.write(dir .. '/r/.git/HEAD', { '' })
+    h.write(dir .. '/r/lua/m.lua', { '' })
+    vim.cmd.edit(dir .. '/r/lua/m.lua')
+    local shown
+    local restore = h.stub(
+      require('util.plugin'),
+      'info',
+      function(lines) shown = lines end
+    )
+    assert.are.equal(dir .. '/r', root.info())
+    restore()
+    assert.truthy(shown[1]:find('[x] `' .. dir .. '/r`', 1, true))
+  end)
 end)

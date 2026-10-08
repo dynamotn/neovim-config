@@ -1,0 +1,149 @@
+local h = require('helpers')
+
+--- A stand-in for a lualine component, marking its highlights in the text
+local function component()
+  return {
+    create_hl = function(_, _, name) return name end,
+    format_hl = function(_, name) return '<' .. name .. '>' end,
+    get_default_hl = function() return '</>' end,
+  }
+end
+
+describe('util.lualine', function()
+  local lualine, dir, cleanup, root, cwd, restores
+
+  before_each(function()
+    dir, cleanup = h.tmpdir()
+    root, cwd = dir, dir
+    restores = {
+      h.stub(_G, 'Snacks', {
+        util = { color = function(name) return '#' .. name end },
+      }),
+      h.stub(package.loaded, 'util.root', {
+        get = function() return root end,
+        cwd = function() return cwd end,
+      }),
+      h.stub(package.loaded, 'lualine.utils.utils', {
+        extract_highlight_colors = function() return nil end,
+      }),
+    }
+    h.unload('util.lualine')
+    lualine = require('util.lualine')
+  end)
+  after_each(function()
+    for i = #restores, 1, -1 do
+      restores[i]()
+    end
+    vim.cmd('silent! %bwipeout!')
+    cleanup()
+  end)
+
+  describe('status', function()
+    it('shows its icon while the status says something', function()
+      local state
+      local status = lualine.status('X', function() return state end)
+      assert.are.equal('X', status[1]())
+      assert.is_false(status.cond())
+      state = 'pending'
+      assert.is_true(status.cond())
+      assert.are.same({ fg = '#DiagnosticWarn' }, status.color())
+      state = 'ok'
+      assert.are.same({ fg = '#Special' }, status.color())
+    end)
+  end)
+
+  describe('format', function()
+    it(
+      'escapes % for the status line',
+      function() assert.are.equal('50%%', lualine.format(component(), '50%')) end
+    )
+
+    it(
+      'wraps the text in the highlight it is given',
+      function()
+        assert.are.equal(
+          '<DyNeo_Bold>name</>',
+          lualine.format(component(), 'name', 'Bold')
+        )
+      end
+    )
+  end)
+
+  describe('pretty_path', function()
+    local function path_of(file, opts)
+      h.write(dir .. '/' .. file, { '' })
+      vim.cmd.edit(dir .. '/' .. file)
+      return lualine.pretty_path(opts)(component())
+    end
+
+    it(
+      'shows the path below the working directory',
+      function()
+        assert.are.equal('src/<DyNeo_Bold>main.lua</>', path_of('src/main.lua'))
+      end
+    )
+
+    it(
+      'cuts a long path to its last parts',
+      function()
+        assert.are.equal('a/…/c/<DyNeo_Bold>d.lua</>', path_of('a/b/c/d.lua'))
+      end
+    )
+
+    it(
+      'keeps the whole path with a length of 0',
+      function()
+        assert.are.equal(
+          'a/b/c/<DyNeo_Bold>d.lua</>',
+          path_of('a/b/c/d.lua', { length = 0 })
+        )
+      end
+    )
+
+    it(
+      'colours the directory when asked to',
+      function()
+        assert.are.equal(
+          '<DyNeo_Comment>src/</><DyNeo_Bold>main.lua</>',
+          path_of('src/main.lua', { directory_hl = 'Comment' })
+        )
+      end
+    )
+
+    it('marks a modified buffer', function()
+      h.write(dir .. '/x.lua', { '' })
+      vim.cmd.edit(dir .. '/x.lua')
+      vim.bo.modified = true
+      assert.are.equal(
+        '<DyNeo_MatchParen>x.lua+</>',
+        lualine.pretty_path({ modified_sign = '+' })(component())
+      )
+      vim.bo.modified = false
+    end)
+
+    it('is empty for a buffer with no file', function()
+      vim.cmd.enew()
+      assert.are.equal('', lualine.pretty_path()(component()))
+    end)
+  end)
+
+  describe('root_dir', function()
+    it(
+      'stays hidden while the root is the working directory',
+      function() assert.is_false(lualine.root_dir().cond()) end
+    )
+
+    it('names a root below the working directory', function()
+      root = dir .. '/project'
+      local part = lualine.root_dir({ icon = 'R' })
+      assert.is_true(part.cond())
+      assert.are.equal('R project', part[1]())
+    end)
+
+    it('can leave a parent root out', function()
+      cwd = dir .. '/project/sub'
+      root = dir .. '/project'
+      assert.is_false(lualine.root_dir({ parent = false }).cond())
+    end)
+  end)
+end)

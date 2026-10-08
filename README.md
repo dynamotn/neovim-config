@@ -609,7 +609,7 @@ Tags are committed, so `:help` works in a fresh clone; after editing
 
 ### Tests
 
-47 spec files under `tests/spec` run with
+58 spec files under `tests/spec` run with
 [plenary-busted](https://github.com/nvim-lua/plenary.nvim#plenarytest_harness)
 in a headless Neovim that loads only the module each spec requires:
 

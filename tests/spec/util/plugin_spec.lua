@@ -55,4 +55,153 @@ describe('util.plugin', function()
       assert.are.equal('syntax', vim.wo.foldmethod)
     end)
   end)
+
+  describe('lazy.nvim lookups', function()
+    local restores
+    before_each(function()
+      restores = {
+        h.stub(package.loaded, 'lazy.core.config', {
+          spec = {
+            plugins = {
+              ['snacks.nvim'] = { dir = '/lazy/snacks.nvim' },
+            },
+          },
+          plugins = {
+            ['snacks.nvim'] = { _ = { loaded = { time = 1 } } },
+            ['flash.nvim'] = { _ = {} },
+          },
+        }),
+        h.stub(package.loaded, 'lazy.core.plugin', {
+          values = function(plugin, field)
+            return field == 'opts' and { dir = plugin.dir } or {}
+          end,
+        }),
+      }
+    end)
+    after_each(function()
+      for i = #restores, 1, -1 do
+        restores[i]()
+      end
+    end)
+
+    it('knows which plugins are part of the configuration', function()
+      assert.is_true(plugin.has('snacks.nvim'))
+      assert.is_false(plugin.has('telescope.nvim'))
+    end)
+
+    it('knows which plugins have loaded', function()
+      assert.is_true(plugin.is_loaded('snacks.nvim'))
+      assert.is_false(plugin.is_loaded('flash.nvim'))
+      assert.is_false(plugin.is_loaded('telescope.nvim'))
+    end)
+
+    it('finds a path inside an installed plugin', function()
+      assert.are.equal(
+        '/lazy/snacks.nvim/lua/snacks/init.lua',
+        plugin.get_plugin_path('snacks.nvim', 'lua/snacks/init.lua')
+      )
+      assert.is_nil(plugin.get_plugin_path('telescope.nvim'))
+    end)
+
+    it('merges the options of a plugin, empty for an unknown one', function()
+      assert.are.same({ dir = '/lazy/snacks.nvim' }, plugin.opts('snacks.nvim'))
+      assert.are.same({}, plugin.opts('telescope.nvim'))
+    end)
+
+    it('runs on_load right away for a loaded plugin', function()
+      local seen
+      plugin.on_load('snacks.nvim', function(name) seen = name end)
+      assert.are.equal('snacks.nvim', seen)
+    end)
+
+    it('waits for LazyLoad of a plugin not loaded yet, once', function()
+      local seen = 0
+      plugin.on_load('flash.nvim', function() seen = seen + 1 end)
+      vim.api.nvim_exec_autocmds('User', { pattern = 'LazyLoad', data = 'x' })
+      assert.are.equal(0, seen)
+      for _ = 1, 2 do
+        vim.api.nvim_exec_autocmds(
+          'User',
+          { pattern = 'LazyLoad', data = 'flash.nvim' }
+        )
+      end
+      assert.are.equal(1, seen)
+    end)
+  end)
+
+  it('runs on_very_lazy on VeryLazy', function()
+    local ran = false
+    plugin.on_very_lazy(function() ran = true end)
+    vim.api.nvim_exec_autocmds('User', { pattern = 'VeryLazy' })
+    assert.is_true(ran)
+  end)
+
+  it('queues notifications until vim.notify is replaced', function()
+    local orig = vim.notify
+    local seen = {}
+    plugin.lazy_notify()
+    vim.notify('early')
+    assert.are.same({}, seen)
+    vim.notify = function(msg) table.insert(seen, msg) end
+    vim.wait(1000, function() return #seen > 0 end, 10)
+    vim.notify = orig
+    assert.are.same({ 'early' }, seen)
+  end)
+
+  describe('safe_keymap_set', function()
+    local set, restores
+    before_each(function()
+      set = {}
+      restores = {
+        h.stub(package.loaded, 'lazy.core.handler', {
+          handlers = {
+            keys = {
+              have = function(_, lhs, mode) return lhs == 's' and mode == 'n' end,
+            },
+          },
+        }),
+        h.stub(_G, 'Snacks', {
+          keymap = {
+            set = function(modes, lhs, _, opts)
+              table.insert(set, { modes = modes, lhs = lhs, opts = opts })
+            end,
+          },
+        }),
+      }
+    end)
+    after_each(function()
+      for i = #restores, 1, -1 do
+        restores[i]()
+      end
+    end)
+
+    it('leaves the modes a plugin spec claims to it', function()
+      plugin.safe_keymap_set({ 'n', 'x' }, 's', 'x')
+      assert.are.same({ 'x' }, set[1].modes)
+      plugin.safe_keymap_set('n', 's', 'x')
+      assert.are.equal(1, #set)
+    end)
+
+    it('maps silently unless told otherwise', function()
+      plugin.safe_keymap_set('n', 'j', 'gj')
+      plugin.safe_keymap_set('n', 'k', 'gk', { silent = false })
+      assert.is_true(set[1].opts.silent)
+      assert.is_false(set[2].opts.silent)
+    end)
+  end)
+
+  it('builds the path of a Mason package without warning', function()
+    local restore = h.stub(vim.env, 'MASON', '/mason')
+    assert.are.equal(
+      '/mason/packages/stylua/bin/stylua',
+      plugin.get_pkg_path('stylua', 'bin/stylua', { warn = false })
+    )
+    restore()
+  end)
+
+  it('draws no status column until Snacks has loaded', function()
+    local restore = h.stub(package.loaded, 'snacks', nil)
+    assert.are.equal('', plugin.statuscolumn())
+    restore()
+  end)
 end)

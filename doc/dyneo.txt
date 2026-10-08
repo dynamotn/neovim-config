@@ -465,11 +465,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
                                                                   *:DyNeoRoot*
 :DyNeoRoot              The roots found for this buffer, the one in use first.
 
-                                                              *:LazyQuarantine*
+                                                             *:LazyQuarantine*
 :LazyQuarantine         Plugins the release quarantine is holding back, and
                         for how much longer.  See |dyneo-quarantine|.
 
-                                                  *:AiGuardCheck* *:AiGuardAllow*
+                                               *:AiGuardCheck* *:AiGuardAllow*
 :AiGuardCheck           Why this buffer is kept from the AI integrations.
 :AiGuardAllow[!]        Let this buffer past the content check, for as long
                         as it is open; with [!], put it back under the check.
@@ -509,7 +509,7 @@ and the rest.
 ------------------------------------------------------------------------------
 9. DEVELOPMENT                                             *dyneo-development*
 
-41 spec files under `tests/spec` run with plenary-busted in a headless Neovim
+58 spec files under `tests/spec` run with plenary-busted in a headless Neovim
 that loads only the module each spec requires: >sh
 
     scripts/test.sh                      # every spec
