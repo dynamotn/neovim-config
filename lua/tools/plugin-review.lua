@@ -131,6 +131,12 @@ end
 ---@param text string
 ---@return boolean
 local function is_comment(text)
+  -- A block comment closed on the line hides nothing: what follows it runs
+  local after = text:match('^%s*%-%-%[(=*)%[')
+  if after then
+    local close = text:find(']' .. after .. ']', 1, true)
+    return not close or vim.trim(text:sub(close + #after + 2)) == ''
+  end
   return text:find('^%s*%-%-') ~= nil
     or text:find('^%s*#') ~= nil
     or text:find('^%s*//') ~= nil
@@ -154,6 +160,12 @@ function M.scan(diff)
 
   for _, raw in ipairs(diff) do
     local b_path = raw:match('^diff %-%-git a/.- b/(.*)$')
+      -- git quotes a path it would not print as it is (`core.quotePath`)
+      or raw:match('^diff %-%-git "a/.-" "b/(.*)"$')
+    if not b_path and raw:find('^diff %-%-git ') then
+      -- Never a hunk read as the file before it, whatever the header says
+      b_path = raw:match(' "?b/(.-)"?$') or '?'
+    end
     if b_path then
       file, in_hunk, skip = b_path, false, is_ignored(b_path)
       if BUILD_FILES[vim.fs.basename(file)] or file:find('%.rockspec$') then
@@ -195,7 +207,8 @@ end
 ---@param args string[]
 ---@return string[]?
 local function git(dir, args)
-  local command = { 'git', '-C', dir }
+  -- Paths as they are, never quoted, for `scan` to read
+  local command = { 'git', '-c', 'core.quotePath=false', '-C', dir }
   vim.list_extend(command, args)
   local ok, result = pcall(
     function() return vim.system(command, { text = true }):wait(30000) end
@@ -220,7 +233,7 @@ end
 ---@param row DyPendingUpdate
 ---@return DyReviewFinding[]
 function M.findings(row)
-  return M.scan(git(row.dir, {
+  local diff = git(row.dir, {
     'diff',
     '--no-color',
     '--no-ext-diff',
@@ -232,7 +245,13 @@ function M.findings(row)
     '--unified=0',
     row.from,
     row.to,
-  }) or {})
+  })
+  -- A diff that could not be read -- lazy's partial clones fetch the blobs
+  -- of a commit only now, and the network may be down -- is no clean diff
+  if not diff then
+    return { { file = row.dir, rule = 'diff unavailable, nothing was read' } }
+  end
+  return M.scan(diff)
 end
 
 --- Longest a line of code is quoted in the report

