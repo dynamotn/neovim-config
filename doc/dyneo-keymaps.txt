@@ -120,7 +120,7 @@ one of the same keys in those buffers.
 <leader>c  code
 
 `<leader>cA`           n      Source Action  (LSP)
-`<leader>cC`           n      Refresh & Display Codelens  (LSP)
+`<leader>cC`           n      Toggle Codelens  (LSP)
 `<leader>cD`           n      Fix all diagnostics  (LSP: vtsls)
 `<leader>cE`           n      Edit Snippets
 `<leader>cF`           nx     Format Injected Langs

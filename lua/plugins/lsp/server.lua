@@ -69,7 +69,7 @@ local function default_opts()
           { '<c-k>', function() return vim.lsp.buf.signature_help() end, mode = 'i', desc = 'Signature Help', has = 'signatureHelp' },
           { '<leader>ca', vim.lsp.buf.code_action, desc = 'Code Action', mode = { 'n', 'x' }, has = 'codeAction' },
           { '<leader>cc', vim.lsp.codelens.run, desc = 'Run Codelens', mode = { 'n', 'x' }, has = 'codeLens' },
-          { '<leader>cC', vim.lsp.codelens.refresh, desc = 'Refresh & Display Codelens', mode = { 'n' }, has = 'codeLens' },
+          { '<leader>cC', function() Lsp.codelens.toggle() end, desc = 'Toggle Codelens', mode = { 'n' }, has = 'codeLens' },
           { '<leader>cr', vim.lsp.buf.rename, desc = 'Rename', has = 'rename' },
           { '<leader>cA', Lsp.action.source, desc = 'Source Action', has = 'codeAction' },
           { ']]', function() Snacks.words.jump(vim.v.count1) end, has = 'documentHighlight',
@@ -248,16 +248,7 @@ return {
       if opts.codelens.enabled and vim.lsp.codelens then
         Snacks.util.lsp.on(
           { method = 'textDocument/codeLens' },
-          function(buffer)
-            vim.lsp.codelens.refresh()
-            vim.api.nvim_create_autocmd(
-              { 'BufEnter', 'CursorHold', 'InsertLeave' },
-              {
-                buffer = buffer,
-                callback = vim.lsp.codelens.refresh,
-              }
-            )
-          end
+          Lsp.codelens.enable
         )
       end
 

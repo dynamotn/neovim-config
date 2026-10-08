@@ -146,4 +146,31 @@ function M.keymaps.set(filter, spec)
   end
 end
 
+--- Code lenses of a buffer. Neovim 0.13 keeps them current on its own once
+--- `enable`d and deprecates `refresh`; 0.12 only has `refresh`, asked again
+--- on the events that may move them.
+M.codelens = {}
+
+--- Show the code lenses of `buf` and keep them current
+---@param buf integer
+function M.codelens.enable(buf)
+  local codelens = vim.lsp.codelens
+  if codelens.enable then return codelens.enable(true, { bufnr = buf }) end
+  codelens.refresh({ bufnr = buf })
+  vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+    group = vim.api.nvim_create_augroup('dyneo_codelens_' .. buf, {}),
+    buffer = buf,
+    callback = function() codelens.refresh({ bufnr = buf }) end,
+  })
+end
+
+--- Turn the code lenses of the current buffer on or off; refresh them on
+--- 0.12, which cannot hide them
+function M.codelens.toggle()
+  local codelens = vim.lsp.codelens
+  if not codelens.enable then return codelens.refresh({ bufnr = 0 }) end
+  local buf = vim.api.nvim_get_current_buf()
+  codelens.enable(not codelens.is_enabled({ bufnr = buf }), { bufnr = buf })
+end
+
 return M
