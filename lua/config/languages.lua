@@ -52,10 +52,15 @@
 --- that binary, and one that runs inside Neovim itself names `lua`, which is
 --- always there.
 ---
---- `mason.enabled = false` says the tool does not come from Mason, almost
---- always because no package exists for it: it ships with the language's
---- toolchain (`mix`, `zig`, `dart`), with the system (`clang-tidy`, `sed`),
---- or from a package manager Mason does not speak (CPAN, CRAN).
+--- A tool Mason has no package for -- one that ships with the language's
+--- toolchain (`mix`, `zig`, `dart`), with the system (`clang-tidy`), or from
+--- a package manager Mason does not speak (CPAN) -- still names a package:
+--- one of `tools.mason-registry` whose source is `dytoy:<tool>`, so dytoy
+--- installs it the way it does on the rest of the machine.
+---
+--- `mason.enabled = false` is left for what nothing needs to install: a tool
+--- that runs inside Neovim (`lua`) or a command every system has (`sed`,
+--- `git`, `curl`).
 ---
 --- `scripts/validate-tools.lua` checks the module and the package of every
 --- tool named below, so a name that drifts is caught before it goes silent.
