@@ -93,4 +93,37 @@ function M.expand(snippet)
   if session then vim.snippet._session = session end
 end
 
+--- Whether blink's own `cmdline` source completes a path at the cursor: the
+--- argument of `:edit`, `:cd`, `:find`, a `complete=file` command, `:!./`.
+--- It then lists the entries of the directory typed so far, which is just
+--- what `path` would list a second time.
+---@return boolean
+function M.cmdline_completes_path()
+  local ok, utils = pcall(require, 'blink.cmp.sources.cmdline.utils')
+  if not ok then return false end
+  return utils.is_path_completion(
+    utils.get_completion_type('cmdline'),
+    vim.fn.getcmdline()
+  )
+end
+
+--- Sources of the command line: the `cmdline` source, then paths and the
+--- words of the buffers; `path` only where `cmdline` does not complete paths
+--- itself. `fuzzy_path` stays either way: it finds files anywhere below,
+--- under their whole relative path.
+---@return string[]
+function M.cmdline_sources()
+  local type = vim.fn.getcmdtype()
+  -- Search forward and backward
+  if type == '/' or type == '?' then return { 'buffer' } end
+  -- Commands, and `input()` that may complete like one
+  if type == ':' or type == '@' then
+    if M.cmdline_completes_path() then
+      return { 'cmdline', 'fuzzy_path', 'buffer' }
+    end
+    return { 'cmdline', 'fuzzy_path', 'path', 'buffer' }
+  end
+  return {}
+end
+
 return M

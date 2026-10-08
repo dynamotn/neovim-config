@@ -241,16 +241,7 @@ return {
           },
           ghost_text = { enabled = true },
         },
-        sources = function()
-          local type = vim.fn.getcmdtype()
-          -- Search forward and backward
-          if type == '/' or type == '?' then return { 'buffer' } end
-          -- Commands
-          if type == ':' or type == '@' then
-            return { 'cmdline', 'fuzzy_path', 'path', 'buffer' }
-          end
-          return {}
-        end,
+        sources = function() return require('util.blink').cmdline_sources() end,
       },
       completion = {
         accept = { auto_brackets = { enabled = true } },
