@@ -276,11 +276,18 @@ return condition
         },
         opts = {
           adapters = {
+            -- The command and the config file are left to the adapter, which
+            -- finds the project's own jest and the nearest `jest.config.*`
             ['neotest-jest'] = {
-              jestCommand = 'npm test --',
-              jestConfigFile = 'custom.jest.config.ts',
               env = { CI = true },
               cwd = function(_) return require('lazyvim.util.root').get() end,
+            },
+            ['neotest-vitest'] = {},
+            ['neotest-playwright'] = {
+              options = {
+                persist_project_selection = true,
+                enable_dynamic_test_discovery = true,
+              },
             },
           },
         },
