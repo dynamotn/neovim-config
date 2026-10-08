@@ -28,6 +28,7 @@ describe('ftdetect', function()
     { '/p/page.jinja', 'jinja' },
     { '/p/page.jinja2', 'jinja' },
     { '/p/page.djhtml', 'htmldjango' },
+    { '/p/post.mdx', 'markdown.mdx' },
     -- file name
     { '/p/terragrunt.hcl', 'terragrunt' },
     { '/p/azure-pipelines.yml', 'yaml.az-pl' },

@@ -47,6 +47,12 @@ describe('config.keymaps', function()
     end
   end)
 
+  it('drops the LSP keys `gr` hides', function()
+    for _, lhs in ipairs({ 'grn', 'gra', 'grr', 'gri', 'grt', 'grx' }) do
+      assert.are.same({}, map('n', lhs), lhs)
+    end
+  end)
+
   describe('smart delete', function()
     local function expand(key, line)
       local bufnr = h.buffer({ lines = { line } })

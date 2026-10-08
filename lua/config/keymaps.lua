@@ -349,6 +349,17 @@ cabbrev('W', 'w')
 cabbrev('Q', 'q')
 cabbrev('Qa', 'qa')
 
+-- Neovim's own LSP keys under `gr` can never be reached: `gr` itself is the
+-- references picker, set `nowait`. The same actions sit under `<leader>c`.
+for mode, keys in pairs({
+  n = { 'grn', 'gra', 'grr', 'gri', 'grt', 'grx' },
+  x = { 'gra' },
+}) do
+  for _, lhs in ipairs(keys) do
+    pcall(vim.keymap.del, mode, lhs)
+  end
+end
+
 -- Change word faster
 vim.keymap.set('n', '<C-c>', 'ciw', { desc = 'Change word' })
 

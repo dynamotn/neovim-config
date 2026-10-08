@@ -29,6 +29,16 @@ describe('util.lazy_install', function()
       assert.same({ 'lua/vim:lua', 'any:lua', 'any:rust' }, seen)
     end)
 
+    it('leaves scratch buffers alone', function()
+      local seen = 0
+      lazy_install.on_filetype({ 'ruby' }, function() seen = seen + 1 end)
+      local scratch = vim.api.nvim_create_buf(false, true)
+      vim.bo[scratch].filetype = 'ruby'
+      assert.equals(0, seen)
+      h.buffer({ filetype = 'ruby' })
+      assert.equals(1, seen)
+    end)
+
     it('registers a single autocmd however many handlers there are', function()
       for _ = 1, 5 do
         lazy_install.on_filetype({ 'a', 'b' }, function() end)

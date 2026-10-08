@@ -22,6 +22,10 @@ local group
 --- The filetype `*` matches every buffer, the way an autocmd pattern of the
 --- same name does. A handler runs on every matching event, not just the first,
 --- so it stays responsible for skipping the work it has already done.
+---
+--- Only buffers that hold a file count: a scratch buffer given a filetype --
+--- a hover window, a plugin's own probe -- is no sign the language is used,
+--- and installing for it reaches out to package managers nobody asked for.
 ---@param filetypes string[] Filetypes the handler is interested in
 ---@param handler DyFileTypeHandler
 M.on_filetype = function(filetypes, handler)
@@ -35,6 +39,7 @@ M.on_filetype = function(filetypes, handler)
   vim.api.nvim_create_autocmd('FileType', {
     group = group,
     callback = function(args)
+      if vim.bo[args.buf].buftype ~= '' then return end
       for _, filetype in ipairs({ args.match, '*' }) do
         for _, matched in ipairs(handlers[filetype] or {}) do
           -- Neovim reports a failing autocmd and carries on to the next one.

@@ -114,6 +114,8 @@ return {
       -- Antigravity CLI integration
       return vim.tbl_deep_extend('force', opts, {
         cli = {
+          -- The multiplexer actually in use, though integration stays off
+          mux = { backend = vim.env.TMUX and 'tmux' or 'zellij' },
           tools = {
             antigravity = {
               cmd = { 'agy' },

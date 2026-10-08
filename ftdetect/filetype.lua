@@ -19,6 +19,8 @@ vim.filetype.add({
     jinja = 'jinja',
     jinja2 = 'jinja',
     djhtml = 'htmldjango',
+    -- Markdown with JSX, which Neovim leaves without a filetype
+    mdx = 'markdown.mdx',
   },
   filename = {
     ['terragrunt.hcl'] = 'terragrunt',
