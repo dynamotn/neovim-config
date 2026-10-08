@@ -119,6 +119,17 @@ describe('util.lsp', function()
       assert.are.same({ 1 }, params.arguments)
     end)
 
+    it('warns rather than fails with no client to run it', function()
+      clients = {}
+      local warned
+      table.insert(
+        restores,
+        h.stub(vim, 'notify', function(msg) warned = msg end)
+      )
+      assert.has_no.errors(function() lsp.execute({ command = 'x.y' }) end)
+      assert.is_truthy(warned:find('x.y', 1, true))
+    end)
+
     it('shows the result in trouble with `open`', function()
       local seen
       table.insert(

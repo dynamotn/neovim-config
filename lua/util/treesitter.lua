@@ -106,21 +106,30 @@ function M.ensure_treesitter_cli(cb)
 
   local mr = require('mason-registry')
   mr.refresh(function()
-    local p = mr.get_package('tree-sitter-cli')
-    if not p:is_installed() then
-      Plugin.info('Installing `tree-sitter-cli` with `mason.nvim`...')
-      p:install(
-        nil,
-        vim.schedule_wrap(function(success)
-          if success then
-            Plugin.info('Installed `tree-sitter-cli` with `mason.nvim`.')
-            cb(true)
-          else
-            cb(false, 'Failed to install `tree-sitter-cli` with `mason.nvim`.')
-          end
-        end)
+    local ok, p = pcall(mr.get_package, 'tree-sitter-cli')
+    if not ok then
+      return cb(false, 'The Mason registry has no `tree-sitter-cli`.')
+    end
+    -- Installed, yet not found above: say so rather than leave the caller
+    -- waiting on an answer that never comes
+    if p:is_installed() then
+      return cb(
+        false,
+        '`tree-sitter-cli` is installed by Mason but `tree-sitter` is not on PATH.'
       )
     end
+    Plugin.info('Installing `tree-sitter-cli` with `mason.nvim`...')
+    p:install(
+      nil,
+      vim.schedule_wrap(function(success)
+        if success then
+          Plugin.info('Installed `tree-sitter-cli` with `mason.nvim`.')
+          cb(true)
+        else
+          cb(false, 'Failed to install `tree-sitter-cli` with `mason.nvim`.')
+        end
+      end)
+    )
   end)
 end
 

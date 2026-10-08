@@ -93,8 +93,20 @@ describe('tools.diagnostics.terragrunt_validate', function()
       local restore = h.stub(vim.diagnostic, 'get', function(bufnr, o)
         asked = { bufnr, o }
         return {
-          { filename = '/repo/b/terragrunt.hcl', message = 'kept' },
-          { filename = '/repo/a/terragrunt.hcl', message = 'replaced' },
+          {
+            filename = '/repo/ab/terragrunt.hcl',
+            message = 'kept',
+            lnum = 2,
+            col = 4,
+            end_lnum = 2,
+            end_col = 9,
+          },
+          {
+            filename = '/repo/a/terragrunt.hcl',
+            message = 'replaced',
+            lnum = 0,
+            col = 0,
+          },
         }
       end)
       local ok, result = pcall(opts.on_output, {
@@ -106,10 +118,17 @@ describe('tools.diagnostics.terragrunt_validate', function()
       restore()
       assert.is_true(ok, result)
       assert.are.same({ nil, { namespace = 'ns7' } }, asked)
-      assert.are.same(
-        { { filename = '/repo/b/terragrunt.hcl', message = 'kept' } },
-        result
-      )
+      -- Handed back 1-based, as none-ls reads them, so they stay in place
+      assert.are.same({
+        {
+          filename = '/repo/ab/terragrunt.hcl',
+          message = 'kept',
+          row = 3,
+          col = 5,
+          end_row = 3,
+          end_col = 10,
+        },
+      }, result)
     end)
   end)
 end)

@@ -50,6 +50,34 @@ describe('util.project_rtp', function()
     load()
     assert.is_false(vim.list_contains(vim.opt.rtp:get(), dir .. '/.nvim'))
   end)
+  it('asks again once the trust database changes', function()
+    vim.fn.mkdir(dir .. '/.nvim', 'p')
+    local reads, mtime = 0, 1
+    local trust = vim.fn.stdpath('state') .. '/trust'
+    local fs_stat = vim.uv.fs_stat
+    table.insert(
+      restores,
+      h.stub(vim.uv, 'fs_stat', function(path, ...)
+        if path == trust then return { mtime = { sec = mtime, nsec = 0 } } end
+        return fs_stat(path, ...)
+      end)
+    )
+    table.insert(
+      restores,
+      h.stub(vim.secure, 'read', function()
+        reads = reads + 1
+        return nil
+      end)
+    )
+    local project_rtp = require('util.project_rtp')
+    project_rtp.startup_path()
+    project_rtp.startup_path()
+    assert.are.equal(1, reads)
+    mtime = 2
+    project_rtp.startup_path()
+    assert.are.equal(2, reads)
+  end)
+
   it('hands lazy.nvim a trusted folder to start with', function()
     vim.fn.mkdir(dir .. '/.nvim', 'p')
     table.insert(restores, h.stub(vim.secure, 'read', function() return '' end))

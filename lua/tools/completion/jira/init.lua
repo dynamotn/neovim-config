@@ -58,6 +58,107 @@ local function candidate_of(kind, row)
     key
 end
 
+--- Milliseconds the typing has to settle before a word is searched
+local DEBOUNCE = 300
+--- Milliseconds the items found for a word are reused
+local CACHE_TTL = 60000
+---@type table<string, { time: integer, items: table[] }>
+local cache = {}
+--- Bumped by each request: a search waiting on a newer one is dropped
+local generation = 0
+
+--- Search Jira for `word`, and hand the items to `on_items` on the main loop
+---@param word string
+---@param on_items fun(items: table[])
+local function search(word, on_items)
+  local queries = {
+    key = 'project = ' .. word,
+    text = [[text ~ "*]] .. word .. [[*"]],
+  }
+
+  --- Hand the items over, once
+  ---
+  --- The callback arrives straight off the libuv loop, which is a fast
+  --- event context. `done` leads into null-ls and from there into the API,
+  --- so it waits for the loop.
+  ---@param items table[]
+  local function finish(items)
+    vim.schedule(function() on_items(items) end)
+  end
+
+  --- Read the body of each issue and fill it into the items standing for
+  --- it, then hand everything over
+  ---
+  --- One read per issue, not per row: the two queries overlap, and an
+  --- issue found by both used to be read twice.
+  ---@param items table[]
+  ---@param by_key table<string, table[]> Issue key to the items using it
+  local function describe(items, by_key)
+    local keys = vim.tbl_keys(by_key)
+    -- Nothing to read still has to answer, or the request never completes
+    if #keys == 0 then return finish(items) end
+
+    local pending = #keys
+    for _, key in ipairs(keys) do
+      jira({ 'issue', 'view', '--plain', key }, function(lines)
+        if #lines > 0 then
+          local body = table.concat(
+            vim.lsp.util.convert_input_to_markdown_lines(lines),
+            '\n'
+          )
+          for _, item in ipairs(by_key[key]) do
+            item.documentation.value = body
+          end
+        end
+        pending = pending - 1
+        -- Every item is settled before anything is handed over, so
+        -- nothing is still being written to afterwards
+        if pending == 0 then finish(items) end
+      end)
+    end
+  end
+
+  local rows = {}
+  local pending_searches = vim.tbl_count(queries)
+
+  for kind, query in pairs(queries) do
+    local args = {
+      'issue',
+      'list',
+      '--plain',
+      '--columns',
+      'KEY,SUMMARY,ASSIGNEE',
+      '--paginate',
+      '10',
+      '--no-headers',
+      '--jql',
+      query,
+    }
+    jira(args, function(lines)
+      -- A query that fails contributes nothing, rather than holding the
+      -- whole request back
+      rows[kind] = lines
+      pending_searches = pending_searches - 1
+      if pending_searches > 0 then return end
+
+      local items, by_key = {}, {}
+      for row_kind, list in pairs(rows) do
+        for _, row in ipairs(list) do
+          local candidate, key = candidate_of(row_kind, row)
+          -- The two come and go together, but saying so keeps the key a
+          -- `string` rather than a `string?` for whoever reads it next
+          if candidate and key then
+            table.insert(items, candidate)
+            by_key[key] = by_key[key] or {}
+            table.insert(by_key[key], candidate)
+          end
+        end
+      end
+      describe(items, by_key)
+    end)
+  end
+end
+
 return h.make_builtin({
   name = 'jira',
   meta = {
@@ -75,94 +176,25 @@ return h.make_builtin({
         return
       end
 
-      local queries = {
-        key = 'project = ' .. word,
-        text = [[text ~ "*]] .. word .. [[*"]],
-      }
-
-      --- Hand the items over, once
-      ---
-      --- The callback arrives straight off the libuv loop, which is a fast
-      --- event context. `done` leads into null-ls and from there into the API,
-      --- so it waits for the loop.
-      ---@param items table[]
-      local function finish(items)
-        vim.schedule(
-          function() done({ { items = items, isIncomplete = #items == 0 } }) end
-        )
+      -- Each search starts up to 22 `jira` processes: a word typed again
+      -- (backspace, a second commit) is answered from what was found, and
+      -- only the word the typing settles on is searched at all
+      local cached = cache[word]
+      if cached and vim.uv.now() - cached.time < CACHE_TTL then
+        local items = vim.deepcopy(cached.items)
+        return done({ { items = items, isIncomplete = #items == 0 } })
       end
-
-      --- Read the body of each issue and fill it into the items standing for
-      --- it, then hand everything over
-      ---
-      --- One read per issue, not per row: the two queries overlap, and an
-      --- issue found by both used to be read twice.
-      ---@param items table[]
-      ---@param by_key table<string, table[]> Issue key to the items using it
-      local function describe(items, by_key)
-        local keys = vim.tbl_keys(by_key)
-        -- Nothing to read still has to answer, or the request never completes
-        if #keys == 0 then return finish(items) end
-
-        local pending = #keys
-        for _, key in ipairs(keys) do
-          jira({ 'issue', 'view', '--plain', key }, function(lines)
-            if #lines > 0 then
-              local body = table.concat(
-                vim.lsp.util.convert_input_to_markdown_lines(lines),
-                '\n'
-              )
-              for _, item in ipairs(by_key[key]) do
-                item.documentation.value = body
-              end
-            end
-            pending = pending - 1
-            -- Every item is settled before anything is handed over, so
-            -- nothing is still being written to afterwards
-            if pending == 0 then finish(items) end
-          end)
+      generation = generation + 1
+      local mine = generation
+      vim.defer_fn(function()
+        if mine ~= generation then
+          return done({ { items = {}, isIncomplete = true } })
         end
-      end
-
-      local rows = {}
-      local pending_searches = vim.tbl_count(queries)
-
-      for kind, query in pairs(queries) do
-        local args = {
-          'issue',
-          'list',
-          '--plain',
-          '--columns',
-          'KEY,SUMMARY,ASSIGNEE',
-          '--paginate',
-          '10',
-          '--no-headers',
-          '--jql',
-          query,
-        }
-        jira(args, function(lines)
-          -- A query that fails contributes nothing, rather than holding the
-          -- whole request back
-          rows[kind] = lines
-          pending_searches = pending_searches - 1
-          if pending_searches > 0 then return end
-
-          local items, by_key = {}, {}
-          for row_kind, list in pairs(rows) do
-            for _, row in ipairs(list) do
-              local candidate, key = candidate_of(row_kind, row)
-              -- The two come and go together, but saying so keeps the key a
-              -- `string` rather than a `string?` for whoever reads it next
-              if candidate and key then
-                table.insert(items, candidate)
-                by_key[key] = by_key[key] or {}
-                table.insert(by_key[key], candidate)
-              end
-            end
-          end
-          describe(items, by_key)
+        search(word, function(items)
+          cache[word] = { time = vim.uv.now(), items = vim.deepcopy(items) }
+          done({ { items = items, isIncomplete = #items == 0 } })
         end)
-      end
+      end, DEBOUNCE)
     end,
     async = true,
   },

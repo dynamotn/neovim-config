@@ -14,10 +14,20 @@ local project_rtp
 ---@type table<string, boolean> Verdict per folder, kept for the session so
 --- that walking back into a project neither asks again nor loses its folder
 local trusted_rtp = {}
+---@type number? When the trust database last changed, as `trusted_rtp` knows it
+local trust_mtime
 
 ---@param directory string
 ---@return boolean
 local function is_trusted(directory)
+  -- `:trust` changes its database: a verdict taken back there must not live
+  -- on here until the next session
+  local stat = vim.uv.fs_stat(vim.fn.stdpath('state') .. '/trust')
+  local mtime = stat and (stat.mtime.sec * 1e9 + stat.mtime.nsec) or 0
+  if mtime ~= trust_mtime then
+    trust_mtime = mtime
+    trusted_rtp = {}
+  end
   if trusted_rtp[directory] == nil then
     -- `vim.secure.read` blocks on its prompt and goes on handling events while
     -- it waits, so the verdict is pinned before the question is put: without

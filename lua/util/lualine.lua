@@ -2,6 +2,16 @@
 ---@class util.lualine
 local M = {}
 
+--- The length of `dir` and its separator when `path` lies under it: `/x/proj`
+--- holds `/x/proj/a.lua`, not `/x/proj-other/a.lua`
+---@param dir string
+---@param path string
+---@return integer?
+local function under(dir, path)
+  local prefix = dir:sub(-1) == '/' and dir or dir .. '/'
+  if path:sub(1, #prefix) == prefix then return #prefix end
+end
+
 --- An icon coloured by what `status` reports, hidden while it reports nil
 ---@param icon string
 ---@param status fun(): nil|'ok'|'error'|'pending'
@@ -109,11 +119,20 @@ function M.pretty_path(opts)
       cwd = cwd:lower()
     end
 
-    if opts.relative == 'cwd' and norm_path:find(cwd, 1, true) == 1 then
-      path = path:sub(#cwd + 2)
-    elseif norm_path:find(root, 1, true) == 1 then
-      path = path:sub(#root + 2)
+    local skip = opts.relative == 'cwd' and under(cwd, norm_path)
+      or under(root, norm_path)
+    if not skip then
+      -- A symlink into the project (chezmoi's `mode: symlink` home) is under
+      -- the root only once resolved, the root being a resolved path itself
+      local real = vim.uv.fs_realpath(path)
+      if real and real ~= path then
+        path = require('util.plugin').norm(real)
+        norm_path = vim.fn.has('win32') == 1 and path:lower() or path
+        skip = opts.relative == 'cwd' and under(cwd, norm_path)
+          or under(root, norm_path)
+      end
     end
+    if skip then path = path:sub(skip + 1) end
 
     local sep = package.config:sub(1, 1)
     local parts = vim.split(path, '[\\/]')
@@ -165,9 +184,9 @@ function M.root_dir(opts)
 
     if root == cwd then
       return opts.cwd and name
-    elseif root:find(cwd, 1, true) == 1 then
+    elseif under(cwd, root) then
       return opts.subdirectory and name
-    elseif cwd:find(root, 1, true) == 1 then
+    elseif under(root, cwd) then
       return opts.parent and name
     else
       return opts.other and name

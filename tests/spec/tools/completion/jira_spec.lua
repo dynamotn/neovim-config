@@ -101,6 +101,29 @@ describe('tools.completion.jira', function()
     assert.are.equal(2, #views, 'each issue is read once')
   end)
 
+  it('answers a word searched before from what it found', function()
+    replies['project = AB'] = { code = 0, stdout = 'AB-1\tFix login\tme\n' }
+    complete('AB')
+    local spawned = #commands
+    assert.are.same({ 'AB-1' }, labels(complete('AB')))
+    assert.are.equal(spawned, #commands)
+  end)
+
+  it('searches only the word the typing settles on', function()
+    local first, second
+    builtin.generator.fn({ word_to_complete = 'AB' }, function(r) first = r end)
+    builtin.generator.fn(
+      { word_to_complete = 'ABC' },
+      function(r) second = r end
+    )
+    vim.wait(1000, function() return first ~= nil and second ~= nil end)
+    assert.are.same({ { items = {}, isIncomplete = true } }, first)
+    for _, cmd in ipairs(commands) do
+      assert.is_nil(cmd[#cmd]:find('AB"', 1, true))
+      assert.are_not.equal('project = AB', cmd[#cmd])
+    end
+  end)
+
   it('drops rows missing a column', function()
     replies['project = AB'] = { code = 0, stdout = 'AB-1\n\nAB-2\tTwo\tx\n' }
     replies['AB-2'] = { code = 0, stdout = '' }

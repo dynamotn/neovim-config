@@ -40,7 +40,11 @@ function M.relative()
   if not ok then return abs end
   -- Ensure root ends with / for consistent string matching
   if root:sub(-1) ~= '/' then root = root .. '/' end
-  if abs:find(root, 1, true) == 1 then return abs:sub(#root + 1) end
+  if abs:sub(1, #root) == root then return abs:sub(#root + 1) end
+  -- The root is a resolved path: a symlink into the project (chezmoi's
+  -- `mode: symlink` home) is under it only once resolved too
+  local real = vim.uv.fs_realpath(abs)
+  if real and real:sub(1, #root) == root then return real:sub(#root + 1) end
   -- Not under project root -- fall back to absolute
   return abs
 end

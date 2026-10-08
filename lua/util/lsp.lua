@@ -82,7 +82,13 @@ function M.execute(opts)
   if opts.open then
     require('trouble').open({ mode = 'lsp_command', params = params })
   else
-    vim.list_extend(params, { title = opts.title })
+    if not client then
+      return vim.notify(
+        ('No language server to run `%s`'):format(opts.command),
+        vim.log.levels.WARN
+      )
+    end
+    params.title = opts.title
     return client:exec_cmd(params, { bufnr = buf }, opts.handler)
   end
 end

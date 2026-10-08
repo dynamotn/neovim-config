@@ -110,6 +110,13 @@ describe('util.lualine', function()
       end
     )
 
+    it('does not take a sibling directory for the root', function()
+      root, cwd = dir .. '/proj', dir .. '/proj'
+      vim.fn.mkdir(root, 'p')
+      local path = path_of('proj-other/a.lua', { length = 0 })
+      assert.is_truthy(path:find('proj-other/', 1, true), path)
+    end)
+
     it('marks a modified buffer', function()
       h.write(dir .. '/x.lua', { '' })
       vim.cmd.edit(dir .. '/x.lua')

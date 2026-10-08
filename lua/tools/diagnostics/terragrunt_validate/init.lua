@@ -35,9 +35,24 @@ return h.make_builtin({
           require('null-ls.diagnostics').get_namespace(params.source_id)
         local old_diagnostics =
           vim.diagnostic.get(nil, { namespace = namespace })
-        for _, old_diagnostic in ipairs(old_diagnostics) do
-          if not vim.startswith(old_diagnostic.filename, params.cwd) then
-            table.insert(combined_diagnostics, old_diagnostic)
+        -- `/repo/ab` is not under `/repo/a`
+        local prefix = params.cwd:gsub('/$', '') .. '/'
+        for _, old in ipairs(old_diagnostics) do
+          local filename = old.filename
+            or (old.bufnr and vim.api.nvim_buf_get_name(old.bufnr))
+          if filename and filename:sub(1, #prefix) ~= prefix then
+            -- Handed back as none-ls takes them, 1-based: what it stored is
+            -- 0-based, and fed as it is would move a column left each run
+            table.insert(combined_diagnostics, {
+              message = old.message,
+              source = old.source,
+              severity = old.severity,
+              filename = filename,
+              row = old.lnum + 1,
+              col = old.col + 1,
+              end_row = (old.end_lnum or old.lnum) + 1,
+              end_col = (old.end_col or old.col) + 1,
+            })
           end
         end
       end
