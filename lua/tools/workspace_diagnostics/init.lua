@@ -249,6 +249,8 @@ function M.populate(client)
     ---@param filetype? string
     local function send(path, text, filetype)
       if not text then return end
+      -- A server may well send what it is given on to somewhere else
+      if require('util.sensitive').is_sensitive_path(path) then return end
       -- An extension alone does not tell every filetype apart (`.conf`,
       -- `.h`, a script without one), the contents do
       filetype = filetype

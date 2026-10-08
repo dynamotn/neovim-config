@@ -143,6 +143,13 @@ describe('tools.workspace_diagnostics', function()
     assert.are.same({ 'script' }, sent_paths(c, 'textDocument/didOpen'))
   end)
 
+  it('never sends a sensitive file', function()
+    files({ ['a.lua'] = { 'x' }, ['secrets/key.lua'] = { 'y' } })
+    local c = client()
+    populate(c)
+    assert.are.same({ 'a.lua' }, sent_paths(c, 'textDocument/didOpen'))
+  end)
+
   it('skips binary and oversized files', function()
     files({ ['small.lua'] = { 'x' }, ['big.lua'] = { string.rep('x', 100) } })
     local file = assert(io.open(dir .. '/bin.lua', 'wb'))

@@ -69,6 +69,15 @@ return {
               .. config.info[1]
           ).with({
             filetypes = config.filetypes,
+            -- A source that sends the buffer off the machine skips one whose
+            -- content must stay on it
+            runtime_condition = config.info.remote
+                and function(params)
+                  return not require('util.sensitive').is_sensitive(
+                    params.bufnr
+                  )
+                end
+              or nil,
           })
         )
       end

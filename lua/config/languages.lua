@@ -84,6 +84,7 @@
 ---@field type string
 ---@field command string
 ---@field custom? boolean
+---@field remote? boolean Sends the buffer off the machine: never a sensitive one
 ---@field mason? DyMasonSpec
 
 --- A debug adapter mason-nvim-dap does not map to a package, see `util.dap`
@@ -125,10 +126,22 @@ local reuse_filetypes = {
 -- so `lua` stands in for a binary that does not exist.
 local injected_formatter =
   { 'injected', command = 'lua', mason = { enabled = false } }
-local ltcc_code_action =
-  { 'ltcc', type = 'code_actions', command = 'ltcc', custom = true }
-local ltcc_diagnostics =
-  { 'ltcc', type = 'diagnostics', command = 'ltcc', custom = true }
+-- `ltcc` sends the comments it checks to a LanguageTool server, by default
+-- the public one: `remote` keeps it away from sensitive buffers.
+local ltcc_code_action = {
+  'ltcc',
+  type = 'code_actions',
+  command = 'ltcc',
+  custom = true,
+  remote = true,
+}
+local ltcc_diagnostics = {
+  'ltcc',
+  type = 'diagnostics',
+  command = 'ltcc',
+  custom = true,
+  remote = true,
+}
 local html_beautify_formatter = {
   'html_beautify',
   command = 'js-beautify',
