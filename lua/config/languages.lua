@@ -242,6 +242,14 @@ local js_autopairs = function(filetypes, rule)
   })
 end
 
+--- Whether `buf` holds plain JSON rather than JSONC or JSON5, whose comments
+--- and trailing commas `jq` and `jsonlint` both reject as parse errors
+---@param buf integer
+---@return boolean
+local strict_json = function(buf)
+  return not vim.list_contains({ 'jsonc', 'json5' }, vim.bo[buf].filetype)
+end
+
 ---@alias DyLangRootSpec table<string,DyLangSpec>
 ---@type DyLangRootSpec
 
@@ -1643,8 +1651,22 @@ return {
       { 'jsonls', filetypes = { 'json', 'jsonc', 'json.openapi' } },
       { 'vacuum', filetypes = { 'json.openapi' } },
     },
-    linters = { 'jsonlint', 'trivy' },
-    formatters = { 'jq' },
+    linters = {
+      -- nvim-lint asks the condition about the current buffer
+      {
+        'jsonlint',
+        opts = { condition = function() return strict_json(0) end },
+      },
+      'trivy',
+    },
+    formatters = {
+      {
+        'jq',
+        opts = {
+          condition = function(_, ctx) return strict_json(ctx.buf) end,
+        },
+      },
+    },
   },
   jsonnet = {
     filetypes = { 'jsonnet' },
