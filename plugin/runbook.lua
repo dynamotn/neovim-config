@@ -8,7 +8,7 @@ vim.api.nvim_create_user_command(
     complete = function(lead)
       return vim.tbl_filter(
         function(word) return word:find(lead, 1, true) == 1 end,
-        { 'run', 'all', 'clear', 'stop' }
+        require('tools.runbook').SUBCOMMANDS
       )
     end,
     desc = 'Run the code block under the cursor, or all of them, in place',

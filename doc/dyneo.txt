@@ -453,6 +453,20 @@ first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
 what is running.  A block that deletes, destroys or reaches for root asks
 first.  See |:Runbook|.
 
+A block can leave a value to the moment it runs: `${input:name}` is asked
+for once per buffer and filled in, everywhere it appears, before the block
+is checked for what it would destroy -- the check sees the command that
+runs.  `:Runbook inputs` forgets the values typed.  `<localleader>F` runs
+every block from the one under the cursor down, where a runbook is picked up
+after a step failed and was fixed.
+
+`<localleader>L` (`:Runbook record`) starts a record of the session, and
+stops it: each block run is appended, with the time, how it ended and how
+long it took, the code as it ran and what it printed, to a Markdown file
+under `stdpath('state')/dyneo/runbook/` that only its owner can read -- the
+timeline of an incident, written as it happens.  Values typed for inputs are
+in it as typed.
+
 OpenAPI requests                                               *dyneo-openapi*
 
 In an OpenAPI document (`openapi*.yaml`, `openapi*.json`), `<localleader>h`
@@ -713,6 +727,9 @@ Command-line abbreviations, which only fire as a whole command line, so a
                                                                     *:Runbook*
 :Runbook [run]          Run the code block under the cursor.
 :Runbook all            Run every block in turn, stopping at a failure.
+:Runbook from           The same, from the block under the cursor down.
+:Runbook record         Start recording each run to a file, or stop.
+:Runbook inputs         Forget the values typed for `${input:…}`.
 :Runbook clear          Remove every `output` fence.
 :Runbook stop           Stop what the buffer is running.
                         See |dyneo-runbook|.

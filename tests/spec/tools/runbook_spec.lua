@@ -360,6 +360,199 @@ describe('tools.runbook', function()
         vim.api.nvim_buf_get_keymap(bufnr, 'n')
       )
       assert.is_true(vim.tbl_contains(lhs, 'Run Block (Runbook)'))
+      assert.is_true(vim.tbl_contains(lhs, 'Run From Here (Runbook)'))
+      assert.is_true(vim.tbl_contains(lhs, 'Record Runs (Runbook)'))
     end)
+
+    describe('inputs', function()
+      it('finds each input once, and fills them in', function()
+        local code = 'kubectl -n ${input:ns} get pod ${input:pod}\n'
+          .. 'echo ${input:ns} ${HOME} {{ .x }}'
+        assert.same({ 'ns', 'pod' }, runbook.inputs(code))
+        assert.equals(
+          'kubectl -n prod get pod api\necho prod ${HOME} {{ .x }}',
+          runbook.expand(code, { ns = 'prod', pod = 'api' })
+        )
+        assert.equals('${input:x}', runbook.expand('${input:x}', {}))
+      end)
+
+      it(
+        'asks for each input once per buffer, and runs it filled in',
+        function()
+          local bufnr = buffer({ '```sh', 'echo "${input:who}"', '```' })
+          local asked = {}
+          local restore = h.stub(vim.ui, 'input', function(opts, on_confirm)
+            table.insert(asked, opts.prompt)
+            on_confirm('world')
+          end)
+          local block =
+            runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2)
+          local finished
+          runbook.run_block(bufnr, block, function(ok) finished = ok end)
+          settle(function() return finished ~= nil end)
+          assert.is_true(finished)
+          assert.same({ 'who: ' }, asked)
+          assert.same(
+            { '```output', 'world', '```' },
+            vim.api.nvim_buf_get_lines(bufnr, 4, 7, false)
+          )
+
+          -- Kept for the next run, until forgotten
+          finished = nil
+          runbook.run_block(bufnr, block, function(ok) finished = ok end)
+          settle(function() return finished ~= nil end)
+          assert.equals(1, #asked)
+          runbook.command({ fargs = { 'inputs' } })
+          assert.is_nil(vim.b[bufnr].dy_runbook_inputs)
+          restore()
+        end
+      )
+
+      it('runs nothing when an input is not given', function()
+        local bufnr = buffer({ '```sh', 'echo ${input:x}', '```' })
+        local restore = h.stub(
+          vim.ui,
+          'input',
+          function(_, on_confirm) on_confirm(nil) end
+        )
+        local finished
+        runbook.run_block(
+          bufnr,
+          runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2),
+          function(ok) finished = ok end
+        )
+        restore()
+        assert.is_false(finished)
+        assert.equals(3, vim.api.nvim_buf_line_count(bufnr))
+      end)
+
+      it('checks the command as it will run, inputs filled in', function()
+        local bufnr = buffer({ '```sh', '${input:cmd} -rf /tmp/x', '```' })
+        local restore_input = h.stub(
+          vim.ui,
+          'input',
+          function(_, on_confirm) on_confirm('rm') end
+        )
+        local question
+        local restore_confirm = h.stub(vim.fn, 'confirm', function(msg)
+          question = msg
+          return 2
+        end)
+        local finished
+        runbook.run_block(
+          bufnr,
+          runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2),
+          function(ok) finished = ok end
+        )
+        restore_confirm()
+        restore_input()
+        assert.is_false(finished)
+        assert.equals('This block runs `rm -rf /tmp/x`. Run it?', question)
+      end)
+    end)
+
+    it('runs from the block under the cursor down', function()
+      local bufnr = buffer({
+        '```sh',
+        'echo one',
+        '```',
+        'text',
+        '```sh',
+        'echo two',
+        '```',
+        '```sh',
+        'echo three',
+        '```',
+      })
+      vim.api.nvim_win_set_cursor(0, { 4, 0 })
+      local notes, question = {}, nil
+      local restore = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+      local restore_confirm = h.stub(vim.fn, 'confirm', function(msg)
+        question = msg
+        return 1
+      end)
+      runbook.command({ fargs = { 'from' } })
+      settle(function() return #notes > 0 end)
+      restore_confirm()
+      restore()
+      assert.equals(
+        'Run the 2 blocks from block 2, one after the other?',
+        question
+      )
+      assert.equals('Ran 2 blocks', notes[1])
+      local text =
+        table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), '\n')
+      assert.is_falsy(text:find('```output\none', 1, true))
+      assert.is_truthy(text:find('```output\ntwo', 1, true))
+      assert.is_truthy(text:find('```output\nthree', 1, true))
+    end)
+
+    it('records each run to a private file, until stopped', function()
+      local bufnr = buffer({ '```sh', 'echo "${input:x}"; exit 4', '```' })
+      local log = dir .. '/records/runbook-1.md'
+      local restore_path = h.stub(
+        runbook,
+        'log_path',
+        function() return log end
+      )
+      local restore_input = h.stub(
+        vim.ui,
+        'input',
+        function(_, on_confirm) on_confirm('typed') end
+      )
+      local restore_notify = h.stub(vim, 'notify', function() end)
+      runbook.command({ fargs = { 'record' } })
+      assert.equals(log, vim.b[bufnr].dy_runbook_log)
+
+      local finished
+      runbook.run_block(
+        bufnr,
+        runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2),
+        function(ok) finished = ok end
+      )
+      settle(function() return finished ~= nil end)
+      runbook.command({ fargs = { 'record' } })
+      restore_notify()
+      restore_input()
+      restore_path()
+
+      assert.is_nil(vim.b[bufnr].dy_runbook_log)
+      assert.equals('rw-------', vim.fn.getfperm(log))
+      local lines = vim.fn.readfile(log)
+      assert.equals(
+        '# ' .. vim.fn.fnamemodify(dir .. '/runbook.md', ':~'),
+        lines[1]
+      )
+      local text = table.concat(lines, '\n')
+      assert.is_truthy(text:find('line 1 (sh): exit 4', 1, true))
+      -- What ran, the input filled in, and what it printed
+      assert.is_truthy(text:find('```sh\necho "typed"; exit 4\n```', 1, true))
+      assert.is_truthy(text:find('```output\ntyped\n[exit 4]\n```', 1, true))
+    end)
+  end)
+
+  it('tells how each run ended in its record', function()
+    local function entry(fields)
+      return runbook.log_entry(vim.tbl_extend('force', {
+        line = 3,
+        lang = 'bash',
+        code = 'ls',
+        output = { 'a' },
+        code_status = 0,
+        started = 0,
+        ms = 1500,
+      }, fields))
+    end
+    assert.equals(
+      os.date('## %H:%M:%S', 0) .. ' line 3 (bash): exit 0, 1.5 s',
+      entry({})[1]
+    )
+    assert.is_truthy(entry({ signal = 15 })[1]:find('signal 15', 1, true))
+    assert.is_truthy(entry({ cut = true })[1]:find('output cut', 1, true))
+    assert.same({ '', '```bash', 'ls', '```' }, vim.list_slice(entry({}), 2, 5))
   end)
 end)

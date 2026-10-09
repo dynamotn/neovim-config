@@ -155,6 +155,59 @@ function M.code_of(block)
   return table.concat(commands, '\n')
 end
 
+--- The inputs `code` asks for, `${input:name}`, each once, in order
+---
+--- Spelled so it can be nothing else: `${VAR}` is the shell's, `{{ }}` a
+--- template's, and `<<NAME` a heredoc.
+---@param code string
+---@return string[]
+function M.inputs(code)
+  local names, seen = {}, {}
+  for name in code:gmatch('%${input:([%w_%-%.]+)}') do
+    if not seen[name] then
+      seen[name] = true
+      table.insert(names, name)
+    end
+  end
+  return names
+end
+
+--- `code` with each input replaced by its value, as typed
+---@param code string
+---@param values table<string, string>
+---@return string
+function M.expand(code, values)
+  return (
+    code:gsub('%${input:([%w_%-%.]+)}', function(name) return values[name] end)
+  )
+end
+
+--- Hand `on_values` a value for each of `names`: kept from earlier in this
+--- buffer, else asked for. Nil when one is not given.
+---@param bufnr integer
+---@param names string[]
+---@param on_values fun(values: table<string, string>?)
+function M.ask_inputs(bufnr, names, on_values)
+  local values = vim.b[bufnr].dy_runbook_inputs or {}
+  local index = 0
+  local function next_input()
+    index = index + 1
+    local name = names[index]
+    if not name then return on_values(values) end
+    if values[name] ~= nil then return next_input() end
+    vim.ui.input({ prompt = name .. ': ' }, function(value)
+      if value == nil then return on_values(nil) end
+      values[name] = value
+      -- `vim.b` hands out copies: the whole table goes back
+      if vim.api.nvim_buf_is_valid(bufnr) then
+        vim.b[bufnr].dy_runbook_inputs = values
+      end
+      next_input()
+    end)
+  end
+  next_input()
+end
+
 --- The first line of `code` a dangerous pattern matches, trimmed, or nil
 ---@param code string
 ---@return string?
@@ -229,15 +282,16 @@ end
 --- with, so a command printing Markdown cannot close it early.
 ---@param output string[]
 ---@param indent string
+---@param info? string The info string of the fence, `output` unless given
 ---@return string[]
-function M.fence(output, indent)
+function M.fence(output, indent, info)
   local longest = 2
   for _, line in ipairs(output) do
     local run = line:match('^%s*(`+)')
     if run then longest = math.max(longest, #run) end
   end
   local fence = ('`'):rep(longest + 1)
-  local lines = { '', indent .. fence .. 'output' }
+  local lines = { '', indent .. fence .. (info or 'output') }
   for _, line in ipairs(output) do
     table.insert(lines, line == '' and '' or indent .. line)
   end
@@ -275,6 +329,9 @@ function M.render(result)
 end
 
 local ns = vim.api.nvim_create_namespace('dy_runbook')
+
+-- Defined further down, next to what they belong with
+local start, record
 
 --- The processes running per buffer, to stop them
 ---@type table<integer, vim.SystemObj[]>
@@ -343,6 +400,135 @@ local function place(bufnr, mark, indent, output)
   )
 end
 
+---@class DyRunbookRun
+---@field line integer Where the block opens
+---@field lang string
+---@field code string As it ran, inputs filled in
+---@field output string[] As `M.render` made it
+---@field code_status integer
+---@field signal? integer
+---@field cut? boolean
+---@field started integer Seconds since the epoch
+---@field ms integer How long it ran
+
+--- One run, as the record of a session has it
+---@param run DyRunbookRun
+---@return string[]
+function M.log_entry(run)
+  local how = run.cut and 'output cut'
+    or ((run.signal or 0) ~= 0 and ('signal %d'):format(run.signal))
+    or ('exit %d'):format(run.code_status)
+  local lines = {
+    ('## %s line %d (%s): %s, %.1f s'):format(
+      os.date('%H:%M:%S', run.started),
+      run.line,
+      run.lang,
+      how,
+      run.ms / 1000
+    ),
+  }
+  vim.list_extend(
+    lines,
+    M.fence(vim.split(run.code, '\n', { plain = true }), '', run.lang)
+  )
+  vim.list_extend(lines, M.fence(run.output, ''))
+  table.insert(lines, '')
+  return lines
+end
+
+--- Append `lines` to the file at `path`, made only its owner can read
+---@param path string
+---@param lines string[]
+---@return boolean
+local function append(path, lines)
+  local fd = vim.uv.fs_open(path, 'a', tonumber('600', 8))
+  if not fd then return false end
+  local ok = vim.uv.fs_write(fd, table.concat(lines, '\n') .. '\n') ~= nil
+  vim.uv.fs_close(fd)
+  return ok
+end
+
+--- Add `run` to the record of `bufnr`, when it is being recorded
+---@param bufnr integer
+---@param run DyRunbookRun
+record = function(bufnr, run)
+  local path = vim.api.nvim_buf_is_valid(bufnr) and vim.b[bufnr].dy_runbook_log
+  if not path then return end
+  if not append(path, M.log_entry(run)) then
+    vim.notify(
+      'Could not add to the record ' .. path,
+      vim.log.levels.ERROR,
+      { title = 'Runbook' }
+    )
+  end
+end
+
+--- Where the record of a session of `file` started at `now` goes
+---@param file string
+---@param now integer
+---@return string
+function M.log_path(file, now)
+  return vim.fs.joinpath(
+    vim.fn.stdpath('state') --[[@as string]],
+    'dyneo',
+    'runbook',
+    ('%s-%s.md'):format(
+      vim.fn.fnamemodify(file, ':t:r'),
+      os.date('%Y%m%d-%H%M%S', now)
+    )
+  )
+end
+
+--- Start recording every run of the buffer, or stop
+function M.record()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local path = vim.b[bufnr].dy_runbook_log
+  if path then
+    vim.b[bufnr].dy_runbook_log = nil
+    return vim.notify(
+      'Recording stopped: ' .. vim.fn.fnamemodify(path, ':~'),
+      vim.log.levels.INFO,
+      { title = 'Runbook' }
+    )
+  end
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == '' then
+    return vim.notify(
+      'Only the runs of a Markdown file are recorded',
+      vim.log.levels.WARN,
+      { title = 'Runbook' }
+    )
+  end
+  local now = os.time()
+  path = M.log_path(file, now)
+  vim.fn.mkdir(vim.fs.dirname(path), 'p', tonumber('700', 8))
+  local header = {
+    '# ' .. vim.fn.fnamemodify(file, ':~'),
+    '',
+    'Recorded from ' .. os.date('%Y-%m-%d %H:%M:%S', now),
+    '',
+  }
+  if not append(path, header) then
+    return vim.notify(
+      'Could not start the record ' .. path,
+      vim.log.levels.ERROR,
+      { title = 'Runbook' }
+    )
+  end
+  vim.b[bufnr].dy_runbook_log = path
+  vim.notify(
+    'Recording to ' .. vim.fn.fnamemodify(path, ':~'),
+    vim.log.levels.INFO,
+    { title = 'Runbook' }
+  )
+end
+
+--- Forget the inputs typed for the buffer, so the next run asks again
+function M.forget_inputs()
+  vim.b[vim.api.nvim_get_current_buf()].dy_runbook_inputs = nil
+  vim.notify('Inputs forgotten', vim.log.levels.INFO, { title = 'Runbook' })
+end
+
 --- Run `block` of `bufnr`, and call `on_done` with whether it went well
 ---@param bufnr integer
 ---@param block DyRunbookBlock
@@ -369,6 +555,20 @@ function M.run_block(bufnr, block, on_done)
   if not M.allowed(bufnr) then return on_done(false) end
 
   local code = M.code_of(block)
+  M.ask_inputs(bufnr, M.inputs(code), function(values)
+    if not values then return on_done(false) end
+    -- Expanded first: what is checked is what runs
+    start(bufnr, block, runner, M.expand(code, values), on_done)
+  end)
+end
+
+--- Run `code` of `block`, once its inputs are in
+---@param bufnr integer
+---@param block DyRunbookBlock
+---@param runner string[]
+---@param code string
+---@param on_done fun(ok: boolean)
+start = function(bufnr, block, runner, code, on_done)
   local danger = M.danger(code)
   if danger then
     local answer = vim.fn.confirm(
@@ -379,6 +579,7 @@ function M.run_block(bufnr, block, on_done)
     if answer ~= 1 then return on_done(false) end
   end
 
+  local started, clock = os.time(), vim.uv.hrtime()
   local mark = vim.api.nvim_buf_set_extmark(bufnr, ns, block.close - 1, 0, {
     virt_text = { { ' running…', 'DiagnosticInfo' } },
     virt_text_pos = 'eol',
@@ -430,7 +631,19 @@ function M.run_block(bufnr, block, on_done)
         function(p) return p ~= process end,
         running[bufnr] or {}
       )
-      local done = pcall(place, bufnr, mark, block.indent, M.render(result))
+      local output = M.render(result)
+      local done = pcall(place, bufnr, mark, block.indent, output)
+      record(bufnr, {
+        line = block.open,
+        lang = block.lang,
+        code = code,
+        output = output,
+        code_status = result.code,
+        signal = result.signal,
+        cut = result.cut,
+        started = started,
+        ms = math.floor((vim.uv.hrtime() - clock) / 1e6),
+      })
       on_done(
         done
           and not result.cut
@@ -470,22 +683,26 @@ end
 ---
 --- The blocks are found again before each one runs, since the output of the
 --- one before has moved everything below it.
-function M.run_all()
+---@param first? integer The block to start at, 1 unless given
+function M.run_all(first)
+  first = first or 1
   local bufnr = vim.api.nvim_get_current_buf()
   local count = #M.blocks(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
-  if count == 0 then
+  if count < first then
     return vim.notify('No block to run', vim.log.levels.WARN, {
       title = 'Runbook',
     })
   end
   if not M.allowed(bufnr) then return end
-  local answer = vim.fn.confirm(
-    ('Run all %d blocks, one after the other?'):format(count),
-    '&Run\n&Cancel',
-    2
-  )
+  local question = first == 1
+      and ('Run all %d blocks, one after the other?'):format(count)
+    or ('Run the %d blocks from block %d, one after the other?'):format(
+      count - first + 1,
+      first
+    )
+  local answer = vim.fn.confirm(question, '&Run\n&Cancel', 2)
   if answer ~= 1 then return end
-  local index = 0
+  local index = first - 1
   local function next_block()
     if not vim.api.nvim_buf_is_valid(bufnr) then return end
     index = index + 1
@@ -493,7 +710,7 @@ function M.run_all()
     local block = blocks[index]
     if not block then
       return vim.notify(
-        ('Ran %d blocks'):format(index - 1),
+        ('Ran %d blocks'):format(index - first),
         vim.log.levels.INFO,
         { title = 'Runbook' }
       )
@@ -508,6 +725,24 @@ function M.run_all()
     end)
   end
   next_block()
+end
+
+--- Run every block from the one under the cursor down, as `run_all` does:
+--- where to pick a runbook up after a step failed and was fixed
+function M.run_from()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  for index, block in
+    ipairs(M.blocks(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)))
+  do
+    -- The block under the cursor, or the first one below it
+    if block.close >= row then return M.run_all(index) end
+  end
+  vim.notify(
+    'No block from the cursor down',
+    vim.log.levels.WARN,
+    { title = 'Runbook' }
+  )
 end
 
 --- Remove every `output` fence of the buffer
@@ -527,12 +762,22 @@ end
 --- Stop whatever the buffer is running; its output so far is shown as usual
 function M.stop() stop_buffer(vim.api.nvim_get_current_buf()) end
 
---- `:Runbook [run|all|clear|stop]`
+--- The subcommands of `:Runbook`
+M.SUBCOMMANDS = { 'run', 'all', 'from', 'clear', 'stop', 'record', 'inputs' }
+
+--- `:Runbook [run|all|from|clear|stop|record|inputs]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub = args.fargs[1] or 'run'
-  local actions =
-    { run = M.run, all = M.run_all, clear = M.clear, stop = M.stop }
+  local actions = {
+    run = M.run,
+    all = function() M.run_all() end,
+    from = M.run_from,
+    clear = M.clear,
+    stop = M.stop,
+    record = M.record,
+    inputs = M.forget_inputs,
+  }
   if not actions[sub] then
     return vim.notify(
       'Unknown subcommand: ' .. sub,
@@ -550,7 +795,9 @@ function M.attach(bufnr)
     vim.keymap.set('n', lhs, rhs, { buffer = bufnr, desc = desc })
   end
   map('<localleader>r', M.run, 'Run Block (Runbook)')
-  map('<localleader>R', M.run_all, 'Run All Blocks (Runbook)')
+  map('<localleader>R', function() M.run_all() end, 'Run All Blocks (Runbook)')
+  map('<localleader>F', M.run_from, 'Run From Here (Runbook)')
+  map('<localleader>L', M.record, 'Record Runs (Runbook)')
   map('<localleader>x', M.clear, 'Clear Outputs (Runbook)')
   map('<localleader>s', M.stop, 'Stop Running (Runbook)')
 end
