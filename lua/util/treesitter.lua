@@ -27,7 +27,10 @@ end
 function M.have_query(lang, query)
   local key = lang .. ':' .. query
   if M._queries[key] == nil then
-    M._queries[key] = vim.treesitter.query.get(lang, query) ~= nil
+    -- The files, not the parsed query: parsing `indents` or `textobjects`
+    -- only to see that they exist costs as much as using them, and on
+    -- every filetype opened
+    M._queries[key] = #vim.treesitter.query.get_files(lang, query) > 0
   end
   return M._queries[key]
 end

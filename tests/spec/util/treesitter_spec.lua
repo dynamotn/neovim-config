@@ -7,9 +7,16 @@ describe('util.treesitter', function()
     ts = require('util.treesitter')
     ts._installed = { lua = true }
     restores = {
-      h.stub(vim.treesitter.query, 'get', function(lang, query)
-        if lang == 'lua' and query == 'folds' then return {} end
+      h.stub(vim.treesitter.query, 'get_files', function(lang, query)
+        if lang == 'lua' and query == 'folds' then return { 'folds.scm' } end
+        return {}
       end),
+      -- Parsing a query only to see whether it is there is what is avoided
+      h.stub(
+        vim.treesitter.query,
+        'get',
+        function() error('parsed a query to check it exists') end
+      ),
     }
   end)
   after_each(function()
