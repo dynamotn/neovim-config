@@ -69,10 +69,20 @@ describe('lint.linters.betterleaks', function()
       function() assert.are.same({}, linter.parser('[]', 1)) end
     )
 
-    it('is empty for output that is not JSON', function()
-      assert.are.same({}, linter.parser('panic: oops', 1))
-      assert.are.same({}, linter.parser('', 1))
-      assert.are.same({}, linter.parser('"text"', 1))
-    end)
+    it(
+      'reports output that is not a report, rather than a clean run',
+      function()
+        for _, output in ipairs({ 'panic: oops', '', '"text"' }) do
+          local diagnostics = linter.parser(output, 1)
+          assert.are.equal(1, #diagnostics, output)
+          assert.are.equal('unreadable-report', diagnostics[1].code)
+          assert.are.equal(
+            vim.diagnostic.severity.ERROR,
+            diagnostics[1].severity
+          )
+          assert.are.equal('betterleaks', diagnostics[1].source)
+        end
+      end
+    )
   end)
 end)

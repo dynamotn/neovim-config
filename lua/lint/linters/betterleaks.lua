@@ -57,7 +57,21 @@ return function()
     ignore_exitcode = false,
     parser = function(output, bufnr)
       local ok, findings = pcall(vim.json.decode, output)
-      if not ok or type(findings) ~= 'table' then return {} end
+      -- A clean run prints `[]`. Anything else unreadable is reported, not
+      -- taken for clean: `util.sensitive` reads these findings, and holds the
+      -- buffer back from the AI tools while this one stands.
+      if not ok or type(findings) ~= 'table' then
+        return {
+          {
+            lnum = 0,
+            col = 0,
+            severity = vim.diagnostic.severity.ERROR,
+            source = 'betterleaks',
+            code = 'unreadable-report',
+            message = 'betterleaks gave a report that could not be read',
+          },
+        }
+      end
       return vim.tbl_map(
         function(finding) return to_diagnostic(finding, bufnr) end,
         findings
