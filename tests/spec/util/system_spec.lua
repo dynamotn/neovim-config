@@ -58,4 +58,119 @@ describe('util.system', function()
       assert.are.equal(0, vim.fn.filereadable(marker))
     end
   )
+
+  describe('run', function()
+    --- Run `cmd` and wait for its result, on the main loop
+    local function run(cmd, opts)
+      local result, on_main
+      system.run(cmd, opts, function(r)
+        on_main = not vim.in_fast_event()
+        result = r
+      end)
+      assert.is_true(vim.wait(5000, function() return result ~= nil end, 10))
+      assert.is_true(on_main)
+      return result
+    end
+
+    it('hands back what the command said, on the main loop', function()
+      local result = run({ 'sh', '-c', 'echo out; echo err >&2; exit 3' })
+      assert.are.equal(3, result.code)
+      assert.are.equal('out\n', result.stdout)
+      assert.are.equal('err\n', result.stderr)
+      assert.is_false(result.cut)
+      assert.is_false(result.timed_out)
+      assert.is_false(result.missing)
+    end)
+
+    it('says a command is not installed, later and without raising', function()
+      local answered = false
+      system.run({ dir .. '/nothing-here' }, {}, function() answered = true end)
+      assert.is_false(answered)
+      local result = run({ dir .. '/nothing-here' })
+      assert.is_true(result.missing)
+      assert.are.equal(system.MISSING, result.code)
+      assert.is_truthy(
+        system.failure(result):find('nothing-here is not installed', 1, true)
+      )
+    end)
+
+    it('stops a command at the cap and says it was cut', function()
+      local result = run({ 'sh', '-c', 'yes' }, { max_bytes = 1000 })
+      assert.is_true(result.cut)
+      assert.are.equal(1000, #result.stdout + #result.stderr)
+    end)
+
+    it('stops a command at the deadline and says so', function()
+      local result = run({ 'sleep', '5' }, { timeout = 100 })
+      assert.is_true(result.timed_out)
+      assert.are.equal(
+        'sleep gave no answer in time',
+        system.failure(result, 'sleep')
+      )
+    end)
+
+    it(
+      'answers at the deadline though a child keeps the output open',
+      function()
+        h.write(dir .. '/holder', { '#!/bin/sh', 'sleep 10 &', 'sleep 10' })
+        vim.fn.setfperm(dir .. '/holder', 'rwxr-xr-x')
+        local restore = h.stub(system, 'GRACE', 100)
+        local start = vim.uv.hrtime()
+        local result = run({ dir .. '/holder' }, { timeout = 100 })
+        restore()
+        assert.is_true(result.timed_out)
+        assert.is_true((vim.uv.hrtime() - start) / 1e6 < 3000)
+      end
+    )
+
+    it('feeds stdin and works in the directory given', function()
+      local result = run(
+        { 'sh', '-c', 'cat; pwd' },
+        { stdin = 'in\n', cwd = dir }
+      )
+      assert.are.equal('in\n' .. dir .. '\n', result.stdout)
+    end)
+  end)
+
+  describe('failure', function()
+    it('names the exit when nothing was said', function()
+      assert.are.equal(
+        'git exited 2',
+        system.failure({ code = 2, signal = 0, stderr = '  ' }, 'git')
+      )
+      assert.are.equal(
+        'boom',
+        system.failure({ code = 1, signal = 0, stderr = 'boom\n' }, 'git')
+      )
+    end)
+  end)
+
+  describe('each', function()
+    it('runs no more than the limit at once, and ends once', function()
+      local running, most, seen, ended = 0, 0, {}, 0
+      local pending = {}
+      system.each({ 1, 2, 3, 4, 5 }, 2, function(item, done)
+        running = running + 1
+        most = math.max(most, running)
+        table.insert(seen, item)
+        table.insert(pending, function()
+          running = running - 1
+          done()
+          done()
+        end)
+      end, function() ended = ended + 1 end)
+      while #pending > 0 do
+        table.remove(pending, 1)()
+      end
+      assert.are.equal(2, most)
+      assert.are.same({ 1, 2, 3, 4, 5 }, seen)
+      assert.are.equal(1, ended)
+    end)
+
+    it('ends at once for nothing to do', function()
+      local ended = false
+      system.each({}, 4, function() end, function() ended = true end)
+      assert.is_true(ended)
+    end)
+  end)
 end)
