@@ -469,6 +469,12 @@ to the ciphertext.  Ansible Vault cannot ask for a password inside Neovim:
 give it `ANSIBLE_VAULT_PASSWORD_FILE`, or `vault_password_file` in
 `ansible.cfg`.
 
+A diff of ciphertext says nothing, so `<localleader>D` in a decrypted
+buffer, or |:EncryptedDiff|, diffs its clear text with the clear text of the
+file at `HEAD`, or at any revision given, in a split held back the same way.
+The old version goes through the same tool from a private copy in a
+directory of its own, both removed once read.
+
 5.5 Buffer servers and tools                                *dyneo-statusline*
 
 The statusline counts the language servers and the tools that are up rather
@@ -653,6 +659,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :Runbook clear          Remove every `output` fence.
 :Runbook stop           Stop what the buffer is running.
                         See |dyneo-runbook|.
+
+                                                              *:EncryptedDiff*
+:EncryptedDiff [{rev}]  Diff the clear text of this decrypted buffer with its
+                        clear text at {rev}, `HEAD` unless given.  See
+                        |dyneo-encrypted|.
 
                                                                      *:TfPlan*
 :TfPlan                 Plan the module of this buffer and show it on its

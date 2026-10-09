@@ -303,4 +303,101 @@ describe('tools.encrypted', function()
     assert.is_false(decrypted)
     assert.equals(0, vim.fn.filereadable(log))
   end)
+
+  describe('diff', function()
+    local repo
+
+    --- `git` in the scratch repository
+    local function git(...)
+      local result = vim
+        .system(
+          vim.list_extend(
+            { 'git', '-c', 'user.name=t', '-c', 'user.email=t@t' },
+            { ... }
+          ),
+          { cwd = repo }
+        )
+        :wait()
+      assert.equals(0, result.code, result.stderr)
+    end
+
+    before_each(function()
+      repo = dir .. '/repo'
+      vim.fn.mkdir(repo, 'p')
+      git('init', '-q')
+      h.write(repo .. '/values.yaml', {
+        'plain: password: old',
+        'x: ENC[AES256_GCM,data:x]',
+        'sops:',
+      })
+      git('add', 'values.yaml')
+      git('commit', '-q', '-m', 'first')
+      h.write(repo .. '/values.yaml', {
+        'plain: password: new',
+        'x: ENC[AES256_GCM,data:x]',
+        'sops:',
+      })
+    end)
+
+    it('diffs the clear text with the one at HEAD, held back', function()
+      local bufnr = open(repo .. '/values.yaml')
+      assert.same(
+        { 'password: new' },
+        vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      )
+
+      encrypted.command({ fargs = {} })
+      -- The cursor is back on the buffer being edited, the old text beside it
+      assert.equals(bufnr, vim.api.nvim_get_current_buf(), vim.inspect(notes))
+      local wins = vim.api.nvim_tabpage_list_wins(0)
+      assert.equals(2, #wins)
+      local scratch = vim.api.nvim_win_get_buf(wins[1])
+      assert.same(
+        { 'password: old' },
+        vim.api.nvim_buf_get_lines(scratch, 0, -1, false)
+      )
+      assert.is_truthy(require('util.sensitive').marked(scratch))
+      assert.equals('nofile', vim.bo[scratch].buftype)
+      assert.is_false(vim.bo[scratch].swapfile)
+      assert.is_false(vim.bo[scratch].modifiable)
+      assert.is_true(vim.wo[vim.fn.bufwinid(scratch)].diff)
+      assert.is_true(vim.wo[vim.fn.bufwinid(bufnr)].diff)
+
+      -- The copy sops read is gone, with the directory it was put in
+      local decrypted = vim.tbl_filter(
+        function(line) return line:match('^sops decrypt .*/values%.yaml$') end,
+        calls()
+      )
+      local copy = decrypted[#decrypted]:match('^sops decrypt (.*)$')
+      assert.are_not.equal(repo .. '/values.yaml', copy)
+      assert.equals(0, vim.fn.filereadable(copy))
+      assert.equals(0, vim.fn.isdirectory(vim.fs.dirname(copy)))
+    end)
+
+    it('says when the file is not in git at the revision', function()
+      h.write(repo .. '/new.yaml', {
+        'plain: a',
+        'x: ENC[AES256_GCM,data:x]',
+        'sops:',
+      })
+      local bufnr = open(repo .. '/new.yaml')
+      encrypted.diff(bufnr)
+      assert.equals(bufnr, vim.api.nvim_get_current_buf())
+      assert.is_truthy(
+        notes[#notes]:find('new.yaml is not in git at HEAD', 1, true)
+      )
+    end)
+
+    it('refuses a buffer that was not decrypted', function()
+      vim.cmd.edit(repo .. '/plain.txt')
+      encrypted.diff(0)
+      assert.equals('This buffer is not a decrypted file', notes[#notes])
+    end)
+
+    it('maps <localleader>D on a decrypted buffer', function()
+      local bufnr = open(repo .. '/values.yaml')
+      local map = vim.fn.maparg('<localleader>D', 'n', false, true)
+      assert.equals(bufnr, map.buffer == 1 and bufnr or -1)
+    end)
+  end)
 end)

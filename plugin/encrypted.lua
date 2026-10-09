@@ -22,3 +22,14 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     require('tools.encrypted').open(args.buf)
   end,
 })
+
+-- `:EncryptedDiff [{rev}]`: the clear text of this decrypted buffer against
+-- its clear text at {rev}, `HEAD` unless given
+vim.api.nvim_create_user_command(
+  'EncryptedDiff',
+  function(args) require('tools.encrypted').command(args) end,
+  {
+    nargs = '?',
+    desc = 'Diff this decrypted file with its clear text at a revision',
+  }
+)

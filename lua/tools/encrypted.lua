@@ -288,6 +288,20 @@ function M.guard(bufnr)
     buffer = bufnr,
     callback = function(args) M.write(args.buf) end,
   })
+  vim.keymap.set(
+    'n',
+    '<localleader>D',
+    function() M.diff(bufnr) end,
+    { buffer = bufnr, desc = 'Diff With HEAD (Encrypted)' }
+  )
+  M.hold(bufnr, group)
+end
+
+--- Keep the clear text of `bufnr` out of the system clipboard while it is the
+--- current buffer, and out of the shada file once Neovim quits
+---@param bufnr integer
+---@param group integer The augroup of the buffer's autocmds
+function M.hold(bufnr, group)
   -- `unnamedplus` would put every yank of a password into the system
   -- clipboard, and from there into a clipboard manager's history. The value
   -- to restore is kept per buffer, outside this call: `:e!` guards the buffer
@@ -335,5 +349,129 @@ function M.guard(bufnr)
     })
   end
 end
+
+--- Run `command` and wait for it, never raising
+---@param command string[]
+---@param opts table `vim.system` options
+---@return vim.SystemCompleted?
+local function run(command, opts)
+  local ok, result = pcall(
+    function()
+      return vim
+        .system(
+          command,
+          vim.tbl_extend('force', { timeout = M.TIMEOUT, detach = true }, opts)
+        )
+        :wait()
+    end
+  )
+  return ok and result or nil
+end
+
+--- The clear text of the file of `bufnr` as it was at `rev`
+---
+--- The blob goes to a directory of its own only this user can read, under
+--- the name of the file -- sops tells the format from the extension -- and
+--- both are removed as soon as it is decrypted. Nothing of the clear text
+--- is written anywhere.
+---@param bufnr integer
+---@param rev string
+---@return string[]? lines
+---@return string? err
+function M.clear_at(bufnr, rev)
+  local kind = vim.b[bufnr].dy_encrypted
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  local dir, name = vim.fs.dirname(file), vim.fs.basename(file)
+  local blob = run(
+    { 'git', 'show', ('%s:./%s'):format(rev, name) },
+    { cwd = dir, text = false }
+  )
+  if not blob or blob.code ~= 0 then
+    return nil,
+      ('%s is not in git at %s%s'):format(
+        name,
+        rev,
+        blob and blob.stderr ~= '' and (': ' .. vim.trim(blob.stderr)) or ''
+      )
+  end
+
+  local private = vim.fn.tempname()
+  vim.fn.mkdir(private, 'p', tonumber('700', 8))
+  local copy = vim.fs.joinpath(private, name)
+  local fd = vim.uv.fs_open(copy, 'w', tonumber('600', 8))
+  if not fd then
+    vim.fn.delete(private, 'rf')
+    return nil, 'could not write a private copy'
+  end
+  vim.uv.fs_write(fd, blob.stdout or '')
+  vim.uv.fs_close(fd)
+
+  local result = run(M.decrypt_command(kind, copy), { text = true })
+  vim.fn.delete(private, 'rf')
+  if not result or result.code ~= 0 then
+    return nil,
+      'could not decrypt it: ' .. (result and failure(kind, result) or 'failed')
+  end
+  return vim.split(
+    (result.stdout or ''):gsub('\n$', ''),
+    '\n',
+    { plain = true }
+  )
+end
+
+--- Diff the clear text of `bufnr` with its clear text at `rev` (`HEAD`), in
+--- a split that is held back like the buffer itself
+---@param bufnr? integer
+---@param rev? string
+function M.diff(bufnr, rev)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
+    or bufnr
+  rev = rev or 'HEAD'
+  local kind = vim.b[bufnr].dy_encrypted
+  if not kind then
+    return notify('This buffer is not a decrypted file', vim.log.levels.ERROR)
+  end
+  local lines, err = M.clear_at(bufnr, rev)
+  if not lines then return notify(err, vim.log.levels.ERROR) end
+
+  local win = vim.fn.bufwinid(bufnr)
+  if win ~= -1 then vim.api.nvim_set_current_win(win) end
+  vim.cmd('leftabove vnew')
+  local scratch = vim.api.nvim_get_current_buf()
+  -- Held back before the clear text goes in, as the buffer itself is
+  sensitive.mark(
+    scratch,
+    ('decrypted with %s, at %s'):format(TOOLS[kind].name, rev)
+  )
+  vim.bo[scratch].buftype = 'nofile'
+  vim.bo[scratch].bufhidden = 'wipe'
+  vim.bo[scratch].swapfile = false
+  vim.bo[scratch].undofile = false
+  vim.api.nvim_buf_set_lines(scratch, 0, -1, false, lines)
+  vim.bo[scratch].modifiable = false
+  vim.bo[scratch].filetype = vim.bo[bufnr].filetype
+  pcall(
+    vim.api.nvim_buf_set_name,
+    scratch,
+    ('%s@%s'):format(vim.fs.basename(vim.api.nvim_buf_get_name(bufnr)), rev)
+  )
+  M.hold(
+    scratch,
+    vim.api.nvim_create_augroup('dy_encrypted_' .. scratch, { clear = true })
+  )
+  vim.keymap.set(
+    'n',
+    'q',
+    '<cmd>close<cr>',
+    { buffer = scratch, desc = 'Close', nowait = true }
+  )
+  vim.cmd('diffthis')
+  vim.cmd('wincmd p')
+  vim.cmd('diffthis')
+end
+
+--- `:EncryptedDiff [{rev}]`
+---@param args { fargs: string[] }
+function M.command(args) M.diff(0, args.fargs[1]) end
 
 return M
