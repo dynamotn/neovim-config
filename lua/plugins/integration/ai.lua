@@ -474,6 +474,41 @@ return {
       selection = {
         hint_display = 'none',
       },
+      -- Laid out and titled like the panels edgy docks: a plain title rather
+      -- than pills, rounded floats like completion and noice, and one family
+      -- of spinners
+      windows = {
+        position = 'right',
+        width = 35,
+        sidebar_header = {
+          align = 'left',
+          rounded = false,
+          include_model = true,
+        },
+        spinner = {
+          thinking = {
+            '⠋',
+            '⠙',
+            '⠹',
+            '⠸',
+            '⠼',
+            '⠴',
+            '⠦',
+            '⠧',
+            '⠇',
+            '⠏',
+          },
+        },
+        input = {
+          prefix = '❯ ',
+        },
+        edit = {
+          border = 'rounded',
+        },
+        ask = {
+          border = 'rounded',
+        },
+      },
       input = {
         provider = 'snacks',
       },
@@ -580,7 +615,8 @@ return {
       },
       ui = {
         window = {
-          border = vim.o.winborder,
+          -- `winborder` is unset, and the other floats are rounded
+          border = 'rounded',
         },
       },
     },

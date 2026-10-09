@@ -8,6 +8,7 @@ return {
       octo = ' ',
       gh = ' ',
       ['markdown.gh'] = ' ',
+      Avante = '󰚩 ',
     },
     me = ' ',
     treesitter = {

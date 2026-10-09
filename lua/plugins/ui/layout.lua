@@ -121,6 +121,8 @@ return {
         left = {
           { title = 'Neotest Summary', ft = 'neotest-summary' },
         },
+        -- Avante is not here: it lays out and resizes its own stack of
+        -- windows, which edgy would split into separate panels
         right = {
           { title = 'Grug Far', ft = 'grug-far', size = { width = 0.4 } },
         },

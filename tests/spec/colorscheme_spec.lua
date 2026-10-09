@@ -62,4 +62,23 @@ describe('colorscheme', function()
     )
     assert.is_nil(source:find('CmpItem', 1, true))
   end)
+
+  it('draws the Avante sidebar like the other panels', function()
+    -- Catppuccin is not on the test runtimepath: any colour does
+    package.loaded['catppuccin.utils.colors'] =
+      { lighten = function() return '#000000' end }
+    local colors = setmetatable(
+      {},
+      { __index = function() return '#000000' end }
+    )
+    local groups = opts.custom_highlights(colors)
+    package.loaded['catppuccin.utils.colors'] = nil
+    assert.same({ link = 'Normal' }, groups.AvanteSidebarNormal)
+    assert.same({ link = 'WinSeparator' }, groups.AvanteSidebarWinSeparator)
+    assert.same(
+      { link = 'WinSeparator' },
+      groups.AvanteSidebarWinHorizontalSeparator
+    )
+    assert.same({ link = 'SnacksInputNormal' }, groups.AvantePromptInput)
+  end)
 end)

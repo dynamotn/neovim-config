@@ -189,6 +189,15 @@ return {
             fg = util.lighten(colors.surface0, 0.9, colors.mauve),
             bg = colors.mauve,
           },
+          -- Avante's sidebar sits on the float background, behind a
+          -- separator drawn in that same colour. Every other panel shares the
+          -- editor's background and its plain separator, so Avante does too.
+          AvanteSidebarNormal = { link = 'Normal' },
+          AvanteSidebarWinSeparator = { link = 'WinSeparator' },
+          AvanteSidebarWinHorizontalSeparator = { link = 'WinSeparator' },
+          -- Its prompt float looks like every other prompt: Snacks' input
+          AvantePromptInput = { link = 'SnacksInputNormal' },
+          AvantePromptInputBorder = { link = 'SnacksInputBorder' },
         }
       end,
     },

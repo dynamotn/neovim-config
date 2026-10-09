@@ -262,6 +262,13 @@ return {
           {
             filetype = 'snacks_layout_box',
           },
+          {
+            -- Avante docks its own sidebar, outside edgy's offsets
+            filetype = 'Avante',
+            text = '󰚩 Avante',
+            highlight = 'Directory',
+            text_align = 'left',
+          },
         },
         ---@param opts bufferline.IconFetcherOpts
         get_element_icon = function(opts)
@@ -307,7 +314,11 @@ return {
         'snacks_picker_list',
         'snacks_picker_input',
         'snacks_terminal',
-        'codecompanion',
+        'Avante',
+        'AvanteInput',
+        'AvanteSelectedFiles',
+        'AvanteSelectedCode',
+        'AvanteTodos',
         'lazy',
         'mason',
       },
