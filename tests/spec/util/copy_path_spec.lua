@@ -25,10 +25,29 @@ describe('util.copy_path', function()
         )
       end,
     }
+    -- The `+` register needs a clipboard provider, which a runner with no
+    -- display lacks: one kept in memory stands in for it
+    local clipboard = { lines = { '' }, regtype = 'v' }
     restores = {
       h.stub(package.loaded, 'util.root', root_module),
       h.stub(package.loaded, 'util.plugin', plugin),
+      h.stub(vim.g, 'clipboard', {
+        name = 'dyneo-spec',
+        copy = {
+          ['+'] = function(lines, regtype)
+            clipboard = { lines = lines, regtype = regtype }
+          end,
+          ['*'] = function() end,
+        },
+        paste = {
+          ['+'] = function() return { clipboard.lines, clipboard.regtype } end,
+          ['*'] = function() return { {}, 'v' } end,
+        },
+      }),
     }
+    -- The provider is picked once, when the clipboard is first used
+    vim.g.loaded_clipboard_provider = nil
+    vim.cmd('runtime autoload/provider/clipboard.vim')
     h.unload('util.copy_path')
     copy_path = require('util.copy_path')
   end)
@@ -36,6 +55,8 @@ describe('util.copy_path', function()
     for i = #restores, 1, -1 do
       restores[i]()
     end
+    vim.g.loaded_clipboard_provider = nil
+    vim.cmd('runtime autoload/provider/clipboard.vim')
     vim.cmd('silent! %bwipeout!')
     cleanup()
   end)
