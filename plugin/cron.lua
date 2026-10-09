@@ -11,22 +11,25 @@ vim.api.nvim_create_user_command(
   }
 )
 
+-- The lines `tools.cron` reads; a schedule further down is not read out
+local MAX_LINES = 5000
+
+--- Whether one of the first lines of `bufnr` is a `schedule:` or `cron:` key
+---@param bufnr integer
+---@return boolean
+local function has_schedule(bufnr)
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, MAX_LINES, false)) do
+    local key = line:match('^%s*%-?%s*(%a+):')
+    if key == 'schedule' or key == 'cron' then return true end
+  end
+  return false
+end
+
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('dy_cron', { clear = true }),
   pattern = { 'crontab', 'yaml', 'yaml.*' },
   callback = function(args)
-    if
-      args.match ~= 'crontab'
-      and vim.api.nvim_buf_call(
-          args.buf,
-          function()
-            return vim.fn.search([[\v^\s*(-\s*)?(schedule|cron):]], 'nw')
-          end
-        )
-        == 0
-    then
-      return
-    end
+    if args.match ~= 'crontab' and not has_schedule(args.buf) then return end
     require('tools.cron').attach(args.buf)
   end,
 })
