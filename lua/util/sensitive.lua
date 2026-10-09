@@ -74,63 +74,110 @@ M.is_secret_key = function(key)
   return false
 end
 
---- The credential formats `lines` hold, one entry per rule that matched
----@param lines string[]
----@param first integer Number of the first line, for the report
----@return { name: string, line: integer }[]
-local function secrets_in(lines, first)
-  local found = {}
-  local seen = {}
-  for offset, line in ipairs(lines) do
-    local name = M.secret_format(line)
-    if name and not seen[name] then
-      seen[name] = true
-      table.insert(found, { name = name, line = first + offset - 1 })
+--- The rule each line of a buffer matches, `false` for none, kept current by
+--- `nvim_buf_attach`: an edit costs a scan of the lines it touched, not of
+--- the whole buffer, which the guards would otherwise read again on every
+--- keystroke
+---@class DySensitiveScan
+---@field lines (string|false)[]
+---@field tick? integer The change `found` was worked out for
+---@field found? { name: string, line: integer }[]
+
+---@type table<integer, DySensitiveScan>
+local scans = {}
+
+---@param bufnr integer
+---@param first integer
+---@param last integer
+---@return (string|false)[]
+local function scan_lines(bufnr, first, last)
+  local out = {}
+  for index, line in
+    ipairs(vim.api.nvim_buf_get_lines(bufnr, first, last, false))
+  do
+    out[index] = M.secret_format(line) or false
+  end
+  return out
+end
+
+--- Put the scan of lines `first` to `last_old` (zero-based, end exclusive)
+--- of `lines` in place of what they were, now that they are `fresh`
+---@param lines (string|false)[]
+---@param first integer
+---@param last_old integer
+---@param fresh (string|false)[]
+local function splice(lines, first, last_old, fresh)
+  local count = #lines
+  local delta = #fresh - (last_old - first)
+  if delta > 0 then
+    for index = count, last_old + 1, -1 do
+      lines[index + delta] = lines[index]
+    end
+  elseif delta < 0 then
+    for index = last_old + 1, count do
+      lines[index + delta] = lines[index]
+    end
+    for index = count + delta + 1, count do
+      lines[index] = nil
     end
   end
-  return found
+  for index, value in ipairs(fresh) do
+    lines[first + index] = value
+  end
+end
+
+--- The scan of `bufnr`, started and attached on first use
+---@param bufnr integer
+---@return DySensitiveScan
+local function scan_of(bufnr)
+  if scans[bufnr] then return scans[bufnr] end
+  ---@type DySensitiveScan
+  local scan = { lines = scan_lines(bufnr, 0, -1) }
+  local forget = function(_, buf)
+    if scans[buf] == scan then scans[buf] = nil end
+    return true
+  end
+  local attached = vim.api.nvim_buf_attach(bufnr, false, {
+    on_lines = function(_, buf, _, first, last_old, last_new)
+      if scans[buf] ~= scan then return true end
+      splice(scan.lines, first, last_old, scan_lines(buf, first, last_new))
+      scan.tick = nil
+    end,
+    on_reload = forget,
+    on_detach = forget,
+  })
+  -- Not kept when no change can reach it: it would go stale
+  if attached then scans[bufnr] = scan end
+  return scan
 end
 
 --- The credential formats a buffer holds, whatever it is called
 ---
 --- Only the text is read: a buffer of a file that was never written, a
---- scratch buffer and a terminal's output are all searched the same way. The
---- guards ask on every cursor move, so the answer is kept in a buffer
---- variable -- gone when the buffer is -- and the text is read once per
---- change rather than once per question.
+--- scratch buffer and a terminal's output are all searched the same way. A
+--- buffer past `content_max_bytes` is not searched at all, and reads as
+--- sensitive: what a search cut short missed could be a key.
 ---@param bufnr integer
 ---@return { name: string, line: integer }[] found
----@return boolean partial Whether the buffer was only searched in part
+---@return boolean partial Whether the buffer was too large to search
 local function secrets_in_buffer(bufnr)
-  local tick = vim.api.nvim_buf_get_changedtick(bufnr)
-  local cached = vim.b[bufnr].dy_sensitive_scan
-  if cached and cached.tick == tick then return cached.found, cached.partial end
-
   local lines = vim.api.nvim_buf_line_count(bufnr)
-  local bytes = vim.api.nvim_buf_get_offset(bufnr, lines)
-  local partial = bytes > config.content_max_bytes
-  if partial then
-    -- The offset of a line is where it starts, and so where the one before it
-    -- ends: this counts the lines that end inside the budget.
-    local low, high = 1, lines
-    while low < high do
-      local middle = math.floor((low + high + 1) / 2)
-      if
-        vim.api.nvim_buf_get_offset(bufnr, middle) <= config.content_max_bytes
-      then
-        low = middle
-      else
-        high = middle - 1
+  if vim.api.nvim_buf_get_offset(bufnr, lines) > config.content_max_bytes then
+    return {}, true
+  end
+  local scan = scan_of(bufnr)
+  local tick = vim.api.nvim_buf_get_changedtick(bufnr)
+  if scan.tick ~= tick or not scan.found then
+    local found, seen = {}, {}
+    for line, name in ipairs(scan.lines) do
+      if name and not seen[name] then
+        seen[name] = true
+        table.insert(found, { name = name, line = line })
       end
     end
-    lines = low
+    scan.found, scan.tick = found, tick
   end
-
-  local found =
-    secrets_in(vim.api.nvim_buf_get_lines(bufnr, 0, lines, false), 1)
-  vim.b[bufnr].dy_sensitive_scan =
-    { tick = tick, found = found, partial = partial }
-  return found, partial
+  return vim.deepcopy(scan.found), false
 end
 
 --- What `betterleaks` found in a buffer, as its diagnostics
@@ -233,8 +280,13 @@ M.reasons = function(bufnr, opts)
   for _, secret in ipairs(found) do
     table.insert(reasons, ('%s on line %d'):format(secret.name, secret.line))
   end
-  if partial and #found == 0 then
-    table.insert(reasons, 'searched only the first part of the buffer')
+  if partial then
+    table.insert(
+      reasons,
+      ('larger than %d KiB, too large to search'):format(
+        config.content_max_bytes / 1024
+      )
+    )
   end
   return reasons
 end
@@ -251,7 +303,8 @@ M.is_sensitive = function(bufnr)
   if M.is_sensitive_path(vim.api.nvim_buf_get_name(bufnr)) then return true end
   if M.marked(bufnr) then return true end
   if M.is_allowed(bufnr) then return false end
-  return #(secrets_in_buffer(bufnr)) > 0 or #(leaks_in_buffer(bufnr)) > 0
+  local found, partial = secrets_in_buffer(bufnr)
+  return partial or #found > 0 or #(leaks_in_buffer(bufnr)) > 0
 end
 
 return M

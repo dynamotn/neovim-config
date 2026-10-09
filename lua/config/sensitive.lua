@@ -116,10 +116,10 @@ return {
     'access[_%-]*key',
     'private[_%-]*key',
   },
-  --- Bytes of a buffer read when looking for the patterns above. A buffer
-  --- bigger than this is searched up to here and reported as searched in
-  --- part, rather than holding up the editor on a log of a few hundred
-  --- megabytes.
+  --- The largest buffer searched for the patterns above. A bigger one is
+  --- not searched, which would hold up the editor on a log of a few hundred
+  --- megabytes, and is held back unless waived: what is not searched could
+  --- hold a key.
   ---@type integer
   content_max_bytes = 2 * 1024 * 1024,
 }

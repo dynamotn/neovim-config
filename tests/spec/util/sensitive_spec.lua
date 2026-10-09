@@ -229,6 +229,48 @@ describe('util.sensitive', function()
       assert.is_true(sensitive.is_sensitive(bufnr))
     end)
 
+    it(
+      'follows lines added, removed and changed after the first read',
+      function()
+        local token = 'token = "ghp_0123456789abcdefghij"'
+        local bufnr = h.buffer({
+          name = dir .. '/main.lua',
+          lines = { 'a', 'b', 'c', 'd' },
+        })
+        assert.are.same({}, sensitive.reasons(bufnr))
+        -- Two lines in, one of them a token: it moves the rest down
+        vim.api.nvim_buf_set_lines(bufnr, 1, 1, false, { 'x', token })
+        assert.are.same({ 'GitHub token on line 3' }, sensitive.reasons(bufnr))
+        -- The lines above it go: the token moves up with what follows
+        vim.api.nvim_buf_set_lines(bufnr, 0, 2, false, {})
+        assert.are.same({ 'GitHub token on line 1' }, sensitive.reasons(bufnr))
+        -- A token typed into the last line, and the first one taken out
+        vim.api.nvim_buf_set_text(bufnr, 3, 1, 3, 1, { ' ' .. token })
+        vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { 'clean' })
+        assert.are.same({ 'GitHub token on line 4' }, sensitive.reasons(bufnr))
+        vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'clean' })
+        assert.is_false(sensitive.is_sensitive(bufnr))
+      end
+    )
+
+    it('holds back a buffer too large to search', function()
+      local config = require('config.sensitive')
+      local before = config.content_max_bytes
+      config.content_max_bytes = 16
+      local bufnr = h.buffer({
+        name = dir .. '/main.lua',
+        lines = { 'nothing secret here', 'nor here' },
+      })
+      local held = sensitive.is_sensitive(bufnr)
+      local reasons = sensitive.reasons(bufnr)
+      sensitive.allow(bufnr)
+      local waived = sensitive.is_sensitive(bufnr)
+      config.content_max_bytes = before
+      assert.is_true(held)
+      assert.is_truthy(reasons[1]:find('too large to search', 1, true))
+      assert.is_false(waived)
+    end)
+
     --- Leave a `betterleaks` finding on `bufnr`, as the linter would
     ---@param bufnr integer
     local function leak(bufnr)
