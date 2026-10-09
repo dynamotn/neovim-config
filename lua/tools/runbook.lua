@@ -76,13 +76,15 @@ M.DANGEROUS = {
 ---@field code string[]
 ---@field indent string
 
---- The fenced block `row` is in, fences included
+--- Every closed fenced block of `lines`, fences included, in order
+---
+--- One pass over the lines: `blocks` and `block_at` both read from it, so
+--- running each block of a long runbook does not read it again per block.
 ---@param lines string[]
----@param row integer 1-based
----@return DyRunbookBlock?
-function M.block_at(lines, row)
-  local open
-  local fence, indent, lang
+---@return DyRunbookBlock[]
+function M.fences(lines)
+  local found = {}
+  local open, fence, indent, lang
   for index, line in ipairs(lines) do
     if not open then
       local i, f, info = line:match('^(%s*)(```+)%s*([^%s`]*)')
@@ -98,19 +100,28 @@ function M.block_at(lines, row)
     else
       local f = line:match('^%s*([`~]+)%s*$')
       if f and f:sub(1, 1) == fence:sub(1, 1) and #f >= #fence then
-        if row >= open and row <= index then
-          return {
-            open = open,
-            close = index,
-            lang = lang,
-            code = vim.list_slice(lines, open + 1, index - 1),
-            indent = indent,
-          }
-        end
+        table.insert(found, {
+          open = open,
+          close = index,
+          lang = lang,
+          code = vim.list_slice(lines, open + 1, index - 1),
+          indent = indent,
+        })
         open = nil
       end
     end
-    if not open and index >= row then return nil end
+  end
+  return found
+end
+
+--- The fenced block `row` is in, fences included
+---@param lines string[]
+---@param row integer 1-based
+---@return DyRunbookBlock?
+function M.block_at(lines, row)
+  for _, block in ipairs(M.fences(lines)) do
+    if row < block.open then return nil end
+    if row <= block.close then return block end
   end
   return nil
 end
@@ -119,17 +130,10 @@ end
 ---@param lines string[]
 ---@return DyRunbookBlock[]
 function M.blocks(lines)
-  local found, row = {}, 1
-  while row <= #lines do
-    local block = M.block_at(lines, row)
-    if block then
-      if M.RUNNERS[block.lang] then table.insert(found, block) end
-      row = block.close + 1
-    else
-      row = row + 1
-    end
-  end
-  return found
+  return vim.tbl_filter(
+    function(block) return M.RUNNERS[block.lang] ~= nil end,
+    M.fences(lines)
+  )
 end
 
 --- The code of `block` as it runs: a `console` block keeps only its `$ `

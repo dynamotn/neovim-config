@@ -31,6 +31,28 @@ describe('tools.runbook', function()
     '````',
   }
 
+  describe('blocks', function()
+    it('lists the runnable blocks of a long runbook in one pass', function()
+      local lines = {}
+      for index = 1, 2000 do
+        vim.list_extend(lines, { '```bash', 'echo ' .. index, '```', '' })
+      end
+      local start = vim.uv.hrtime()
+      local blocks = runbook.blocks(lines)
+      local took = (vim.uv.hrtime() - start) / 1e6
+      assert.are.equal(2000, #blocks)
+      assert.are.same({ 'echo 2000' }, blocks[2000].code)
+      -- Read again from the top for each block, this is several seconds
+      assert.is_true(took < 1000, ('took %d ms'):format(took))
+    end)
+
+    it('leaves out a fence never closed', function()
+      local blocks = runbook.blocks({ '```bash', 'echo a', '```', '```sh' })
+      assert.are.equal(1, #blocks)
+      assert.is_nil(runbook.block_at({ '```sh', 'echo b' }, 2))
+    end)
+  end)
+
   describe('block_at', function()
     it('finds the block the row is in, fences included', function()
       local block = runbook.block_at(doc, 4)
