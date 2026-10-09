@@ -5,7 +5,12 @@ return {
   'hrsh7th/cmp-calc', -- Math calculation
   'mgalliou/blink-cmp-tmux', -- Tmux buffer source
   'dynamotn/blink-cmp-zellij', -- Zellij source
-  'garyhurtz/blink_cmp_kitty', -- Kitty source
+  {
+    -- Kitty source. The local checkout, while upstream has not taken the fix
+    -- for reading kitty on the main loop; other machines clone upstream.
+    'garyhurtz/blink_cmp_kitty',
+    dev = true,
+  },
   'moyiz/blink-emoji.nvim', -- Emoji source
   'MahanRahmati/blink-nerdfont.nvim', -- Nerdfont source
   {
