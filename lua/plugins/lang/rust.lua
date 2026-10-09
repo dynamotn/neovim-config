@@ -30,7 +30,8 @@ return vim.list_contains(DyNeo.enabled_languages, 'rust')
                   { desc = desc, buffer = bufnr }
                 )
               end
-              map('<leader>cR', 'codeAction', 'Code Action')
+              -- Not `<leader>cR`, which renames the file
+              map('<localleader>a', 'codeAction', 'Code Action')
               -- Not `<leader>dr`, which is the dap REPL
               map('<leader>dR', 'debuggables', 'Rust Debuggables')
               map('<localleader>e', 'explainError', 'Explain Error')

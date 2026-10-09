@@ -8,10 +8,10 @@ describe('config.autocmds', function()
 
   it('creates its autocommand groups', function()
     for _, group in ipairs({
-      'terminal',
-      'cursor_active_window',
-      'cursor_inactive_window',
-      'auto_relative_number',
+      'dyneo_terminal',
+      'dyneo_cursor_active_window',
+      'dyneo_cursor_inactive_window',
+      'dyneo_auto_relative_number',
     }) do
       assert.is_true(#vim.api.nvim_get_autocmds({ group = group }) > 0, group)
     end
@@ -34,7 +34,9 @@ describe('config.autocmds', function()
 
   it('drops relative numbers on the command line only', function()
     vim.wo.relativenumber = true
-    vim.api.nvim_exec_autocmds('CmdlineEnter', {})
+    vim.api.nvim_exec_autocmds('CmdlineEnter', { pattern = '/' })
+    assert.is_true(vim.wo.relativenumber)
+    vim.api.nvim_exec_autocmds('CmdlineEnter', { pattern = ':' })
     assert.is_false(vim.wo.relativenumber)
     vim.api.nvim_exec_autocmds('CmdlineLeave', {})
     assert.is_true(vim.wo.relativenumber)
@@ -51,6 +53,7 @@ describe('config.autocmds', function()
     local dir, cleanup
     before_each(function()
       dir, cleanup = h.tmpdir()
+      dofile(h.root .. '/plugin/sensitive.lua')
     end)
     after_each(function() cleanup() end)
 

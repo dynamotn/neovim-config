@@ -150,6 +150,10 @@ describe('util.sensitive', function()
 
     it('says nothing about an ordinary value', function()
       assert.is_nil(sensitive.secret_format('nginx:1.27'))
+      -- A token's prefix in ordinary code
+      assert.is_nil(sensitive.secret_format('hf_hub_download(repo_id)'))
+      assert.is_nil(sensitive.secret_format('echo $npm_package_version'))
+      assert.is_nil(sensitive.secret_format('ghs_check = true'))
       assert.is_nil(sensitive.secret_format(nil))
     end)
   end)

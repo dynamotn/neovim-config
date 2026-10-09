@@ -1,5 +1,12 @@
 --- What counts as sensitive: files whose content must never reach an AI
 --- service. The checks that read these lists live in `util.sensitive`.
+--- At least 20 characters of `class`: a real token is longer, while
+--- `hf_hub_download` or `$npm_package_version` is ordinary code that a bare
+--- prefix would hold back from every AI integration
+---@param class string
+---@return string
+local function token(class) return class:rep(20) end
+
 ---@class DySensitiveConfig
 return {
   --- Lua patterns matched against the file name alone
@@ -71,18 +78,18 @@ return {
     { name = 'private key block', pattern = 'BEGIN [%u ]*PRIVATE KEY' },
     { name = 'age secret key', pattern = 'AGE%-SECRET%-KEY%-1[%u%d]+' },
     { name = 'AWS access key', pattern = 'A[KS]IA[%u%d][%u%d][%u%d][%u%d]+' },
-    { name = 'GitHub token', pattern = 'gh[pousr]_[%w]+' },
+    { name = 'GitHub token', pattern = '%f[%w]gh[pousr]_' .. token('%w') },
     { name = 'GitHub token', pattern = 'github_pat_[%w_]+' },
     { name = 'GitLab token', pattern = 'glpat%-[%w%-_]+' },
     { name = 'Slack token', pattern = 'xox[abprs]%-[%w%-]+' },
     { name = 'Slack webhook', pattern = 'hooks%.slack%.com/services/' },
     { name = 'Anthropic API key', pattern = 'sk%-ant%-[%w%-]+' },
     { name = 'OpenAI API key', pattern = 'sk%-proj%-[%w%-_]+' },
-    { name = 'Google API key', pattern = 'AIza[%w%-_]+' },
-    { name = 'npm token', pattern = 'npm_[%w]+' },
+    { name = 'Google API key', pattern = '%f[%w]AIza' .. token('[%w%-_]') },
+    { name = 'npm token', pattern = '%f[%w]npm_' .. token('%w') },
     { name = 'PyPI token', pattern = 'pypi%-AgE[%w%-_]+' },
-    { name = 'Hugging Face token', pattern = 'hf_[%w]+' },
-    { name = 'Stripe key', pattern = '[sr]k_live_[%w]+' },
+    { name = 'Hugging Face token', pattern = '%f[%w]hf_' .. token('%w') },
+    { name = 'Stripe key', pattern = '%f[%w][sr]k_live_' .. token('%w') },
     -- `header.payload.` of a JSON Web Token: both halves start from the
     -- base64 of `{"`, which is what makes this worth matching at all.
     { name = 'JSON Web Token', pattern = 'eyJ[%w%-_]+%.eyJ[%w%-_]+%.' },

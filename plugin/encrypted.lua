@@ -10,7 +10,12 @@ vim.api.nvim_create_autocmd('BufReadPost', {
       not name:match('^encrypted_.+%.age$')
       and not name:match('^encrypted_.+%.asc$')
       and not first:find('$ANSIBLE_VAULT;', 1, true)
-      and vim.fn.search('ENC\\[AES256_GCM,', 'nw') == 0
+      -- In the buffer read, which need not be the current one
+      and vim.api.nvim_buf_call(
+          args.buf,
+          function() return vim.fn.search('ENC\\[AES256_GCM,', 'nw') end
+        )
+        == 0
     then
       return
     end

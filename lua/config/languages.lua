@@ -938,7 +938,8 @@ return {
 
         -- Add pair text after \start...
         -- e.g., \start... ... \stop...
-        rule('\\start(%w*) $', filetypes)
+        -- The second argument is the end pair: filetypes are the third
+        rule('\\start(%w*) $', '', filetypes)
           :replace_endpair(function(opts)
             local beforeText = string.sub(opts.line, 0, opts.col)
             local _, _, match = beforeText:find('\\start(%w*)')

@@ -110,7 +110,10 @@ vim.api.nvim_create_autocmd({ 'UIEnter', 'UILeave' }, {
   end,
 })
 vim.print = function(...)
-  if not has_ui or vim.in_fast_event() then return builtin_print(...) end
+  -- Before `lazy.setup` snacks is not on the runtimepath yet
+  if not has_ui or vim.in_fast_event() or not package.loaded.snacks then
+    return builtin_print(...)
+  end
   _G.dd(...)
   return ...
 end

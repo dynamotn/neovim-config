@@ -255,7 +255,16 @@ local diagnostic_goto = function(next, severity)
     vim.diagnostic.jump({
       count = (next and 1 or -1) * vim.v.count1,
       severity = severity and vim.diagnostic.severity[severity] or nil,
-      float = true,
+      -- `float` is deprecated from 0.13 on, in favour of `on_jump`
+      float = vim.fn.has('nvim-0.13') == 0 or nil,
+      on_jump = function(diagnostic, bufnr)
+        if not diagnostic then return end
+        vim.diagnostic.open_float({
+          bufnr = bufnr,
+          scope = 'cursor',
+          focus = false,
+        })
+      end,
     })
   end
 end
@@ -593,7 +602,15 @@ local function selected_pattern(delimiter)
     vim.fn.getpos('.'),
     { type = vim.fn.mode() }
   )
-  local pattern = vim.fn.escape(table.concat(text, '\n'), '\\' .. delimiter)
+  local pattern = vim
+    .fn
+    .escape(table.concat(text, '\n'), '\\' .. delimiter)
+    -- A raw newline is read as <CR>, which would run `:s` on the first line
+    -- alone; `\n` still matches a line break under `\V`
+    :gsub(
+      '\n',
+      '\\n'
+    )
   -- The result is read as keys: a `<` must not start a key code
   return '\\V' .. pattern:gsub('<', '<lt>')
 end

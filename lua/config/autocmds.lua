@@ -17,7 +17,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     if vim.fn.has('nvim-0.13') == 1 then
       vim.hl.hl_op()
     else
-      (vim.hl or vim.highlight).on_yank()
+      vim.hl.on_yank()
     end
   end,
 })
@@ -83,7 +83,8 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.bo[event.buf].buflisted = false
     vim.schedule(function()
       vim.keymap.set('n', 'q', function()
-        vim.cmd('close')
+        -- The last window cannot be closed (E444): the buffer still goes
+        pcall(vim.cmd.close)
         -- Never at the cost of unsaved changes
         if not vim.bo[event.buf].modified then
           pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
@@ -107,7 +108,8 @@ vim.api.nvim_create_autocmd('FileType', {
 -- wrap and check for spell in text filetypes
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup('wrap_spell'),
-  pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
+  -- gitcommit and markdown have their own in `ftplugin/`
+  pattern = { 'text', 'plaintex', 'typst' },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
@@ -131,51 +133,11 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
   end,
 })
 
--- Keep a sensitive file's content out of the undo, swap and backup files,
--- which outlive it on disk in plain text. The same goes for a file under the
--- temporary directory, such as the decrypted copy `chezmoi edit` works on.
-local function leaves_no_copy(file)
-  if file == '' then return false end
-  local tmp = vim.fs.normalize(vim.env.TMPDIR or '/tmp')
-  file = vim.fs.normalize(vim.fn.fnamemodify(file, ':p'))
-  return vim.startswith(file, tmp .. '/')
-    or vim.startswith(file, '/tmp/')
-    or require('util.sensitive').is_sensitive_path(file)
-end
-
-vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
-  group = augroup('sensitive_no_copy'),
-  callback = function(event)
-    if not leaves_no_copy(event.match) then return end
-    vim.bo[event.buf].undofile = false
-    vim.bo[event.buf].swapfile = false
-  end,
-})
-
--- `backup` and `writebackup` are global: off for the one write only
-local backup_saved
-vim.api.nvim_create_autocmd('BufWritePre', {
-  group = augroup('sensitive_no_backup'),
-  callback = function(event)
-    if not leaves_no_copy(event.match) then return end
-    backup_saved = { vim.o.backup, vim.o.writebackup }
-    vim.o.backup, vim.o.writebackup = false, false
-  end,
-})
-vim.api.nvim_create_autocmd({ 'BufWritePost', 'FileWritePost' }, {
-  group = augroup('sensitive_restore_backup'),
-  callback = function()
-    if not backup_saved then return end
-    vim.o.backup, vim.o.writebackup = backup_saved[1], backup_saved[2]
-    backup_saved = nil
-  end,
-})
-
 -- A terminal without a filetype of its own gets one, once. Terminal plugins
 -- set theirs (`snacks_terminal`, `toggleterm`), and layouts key on it.
 local set_ft_terminal = function()
   vim.api.nvim_create_autocmd('TermOpen', {
-    group = vim.api.nvim_create_augroup('terminal', {}),
+    group = augroup('terminal'),
     callback = function(event)
       if vim.bo[event.buf].filetype == '' then
         vim.bo[event.buf].filetype = 'terminal'
@@ -186,7 +148,7 @@ end
 
 local enable_cursorline = function()
   vim.api.nvim_create_autocmd({ 'InsertLeave', 'WinEnter' }, {
-    group = vim.api.nvim_create_augroup('cursor_active_window', {}),
+    group = augroup('cursor_active_window'),
     callback = function()
       local ok, cl = pcall(vim.api.nvim_win_get_var, 0, 'auto-cursorline')
       if ok and cl then
@@ -196,7 +158,7 @@ local enable_cursorline = function()
     end,
   })
   vim.api.nvim_create_autocmd({ 'InsertEnter', 'WinLeave' }, {
-    group = vim.api.nvim_create_augroup('cursor_inactive_window', {}),
+    group = augroup('cursor_inactive_window'),
     callback = function()
       local cl = vim.wo.cursorline
       if cl then
@@ -208,7 +170,7 @@ local enable_cursorline = function()
 end
 
 local auto_relative_number = function()
-  local group = vim.api.nvim_create_augroup('auto_relative_number', {})
+  local group = augroup('auto_relative_number')
   local function set_relnum_back(win)
     vim.api.nvim_create_autocmd('CmdlineLeave', {
       group = group,
@@ -219,9 +181,13 @@ local auto_relative_number = function()
   -- Absolute numbers while a command is typed, so a range like `:12,20d` can
   -- be read straight off the gutter. Entering the command line does not
   -- repaint the window, hence the `redraw`.
+  -- Only a command typed at `:`: not a search, an `input()`, or the `:` of a
+  -- mapping, which would flicker the gutter for nothing
   vim.api.nvim_create_autocmd('CmdlineEnter', {
     group = group,
+    pattern = ':',
     callback = function()
+      if vim.fn.state('m') ~= '' then return end
       local win = vim.api.nvim_get_current_win()
       if vim.wo[win].relativenumber then
         vim.wo[win].relativenumber = false
