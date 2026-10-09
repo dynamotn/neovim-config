@@ -107,6 +107,27 @@ describe('tools.diagnostics.terragrunt_validate', function()
       )
     end)
 
+    it(
+      'reports output that is not a report, rather than a clean run',
+      function()
+        local result = opts.on_output({
+          bufname = '/repo/a/terragrunt.hcl',
+          cwd = '/repo/a',
+          output = 'ERRO[0000] no such file\nmore',
+        })
+        assert.are.equal(1, #result)
+        assert.are.equal('/repo/a/terragrunt.hcl', result[1].filename)
+        assert.are.equal(
+          'terragrunt hcl validate gave no JSON report: ERRO[0000] no such file',
+          result[1].message
+        )
+        assert.are.same(
+          {},
+          opts.on_output({ bufname = '/repo/a/x', cwd = '/repo/a', output = '' })
+        )
+      end
+    )
+
     it('keeps earlier diagnostics of other directories only', function()
       package.loaded['null-ls.diagnostics'] = {
         get_namespace = function(id) return 'ns' .. id end,

@@ -31,12 +31,27 @@ return h.make_builtin({
     check_exit_code = function() return true end,
     on_output = function(params, done)
       local output = params.output
+      -- Something said that is not the JSON report -- a crash, a prompt --
+      -- is reported on the buffer rather than read as a clean directory
+      local unreadable = false
       if type(output) == 'string' then
         local ok, decoded = pcall(vim.json.decode, output)
+        unreadable = not ok and vim.trim(output) ~= ''
         output = ok and decoded or nil
       end
       if type(output) ~= 'table' then output = {} end
       local combined_diagnostics = {}
+      if unreadable then
+        table.insert(combined_diagnostics, {
+          message = 'terragrunt hcl validate gave no JSON report: '
+            .. vim.split(vim.trim(params.output), '\n')[1],
+          row = 1,
+          col = 1,
+          source = 'terragrunt validate',
+          severity = h.diagnostics.severities.error,
+          filename = params.bufname,
+        })
+      end
 
       -- keep diagnostics from other directories
       if params.source_id ~= nil then
