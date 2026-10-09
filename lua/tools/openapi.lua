@@ -8,6 +8,10 @@
 --- file is left as it is.
 local M = {}
 
+--- The copies `compare` wrote and has not removed yet, by path
+---@type table<string, true>
+M._leftover = {}
+
 local METHODS = {
   get = true,
   put = true,
@@ -566,22 +570,48 @@ function M.compare(bufnr, rev, file, base_text, current, modified)
   -- relative `$ref` resolves from either side; the file itself stands for
   -- the buffer when they agree
   local base = vim.fs.joinpath(dir, '.oasdiff-base-' .. name)
-  local revision = file
+  local revision = modified
+      and vim.fs.joinpath(dir, '.oasdiff-revision-' .. name)
+    or file
+  for _, path in ipairs({ base, revision ~= file and revision or nil }) do
+    if vim.uv.fs_stat(path) then
+      return notify(
+        ('%s is in the way: not written over'):format(vim.fs.basename(path)),
+        vim.log.levels.ERROR
+      )
+    end
+  end
   local written = { base }
   vim.fn.writefile(vim.split(base_text, '\n', { plain = true }), base)
   if modified then
-    revision = vim.fs.joinpath(dir, '.oasdiff-revision-' .. name)
     table.insert(written, revision)
     vim.fn.writefile(current, revision)
   end
-  vim.system(
+  -- Gone however the run ends: with it, when it cannot start, or with Neovim
+  local function remove()
+    for _, path in ipairs(written) do
+      vim.fn.delete(path)
+      M._leftover[path] = nil
+    end
+  end
+  for _, path in ipairs(written) do
+    M._leftover[path] = true
+  end
+  vim.api.nvim_create_autocmd('VimLeavePre', {
+    group = vim.api.nvim_create_augroup('dy_openapi', { clear = true }),
+    callback = function()
+      for path in pairs(M._leftover) do
+        vim.fn.delete(path)
+      end
+    end,
+  })
+  local started = pcall(
+    vim.system,
     { 'oasdiff', 'breaking', base, revision, '--format', 'json' },
     { text = true, timeout = 60000 },
     function(result)
       vim.schedule(function()
-        for _, path in ipairs(written) do
-          vim.fn.delete(path)
-        end
+        remove()
         if not vim.api.nvim_buf_is_valid(bufnr) then return end
         -- A failed run says nothing about breaking: never an all-clear
         if result.code ~= 0 then
@@ -618,6 +648,10 @@ function M.compare(bufnr, rev, file, base_text, current, modified)
       end)
     end
   )
+  if not started then
+    remove()
+    notify('oasdiff could not run', vim.log.levels.ERROR)
+  end
 end
 
 return M

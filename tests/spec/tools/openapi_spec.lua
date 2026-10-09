@@ -323,6 +323,48 @@ describe('tools.openapi', function()
       assert.equals(vim.diagnostic.severity.INFO, diagnostics[3].severity)
     end)
 
+    it('leaves a file already named like its copies alone', function()
+      local dir, cleanup = h.tmpdir()
+      h.write(dir .. '/openapi.yaml', YAML)
+      h.write(dir .. '/.oasdiff-base-openapi.yaml', { 'mine' })
+      local notes = {}
+      local restore = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+      openapi.compare(0, 'HEAD', dir .. '/openapi.yaml', 'old', {}, false)
+      restore()
+      assert.same(
+        { 'mine' },
+        vim.fn.readfile(dir .. '/.oasdiff-base-openapi.yaml')
+      )
+      assert.equals(
+        '.oasdiff-base-openapi.yaml is in the way: not written over',
+        notes[1]
+      )
+      cleanup()
+    end)
+
+    it('removes its copies when oasdiff cannot start', function()
+      local dir, cleanup = h.tmpdir()
+      h.write(dir .. '/openapi.yaml', YAML)
+      local path = vim.env.PATH
+      vim.env.PATH = dir .. '/no-bin'
+      local notes = {}
+      local restore = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+      openapi.compare(0, 'HEAD', dir .. '/openapi.yaml', 'old', { 'new' }, true)
+      restore()
+      vim.env.PATH = path
+      assert.equals('oasdiff could not run', notes[1])
+      assert.same({}, vim.fn.glob(dir .. '/.oasdiff-*', true, true))
+      cleanup()
+    end)
+
     it('compares the buffer with the spec at a revision', function()
       local dir, cleanup = h.tmpdir()
       local function git(...)
