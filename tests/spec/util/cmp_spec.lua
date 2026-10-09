@@ -3,13 +3,7 @@ local h = require('helpers')
 describe('util.cmp', function()
   local cmp, env_backup, restore_executable, executables
 
-  local pane_vars = {
-    'KITTY_LISTEN_ON',
-    'KITTY_WINDOW_ID',
-    'TMUX',
-    'ZELLIJ',
-    'ZELLIJ_SESSION_NAME',
-  }
+  local pane_vars = { 'TMUX' }
 
   before_each(function()
     env_backup = {}
@@ -44,6 +38,9 @@ describe('util.cmp', function()
     'emoji',
     'dynamic',
     'dictionary',
+    -- They say themselves whether their session or socket is there
+    'zellij',
+    'kitty',
   }
 
   describe('sources', function()
@@ -121,11 +118,10 @@ describe('util.cmp', function()
       return path
     end
 
-    it('adds zellij when its session is set and the binary exists', function()
-      vim.env.ZELLIJ, vim.env.ZELLIJ_SESSION_NAME = '0', 'main'
-      assert.is_false(vim.list_contains(cmp.sources('*'), 'zellij'))
-      executables.zellij = true
-      assert.is_true(vim.list_contains(cmp.sources('*'), 'zellij'))
+    it('leaves zellij and kitty to say whether they are reachable', function()
+      local sources = cmp.sources('*')
+      assert.is_true(vim.list_contains(sources, 'zellij'))
+      assert.is_true(vim.list_contains(sources, 'kitty'))
     end)
 
     it('adds tmux only when its socket is alive', function()
@@ -134,28 +130,6 @@ describe('util.cmp', function()
       assert.is_false(vim.list_contains(cmp.sources('*'), 'tmux'))
       vim.env.TMUX = socket(dir .. '/tmux.sock') .. ',1,0'
       assert.is_true(vim.list_contains(cmp.sources('*'), 'tmux'))
-    end)
-
-    it('adds kitty for a live socket, an abstract one, or TCP', function()
-      executables.kitty = true
-      vim.env.KITTY_WINDOW_ID = '1'
-      vim.env.KITTY_LISTEN_ON = 'unix:' .. dir .. '/missing'
-      assert.is_false(vim.list_contains(cmp.sources('*'), 'kitty'))
-      vim.env.KITTY_LISTEN_ON = 'unix:' .. socket(dir .. '/kitty.sock')
-      assert.is_true(vim.list_contains(cmp.sources('*'), 'kitty'))
-      vim.env.KITTY_LISTEN_ON = 'unix:@kitty'
-      assert.is_true(vim.list_contains(cmp.sources('*'), 'kitty'))
-      vim.env.KITTY_LISTEN_ON = 'tcp:localhost:1234'
-      assert.is_true(vim.list_contains(cmp.sources('*'), 'kitty'))
-    end)
-
-    it('leaves kitty out without a window id or binary', function()
-      vim.env.KITTY_LISTEN_ON = 'unix:@kitty'
-      executables.kitty = true
-      assert.is_false(vim.list_contains(cmp.sources('*'), 'kitty'))
-      vim.env.KITTY_WINDOW_ID = '1'
-      executables.kitty = nil
-      assert.is_false(vim.list_contains(cmp.sources('*'), 'kitty'))
     end)
   end)
 

@@ -1,12 +1,12 @@
 --- A blink.cmp source that keeps the items of another one for a while.
 ---
---- `blink-cmp-tmux` and `blink-cmp-zellij` capture every pane with
---- `vim.system():wait()`, on the main loop, and mark their answer incomplete,
---- so blink asks again on every key: each one typed stalled the editor for a
---- `list-panes` plus a capture per pane. Their words do not depend on what is
---- being typed, so they are kept here, handed to blink as complete -- it then
---- filters them itself -- and captured again only once they are `ttl` old,
---- when the editor next sits idle, rather than in the middle of a word.
+--- `blink-cmp-tmux` captures every pane with `vim.system():wait()`, on the
+--- main loop, and marks its answer incomplete, so blink asks again on every
+--- key: each one typed stalled the editor for a `list-panes` plus a capture
+--- per pane. Its words do not depend on what is being typed, so they are kept
+--- here, handed to blink as complete -- it then filters them itself -- and
+--- captured again only once they are `ttl` old, when the editor next sits
+--- idle, rather than in the middle of a word.
 ---
 --- Provider options:
 ---   source  module of the wrapped source

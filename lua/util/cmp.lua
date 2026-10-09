@@ -10,39 +10,17 @@ local function is_socket(path)
   return stat ~= nil and stat.type == 'socket'
 end
 
---- Whether the terminal or multiplexer behind each pane source is reachable.
---- Their environment variables outlive the process that set them (e.g. a
---- long-lived zellij session started from an old kitty), and a source
---- talking to a dead socket either errors out or spawns a failing command on
---- every completion.
----@type table<string, fun(): boolean>
-local pane_source_reachable = {
-  -- Every read of a dead socket waits out its deadline, and finds nothing
-  kitty = function()
-    local listen_on = vim.env.KITTY_LISTEN_ON
-    if not vim.env.KITTY_WINDOW_ID or not listen_on then return false end
-    if vim.fn.executable('kitten') == 0 and vim.fn.executable('kitty') == 0 then
-      return false
-    end
-    local path = listen_on:match('^unix:(.+)$')
-    -- Abstract sockets (`unix:@name`) and TCP have nothing on disk to check
-    if not path or vim.startswith(path, '@') then return true end
-    return is_socket(path)
-  end,
+--- Whether tmux is reachable: `$TMUX` outlives the server that set it (a
+--- shell started from a session since killed), and `blink-cmp-tmux` would
+--- spawn a failing command on every completion. The zellij and kitty
+--- sources check their own session and socket.
+---@return boolean
+local function tmux_reachable()
   -- `$TMUX` is `<socket>,<pid>,<session>`
-  tmux = function()
-    local tmux = vim.env.TMUX
-    if not tmux or vim.fn.executable('tmux') == 0 then return false end
-    return is_socket(tmux:match('^([^,]+)') or '')
-  end,
-  -- The zellij socket lives under a versioned directory that also depends on
-  -- `ZELLIJ_SOCKET_DIR` or `TMPDIR`, so only its environment is checked
-  zellij = function()
-    return vim.env.ZELLIJ ~= nil
-      and vim.env.ZELLIJ_SESSION_NAME ~= nil
-      and vim.fn.executable('zellij') == 1
-  end,
-}
+  local tmux = vim.env.TMUX
+  if not tmux or vim.fn.executable('tmux') == 0 then return false end
+  return is_socket(tmux:match('^([^,]+)') or '')
+end
 
 --- Setup default sources of cmp
 M.setup_default_sources = function()
@@ -76,11 +54,8 @@ M.sources = function(filetype)
     'dynamic',
     'dictionary',
   }
-  for _, source in ipairs({ 'tmux', 'zellij', 'kitty' }) do
-    if pane_source_reachable[source]() then
-      table.insert(common_sources, source)
-    end
-  end
+  if tmux_reachable() then table.insert(common_sources, 'tmux') end
+  vim.list_extend(common_sources, { 'zellij', 'kitty' })
   local unique_sources = {
     markdown = { 'nerdfont' },
     typst = { 'nerdfont' },
