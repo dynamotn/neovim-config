@@ -105,17 +105,6 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 
--- wrap and check for spell in text filetypes
-vim.api.nvim_create_autocmd('FileType', {
-  group = augroup('wrap_spell'),
-  -- gitcommit and markdown have their own in `ftplugin/`
-  pattern = { 'text', 'plaintex', 'typst' },
-  callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.spell = true
-  end,
-})
-
 -- Fix conceallevel for json files
 vim.api.nvim_create_autocmd({ 'FileType' }, {
   group = augroup('json_conceal'),
