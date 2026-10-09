@@ -179,18 +179,11 @@ end
 ---@param pem string
 ---@param on_done fun(result: vim.SystemCompleted?) Nil when it cannot run
 local function openssl(args, pem, on_done)
-  if vim.fn.executable('openssl') ~= 1 then
-    return vim.schedule(function() on_done(nil) end)
-  end
-  local ok = pcall(
-    vim.system,
+  require('util.system').run(
     vim.list_extend({ 'openssl' }, args),
-    { stdin = pem, text = true, timeout = M.TIMEOUT },
-    function(result)
-      vim.schedule(function() on_done(result) end)
-    end
+    { stdin = pem, timeout = M.TIMEOUT },
+    function(result) on_done(not result.missing and result or nil) end
   )
-  if not ok then vim.schedule(function() on_done(nil) end) end
 end
 
 --- The `openssl` arguments that print what a block of `label` says

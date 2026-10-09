@@ -92,14 +92,14 @@ end
 ---@param stdin? string
 ---@param on_done fun(result: vim.SystemCompleted)
 local function run(command, dir, stdin, on_done)
-  if vim.fn.executable(command[1]) ~= 1 then
-    return notify(command[1] .. ' is not installed', vim.log.levels.ERROR)
-  end
-  vim.system(
+  require('util.system').run(
     command,
-    { cwd = dir, text = true, stdin = stdin, timeout = M.TIMEOUT },
+    { cwd = dir, stdin = stdin, timeout = M.TIMEOUT },
     function(result)
-      vim.schedule(function() on_done(result) end)
+      if result.missing then
+        return notify(result.stderr, vim.log.levels.ERROR)
+      end
+      on_done(result)
     end
   )
 end

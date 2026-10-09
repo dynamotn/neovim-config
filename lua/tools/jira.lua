@@ -162,23 +162,21 @@ function M.run(args, on_done)
   end
   -- jira-cli waits on the network for as long as it takes, and with no
   -- server to reach that is forever: nothing would ever be reported
-  vim.system(
+  require('util.system').run(
     vim.list_extend({ 'jira' }, args),
-    { text = true, timeout = M.RUN_TIMEOUT },
+    { timeout = M.RUN_TIMEOUT },
     function(result)
-      vim.schedule(function()
-        local err = vim.trim(result.stderr or '')
-        if result.signal ~= 0 and err == '' then
-          err = ('jira gave no answer within %g seconds'):format(
-            M.RUN_TIMEOUT / 1000
-          )
-        end
-        on_done(
-          result.code == 0,
-          vim.split(result.stdout or '', '\n', { trimempty = true }),
-          err
+      local err = vim.trim(result.stderr or '')
+      if result.timed_out or (result.signal ~= 0 and err == '') then
+        err = ('jira gave no answer within %g seconds'):format(
+          M.RUN_TIMEOUT / 1000
         )
-      end)
+      end
+      on_done(
+        result.code == 0,
+        vim.split(result.stdout or '', '\n', { trimempty = true }),
+        err
+      )
     end
   )
 end

@@ -366,15 +366,11 @@ end
 ---@param opts table `vim.system` options
 ---@param on_done fun(result: vim.SystemCompleted?)
 local function run(command, opts, on_done)
-  local ok = pcall(
-    vim.system,
+  require('util.system').run(
     command,
     vim.tbl_extend('force', { timeout = M.TIMEOUT, detach = true }, opts),
-    function(result)
-      vim.schedule(function() on_done(result) end)
-    end
+    function(result) on_done(not result.missing and result or nil) end
   )
-  if not ok then vim.schedule(function() on_done(nil) end) end
 end
 
 --- Hand `on_done` the clear text of the file of `bufnr` as it was at `rev`

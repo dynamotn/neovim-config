@@ -121,18 +121,14 @@ end
 ---@param dir string
 ---@param on_done fun(lines: string[]?)
 local function run(command, dir, on_done)
-  local ok = pcall(
-    vim.system,
+  require('util.system').run(
     command,
-    { cwd = dir, text = true, timeout = forge.TIMEOUT },
+    { cwd = dir, timeout = forge.TIMEOUT },
     function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then return on_done(nil) end
-        on_done(vim.split(result.stdout or '', '\n', { trimempty = true }))
-      end)
+      if result.code ~= 0 then return on_done(nil) end
+      on_done(vim.split(result.stdout or '', '\n', { trimempty = true }))
     end
   )
-  if not ok then on_done(nil) end
 end
 
 --- What a section's answer does: set it, unless a newer refresh started

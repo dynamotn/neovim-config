@@ -50,19 +50,14 @@ end
 ---@param args string[]
 ---@param on_done fun(output: string?) Its output trimmed, nil on failure
 local function git(dir, args, on_done)
-  local ok = pcall(
-    vim.system,
+  require('util.system').run(
     vim.list_extend({ 'git' }, args),
-    { cwd = dir, text = true, timeout = 5000 },
+    { cwd = dir, timeout = 5000 },
     function(result)
-      vim.schedule(function()
-        local output = vim.trim(result.stdout or '')
-        on_done(result.code == 0 and output ~= '' and output or nil)
-      end)
+      local output = vim.trim(result.stdout or '')
+      on_done(result.code == 0 and output ~= '' and output or nil)
     end
   )
-  -- Answered later even when git cannot start, as every other answer is
-  if not ok then vim.schedule(function() on_done(nil) end) end
 end
 
 --- The first remote of `urls` on a forge this knows, in `M.REMOTES` order
@@ -127,32 +122,25 @@ function M.api(remote, endpoint, on_done)
     return on_done(nil, cli .. ' is not installed')
   end
   local command = { cli, 'api', '--hostname', remote.host, endpoint }
-  local ok, err = pcall(
-    vim.system,
-    command,
-    { text = true, timeout = M.TIMEOUT },
-    function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then
-          local msg = vim.trim(result.stderr or '')
-          if msg == '' then
-            msg = ('%s api exited %d'):format(cli, result.code)
-          end
-          return on_done(nil, msg)
-        end
-        local decoded, data = pcall(
-          vim.json.decode,
-          result.stdout or '',
-          { luanil = { object = true, array = true } }
-        )
-        if not decoded then
-          return on_done(nil, cli .. ' api answered with something not JSON')
-        end
-        on_done(data)
-      end)
+  local system = require('util.system')
+  system.run(command, { timeout = M.TIMEOUT }, function(result)
+    if result.code ~= 0 and not result.cut then
+      return on_done(nil, system.failure(result, cli .. ' api'))
     end
-  )
-  if not ok then on_done(nil, tostring(err)) end
+    -- Half a JSON document is no answer
+    if result.cut then
+      return on_done(nil, cli .. ' api answered with more than can be read')
+    end
+    local decoded, data = pcall(
+      vim.json.decode,
+      result.stdout or '',
+      { luanil = { object = true, array = true } }
+    )
+    if not decoded then
+      return on_done(nil, cli .. ' api answered with something not JSON')
+    end
+    on_done(data)
+  end)
 end
 
 return M
