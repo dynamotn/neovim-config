@@ -279,8 +279,7 @@ describe('tools.kube', function()
         '#!/bin/sh',
         'echo "kubectl $*" >> "' .. log .. '"',
         'case "$*" in',
-        '  *current-context*) echo prod-cluster ;;',
-        '  *jsonpath*) echo web ;;',
+        [[  *jsonpath*) printf 'prod-cluster\tweb\n' ;;]],
         '  *) echo applied ;;',
         'esac',
       })
@@ -296,6 +295,8 @@ describe('tools.kube', function()
         return 2
       end)
       kube.apply()
+      -- The context is read off the main loop, then asked about
+      assert.is_true(vim.wait(5000, function() return asked ~= nil end, 10))
       restore()
       assert.equals(
         'Apply deploy.yaml to context prod-cluster, namespace web by default?',
@@ -313,8 +314,8 @@ describe('tools.kube', function()
       vim.cmd.edit(dir .. '/app/deploy.yaml')
       local restore = h.stub(vim.fn, 'confirm', function() return 1 end)
       kube.apply()
-      restore()
       settle(1)
+      restore()
       assert.equals(
         'kubectl --context=prod-cluster apply -f ' .. dir .. '/app/deploy.yaml',
         logged()[#logged()]

@@ -221,32 +221,36 @@ function M.dry_run()
   end)
 end
 
---- The current context, or nil
----@return string?
-function M.current_context()
-  if vim.fn.executable('kubectl') ~= 1 then return nil end
-  local result = vim
-    .system({ 'kubectl', 'config', 'current-context' }, { text = true })
-    :wait(5000)
-  local context = result.code == 0 and vim.trim(result.stdout or '') or ''
-  return context ~= '' and context or nil
-end
-
---- The namespace the current context puts an object without one in
----@return string
-function M.current_namespace()
-  local result = vim
-    .system({
+--- Hand `on_done` the current context and the namespace it puts an object
+--- without one in, read off the main loop; no context when there is none
+---
+--- Only those two fields are asked for: the rest of the kubeconfig holds
+--- credentials, and none of it is needed here.
+---@param dir string
+---@param on_done fun(context: string?, namespace: string)
+function M.current(dir, on_done)
+  run(
+    {
       'kubectl',
       'config',
       'view',
       '--minify',
       '-o',
-      'jsonpath={..namespace}',
-    }, { text = true })
-    :wait(5000)
-  local namespace = result.code == 0 and vim.trim(result.stdout or '') or ''
-  return namespace ~= '' and namespace or 'default'
+      'jsonpath={.current-context}{"\\t"}{.contexts[0].context.namespace}',
+    },
+    dir,
+    nil,
+    function(result)
+      local context, namespace = (result.code == 0 and result.stdout or ''):match(
+        '^([^\t]*)\t?(.*)$'
+      )
+      context, namespace = vim.trim(context or ''), vim.trim(namespace or '')
+      on_done(
+        context ~= '' and context or nil,
+        namespace ~= '' and namespace or 'default'
+      )
+    end
+  )
 end
 
 --- Apply it, once told to, to the context named -- and to that one only,
@@ -263,20 +267,28 @@ function M.apply()
       vim.log.levels.WARN
     )
   end
-  local context = M.current_context()
-  if not context then
-    return notify('No current kubectl context', vim.log.levels.ERROR)
-  end
-  local answer = vim.fn.confirm(
-    ('Apply %s to context %s, namespace %s by default?'):format(
-      vim.fs.basename(target.file),
-      context,
-      M.current_namespace()
-    ),
-    '&Apply\n&Cancel',
-    2
-  )
-  if answer ~= 1 then return end
+  M.current(target.dir, function(context, namespace)
+    if not context then
+      return notify('No current kubectl context', vim.log.levels.ERROR)
+    end
+    local answer = vim.fn.confirm(
+      ('Apply %s to context %s, namespace %s by default?'):format(
+        vim.fs.basename(target.file),
+        context,
+        namespace
+      ),
+      '&Apply\n&Cancel',
+      2
+    )
+    if answer ~= 1 then return end
+    M.apply_to(target, context)
+  end)
+end
+
+--- Apply `target` to `context`
+---@param target DyKubeTarget
+---@param context string
+function M.apply_to(target, context)
   rendered(target, function(stdin)
     run(
       M.kubectl_command({ '--context=' .. context, 'apply' }, target),
