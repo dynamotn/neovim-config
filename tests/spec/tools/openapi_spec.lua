@@ -384,6 +384,31 @@ describe('tools.openapi', function()
       -- And the copies are gone
       local base = vim.fn.readfile(dir .. '/args')[1]:match('breaking (%S+)')
       assert.equals(0, vim.fn.filereadable(base))
+      -- Beside the document, so a relative `$ref` resolves
+      assert.equals(dir, vim.fs.dirname(base))
+
+      -- A failed run is an error, never an all-clear
+      notes = {}
+      restore = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+      h.write(dir .. '/bin/oasdiff', {
+        '#!/bin/sh',
+        'echo "failed to load base spec: ./pet.yaml not found" >&2',
+        'exit 1',
+      })
+      vim.env.PATH = dir .. '/bin:' .. path
+      openapi.diff(bufnr)
+      assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
+      restore()
+      vim.env.PATH = path
+      assert.equals(
+        'oasdiff failed: failed to load base spec: ./pet.yaml not found',
+        notes[1]
+      )
+      assert.same({}, vim.fn.glob(dir .. '/.oasdiff-*', true, true))
       vim.diagnostic.reset()
       cleanup()
     end)

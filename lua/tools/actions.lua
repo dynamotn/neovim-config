@@ -59,12 +59,17 @@ function M.pinned(ref) return ref:match('^%x+$') ~= nil and #ref == 40 end
 ---@param sha string
 ---@return string
 function M.pin_line(uses, sha)
+  -- A comment of the author's own stays after the ref
+  local comment = uses.ref
+  if uses.comment and uses.comment ~= '' and uses.comment ~= uses.ref then
+    comment = comment .. ' ' .. uses.comment
+  end
   return ('%s%s%s@%s # %s'):format(
     uses.head,
     uses.repo,
     uses.path,
     sha,
-    uses.ref
+    comment
   )
 end
 

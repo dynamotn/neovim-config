@@ -535,20 +535,38 @@ function M.diff(bufnr, rev)
       vim.log.levels.WARN
     )
   end
-  -- Both sides as files of their own, the extension kept for the format
-  local work = vim.fn.tempname()
-  vim.fn.mkdir(work, 'p', tonumber('700', 8))
-  local base, revision =
-    vim.fs.joinpath(work, 'base-' .. name), vim.fs.joinpath(work, name)
+  -- Beside the document, under hidden names that keep its extension, so a
+  -- relative `$ref` resolves from either side; the file itself stands for
+  -- the buffer when they agree
+  local base = vim.fs.joinpath(dir, '.oasdiff-base-' .. name)
+  local revision = file
+  local written = { base }
   vim.fn.writefile(vim.split(old.stdout or '', '\n', { plain = true }), base)
-  vim.fn.writefile(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), revision)
+  if vim.bo[bufnr].modified then
+    revision = vim.fs.joinpath(dir, '.oasdiff-revision-' .. name)
+    table.insert(written, revision)
+    vim.fn.writefile(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), revision)
+  end
   vim.system(
     { 'oasdiff', 'breaking', base, revision, '--format', 'json' },
     { text = true, timeout = 60000 },
     function(result)
       vim.schedule(function()
-        vim.fn.delete(work, 'rf')
+        for _, path in ipairs(written) do
+          vim.fn.delete(path)
+        end
         if not vim.api.nvim_buf_is_valid(bufnr) then return end
+        -- A failed run says nothing about breaking: never an all-clear
+        if result.code ~= 0 then
+          return notify(
+            'oasdiff failed: '
+              .. vim.trim(
+                result.stderr ~= '' and result.stderr
+                  or ('exit ' .. result.code)
+              ),
+            vim.log.levels.ERROR
+          )
+        end
         local ok, changes = pcall(
           vim.json.decode,
           result.stdout ~= '' and result.stdout or '[]',
@@ -556,7 +574,7 @@ function M.diff(bufnr, rev)
         )
         if not ok or type(changes) ~= 'table' then
           return notify(
-            'oasdiff failed: ' .. vim.trim(result.stderr or ''),
+            'oasdiff printed something that is not JSON',
             vim.log.levels.ERROR
           )
         end

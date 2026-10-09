@@ -57,6 +57,39 @@ describe('tools.architecture', function()
     }, edges(graph))
   end)
 
+  it('cuts comments, not what a string holds', function()
+    assert.same(
+      { 'a = "https://x" ', 'a = "" ' },
+      { arch.hcl_code('a = "https://x" # note') }
+    )
+    assert.same(
+      { 'b = "${aws_lb.x.dns_name}/#"', 'b = ""' },
+      { arch.hcl_code('b = "${aws_lb.x.dns_name}/#"') }
+    )
+    assert.same({ '', '' }, { arch.hcl_code('// all comment') })
+    assert.same(
+      { [[c = "a \" b" ]], [[c = "" ]] },
+      { arch.hcl_code([[c = "a \" b" # x]]) }
+    )
+  end)
+
+  it('keeps a block whole however its strings look', function()
+    local graph = arch.terraform({
+      ['/m/main.tf'] = {
+        'resource "aws_s3_bucket" "logs" {',
+        '  tags = { Source = "https://github.com/o/r" }',
+        '  note = "{ not a block"',
+        '}',
+        'resource "aws_route53_record" "web" {',
+        '  records = ["${aws_lb.main.dns_name}"]',
+        '}',
+        'resource "aws_lb" "main" {}',
+      },
+    })
+    assert.equals(3, #graph.nodes)
+    assert.same({ 'aws_route53_record.web -> aws_lb.main' }, edges(graph))
+  end)
+
   it('draws the links the cluster makes, a missing one dashed', function()
     local graph = arch.kube({
       {
@@ -188,11 +221,15 @@ describe('tools.architecture', function()
       'spec: {template: {metadata: {labels: {app: web}}}}',
     })
     h.write(dir .. '/values.yaml', { 'replicas: 2' })
+    -- A template and a broken file are left out, not fatal
+    h.write(dir .. '/template.yaml', { '{{- if .Values.x }}', 'kind: X' })
+    h.write(dir .. '/broken.yaml', { 'a: [' })
     vim.cmd.edit(dir .. '/app.yaml')
     vim.bo.filetype = 'yaml'
-    local graph, title = arch.read()
+    local graph, title, skipped = arch.read()
     assert.equals('Kubernetes: ' .. vim.fn.fnamemodify(dir, ':~'), title)
     assert.same({ 'Service/web -> Deployment/web' }, edges(graph))
+    assert.same({ 'broken.yaml', 'template.yaml' }, skipped)
 
     local restore = h.stub(vim, 'notify', function() end)
     arch.open()

@@ -49,12 +49,21 @@ describe('tools.actions', function()
     assert.is_true(actions.pinned(SHA))
     assert.is_false(actions.pinned('v4'))
     assert.is_false(actions.pinned('abc123'))
+    -- The author's comment stays, after the ref
     assert.equals(
-      '  - uses: actions/checkout@' .. SHA .. ' # v4',
+      '  - uses: actions/checkout@' .. SHA .. ' # v4 keep in sync',
       actions.pin_line(
-        actions.parse('  - uses: actions/checkout@v4 # old'),
+        actions.parse('  - uses: actions/checkout@v4 # keep in sync'),
         SHA
       )
+    )
+    assert.equals(
+      '  - uses: actions/checkout@' .. SHA .. ' # v4',
+      actions.pin_line(actions.parse('  - uses: actions/checkout@v4 # v4'), SHA)
+    )
+    assert.equals(
+      '  - uses: actions/checkout@' .. SHA .. ' # v4',
+      actions.pin_line(actions.parse('  - uses: actions/checkout@v4'), SHA)
     )
   end)
 

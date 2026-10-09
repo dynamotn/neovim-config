@@ -521,6 +521,9 @@ function M.dependents(configuration)
   for _, block in ipairs(blocks) do
     local refs = {}
     references(block.node.expressions, refs)
+    -- `count` and `for_each` are kept beside the expressions, not in them
+    references(block.node.count_expression, refs)
+    references(block.node.for_each_expression, refs)
     vim.list_extend(
       refs,
       type(block.node.depends_on) == 'table' and block.node.depends_on or {}

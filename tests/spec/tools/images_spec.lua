@@ -146,6 +146,33 @@ describe('tools.images', function()
     assert.is_truthy(scans[1]:find('--scanners vuln', 1, true))
   end)
 
+  it(
+    'leaves a Helm template out',
+    function()
+      assert.same(
+        {},
+        images.images({
+          '  image: "{{ .Values.image.repository }}:{{ .Values.tag }}"',
+        })
+      )
+    end
+  )
+
+  it('puts the findings where the images are when the scans end', function()
+    tool('trivy', {
+      'sleep 0.3',
+      [[echo '{"Results":[{"Vulnerabilities":[{"VulnerabilityID":"CVE-9","Severity":"HIGH"}]}]}']],
+    })
+    local bufnr = h.buffer({ lines = { 'FROM golang:1.23' } })
+    images.scan(bufnr)
+    -- Lines put above it while the scan runs
+    vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, { '# a', '# b' })
+    assert.is_true(vim.wait(5000, function() return #notes > 1 end, 10))
+    local diagnostics = vim.diagnostic.get(bufnr)
+    assert.equals(1, #diagnostics)
+    assert.equals(2, diagnostics[1].lnum)
+  end)
+
   it('says when it has no scanner, or nothing to scan', function()
     images.scan(h.buffer({ lines = { 'FROM scratch' } }))
     images.scan(h.buffer({ lines = { 'FROM alpine:3' } }))

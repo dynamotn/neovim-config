@@ -467,7 +467,9 @@ state.
 block replaced or destroyed takes with it: every block of the module that
 refers to it, or names it in `depends_on`, directly or through another, gets
 `↳ depends on aws_instance.web (replace)`.  The graph is read off the
-configuration the plan carries, the root module only.
+configuration the plan carries -- expressions, `count`, `for_each` and
+`depends_on` -- the root module only.  A reference made through a `local`
+is not in it, and not followed.
 
 `<localleader>c` (`:TfPlan cost`) plans, then hands the plan to `infracost
 breakdown` and puts the monthly cost of each block at the end of its line,
@@ -517,8 +519,11 @@ save where it belongs.
 `<localleader>d` (|:OpenApiDiff|) compares the document as it is in the
 buffer, written or not, with itself at `HEAD` or at any revision given,
 through `oasdiff breaking`: each change that breaks a client is an error on
-its operation, one that may break it a warning, and the rest notes.  Install
-`oasdiff` once with `:MasonInstall oasdiff`.
+its operation, one that may break it a warning, and the rest notes.  The old
+version, and the buffer when it is not written, are put beside the document
+under hidden names for the run, so a relative `$ref` resolves from both, and
+removed after it.  A run that fails is reported as such, never as nothing
+breaking.  Install `oasdiff` once with `:MasonInstall oasdiff`.
 
 CI pipelines                                                        *dyneo-ci*
 
@@ -540,7 +545,8 @@ workflow is checked by `actionlint` and `zizmor` as it is edited
 A tag such as `actions/checkout@v4` runs whatever it points at the day the
 workflow runs.  In a workflow, `<localleader>P` (|:ActionsPin|) pins every
 `uses:` to the full commit its ref points at now, the ref kept as a comment
-for Renovate and Dependabot: `actions/checkout@<sha> # v4`.  Each commit is
+for Renovate and Dependabot: `actions/checkout@<sha> # v4`, any comment of
+your own kept after it.  Each commit is
 asked of GitHub through `gh`; a local action, a `docker://` image and a ref
 that is already a commit are left alone, and nothing is pinned if the
 workflow was edited while GitHub answered.
@@ -650,7 +656,8 @@ a new buffer to preview or to keep:
                   in the directory is drawn dashed, `(missing)`.
     Compose       each service, and its `depends_on`
 
-YAML is read through `yq`.
+YAML is read through `yq`, a file at a time: a template of a chart (`{{ }}`)
+or a file yq cannot read is left out, and named, rather than ending it.
 
 5.8 Workspace diagnostics                                    *dyneo-workspace*
 
@@ -666,7 +673,7 @@ sees two `didOpen` for one URI.
 Decision records                                                   *dyneo-adr*
 
 |:Adr| keeps the architecture decisions of a project as adr-tools does: one
-Markdown file per decision, `0001-record-decisions.md` and on, in the
+Markdown file per decision, numbered `0001-<title>.md` and on, in the
 directory a `.adr-dir` file at the root names, else `docs/adr`, `doc/adr`,
 `docs/decisions` or `adr` when one exists, else `docs/adr`.  A record has a
 title, a date, a status -- proposed, accepted, deprecated, superseded -- and

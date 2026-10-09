@@ -466,6 +466,29 @@ describe('tools.tfplan', function()
       assert.same({}, tfplan.dependents(nil))
     end)
 
+    it('takes count and for_each as references too', function()
+      local dependents = tfplan.dependents({
+        root_module = {
+          resources = {
+            {
+              address = 'aws_route_table.each',
+              for_each_expression = { references = { 'aws_instance.web.tags' } },
+            },
+          },
+          module_calls = {
+            replicas = {
+              count_expression = { references = { 'aws_instance.web' } },
+            },
+          },
+        },
+      })
+      table.sort(dependents['aws_instance.web'])
+      assert.same(
+        { 'aws_route_table.each', 'module.replicas' },
+        dependents['aws_instance.web']
+      )
+    end)
+
     it('follows a replacement through everything depending on it', function()
       local reached = tfplan.affected({
         {

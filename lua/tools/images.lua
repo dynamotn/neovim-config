@@ -46,7 +46,8 @@ function M.images(lines)
     else
       image = line:match('^%s*%-?%s*image:%s*["\']?([^%s"\'#]+)')
     end
-    if image and not image:find('%$') then
+    -- A variable or a Helm template is no image to ask a registry about
+    if image and not image:find('%$') and not image:find('{{', 1, true) then
       table.insert(refs, { line = number, image = image })
     end
   end
@@ -181,32 +182,41 @@ function M.scan(bufnr)
     return notify('Neither trivy nor grype is installed', vim.log.levels.ERROR)
   end
   -- One scan per image, however many lines name it
-  local by_image, order = {}, {}
+  local seen, order = {}, {}
   for _, ref in ipairs(refs) do
-    if not by_image[ref.image] then
-      by_image[ref.image] = {}
+    if not seen[ref.image] then
+      seen[ref.image] = true
       table.insert(order, ref.image)
     end
-    table.insert(by_image[ref.image], ref)
   end
   vim.diagnostic.reset(ns, bufnr)
   notify(('Scanning %d images…'):format(#order))
-  local diagnostics, failed, vulnerable = {}, {}, 0
+  ---@type table<string, DyImageFindings>
+  local found, failed, vulnerable = {}, {}, 0
   local index = 0
   local function next_image()
     index = index + 1
     local image = order[index]
     if not image then
-      if vim.api.nvim_buf_is_valid(bufnr) then
-        vim.diagnostic.set(ns, bufnr, diagnostics)
+      if not vim.api.nvim_buf_is_valid(bufnr) then return end
+      -- The scans take minutes: the findings go on the lines naming each
+      -- image now, wherever an edit meanwhile moved them
+      local diagnostics = {}
+      for _, ref in
+        ipairs(M.images(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)))
+      do
+        local diagnostic = found[ref.image]
+          and M.diagnostic(ref, found[ref.image])
+        if diagnostic then table.insert(diagnostics, diagnostic) end
       end
+      vim.diagnostic.set(ns, bufnr, diagnostics)
       return notify(
         ('%d images scanned, %d with known vulnerabilities%s'):format(
           #order - #failed,
           vulnerable,
           #failed > 0 and ('; failed: ' .. table.concat(failed, ', ')) or ''
         ),
-        (#diagnostics > 0 or #failed > 0) and vim.log.levels.WARN or nil
+        (vulnerable > 0 or #failed > 0) and vim.log.levels.WARN or nil
       )
     end
     vim.system(
@@ -224,10 +234,7 @@ function M.scan(bufnr)
           else
             local findings = M.findings(report)
             if next(findings.counts) then vulnerable = vulnerable + 1 end
-            for _, ref in ipairs(by_image[image]) do
-              local diagnostic = M.diagnostic(ref, findings)
-              if diagnostic then table.insert(diagnostics, diagnostic) end
-            end
+            found[image] = findings
           end
           next_image()
         end)

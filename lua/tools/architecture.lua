@@ -48,6 +48,41 @@ local function builder()
   return graph, node, edge
 end
 
+--- A line of HCL with its comment cut, and the same with the text of its
+--- strings blanked: a `#` or `//` inside a string is no comment, and a
+--- brace inside one (`"${x}"`) opens no block
+---@param line string
+---@return string code The line without its comment
+---@return string bare The same, strings blanked, for counting braces
+function M.hcl_code(line)
+  local code, bare = {}, {}
+  local in_string, index = false, 1
+  while index <= #line do
+    local char = line:sub(index, index)
+    if in_string then
+      table.insert(code, char)
+      if char == '\\' then
+        table.insert(code, line:sub(index + 1, index + 1))
+        index = index + 1
+      elseif char == '"' then
+        in_string = false
+        table.insert(bare, '"')
+      end
+    elseif char == '"' then
+      in_string = true
+      table.insert(code, char)
+      table.insert(bare, '"')
+    elseif char == '#' or line:sub(index, index + 1) == '//' then
+      break
+    else
+      table.insert(code, char)
+      table.insert(bare, char)
+    end
+    index = index + 1
+  end
+  return table.concat(code), table.concat(bare)
+end
+
 --- The graph of the blocks of Terraform files and their references
 ---@param files table<string, string[]> Lines by file name
 ---@return DyArchGraph
@@ -74,10 +109,10 @@ function M.terraform(files)
         -- The body: up to the brace that closes the block
         local depth, body, last = 0, {}, index
         for row = index, #lines do
-          local line = lines[row]:gsub('#.*$', ''):gsub('//.*$', '')
-          table.insert(body, line)
-          local _, opened = line:gsub('{', '')
-          local _, closed = line:gsub('}', '')
+          local code, bare = M.hcl_code(lines[row])
+          table.insert(body, code)
+          local _, opened = bare:gsub('{', '')
+          local _, closed = bare:gsub('}', '')
           depth = depth + opened - closed
           last = row
           if depth <= 0 then break end
@@ -340,19 +375,30 @@ function M.yaml_docs(files)
   if vim.fn.executable('yq') ~= 1 then
     return nil, 'yq is needed to read YAML'
   end
-  local result = vim
-    .system(vim.list_extend({ 'yq', '-o=json', '-I=0', '.' }, files), { text = true })
-    :wait(30000)
-  if result.code ~= 0 then
-    return nil, 'yq could not read them: ' .. vim.trim(result.stderr or '')
+  -- One file at a time: a template of a chart (`{{ }}`) or a broken file
+  -- is no YAML yq reads, and must not take the others down with it
+  local docs, skipped = {}, {}
+  for _, file in ipairs(files) do
+    local ok_read, lines = pcall(vim.fn.readfile, file)
+    local text = ok_read and table.concat(lines, '\n') or ''
+    local result = not text:find('{{', 1, true)
+      and vim
+        .system({ 'yq', '-o=json', '-I=0', '.', file }, { text = true })
+        :wait(30000)
+    if not result or result.code ~= 0 then
+      table.insert(skipped, vim.fs.basename(file))
+    else
+      for line in (result.stdout or ''):gmatch('[^\n]+') do
+        local ok, doc = pcall(
+          vim.json.decode,
+          line,
+          { luanil = { object = true, array = true } }
+        )
+        if ok and type(doc) == 'table' then table.insert(docs, doc) end
+      end
+    end
   end
-  local docs = {}
-  for line in (result.stdout or ''):gmatch('[^\n]+') do
-    local ok, doc =
-      pcall(vim.json.decode, line, { luanil = { object = true, array = true } })
-    if ok and type(doc) == 'table' then table.insert(docs, doc) end
-  end
-  return docs
+  return docs, nil, skipped
 end
 
 --- The files of `dir` whose name matches one of `patterns`
@@ -378,6 +424,7 @@ end
 --- The graph of the directory of the current buffer, by what it holds
 ---@return DyArchGraph? graph
 ---@return string? title
+---@return string[]? skipped The files left out: templates, unreadable
 function M.read()
   local file = vim.api.nvim_buf_get_name(0)
   local dir = file ~= '' and vim.fs.dirname(file) or vim.uv.cwd() --[[@as string]]
@@ -390,26 +437,29 @@ function M.read()
     return M.terraform(files), 'Terraform: ' .. vim.fn.fnamemodify(dir, ':~')
   end
   if ft == 'yaml.docker-compose' or vim.fs.basename(file):match('compose') then
-    local docs, err = M.yaml_docs({ file })
+    local docs, err, skipped = M.yaml_docs({ file })
     if not docs then return nil, err end
+    if #skipped > 0 then return nil, 'yq could not read ' .. skipped[1] end
     return M.compose(docs[1] or {}),
       'Compose: ' .. vim.fn.fnamemodify(file, ':~')
   end
   if ft == 'yaml' or ft:match('^yaml%.') or ft == 'helm' then
-    local docs, err = M.yaml_docs(files_of(dir, { '%.ya?ml$' }))
+    local docs, err, skipped = M.yaml_docs(files_of(dir, { '%.ya?ml$' }))
     if not docs then return nil, err end
     docs = vim.tbl_filter(
       function(doc) return type(doc.kind) == 'string' and doc.apiVersion ~= nil end,
       docs
     )
-    return M.kube(docs), 'Kubernetes: ' .. vim.fn.fnamemodify(dir, ':~')
+    return M.kube(docs),
+      'Kubernetes: ' .. vim.fn.fnamemodify(dir, ':~'),
+      skipped
   end
   return nil, 'Draws Terraform, Kubernetes manifests and compose files'
 end
 
 --- Draw the directory of the current buffer, in a new D2 buffer
 function M.open()
-  local graph, title = M.read()
+  local graph, title, skipped = M.read()
   if not graph then
     return notify(title or 'Nothing to draw', vim.log.levels.WARN)
   end
@@ -421,7 +471,15 @@ function M.open()
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, M.d2(graph, title))
   vim.bo[bufnr].filetype = 'd2'
   vim.bo[bufnr].modified = false
-  notify(('%d blocks, %d links'):format(#graph.nodes, #graph.edges))
+  notify(
+    ('%d blocks, %d links'):format(#graph.nodes, #graph.edges)
+      .. (
+        skipped
+          and #skipped > 0
+          and ('; left out: ' .. table.concat(skipped, ', '))
+        or ''
+      )
+  )
 end
 
 return M

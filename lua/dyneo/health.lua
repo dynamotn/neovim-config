@@ -465,7 +465,7 @@ local function requirements()
     infracost = '`:TfPlan cost`',
     glab = '`:CiStatus` and `:CiLint` on GitLab',
     jq = 'the jq filter of `:DyLog`',
-    yq = '`:OpenApiRequest` on a YAML document',
+    yq = '`:OpenApiRequest` on a YAML document, and `:DyArchitecture`',
     openssl = '`:DyInspect` on a certificate',
     oasdiff = '`:OpenApiDiff` (`:MasonInstall oasdiff`)',
     crane = '`:ImagePin` (or `skopeo`)',
