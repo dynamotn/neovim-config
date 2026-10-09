@@ -129,7 +129,9 @@ return {
   {
     -- Syntax highlight
     'OXY2DEV/markview.nvim',
-    lazy = false,
+    -- It attaches to the buffers already open when it loads after startup
+    ft = markview_filetypes,
+    cmd = 'Markview',
     keys = {
       { '<leader>uM', '<cmd>Markview toggle<cr>', desc = 'Toggle Markview' },
     },
@@ -138,6 +140,9 @@ return {
         filetypes = markview_filetypes,
         icon_provider = 'devicons',
         enable = true,
+        -- Past this many lines only the part around the window is drawn,
+        -- not the whole buffer on every open
+        max_buf_lines = 200,
       },
       html = {
         enable = true,

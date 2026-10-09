@@ -13,8 +13,15 @@ return {
   {
     -- Render `:help` pages: headings, tables, code blocks, tags and links
     'OXY2DEV/helpview.nvim',
-    -- Loads itself on a help buffer; lazy-loading it only delays the first
-    -- help page
-    lazy = false,
+    -- Its startup work is a dump of every highlight group, on `VimEnter`
+    -- and each `ColorScheme`: loaded with the first help page instead, which
+    -- it attaches to on the `BufEnter` that follows
+    ft = 'help',
+    config = function(_, opts)
+      local helpview = require('helpview')
+      helpview.setup(opts)
+      -- `VimEnter` is long gone: its highlight groups are made here
+      vim.api.nvim_exec_autocmds('VimEnter', { group = helpview.au })
+    end,
   },
 }

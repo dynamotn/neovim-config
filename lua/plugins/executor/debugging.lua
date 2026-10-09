@@ -180,9 +180,9 @@ return {
     -- with the first file rather than with the first key, or the lines left
     -- from a previous session go unhighlighted until then.
     'andrewferrier/debugprint.nvim',
-    -- Loaded up front: the print lines are highlighted from setup on, so a
-    -- buffer read before then would show its prints plain
-    lazy = false,
+    -- With the first file: the print lines are highlighted from setup on, so
+    -- a buffer read before then would show its prints plain
+    event = 'LazyFile',
     cmd = 'Debugprint',
     dependencies = { 'nvim-mini/mini.hipatterns' },
     keys = {

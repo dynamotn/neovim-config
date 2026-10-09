@@ -2,7 +2,7 @@ return {
   {
     -- Code actions picked with a preview of their diff
     'rachartier/tiny-code-action.nvim',
-    event = 'LspAttach',
+    -- Loaded by the `require` in `<leader>ca`
     opts = {
       picker = 'snacks',
     },
