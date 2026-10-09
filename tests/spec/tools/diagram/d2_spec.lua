@@ -2,7 +2,7 @@ local h = require('helpers')
 
 describe('tools.diagram.d2.snacks', function()
   local dir, cleanup, cache_dir, commands, executables, results, notified
-  local restores
+  local restores, d2
 
   --- Run `fn` with `tbl[key]` replaced for the rest of the test
   local function stub(tbl, key, value)
@@ -24,11 +24,14 @@ describe('tools.diagram.d2.snacks', function()
       return stdpath(what)
     end)
     stub(vim.fn, 'executable', function(name) return executables[name] or 0 end)
-    stub(vim, 'system', function(cmd, _, on_exit)
-      table.insert(commands, cmd)
-      on_exit(results[cmd[1]] or { code = 0, stderr = '' })
-      return {}
-    end)
+    stub(
+      vim,
+      'system',
+      h.system_double(function(cmd)
+        table.insert(commands, cmd)
+        return results[cmd[1]] or { code = 0, stderr = '' }
+      end)
+    )
     stub(
       vim,
       'notify',
@@ -37,7 +40,7 @@ describe('tools.diagram.d2.snacks', function()
     stub(vim.env, 'ZELLIJ', nil)
 
     h.unload('tools.diagram.d2.snacks')
-    require('tools.diagram.d2.snacks')
+    d2 = require('tools.diagram.d2.snacks')
   end)
 
   after_each(function()
@@ -55,9 +58,7 @@ describe('tools.diagram.d2.snacks', function()
     local path = dir .. '/src/diagram.d2'
     h.write(path, lines)
     vim.cmd.edit(path)
-    vim.bo.filetype = 'd2'
-    local map = vim.fn.maparg('<leader>cp', 'n', false, true)
-    map.callback()
+    d2.preview(0)
     -- Converting and opening are scheduled; let them run
     vim.wait(100, function() return false end)
     return path
@@ -70,25 +71,27 @@ describe('tools.diagram.d2.snacks', function()
     end
   end
 
-  it(
-    'makes its cache directory',
-    function() assert.are.equal(1, vim.fn.isdirectory(cache_dir)) end
-  )
+  it('makes its cache directory on the first render, not on load', function()
+    assert.are.equal(0, vim.fn.isdirectory(cache_dir))
+    preview({ 'a -> b' })
+    assert.are.equal(1, vim.fn.isdirectory(cache_dir))
+  end)
 
-  it('maps <leader>cp in d2 buffers only', function()
-    local other = h.buffer({ filetype = 'lua' })
-    vim.api.nvim_set_current_buf(other)
-    assert.are.same({}, vim.fn.maparg('<leader>cp', 'n', false, true))
+  it('maps <leader>cp in the d2 buffer its ftplugin runs for', function()
+    h.unload('tools.diagram.d2.snacks')
     local bufnr = h.buffer({ filetype = 'd2' })
     vim.api.nvim_set_current_buf(bufnr)
+    dofile(h.root .. '/ftplugin/d2.lua')
     local map = vim.fn.maparg('<leader>cp', 'n', false, true)
     assert.are.equal(1, map.buffer)
     assert.are.equal('Preview D2 diagram', map.desc)
+    -- The module waits for the key
+    assert.is_nil(package.loaded['tools.diagram.d2.snacks'])
   end)
 
   it('does nothing for an unnamed buffer', function()
     vim.api.nvim_set_current_buf(h.buffer({ filetype = 'd2' }))
-    vim.fn.maparg('<leader>cp', 'n', false, true).callback()
+    d2.preview(0)
     assert.are.same({}, commands)
     assert.are.same({}, notified)
   end)
@@ -151,15 +154,19 @@ describe('tools.diagram.d2.snacks', function()
   it('crops the Quick Look thumbnail to the aspect of the diagram', function()
     executables['rsvg-convert'] = nil
     executables.qlmanage = 1
+    executables.sips = 1
     -- d2 is stubbed, so the SVG it would have written is put there by hand
-    stub(vim, 'system', function(cmd, _, on_exit)
-      table.insert(commands, cmd)
-      if cmd[1] == 'd2' then
-        h.write(cmd[3], { '<svg viewBox="0 0 200 100">', '</svg>' })
-      end
-      on_exit({ code = 0, stderr = '' })
-      return {}
-    end)
+    stub(
+      vim,
+      'system',
+      h.system_double(function(cmd)
+        table.insert(commands, cmd)
+        if cmd[1] == 'd2' then
+          h.write(cmd[3], { '<svg viewBox="0 0 200 100">', '</svg>' })
+        end
+        return { code = 0, stderr = '' }
+      end)
+    )
     preview({ 'a -> b' })
     local ql = command_of('qlmanage')
     assert.are.same(
@@ -202,6 +209,46 @@ describe('tools.diagram.d2.snacks', function()
     commands = {}
     preview({ '...@lib/shapes', 'a -> b' })
     assert.are_not.equal(first, command_of('d2')[3])
+  end)
+
+  it('follows imports, up a directory too, and reads nothing else', function()
+    h.write(dir .. '/shared/style.d2', { 'classes: { a: {} }' })
+    h.write(dir .. '/src/lib/shapes.d2', { 'x: @../../shared/style' })
+    h.write(dir .. '/src/unrelated.d2', { 'z: 1' })
+    local source = { 'shapes: @lib/shapes', 'a -> b' }
+    preview(source)
+    local first = command_of('d2')[3]
+    -- The render as the converter would have left it
+    h.write(command_of('rsvg-convert')[3], { 'png' })
+
+    -- A file nothing imports changes nothing
+    h.write(dir .. '/src/unrelated.d2', { 'z: 2' })
+    commands = {}
+    preview(source)
+    assert.is_nil(command_of('d2'))
+
+    -- A file two imports away does
+    h.write(dir .. '/shared/style.d2', { 'classes: { b: {} }' })
+    commands = {}
+    preview(source)
+    assert.are_not.equal(first, command_of('d2')[3])
+  end)
+
+  it('leaves no SVG behind when the converter fails', function()
+    results['rsvg-convert'] = { code = 1, stderr = 'bad svg' }
+    stub(
+      vim,
+      'system',
+      h.system_double(function(cmd)
+        table.insert(commands, cmd)
+        if cmd[1] == 'd2' then h.write(cmd[3], { '<svg/>' }) end
+        return results[cmd[1]] or { code = 0, stderr = '' }
+      end)
+    )
+    preview({ 'a -> b' })
+    vim.wait(1000, function() return #notified > 0 end)
+    assert.are.equal('[d2] failed to render:\nbad svg', notified[1].msg)
+    assert.are.same({}, vim.fn.glob(cache_dir .. '/*.svg', true, true))
   end)
 
   it('opens the picture outside zellij', function()

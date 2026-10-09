@@ -1,9 +1,12 @@
+--- A preview of the d2 diagram of a buffer, as a PNG shown by `Snacks.image`
+---
+--- d2 draws an SVG, an SVG converter makes the PNG, and the PNG opens in a
+--- split -- or, under zellij, which drops the kitty graphics protocol, in a
+--- kitty overlay or the system viewer. Renders are cached by the contents of
+--- the diagram and of every file it imports. `ftplugin/d2.lua` maps it.
 local M = {}
 
-local cache_dir = vim.fn.resolve(vim.fn.stdpath('cache') .. '/diagram-cache/d2')
-vim.fn.mkdir(cache_dir, 'p')
-
-local config = {
+M.CONFIG = {
   theme_id = 4,
   dark_theme_id = 4,
   layout = 'tala',
@@ -11,21 +14,109 @@ local config = {
   max_size = 4096,
 }
 
+--- Milliseconds d2 may take: a `tala` layout of a large diagram is slow
+M.TIMEOUT = 2 * 60 * 1000
+
+--- Milliseconds a converter or the kitty overlay may take
+M.CONVERT_TIMEOUT = 60 * 1000
+
+--- Most files followed through imports for the cache key
+M.MAX_IMPORTS = 200
+
 local preview_buf = nil
 local preview_win = nil
+
+---@param msg string
+---@param level? integer
+local function notify(msg, level)
+  vim.notify('[d2] ' .. msg, level or vim.log.levels.INFO)
+end
+
+--- Where renders are kept, made on first use
+---@return string
+function M.cache_dir()
+  local dir = vim.fn.resolve(vim.fn.stdpath('cache') .. '/diagram-cache/d2')
+  vim.fn.mkdir(dir, 'p')
+  return dir
+end
 
 --- Throw away renders more than a week old
 ---
 --- The cache key follows the contents of a diagram, so every edit leaves the
---- previous render behind. Nothing else ever removes them. Age is the only
---- test: a render still in use is dropped as well, and simply drawn again.
+--- previous render behind. Age is the only test: a render still in use is
+--- dropped as well, and simply drawn again.
 local function prune_cache()
   local week = 7 * 24 * 60 * 60
   local now = os.time()
-  for _, file in ipairs(vim.fn.glob(cache_dir .. '/*.png', true, true)) do
+  for _, file in ipairs(vim.fn.glob(M.cache_dir() .. '/*.png', true, true)) do
     local stat = vim.uv.fs_stat(file)
     if stat and now - stat.mtime.sec > week then vim.uv.fs_unlink(file) end
   end
+end
+
+--- The files `text`, the diagram at `path`, imports: `x: @file` and
+--- `...@file`, relative to its directory, `.d2` added when left out
+---@param path string
+---@param text string
+---@return string[]
+function M.imports(path, text)
+  local dir = vim.fs.dirname(path)
+  local found, seen = {}, {}
+  for _, pattern in ipairs({ ':%s*@([^%s;{}]+)', '%.%.%.@([^%s;{}]+)' }) do
+    for name in text:gmatch(pattern) do
+      name = name:gsub('^"(.*)"$', '%1')
+      if not name:match('%.d2$') then name = name .. '.d2' end
+      local file = vim.fs.normalize(
+        name:sub(1, 1) == '/' and name or vim.fs.joinpath(dir, name)
+      )
+      if not seen[file] then
+        seen[file] = true
+        table.insert(found, file)
+      end
+    end
+  end
+  return found
+end
+
+--- The cache key of the diagram at `path`: its text and that of every file
+--- it imports, followed as far as they import, up to `M.MAX_IMPORTS`
+---@param path string
+---@param text string
+---@return string
+function M.content_hash(path, text)
+  local parts = { text }
+  local seen = { [vim.fn.resolve(path)] = true }
+  local queue = M.imports(path, text)
+  local index = 0
+  while index < #queue and index < M.MAX_IMPORTS do
+    index = index + 1
+    local file = queue[index]
+    local real = vim.fn.resolve(file)
+    if not seen[real] then
+      seen[real] = true
+      local ok, lines = pcall(vim.fn.readfile, file)
+      if ok then
+        local imported = table.concat(lines, '\n')
+        table.insert(parts, file .. '\0' .. imported)
+        vim.list_extend(queue, M.imports(file, imported))
+      end
+    end
+  end
+  return vim.fn.sha256(table.concat(parts, '\0'))
+end
+
+--- Run `command`, then `next_step`; `on_fail` hears why it did not work
+---@param command string[]
+---@param next_step fun()
+---@param on_fail fun(err: string)
+local function step(command, next_step, on_fail)
+  local system = require('util.system')
+  system.run(command, { timeout = M.CONVERT_TIMEOUT }, function(result)
+    if result.code ~= 0 then
+      return on_fail(system.failure(result, table.concat(command, ' ')))
+    end
+    next_step()
+  end)
 end
 
 --- Turn the SVG at `svg_path` into the PNG at `png_path`
@@ -37,24 +128,13 @@ end
 ---@param png_path string
 ---@param on_done fun(err?: string)
 local function svg_to_png(svg_path, png_path, on_done)
-  local function run(command, next_step)
-    vim.system(command, { text = true }, function(result)
-      if result.code ~= 0 then
-        on_done(
-          result.stderr ~= '' and result.stderr or table.concat(command, ' ')
-        )
-        return
-      end
-      next_step()
-    end)
-  end
-
+  local function done() on_done() end
   if vim.fn.executable('rsvg-convert') == 1 then
-    run({ 'rsvg-convert', '-o', png_path, svg_path }, on_done)
+    step({ 'rsvg-convert', '-o', png_path, svg_path }, done, on_done)
   elseif vim.fn.executable('resvg') == 1 then
-    run({ 'resvg', svg_path, png_path }, on_done)
+    step({ 'resvg', svg_path, png_path }, done, on_done)
   elseif vim.fn.executable('magick') == 1 then
-    run({ 'magick', '-background', 'none', svg_path, png_path }, on_done)
+    step({ 'magick', '-background', 'none', svg_path, png_path }, done, on_done)
   elseif vim.fn.executable('qlmanage') == 1 then
     -- Quick Look draws the SVG with WebKit, so fonts and icons come out right,
     -- but always on a square canvas with the picture at the top left
@@ -64,7 +144,7 @@ local function svg_to_png(svg_path, png_path, on_done)
     if w then
       width, height = tonumber(w), tonumber(h)
     end
-    local size = config.max_size
+    local size = M.CONFIG.max_size
     local out_dir = vim.fn.fnamemodify(png_path, ':h')
     local thumbnail = out_dir
       .. '/'
@@ -73,12 +153,12 @@ local function svg_to_png(svg_path, png_path, on_done)
     local crop_width = math.floor(size * math.min(1, width / height))
     local crop_height = math.floor(size * math.min(1, height / width))
 
-    run(
+    step(
       { 'qlmanage', '-t', '-s', tostring(size), '-o', out_dir, svg_path },
       function()
         -- `sips` reads an offset of 0 as no offset at all and crops around
         -- the centre, so start one pixel in
-        run({
+        step({
           'sips',
           '--cropOffset',
           '1',
@@ -92,59 +172,38 @@ local function svg_to_png(svg_path, png_path, on_done)
         }, function()
           vim.uv.fs_unlink(thumbnail)
           on_done()
+        end, function(err)
+          vim.uv.fs_unlink(thumbnail)
+          on_done(err)
         end)
-      end
+      end,
+      on_done
     )
   else
     on_done('no SVG converter found: install rsvg-convert, resvg or magick')
   end
 end
 
---- Hash the diagram together with the d2 files beside and below it, which is
---- where its imports usually live
----
---- Only the opened file used to go into the key, so editing an imported file
---- kept serving the stale picture. An import reaching up with `../` is still
---- not covered.
----@param source_path string
----@return string
-local function content_hash(source_path)
-  local parts = { table.concat(vim.fn.readfile(source_path), '\n') }
-  local dir = vim.fn.fnamemodify(source_path, ':h')
-  for _, file in ipairs(vim.fn.globpath(dir, '**/*.d2', false, true)) do
-    if vim.fn.resolve(file) ~= vim.fn.resolve(source_path) then
-      table.insert(
-        parts,
-        file .. '\0' .. table.concat(vim.fn.readfile(file), '\n')
-      )
-    end
-  end
-  return vim.fn.sha256(table.concat(parts, '\0'))
-end
-
 --- Render `source_path` to a PNG and hand the path to `on_rendered`
 ---@param source_path string
 ---@param on_rendered fun(output_path: string)
 local function render_d2(source_path, on_rendered)
-  -- `executable` answers 0 or 1, and 0 is true in Lua, so `not` never caught
-  -- the missing binary and the failure surfaced as a raw spawn error instead
   if vim.fn.executable('d2') == 0 then
-    vim.notify('[d2] d2 not found in PATH', vim.log.levels.ERROR)
-    return
+    return notify('d2 not found in PATH', vim.log.levels.ERROR)
   end
+  local ok, lines = pcall(vim.fn.readfile, source_path)
+  if not ok then return end
+  local text = table.concat(lines, '\n')
 
-  local source = vim.uv.fs_stat(source_path)
-  if not source then return end
-
-  -- Keyed on the contents rather than the timestamp: two edits within the
-  -- same second used to be served the earlier picture.
-  local hash = content_hash(source_path)
+  -- Keyed on the contents rather than the timestamp, which two edits within
+  -- the same second share
+  local hash = M.content_hash(source_path, text)
+  local cache_dir = M.cache_dir()
   local svg_path = vim.fn.resolve(cache_dir .. '/' .. hash .. '.svg')
   local output_path = vim.fn.resolve(cache_dir .. '/' .. hash .. '.png')
 
   if vim.fn.filereadable(output_path) == 1 then
-    on_rendered(output_path)
-    return
+    return on_rendered(output_path)
   end
 
   local command = {
@@ -152,51 +211,40 @@ local function render_d2(source_path, on_rendered)
     source_path,
     svg_path,
     '-t',
-    tostring(config.theme_id),
+    tostring(M.CONFIG.theme_id),
     '--dark-theme',
-    tostring(config.dark_theme_id),
+    tostring(M.CONFIG.dark_theme_id),
   }
   -- The flag wins over `vars.d2-config.layout-engine`, so it would silently
   -- replace the layout the diagram asks for
-  local text = table.concat(vim.fn.readfile(source_path), '\n')
   if not text:find('layout%-engine%s*:') then
-    vim.list_extend(command, { '--layout', config.layout })
+    vim.list_extend(command, { '--layout', M.CONFIG.layout })
   end
 
   local function fail(message)
-    vim.schedule(
-      function()
-        vim.notify(
-          ('[d2] failed to render:\n%s'):format(message or ''),
-          vim.log.levels.ERROR
-        )
-      end
+    -- Never a half-written SVG left in the cache
+    vim.uv.fs_unlink(svg_path)
+    notify(
+      ('failed to render:\n%s'):format(message or ''),
+      vim.log.levels.ERROR
     )
   end
 
-  -- Rendering a `tala` layout takes its time, and waiting on it held the whole
-  -- editor still
-  vim.system(command, { text = true }, function(result)
-    if result.code ~= 0 then
-      fail(result.stderr)
-      return
-    end
-    -- Picking a converter reads the SVG through `vim.fn`, which a
-    -- `vim.system` callback is not allowed to call
-    vim.schedule(function()
+  -- Off the main loop: a `tala` layout takes its time
+  local system = require('util.system')
+  system.run(
+    command,
+    { timeout = M.TIMEOUT, cwd = vim.fs.dirname(source_path) },
+    function(result)
+      if result.code ~= 0 then return fail(system.failure(result, 'd2')) end
       svg_to_png(svg_path, output_path, function(err)
         vim.uv.fs_unlink(svg_path)
-        if err then
-          fail(err)
-          return
-        end
-        vim.schedule(function()
-          prune_cache()
-          on_rendered(output_path)
-        end)
+        if err then return fail(err) end
+        prune_cache()
+        on_rendered(output_path)
       end)
-    end)
-  end)
+    end
+  )
 end
 
 --- Show `output_path` outside of zellij, which drops the kitty graphics
@@ -212,7 +260,8 @@ local function show_outside_zellij(output_path)
     return
   end
 
-  vim.system({
+  local system = require('util.system')
+  system.run({
     'kitten',
     '@',
     '--to',
@@ -224,27 +273,27 @@ local function show_outside_zellij(output_path)
     'icat',
     '--hold',
     output_path,
-  }, { text = true }, function(result)
+  }, { timeout = M.CONVERT_TIMEOUT }, function(result)
     if result.code == 0 then return end
-    vim.schedule(function()
-      vim.notify(
-        ('[d2] kitty overlay failed, opening externally:\n%s'):format(
-          result.stderr or ''
-        ),
-        vim.log.levels.WARN
-      )
-      vim.ui.open(output_path)
-    end)
+    notify(
+      ('kitty overlay failed, opening externally:\n%s'):format(
+        system.failure(result, 'kitten')
+      ),
+      vim.log.levels.WARN
+    )
+    vim.ui.open(output_path)
   end)
 end
 
-local function show_d2_preview()
-  local buf = vim.api.nvim_get_current_buf()
-  local source_path = vim.api.nvim_buf_get_name(buf)
-
+--- Preview the diagram of `bufnr`, the current buffer unless given
+---@param bufnr? integer
+function M.preview(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
+    or bufnr
+  local source_path = vim.api.nvim_buf_get_name(bufnr)
   if not source_path or source_path == '' then return end
 
-  -- The window to come back to, since the render no longer blocks and the
+  -- The window to come back to, since the render does not block and the
   -- cursor may have moved on by the time it lands
   local source_win = vim.api.nvim_get_current_win()
 
@@ -271,22 +320,5 @@ local function show_d2_preview()
     preview_buf = vim.api.nvim_get_current_buf()
   end)
 end
-
-local function setup_autocmds()
-  local group = vim.api.nvim_create_augroup('D2Preview', { clear = true })
-
-  vim.api.nvim_create_autocmd('FileType', {
-    group = group,
-    pattern = 'd2',
-    callback = function()
-      vim.keymap.set('n', '<leader>cp', show_d2_preview, {
-        buffer = true,
-        desc = 'Preview D2 diagram',
-      })
-    end,
-  })
-end
-
-setup_autocmds()
 
 return M

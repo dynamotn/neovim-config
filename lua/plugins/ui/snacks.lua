@@ -126,8 +126,6 @@ return {
       -- Hand `vim.notify` back for noice.nvim to take over, so notifications
       -- sent before it loads still reach its history
       if require('util.plugin').has('noice.nvim') then vim.notify = notify end
-      -- Render d2 diagrams through `Snacks.image`
-      require('tools.diagram.d2.snacks')
     end,
   },
 }
