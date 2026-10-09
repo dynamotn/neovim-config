@@ -1,30 +1,11 @@
 local h = require('helpers')
 
 describe('util.cmp', function()
-  local cmp, env_backup, restore_executable, executables
-
-  local pane_vars = { 'TMUX' }
+  local cmp
 
   before_each(function()
-    env_backup = {}
-    for _, var in ipairs(pane_vars) do
-      env_backup[var] = vim.env[var]
-      vim.env[var] = nil
-    end
-    executables = {}
-    restore_executable = h.stub(
-      vim.fn,
-      'executable',
-      function(name) return executables[name] and 1 or 0 end
-    )
     h.unload('util.cmp')
     cmp = require('util.cmp')
-  end)
-  after_each(function()
-    restore_executable()
-    for _, var in ipairs(pane_vars) do
-      vim.env[var] = env_backup[var]
-    end
   end)
 
   local common = {
@@ -38,7 +19,8 @@ describe('util.cmp', function()
     'emoji',
     'dynamic',
     'dictionary',
-    -- They say themselves whether their session or socket is there
+    -- They say themselves whether their server or socket is there
+    'tmux',
     'zellij',
     'kitty',
   }
@@ -99,38 +81,11 @@ describe('util.cmp', function()
     )
   end)
 
-  describe('pane sources', function()
-    local dir, cleanup, server
-    before_each(function()
-      dir, cleanup = h.tmpdir()
-    end)
-    after_each(function()
-      if server then
-        server:close()
-        server = nil
-      end
-      cleanup()
-    end)
-
-    local function socket(path)
-      server = vim.uv.new_pipe(false)
-      assert(server:bind(path))
-      return path
+  it('leaves the pane sources to say whether their server is there', function()
+    local sources = cmp.sources('*')
+    for _, source in ipairs({ 'tmux', 'zellij', 'kitty' }) do
+      assert.is_true(vim.list_contains(sources, source), source)
     end
-
-    it('leaves zellij and kitty to say whether they are reachable', function()
-      local sources = cmp.sources('*')
-      assert.is_true(vim.list_contains(sources, 'zellij'))
-      assert.is_true(vim.list_contains(sources, 'kitty'))
-    end)
-
-    it('adds tmux only when its socket is alive', function()
-      executables.tmux = true
-      vim.env.TMUX = dir .. '/missing,1,0'
-      assert.is_false(vim.list_contains(cmp.sources('*'), 'tmux'))
-      vim.env.TMUX = socket(dir .. '/tmux.sock') .. ',1,0'
-      assert.is_true(vim.list_contains(cmp.sources('*'), 'tmux'))
-    end)
   end)
 
   describe('setup_default_sources', function()

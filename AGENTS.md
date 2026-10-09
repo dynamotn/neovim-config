@@ -160,8 +160,8 @@ Every one of these came from a bug that shipped. Keep to them.
 - **Lazy installs register through `util.lazy_install.on_filetype`**, never
   one `FileType` autocmd per tool, and its handlers are idempotent.
 - **Nothing per keystroke shells out.** A completion source that runs a CLI
-  is wrapped in `tools.completion.cached` (TTL, refreshed on `CursorHold`);
-  `enabled()` answers are cached per buffer.
+  answers from words it keeps, read again in the background (as the tmux,
+  zellij and kitty sources do); `enabled()` answers are cached per buffer.
 - **Write-time work is deferred and skipped while quitting** (`QuitPre`,
   `vim.v.exiting`): `:wq` must not kill a lint mid-run and fail a
   `git commit`.

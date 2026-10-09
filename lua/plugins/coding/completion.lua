@@ -3,7 +3,12 @@ return {
   'mikavilpas/blink-ripgrep.nvim', -- Ripgrep
   'Kaiser-Yang/blink-cmp-dictionary', -- Dictionary source
   'hrsh7th/cmp-calc', -- Math calculation
-  'mgalliou/blink-cmp-tmux', -- Tmux buffer source
+  {
+    -- Tmux source. The fork reads panes in the background instead of on
+    -- every key; back to mgalliou/blink-cmp-tmux once its #3 is merged.
+    'dynamotn/blink-cmp-tmux',
+    commit = '9787c9f981bd5c7a2b732d2e20505d67a10dfde6',
+  },
   'dynamotn/blink-cmp-zellij', -- Zellij source
   'dynamotn/blink-cmp-kitty', -- Kitty source
   'moyiz/blink-emoji.nvim', -- Emoji source
@@ -105,21 +110,11 @@ return {
               },
             },
           },
-          -- tmux panes. The source captures every pane synchronously and
-          -- would do it again on each key, so its words are kept for a while
-          -- by `tools.completion.cached`. That only holds while
-          -- `triggered_only` is off: on, the items depend on the cursor.
+          -- tmux panes
           tmux = {
-            module = 'tools.completion.cached',
+            module = 'blink-cmp-tmux',
             name = 'tmux',
-            opts = {
-              source = 'blink-cmp-tmux',
-              opts = {
-                panes = 'session',
-                capture_history = false,
-                triggered_only = false,
-              },
-            },
+            opts = { panes = 'session' },
           },
           -- zellij panes
           zellij = {

@@ -2,26 +2,6 @@ local Plugin = require('util.plugin')
 
 local M = {}
 
---- Whether `path` is an existing unix socket
----@param path string
----@return boolean
-local function is_socket(path)
-  local stat = vim.uv.fs_stat(path)
-  return stat ~= nil and stat.type == 'socket'
-end
-
---- Whether tmux is reachable: `$TMUX` outlives the server that set it (a
---- shell started from a session since killed), and `blink-cmp-tmux` would
---- spawn a failing command on every completion. The zellij and kitty
---- sources check their own session and socket.
----@return boolean
-local function tmux_reachable()
-  -- `$TMUX` is `<socket>,<pid>,<session>`
-  local tmux = vim.env.TMUX
-  if not tmux or vim.fn.executable('tmux') == 0 then return false end
-  return is_socket(tmux:match('^([^,]+)') or '')
-end
-
 --- Setup default sources of cmp
 M.setup_default_sources = function()
   local success, node = pcall(vim.treesitter.get_node)
@@ -54,8 +34,8 @@ M.sources = function(filetype)
     'dynamic',
     'dictionary',
   }
-  if tmux_reachable() then table.insert(common_sources, 'tmux') end
-  vim.list_extend(common_sources, { 'zellij', 'kitty' })
+  -- The pane sources say themselves whether their server is there
+  vim.list_extend(common_sources, { 'tmux', 'zellij', 'kitty' })
   local unique_sources = {
     markdown = { 'nerdfont' },
     typst = { 'nerdfont' },
