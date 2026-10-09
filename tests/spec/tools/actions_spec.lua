@@ -119,6 +119,28 @@ describe('tools.actions', function()
     )
   end)
 
+  it('looks up no more than a few refs at once', function()
+    gh({
+      'touch "' .. dir .. '/running.$$"',
+      'ls "' .. dir .. '" | grep -c "^running" >> "' .. dir .. '/counts"',
+      'sleep 0.2',
+      'rm "' .. dir .. '/running.$$"',
+      [[echo '{"sha":"]] .. SHA .. [["}']],
+    })
+    local lines = { 'jobs:', '  build:', '    steps:' }
+    for index = 1, 8 do
+      table.insert(lines, ('      - uses: o/action%d@v1'):format(index))
+    end
+    actions.pin(h.buffer({ lines = lines }))
+    assert.is_true(vim.wait(10000, function() return #notes > 0 end, 10))
+    assert.equals('8 uses pinned', notes[1])
+    local most = 0
+    for _, count in ipairs(vim.fn.readfile(dir .. '/counts')) do
+      most = math.max(most, tonumber(count))
+    end
+    assert.is_true(most <= actions.PARALLEL, ('%d at once'):format(most))
+  end)
+
   it('pins nothing when the workflow changed meanwhile', function()
     gh({ 'sleep 0.3', [[echo '{"sha":"]] .. SHA .. [["}']] })
     local bufnr = h.buffer({ lines = WORKFLOW })

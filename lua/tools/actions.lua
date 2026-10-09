@@ -12,6 +12,9 @@
 --- a `docker://` image and a ref already a full commit are left alone.
 local M = {}
 
+--- `gh api` lookups running at once
+M.PARALLEL = 4
+
 local forge = require('util.forge')
 
 ---@param msg string
@@ -98,9 +101,48 @@ function M.pin(bufnr)
   end
 
   local tick = vim.api.nvim_buf_get_changedtick(bufnr)
-  local shas, failed, pending = {}, {}, #order
+  local shas, failed = {}, {}
   local github = { kind = 'github', host = 'github.com', name = 'github' }
-  for _, key in ipairs(order) do
+
+  local function finish()
+    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    -- Edited meanwhile: the rows may point elsewhere now
+    if vim.api.nvim_buf_get_changedtick(bufnr) ~= tick then
+      return notify(
+        'The workflow changed meanwhile: nothing pinned',
+        vim.log.levels.WARN
+      )
+    end
+    local count = 0
+    for found, rows in pairs(todo) do
+      if shas[found] then
+        for _, row in ipairs(rows) do
+          local line = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1]
+          local uses = M.parse(line)
+          vim.api.nvim_buf_set_lines(
+            bufnr,
+            row - 1,
+            row,
+            false,
+            { M.pin_line(uses, shas[found]) }
+          )
+          count = count + 1
+        end
+      end
+    end
+    table.sort(failed)
+    notify(
+      ('%d uses pinned'):format(count)
+        .. (
+          #failed > 0 and ('; not found:\n' .. table.concat(failed, '\n'))
+          or ''
+        ),
+      #failed > 0 and vim.log.levels.WARN or nil
+    )
+  end
+
+  -- A few lookups at a time, every one of them to the GitHub API
+  require('util.system').each(order, M.PARALLEL, function(key, done)
     local repo, ref = key:match('^(.-)@(.+)$')
     forge.api(
       vim.tbl_extend('force', github, { slug = repo }),
@@ -115,46 +157,10 @@ function M.pin(bufnr)
         else
           table.insert(failed, ('%s: %s'):format(key, err or 'no commit'))
         end
-        pending = pending - 1
-        if pending > 0 then return end
-        if not vim.api.nvim_buf_is_valid(bufnr) then return end
-        -- Edited meanwhile: the rows may point elsewhere now
-        if vim.api.nvim_buf_get_changedtick(bufnr) ~= tick then
-          return notify(
-            'The workflow changed meanwhile: nothing pinned',
-            vim.log.levels.WARN
-          )
-        end
-        local count = 0
-        for found, rows in pairs(todo) do
-          if shas[found] then
-            for _, row in ipairs(rows) do
-              local line =
-                vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1]
-              local uses = M.parse(line)
-              vim.api.nvim_buf_set_lines(
-                bufnr,
-                row - 1,
-                row,
-                false,
-                { M.pin_line(uses, shas[found]) }
-              )
-              count = count + 1
-            end
-          end
-        end
-        table.sort(failed)
-        notify(
-          ('%d uses pinned'):format(count)
-            .. (
-              #failed > 0 and ('; not found:\n' .. table.concat(failed, '\n'))
-              or ''
-            ),
-          #failed > 0 and vim.log.levels.WARN or nil
-        )
+        done()
       end
     )
-  end
+  end, finish)
 end
 
 --- The mappings of a workflow
