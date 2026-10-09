@@ -549,6 +549,14 @@ file at `HEAD`, or at any revision given, in a split held back the same way.
 The old version goes through the same tool from a private copy in a
 directory of its own, both removed once read.
 
+|:EncryptedKeys| lists who can open a sops file -- the age recipients, KMS
+keys, PGP fingerprints, GCP, Azure and Vault keys its metadata names, read
+off the ciphertext on disk.  |:EncryptedRotate| puts a change in place:
+`updatekeys` (the default) sets the recipients to what `.sops.yaml` says
+now, after someone joined or left; `rotate` gives the file a new data key.
+Both ask first, need the buffer written, and open the file again.  Ansible
+Vault is left out: rekeying it asks for passwords Neovim cannot type.
+
 5.5 Buffer servers and tools                                *dyneo-statusline*
 
 The statusline counts the language servers and the tools that are up rather
@@ -781,6 +789,14 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :EncryptedDiff [{rev}]  Diff the clear text of this decrypted buffer with its
                         clear text at {rev}, `HEAD` unless given.  See
                         |dyneo-encrypted|.
+
+                                                              *:EncryptedKeys*
+:EncryptedKeys          The recipients of this sops file.
+
+                                                            *:EncryptedRotate*
+:EncryptedRotate [updatekeys]
+                        Set the recipients of this sops file to `.sops.yaml`.
+:EncryptedRotate rotate Give it a new data key.  See |dyneo-encrypted|.
 
                                                                      *:TfPlan*
 :TfPlan                 Plan the module of this buffer and show it on its

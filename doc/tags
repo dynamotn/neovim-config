@@ -12,6 +12,8 @@
 :DySbom	dyneo.txt	/*:DySbom*
 :DySpell	dyneo.txt	/*:DySpell*
 :EncryptedDiff	dyneo.txt	/*:EncryptedDiff*
+:EncryptedKeys	dyneo.txt	/*:EncryptedKeys*
+:EncryptedRotate	dyneo.txt	/*:EncryptedRotate*
 :Jira	dyneo.txt	/*:Jira*
 :Kube	dyneo.txt	/*:Kube*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*

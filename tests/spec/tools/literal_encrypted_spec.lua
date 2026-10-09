@@ -304,6 +304,119 @@ describe('tools.encrypted', function()
     assert.equals(0, vim.fn.filereadable(log))
   end)
 
+  describe('keys', function()
+    it('reads the recipients off the metadata only', function()
+      local yaml = {
+        'fp: ENC[AES256_GCM,data:x]',
+        'arn: plain-data-not-metadata',
+        'sops:',
+        '  kms:',
+        '    - arn: arn:aws:kms:eu-west-1:1:key/abc',
+        '  age:',
+        '    - recipient: age1aaa',
+        '      enc: |',
+        '    - recipient: age1bbb',
+        '  pgp:',
+        '    - fp: ABCDEF',
+      }
+      assert.same({
+        { kind = 'kms', id = 'arn:aws:kms:eu-west-1:1:key/abc' },
+        { kind = 'age', id = 'age1aaa' },
+        { kind = 'age', id = 'age1bbb' },
+        { kind = 'pgp', id = 'ABCDEF' },
+      }, encrypted.recipients(yaml))
+      assert.same(
+        { { kind = 'age', id = 'age1ccc' } },
+        encrypted.recipients({
+          '{',
+          '  "a": "ENC[AES256_GCM,data:x]",',
+          '  "sops": {',
+          '    "age": [ { "recipient": "age1ccc", "enc": "x" } ]',
+        })
+      )
+      assert.same(
+        { { kind = 'age', id = 'age1ddd' } },
+        encrypted.recipients({
+          'A=ENC[AES256_GCM,data:x]',
+          'sops_age__list_0__map_recipient=age1ddd',
+        })
+      )
+    end)
+
+    it('lists them for a decrypted sops file, and nothing else', function()
+      local file = dir .. '/values.yaml'
+      h.write(file, {
+        'plain: a: 1',
+        'x: ENC[AES256_GCM,data:x]',
+        'sops:',
+        '  age:',
+        '    - recipient: age1zzz',
+      })
+      open(file)
+      encrypted.keys()
+      local text =
+        table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), '\n')
+      assert.is_truthy(text:find('- age      age1zzz', 1, true))
+
+      vim.cmd.enew()
+      encrypted.keys()
+      assert.equals('Recipients are read from a sops file', notes[#notes])
+    end)
+
+    it('rotates through sops once agreed, and opens the file again', function()
+      local file = dir .. '/values.yaml'
+      h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+      local bufnr = open(file)
+      tool('sops', {
+        'case "$1" in',
+        '  decrypt) sed -n "s/^plain: //p" "$2";;',
+        '  updatekeys|rotate) printf "plain: rotated\\nx: ENC[AES256_GCM,data:y]\\nsops:\\n" > "$3";;',
+        'esac',
+      })
+      local restore = h.stub(vim.fn, 'confirm', function() return 2 end)
+      encrypted.rotate('rotate')
+      restore()
+      assert.is_falsy(
+        vim.tbl_contains(calls(), 'sops rotate --in-place ' .. file)
+      )
+
+      restore = h.stub(vim.fn, 'confirm', function() return 1 end)
+      -- What the BufReadPost hook of `plugin/encrypted.lua` does on `:edit!`
+      vim.api.nvim_create_autocmd('BufReadPost', {
+        buffer = bufnr,
+        once = true,
+        callback = function(args) encrypted.open(args.buf) end,
+      })
+      encrypted.rotate('rotate')
+      restore()
+      assert.is_truthy(
+        vim.tbl_contains(calls(), 'sops rotate --in-place ' .. file)
+      )
+      assert.same(
+        { 'rotated' },
+        vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      )
+      assert.equals('New data key', notes[#notes])
+    end)
+
+    it('rotates nothing modified, nor any other kind', function()
+      local file = dir .. '/values.yaml'
+      h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+      local bufnr = open(file)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'changed' })
+      encrypted.rotate()
+      assert.is_truthy(notes[#notes]:find('Write the file first', 1, true))
+      encrypted.rotate('nope')
+      assert.equals('Unknown rotation: nope', notes[#notes])
+
+      local vault = dir .. '/vault.yml'
+      h.write(vault, { '$ANSIBLE_VAULT;1.1;AES256', 'enc:secret' })
+      open(vault)
+      encrypted.rotate()
+      assert.is_truthy(notes[#notes]:find('Only a sops file', 1, true))
+    end)
+  end)
+
   describe('diff', function()
     local repo
 

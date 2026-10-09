@@ -33,3 +33,20 @@ vim.api.nvim_create_user_command(
     desc = 'Diff this decrypted file with its clear text at a revision',
   }
 )
+
+-- `:EncryptedKeys`, `:EncryptedRotate [updatekeys|rotate]`: the recipients
+-- of this sops file, and putting new ones or a new data key in place
+vim.api.nvim_create_user_command(
+  'EncryptedKeys',
+  function() require('tools.encrypted').keys() end,
+  { desc = 'The recipients of this sops file' }
+)
+vim.api.nvim_create_user_command(
+  'EncryptedRotate',
+  function(args) require('tools.encrypted').rotate(args.fargs[1]) end,
+  {
+    nargs = '?',
+    complete = function() return { 'updatekeys', 'rotate' } end,
+    desc = 'Apply .sops.yaml to this sops file, or give it a new data key',
+  }
+)

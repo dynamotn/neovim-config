@@ -487,4 +487,142 @@ end
 ---@param args { fargs: string[] }
 function M.command(args) M.diff(0, args.fargs[1]) end
 
+---@class DyEncryptedRecipient
+---@field kind 'age'|'kms'|'pgp'|'gcp_kms'|'azure_kv'|'hc_vault'
+---@field id string
+
+--- What each key of the sops metadata names, in YAML, JSON, INI or dotenv:
+--- `recipient: age1…`, `"arn": "arn:aws:kms…"`, `sops_pgp__list_0__map_fp=…`
+local RECIPIENT_KEYS = {
+  { pattern = 'recipient', kind = 'age' },
+  { pattern = 'arn', kind = 'kms' },
+  { pattern = 'fp', kind = 'pgp' },
+  { pattern = 'resource_id', kind = 'gcp_kms' },
+  { pattern = 'vault_url', kind = 'azure_kv' },
+  { pattern = 'vaultUrl', kind = 'azure_kv' },
+  { pattern = 'vault_address', kind = 'hc_vault' },
+}
+
+--- The recipients the sops metadata of an encrypted file names: public
+--- keys and key ids only, read off the ciphertext, nothing decrypted
+---@param lines string[] The file as it is on disk
+---@return DyEncryptedRecipient[]
+function M.recipients(lines)
+  local found, seen = {}, {}
+  -- Only the metadata: the data may have a key called `fp` or `arn` too
+  local in_metadata = false
+  for _, line in ipairs(lines) do
+    if
+      line:match('^sops:')
+      or line:match('^%s*"sops"%s*:')
+      or line:match('^%[sops%]')
+    then
+      in_metadata = true
+    end
+    local metadata = in_metadata or line:match('^sops_') ~= nil
+    for _, key in ipairs(metadata and RECIPIENT_KEYS or {}) do
+      -- `key: v`, `"key": "v"`, `…__map_key=v`, `…__map_key = v`; the key
+      -- at the start of the line or after `{`, `,`, `-` or a blank, so a
+      -- JSON object on one line is read too
+      local value = (' ' .. line):match(
+        '[%s{,%-]"?' .. key.pattern .. '"?%s*:%s*"?([^"%s,}]+)'
+      ) or line:match('__map_' .. key.pattern .. '%s*=%s*(%S+)')
+      if
+        value
+        and value ~= ''
+        and not value:find('ENC[', 1, true)
+        and not seen[key.kind .. value]
+      then
+        seen[key.kind .. value] = true
+        table.insert(found, { kind = key.kind, id = value })
+      end
+    end
+  end
+  return found
+end
+
+--- Show the recipients of the decrypted sops file of the current buffer
+function M.keys()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.b[bufnr].dy_encrypted ~= 'sops' then
+    return notify('Recipients are read from a sops file', vim.log.levels.WARN)
+  end
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  local ok, lines = pcall(vim.fn.readfile, file)
+  local recipients = ok and M.recipients(lines) or {}
+  if #recipients == 0 then
+    return notify('No recipient found in the metadata of ' .. file)
+  end
+  local out = { '# Recipients of ' .. vim.fn.fnamemodify(file, ':~:.'), '' }
+  for _, recipient in ipairs(recipients) do
+    table.insert(out, ('- %-8s %s'):format(recipient.kind, recipient.id))
+  end
+  vim.list_extend(out, {
+    '',
+    '`:EncryptedRotate updatekeys` applies the recipients of `.sops.yaml`,',
+    '`:EncryptedRotate rotate` makes a new data key.',
+  })
+  require('util.scratch').open(out, {
+    split = 'horizontal',
+    filetype = 'markdown',
+  })
+end
+
+--- The sops command of each rotation
+M.ROTATIONS = {
+  -- The recipients of the file set to what `.sops.yaml` says now
+  updatekeys = function(file) return { 'sops', 'updatekeys', '--yes', file } end,
+  -- A new data key, the values encrypted again under it
+  rotate = function(file) return { 'sops', 'rotate', '--in-place', file } end,
+}
+
+--- Rotate the keys of the decrypted sops file of the current buffer, and
+--- open it again
+---@param how? 'updatekeys'|'rotate' `updatekeys` unless given
+function M.rotate(how)
+  how = how or 'updatekeys'
+  local bufnr = vim.api.nvim_get_current_buf()
+  if not M.ROTATIONS[how] then
+    return notify('Unknown rotation: ' .. how, vim.log.levels.ERROR)
+  end
+  if vim.b[bufnr].dy_encrypted ~= 'sops' then
+    return notify(
+      'Only a sops file is rotated here: Ansible Vault asks for its password',
+      vim.log.levels.WARN
+    )
+  end
+  if vim.bo[bufnr].modified then
+    return notify(
+      'Write the file first: rotating reads it from disk',
+      vim.log.levels.WARN
+    )
+  end
+  if vim.fn.executable('sops') ~= 1 then
+    return notify('sops is not installed', vim.log.levels.ERROR)
+  end
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  local answer = vim.fn.confirm(
+    ('%s %s?'):format(
+      how == 'rotate' and 'Make a new data key for' or 'Apply .sops.yaml to',
+      vim.fn.fnamemodify(file, ':~:.')
+    ),
+    '&Yes\n&No',
+    2
+  )
+  if answer ~= 1 then return end
+  local result = run(M.ROTATIONS[how](file), {
+    cwd = vim.fs.dirname(file),
+    text = true,
+  })
+  if not result or result.code ~= 0 then
+    return notify(
+      'sops failed: ' .. (result and failure('sops', result) or 'not run'),
+      vim.log.levels.ERROR
+    )
+  end
+  -- Read again, which decrypts the file as rotated
+  vim.api.nvim_buf_call(bufnr, function() vim.cmd('edit!') end)
+  notify(how == 'rotate' and 'New data key' or 'Recipients updated')
+end
+
 return M
