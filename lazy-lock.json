@@ -7,7 +7,7 @@
   "blade-nav.nvim": { "branch": "main", "commit": "909825e2cfa5171867f2109f7cedc5e3e5d60956" },
   "blink-cmp-avante": { "branch": "master", "commit": "4f494c6e124acbe31a8f5d58effa0c14aa38a6d5" },
   "blink-cmp-dictionary": { "branch": "master", "commit": "898a958cece34da20524d04ebc032a92a9565643" },
-  "blink-cmp-fuzzy-path": { "branch": "main", "commit": "e5ff41cf49531b3554ff0adab3dc4073e71d2016" },
+  "blink-cmp-fuzzy-path": { "branch": "main", "commit": "c6d2dcf2fdb4aa4ed2128bf0b4dc42df003a3d14" },
   "blink-cmp-kitty": { "branch": "main", "commit": "eb020e73590f1dc552fac9694d32330ec78998a1" },
   "blink-cmp-tmux": { "branch": "main", "commit": "9787c9f981bd5c7a2b732d2e20505d67a10dfde6" },
   "blink-cmp-zellij": { "branch": "main", "commit": "0f5922fe95afdc1e5f075ff45e9888fb9910e89e" },
