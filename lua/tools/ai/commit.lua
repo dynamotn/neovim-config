@@ -51,15 +51,62 @@ function M.message(reply)
   return lines
 end
 
+--- Lines git writes into the message file itself, after the comment prefix:
+--- how the prefix is found when git picks it (`core.commentChar = auto`)
+M.GIT_LINES = {
+  '%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%- >8 ',
+  'Please enter the commit message',
+  'Changes to be committed:',
+  'On branch ',
+}
+
+--- The comment prefix of `bufnr`'s message, from `value` of
+--- `core.commentString` (or `core.commentChar`), else from the lines git
+--- wrote with it, else `#`
+---@param bufnr integer
+---@param value? string
+---@return string
+function M.prefix(bufnr, value)
+  if value and value ~= '' and value ~= 'auto' then return value end
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
+    for _, pattern in ipairs(M.GIT_LINES) do
+      local prefix = line:match('^(%S+) ' .. pattern)
+      if prefix then return prefix end
+    end
+  end
+  return '#'
+end
+
+--- Hand `on_done` the comment prefix of the commit message in `bufnr`
+---@param root string
+---@param bufnr integer
+---@param on_done fun(prefix: string)
+function M.comment(root, bufnr, on_done)
+  -- Two names of one setting: the one set last wins, as in git
+  require('util.system').run({
+    'git',
+    'config',
+    '--get-regexp',
+    [[^core\.comment(char|string)$]],
+  }, { cwd = root, timeout = 5000 }, function(result)
+    local value
+    for line in (result.stdout or ''):gmatch('[^\n]+') do
+      value = line:match('^%S+ (.*)$') or value
+    end
+    on_done(M.prefix(bufnr, value))
+  end)
+end
+
 --- Lines before the first comment: what the user has typed of the message
 ---@param bufnr integer
+---@param prefix string What a comment line starts with
 ---@return integer last Line where the message area ends, 0-based, exclusive
 ---@return boolean empty
-local function message_area(bufnr)
+local function message_area(bufnr, prefix)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local last, empty = #lines, true
   for i, line in ipairs(lines) do
-    if line:match('^#') then
+    if vim.startswith(line, prefix) then
       last = i - 1
       break
     end
@@ -72,12 +119,14 @@ end
 --- has written something there already
 ---@param bufnr integer
 ---@param lines string[]
-function M.insert(bufnr, lines)
+---@param prefix? string What a comment line starts with, `#` unless given
+function M.insert(bufnr, lines, prefix)
   if not vim.api.nvim_buf_is_valid(bufnr) then return end
-  local _, empty = message_area(bufnr)
+  prefix = prefix or '#'
+  local _, empty = message_area(bufnr, prefix)
   local function put()
     -- The buffer may have changed while the question was up
-    local last = message_area(bufnr)
+    local last = message_area(bufnr, prefix)
     vim.api.nvim_buf_set_lines(
       bufnr,
       0,
@@ -150,7 +199,12 @@ function M.write()
         )
         require('tools.ai').headless(text, root, label, function(answer)
           local lines = M.message(answer)
-          if #lines > 0 and lines[1] ~= '' then M.insert(bufnr, lines) end
+          if #lines == 0 or lines[1] == '' then return end
+          M.comment(
+            root,
+            bufnr,
+            function(prefix) M.insert(bufnr, lines, prefix) end
+          )
         end)
       end)
     end)

@@ -940,8 +940,9 @@ The commit message buffer itself is always kept from AI, since `git commit
 refused when a staged file is one |dyneo-ai-guard| holds back, when it has
 the shape of a credential, or when `betterleaks` finds a secret in it or
 cannot run.  A diff over 512 KiB is cut, and the prompt says so.  The
-message goes where nothing has been typed yet; one already written is
-replaced only when you say so.  The prompt is `prompts/git/commit.md`, and a
+message goes where nothing has been typed yet, before the first comment as
+`core.commentChar` (or `core.commentString`) spells it, or as git wrote it
+for `auto`; one already written is replaced only when you say so.  The prompt is `prompts/git/commit.md`, and a
 trusted project may replace it; it is given `{files}`, `{history}`,
 `{convention}`, `{diff}` and `{fence}`, a code fence longer than any run of
 backticks in the diff.

@@ -183,6 +183,70 @@ describe('tools.ai.commit', function()
     )
   end)
 
+  describe('comment prefix', function()
+    it('takes the one git is set to, the last of its two names', function()
+      local bufnr = message_buffer({ '', '; Please enter the commit message' })
+      git('config', 'core.commentChar', ';')
+      local prefix
+      commit.comment(repo, bufnr, function(p) prefix = p end)
+      wait_for(function() return prefix ~= nil end, 'read the setting')
+      assert.equals(';', prefix)
+      git('config', 'core.commentString', '//')
+      prefix = nil
+      commit.comment(repo, bufnr, function(p) prefix = p end)
+      wait_for(function() return prefix ~= nil end, 'read the setting')
+      assert.equals('//', prefix)
+    end)
+
+    it('finds the one git picked for auto in the lines it wrote', function()
+      local bufnr = message_buffer({
+        '',
+        '# a heading of mine',
+        '; ------------------------ >8 ------------------------',
+        '; Do not modify or remove the line above.',
+      })
+      assert.equals(';', commit.prefix(bufnr, 'auto'))
+      assert.equals(
+        '%',
+        commit.prefix(h.buffer({ lines = { '', '% On branch main' } }), nil)
+      )
+      assert.equals(
+        '#',
+        commit.prefix(h.buffer({ lines = { '', 'text' } }), nil)
+      )
+    end)
+
+    it('ends the message at that prefix, not at a #', function()
+      local bufnr = message_buffer({
+        '',
+        '# not a comment here',
+        '; Please enter the commit message',
+      })
+      local asked = false
+      table.insert(
+        restores,
+        h.stub(vim.ui, 'select', function(_, _, on_choice)
+          asked = true
+          on_choice('Keep mine')
+        end)
+      )
+      commit.insert(bufnr, { 'subject' }, ';')
+      -- `# not a comment here` was in the message area: asked first, kept
+      assert.is_true(asked)
+      assert.same(
+        { '', '# not a comment here', '; Please enter the commit message' },
+        vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      )
+      local empty =
+        h.buffer({ lines = { '', '; Please enter the commit message' } })
+      commit.insert(empty, { 'subject' }, ';')
+      assert.same(
+        { 'subject', '', '; Please enter the commit message' },
+        vim.api.nvim_buf_get_lines(empty, 0, -1, false)
+      )
+    end)
+  end)
+
   describe('insert', function()
     it('asks before replacing a message already written', function()
       local bufnr = message_buffer({ 'mine', '# comment' })
