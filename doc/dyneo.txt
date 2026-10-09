@@ -876,7 +876,9 @@ configuration with the key that does each.
 
 The prompt and the code go through the same guard as everything else: a
 buffer |dyneo-ai-guard| holds back is refused with its reason, and what was
-sent is logged by path and line range.
+sent is logged by path and line range.  A tool an AI calls through MCP Hub
+(`<leader>M`) asks first, unless its server lists it in `autoApprove` of
+`servers.json`.
 
     `<leader>ae`       n, x   Explain the selection, or the whole buffer
     `<leader>ar`       n, x   Review it for bugs and risks

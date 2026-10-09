@@ -591,7 +591,10 @@ return {
     build = vim.fn.executable('mise') == 1 and 'mise use -g npm:mcp-hub@latest'
       or 'npm install -g mcp-hub@latest',
     opts = {
-      auto_approve = true,
+      -- Every MCP tool call is confirmed, but for those a server lists in
+      -- its own `autoApprove` (servers.json): a tool can write files, run
+      -- commands or send the buffer anywhere
+      auto_approve = false,
       auto_toggle_mcp_servers = false,
       extensions = {
         avante = {
