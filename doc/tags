@@ -6,6 +6,7 @@
 :DyArchitecture	dyneo.txt	/*:DyArchitecture*
 :DyCiLint	dyneo.txt	/*:DyCiLint*
 :DyCiStatus	dyneo.txt	/*:DyCiStatus*
+:DyCron	dyneo.txt	/*:DyCron*
 :DyEncryptedDiff	dyneo.txt	/*:DyEncryptedDiff*
 :DyEncryptedKeys	dyneo.txt	/*:DyEncryptedKeys*
 :DyEncryptedRotate	dyneo.txt	/*:DyEncryptedRotate*
@@ -59,6 +60,7 @@ dyneo-ci	dyneo.txt	/*dyneo-ci*
 dyneo-commands	dyneo.txt	/*dyneo-commands*
 dyneo-configuration	dyneo.txt	/*dyneo-configuration*
 dyneo-contents	dyneo.txt	/*dyneo-contents*
+dyneo-cron	dyneo.txt	/*dyneo-cron*
 dyneo-development	dyneo.txt	/*dyneo-development*
 dyneo-diagram	dyneo.txt	/*dyneo-diagram*
 dyneo-encrypted	dyneo.txt	/*dyneo-encrypted*

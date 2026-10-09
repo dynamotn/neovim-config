@@ -51,6 +51,7 @@ CONTENTS                                                      *dyneo-contents*
        7.3 Certificates and tokens ........................... |dyneo-inspect|
        7.4 CI pipelines ........................................... |dyneo-ci|
        7.5 OpenAPI requests .................................. |dyneo-openapi|
+       7.6 Cron schedules ....................................... |dyneo-cron|
     8. Project and writing .................................. |dyneo-features|
        8.1 Project overview .................................. |dyneo-project|
        8.2 Decision records ...................................... |dyneo-adr|
@@ -714,6 +715,26 @@ under hidden names for the run, so a relative `$ref` resolves from both, and
 removed after it.  A run that fails is reported as such, never as nothing
 breaking.  Install `oasdiff` once with `:MasonInstall oasdiff`.
 
+7.6 Cron schedules                                                *dyneo-cron*
+
+A schedule says when it runs at the end of its own line, and when it runs
+next: `0 9 * * 1-5` reads `⏱ at 09:00 on Mon–Fri · next Mon 12 Oct 09:00,
+…`.  The schedules read are the lines of a crontab, the `schedule:` of a
+Kubernetes CronJob (or an Argo CronWorkflow), and the `cron:` entries of a
+GitHub Actions workflow.  Lists, ranges, steps, month and day names, `7` for
+Sunday and the `@daily` family are understood; when both the day of the month
+and the day of the week are given, either one is enough, as in every cron.
+
+Times are read in the zone the schedule runs in: local time for a crontab,
+UTC for a workflow and for a CronJob without a `timeZone`.  A `CRON_TZ=` or
+a `timeZone` naming another zone is said, but no next run is worked out for
+it.  A schedule that is no schedule is an error; one that never runs, such as
+`0 0 30 2 *`, a warning, and so are a macro or a schedule more often than
+every five minutes in a workflow, which GitHub does not run.
+
+`<leader>it` (|:DyCron|) says the same of the schedule on the cursor line in
+a notification, and `:DyCron {expr}` of any schedule typed.
+
 ------------------------------------------------------------------------------
 8. PROJECT AND WRITING                                        *dyneo-features*
 
@@ -841,6 +862,7 @@ Infrastructure and operations (|dyneo-infra|, |dyneo-ops|) ~
     `<leader>il`       n      Read this file as a log
     `<leader>ij`       n      Read the journal
     `<leader>ip`       n      Read the logs of a pod
+    `<leader>it`       n      The cron schedule of this line in words
     `<leader>ic`       n      Switch the Kubernetes context
     `<leader>in`       n      Switch the Kubernetes namespace
 
@@ -1071,6 +1093,11 @@ Operations ~
                                                               *:DyOpenApiDiff*
 :DyOpenApiDiff [{rev}]  The breaking changes of this OpenAPI document since
                         {rev}, `HEAD` unless given.
+
+                                                                     *:DyCron*
+:DyCron                 The schedule on the cursor line in words, with its
+                        next runs.
+:DyCron {expr}          The same of {expr}, in local time.  See |dyneo-cron|.
 
 Project ~
                                                                   *:DyProject*

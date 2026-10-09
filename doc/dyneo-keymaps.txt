@@ -293,6 +293,7 @@ one of the same keys in those buffers.
 `<leader>il`           n      Read File as Log
 `<leader>in`           n      Switch Kube Namespace
 `<leader>ip`           n      Pod Logs
+`<leader>it`           n      Explain Cron Schedule
 
 ==============================================================================
 <leader>k  security

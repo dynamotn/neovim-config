@@ -114,6 +114,8 @@ below follow the sections of `:help dyneo`.
 - **OpenAPI** — the operation under the cursor as a kulala or Hurl request,
   and the breaking changes of a spec since a revision. `:DyOpenApiRequest` ·
   `:DyOpenApiDiff`
+- **Cron** — each schedule of a crontab, a CronJob or a workflow read out at
+  the end of its line, with its next runs; a broken one flagged. `:DyCron`
 - **Tasks** — run, build and test the current file or project in ~50
   languages. `<leader>oo`
 

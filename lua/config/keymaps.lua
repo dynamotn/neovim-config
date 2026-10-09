@@ -350,6 +350,7 @@ end, { desc = "Read File as Log" })
 map("n", "<leader>ij", "<cmd>DyLog journal<cr>", { desc = "Journal" })
 -- The pod is typed on the command line, where it completes
 map("n", "<leader>ip", function() vim.api.nvim_feedkeys(":DyLog kube ", "n", false) end, { desc = "Pod Logs" })
+map("n", "<leader>it", "<cmd>DyCron<cr>", { desc = "Explain Cron Schedule" })
 map("n", "<leader>ic", "<cmd>DyKube context<cr>", { desc = "Switch Kube Context" })
 map("n", "<leader>in", "<cmd>DyKube namespace<cr>", { desc = "Switch Kube Namespace" })
 
