@@ -76,12 +76,41 @@ A feature under `lua/tools/` lands in one commit with everything around it:
    `scripts/keymaps-doc.sh` to regenerate `doc/dyneo-keymaps.txt`.
 7. External binaries it needs reported in `lua/dyneo/health.lua`.
 
-A new language or tool is an entry in `lua/config/languages.lua`. A tool has
-up to three names -- `[1]` for conform or nvim-lint, `command` for the binary,
-`mason.package` for the installer -- and the last two are written down
-whenever they differ. A tool Mason lacks gets a package in
-`lua/tools/mason-registry/` (a release purl, or `dytoy:<tool>`), or
-`mason = { enabled = false }` when it comes from the system.
+## Languages and tools
+
+A new language or tool is an entry in `lua/config/languages.lua`.
+
+- A tool has up to three names -- `[1]` for conform or nvim-lint, `command`
+  for the binary, `mason.package` for the installer -- and the last two are
+  written down whenever they differ. A tool Mason lacks gets a package in
+  `lua/tools/mason-registry/` (a release purl, or `dytoy:<tool>`), or
+  `mason = { enabled = false }` when it comes from the system.
+- A server is given every filetype of the language that names it. One that
+  suits only a dialect lists its own: `{ 'helm_ls', filetypes =
+  { 'yaml.helm-values' } }`, or it attaches to every YAML buffer.
+- A conditional server's `enabled` is `fun(bufnr)`, decided per buffer from
+  where that buffer lives (`vim.fs.root(bufnr, ...)`), never once at startup
+  from the working directory.
+- `['*']` (every buffer) and `['_']` (fallback for a filetype with no linters
+  of its own) are pseudo-languages, not filetypes; never hand them to a
+  server.
+- A tool's options sit on its entry. Conform keys options by tool name, so a
+  tool serving two dialects gets one shared definition that reads the buffer,
+  not two entries where the last one read wins.
+- Anything built from `config.languages` walks it in sorted order, and only
+  the language that owns a parser speaks for it: `pairs` order is not stable
+  across sessions.
+- A non-obvious tool choice gets a comment above its entry.
+- Custom nvim-lint linters live in `lua/lint/linters/<name>.lua`; per-server
+  settings in `lsp/<server>.lua`.
+- `after/queries/<lang>/` extends upstream queries; `queries/<lang>/` replaces
+  them, and is only for overriding a broken upstream query.
+- Harper parses by the LSP `languageId`: a compound or unusual filetype is
+  mapped to a grammar it knows. Its dictionary is a merged copy of
+  `spell/*.txt` in `stdpath('state')`, since it rewrites the file on every
+  added word.
+- A new filetype needs a sample in `scripts/lib/samples.lua` (or an entry in
+  its file-name map), so `check-startup` opens it.
 
 ## Code rules learned the hard way
 
@@ -121,6 +150,25 @@ Every one of these came from a bug that shipped. Keep to them.
   terminal stack: `<C-s>` is the zellij prefix.
 - **Stay lazy.** Load on filetype, command or key; cache what statusline and
   redraws ask, invalidated by events. Watch `README.md`'s benchmark.
+- **Lazy installs register through `util.lazy_install.on_filetype`**, never
+  one `FileType` autocmd per tool, and its handlers are idempotent.
+- **Nothing per keystroke shells out.** A completion source that runs a CLI
+  is wrapped in `tools.completion.cached` (TTL, refreshed on `CursorHold`);
+  `enabled()` answers are cached per buffer.
+- **Write-time work is deferred and skipped while quitting** (`QuitPre`,
+  `vim.v.exiting`): `:wq` must not kill a lint mid-run and fail a
+  `git commit`.
+- **`plugin/` code runs under `nvim --clean` too**, before lazy.nvim has
+  loaded anything; ask `lazy.core.config` or wait for `User LazyLoad`.
+- **Fast events allow only fast APIs.** `vim.print`/`dd` may be called from
+  one; never call `nvim_list_uis()` and the like there.
+- **Trust before running project code.** A project `.nvim` folder joins the
+  runtimepath only through `vim.secure.read`; pin the verdict before
+  prompting, since the prompt keeps handling events and would ask again.
+  Secret scanners run with live validation off, so nothing is sent to a
+  provider to check it.
+- **Colorscheme integrations are listed by hand** (`auto_integrations =
+  false` in catppuccin); a new plugin with one is added there.
 - **Per-filetype options live in `ftplugin/<ft>.lua`**, not in a global
   `FileType` autocmd. Anchor `ftdetect` patterns to their project, not to a
   bare file name.
@@ -150,6 +198,9 @@ Every one of these came from a bug that shipped. Keep to them.
   `$PATH` instead of depending on what the machine has.
 - Specs must pass on a clean CI runner with no parsers, formatters or
   servers installed.
+- When `check-startup` fails only because of the machine it runs on (no
+  tree-sitter CLI, Copilot not signed in), stub the plugin with
+  `before_config` in `scripts/lib/samples.lua`; do not change the config.
 - Never name a file with a chezmoi prefix (`encrypted_`, `private_`,
   `executable_`, `dot_`, ...): this tree is a chezmoi source, and chezmoi
   reads the prefix as an attribute. `literal_encrypted_spec.lua` exists for
@@ -163,6 +214,11 @@ Every one of these came from a bug that shipped. Keep to them.
 - Plugin bumps are their own `chore: update version of plugins` commit.
   Renovate deliberately leaves lockfiles to lazy.nvim, and covers pre-commit
   hooks, workflow actions and the purls in `lua/tools/mason-registry/`.
+- A plugin whose last release lags what the config needs goes in
+  `stale_releases` in `lua/config/lazy.lua`, with a comment saying why, so
+  `stable` follows its branch.
+- A local checkout of a plugin is `dev = true` under `DyNeo.dev_plugins_path`
+  with `fallback = true`, so other machines still clone it.
 - Releases wait `DyNeo.quarantine_window` (a week) before Mason or lazy.nvim
   installs them. Use that one global; never a copy of the constant.
 - `lua/per_machine/config.lua` comes from chezmoi. Changing a per-machine
@@ -192,4 +248,17 @@ in `mode: symlink` the tree is what Neovim loads.
   no models", "cap a run's output at 1 MiB".
 - A body, when needed, gives the concrete failure and why, then the fix in a
   sentence; side fixes go under "Also: ...". No headings, no trailers.
+- Older history has unscoped subjects ("fix: portability"); do not copy them.
+- Branches land on `main` as a plain `Merge branch '<branch>'` commit, done
+  by the user; keep a branch's commits clean enough to merge as they are.
 - There is no `CHANGELOG.md`; do not create one.
+
+## Gone, do not bring back
+
+- Loose globals (`_G.plugin_channel`, `_G.enabled_languages`, ...) and
+  `LazyVim.*` / `lazyvim.util.*` calls: all replaced by `DyNeo.*` and
+  `lua/util/*`.
+- Reloading a buffer with `:e!` after a parser installs; the buffer is set
+  up again instead.
+- gitleaks (now betterleaks), editorconfig-checker (removed), nvim-dap-ui
+  (now nvim-dap-view).
