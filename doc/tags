@@ -17,6 +17,9 @@
 :EncryptedDiff	dyneo.txt	/*:EncryptedDiff*
 :EncryptedKeys	dyneo.txt	/*:EncryptedKeys*
 :EncryptedRotate	dyneo.txt	/*:EncryptedRotate*
+:HelmUnused	dyneo.txt	/*:HelmUnused*
+:HelmUsages	dyneo.txt	/*:HelmUsages*
+:HelmValue	dyneo.txt	/*:HelmValue*
 :ImagePin	dyneo.txt	/*:ImagePin*
 :ImageScan	dyneo.txt	/*:ImageScan*
 :Jira	dyneo.txt	/*:Jira*
@@ -57,6 +60,7 @@ dyneo-diagram	dyneo.txt	/*dyneo-diagram*
 dyneo-encrypted	dyneo.txt	/*dyneo-encrypted*
 dyneo-features	dyneo.txt	/*dyneo-features*
 dyneo-globals	dyneo.txt	/*dyneo-globals*
+dyneo-helm	dyneo.txt	/*dyneo-helm*
 dyneo-images	dyneo.txt	/*dyneo-images*
 dyneo-infra	dyneo.txt	/*dyneo-infra*
 dyneo-inspect	dyneo.txt	/*dyneo-inspect*

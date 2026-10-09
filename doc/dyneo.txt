@@ -401,6 +401,17 @@ of a chart is rendered first and piped in, with the values file being edited
 as its values.  A diff or a render can hold Secret data, so its buffer is
 kept from every AI integration.
 
+Helm values                                                      *dyneo-helm*
+
+In a template of a chart, `<localleader>v` (|:HelmValue|) goes from the
+`.Values` path under the cursor to its line in the chart's `values.yaml`, or
+to the deepest key of it the file sets.  In `values.yaml`, `<localleader>u`
+(|:HelmUsages|) lists in the quickfix list every template line using the key
+under the cursor, and |:HelmUnused| marks the keys no template uses.  A key
+is used when a template names it, a parent of it -- `toYaml .Values.resources`
+uses all of `resources` -- or a child; `global` and the values of a subchart
+are left to their owner.
+
 Container images                                               *dyneo-images*
 
 A Dockerfile names its bases in `FROM`, a manifest or a compose file in
@@ -896,6 +907,14 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         or destroyed.
 :TfPlan clear           Clear the plan, drift and costs shown.  See
                         |dyneo-tfplan|.
+
+                                                                  *:HelmValue*
+:HelmValue              Go to the value under the cursor in values.yaml.
+                                                                 *:HelmUsages*
+:HelmUsages             List the template lines using the key under the
+                        cursor.
+                                                                 *:HelmUnused*
+:HelmUnused             Mark the values no template uses.  See |dyneo-helm|.
 
                                                                   *:ImageScan*
 :ImageScan              Scan the images this file names for known
