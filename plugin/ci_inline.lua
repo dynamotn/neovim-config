@@ -1,0 +1,24 @@
+-- `:CiStatus`, `:CiLint`: the last pipeline of the branch on the jobs of a
+-- `.gitlab-ci.yml` or a GitHub Actions workflow, and GitLab's own check of
+-- the former. The module only loads when asked, or when such a file opens.
+vim.api.nvim_create_user_command(
+  'CiStatus',
+  function(args) require('tools.ci_inline').command(args) end,
+  {
+    nargs = '?',
+    complete = function() return { 'clear' } end,
+    desc = 'Show the last pipeline of the branch on the jobs of this file',
+  }
+)
+
+vim.api.nvim_create_user_command(
+  'CiLint',
+  function() require('tools.ci_inline').lint(0) end,
+  { desc = 'Have GitLab check this .gitlab-ci.yml' }
+)
+
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('dy_ci_inline', { clear = true }),
+  pattern = { 'yaml.gitlab', 'yaml.gh-action' },
+  callback = function(args) require('tools.ci_inline').attach(args.buf) end,
+})

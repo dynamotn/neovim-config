@@ -453,6 +453,22 @@ first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
 what is running.  A block that deletes, destroys or reaches for root asks
 first.  See |:Runbook|.
 
+CI pipelines                                                        *dyneo-ci*
+
+In a `.gitlab-ci.yml` or a GitHub Actions workflow, `<localleader>s` (or
+|:CiStatus|) asks the forge for the last pipeline of the current branch and
+puts the status of each job at the end of the line defining it: `✓` passed,
+`✗` failed, `●` running, `○` waiting, `⊘` skipped.  The jobs of a matrix are
+counted on their one line, the worst of them shown.  `<localleader>x` clears
+them.  The forge is the first of the remotes `upstream`, `gh`, `github` and
+`origin` on GitHub or GitLab, asked through `gh` or `glab`, which keep the
+token.
+
+In a `.gitlab-ci.yml`, `<localleader>l` (or |:CiLint|) has GitLab check the
+saved file with `glab ci lint`, and puts what it finds on the jobs it names.
+This sends the file to GitLab, so a file held back from AI is not sent.  A
+workflow is checked by `actionlint` as it is edited (|dyneo-policy|).
+
 Logs                                                              *dyneo-logs*
 
 |:DyLog| opens a log file, the journal (`journalctl`) or the logs of a pod
@@ -677,6 +693,14 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :Runbook clear          Remove every `output` fence.
 :Runbook stop           Stop what the buffer is running.
                         See |dyneo-runbook|.
+
+                                                                   *:CiStatus*
+:CiStatus               Show the last pipeline of the branch on the jobs of
+                        this `.gitlab-ci.yml` or workflow.
+:CiStatus clear         Clear it.  See |dyneo-ci|.
+
+                                                                     *:CiLint*
+:CiLint                 Have GitLab check this saved `.gitlab-ci.yml`.
 
                                                                       *:DyLog*
 :DyLog {file}           Read {file} as log records.

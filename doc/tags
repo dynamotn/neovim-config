@@ -1,6 +1,8 @@
 :AiGuardAllow	dyneo.txt	/*:AiGuardAllow*
 :AiGuardCheck	dyneo.txt	/*:AiGuardCheck*
 :AiGuardLog	dyneo.txt	/*:AiGuardLog*
+:CiLint	dyneo.txt	/*:CiLint*
+:CiStatus	dyneo.txt	/*:CiStatus*
 :DyLog	dyneo.txt	/*:DyLog*
 :DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
 :DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
@@ -33,6 +35,7 @@ DyNeo.yaml_schema_dirs	dyneo.txt	/*DyNeo.yaml_schema_dirs*
 dyneo	dyneo.txt	/*dyneo*
 dyneo-ai-guard	dyneo.txt	/*dyneo-ai-guard*
 dyneo-channels	dyneo.txt	/*dyneo-channels*
+dyneo-ci	dyneo.txt	/*dyneo-ci*
 dyneo-commands	dyneo.txt	/*dyneo-commands*
 dyneo-configuration	dyneo.txt	/*dyneo-configuration*
 dyneo-contents	dyneo.txt	/*dyneo-contents*

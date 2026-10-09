@@ -463,6 +463,7 @@ local function requirements()
   -- only worth knowing about, not a warning
   local on_demand = {
     infracost = '`:TfPlan cost`',
+    glab = '`:CiStatus` and `:CiLint` on GitLab',
   }
   for _, command in ipairs(required) do
     table.insert(
