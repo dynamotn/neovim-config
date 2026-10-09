@@ -115,7 +115,14 @@ vim.filetype.add({
     ['.*/templates/.*%.tpl'] = helm,
     ['.*/templates/.*%.ya?ml'] = helm,
     ['helmfile.*%.ya?ml'] = 'helm',
-    ['values.*%.ya?ml'] = 'yaml.helm-values',
+    -- The values of a chart, or of the releases a helmfile deploys; any other
+    -- `values.yaml` (Kustomize, Argo CD, an app's own) stays plain YAML
+    ['values.*%.ya?ml'] = within('yaml.helm-values', {
+      'Chart.yaml',
+      'helmfile.yaml',
+      'helmfile.yml',
+      'helmfile.d',
+    }),
 
     ['.*/hypr/.*%.conf'] = 'hyprlang',
 

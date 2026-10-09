@@ -65,17 +65,31 @@ M.names_of = {
   ['yaml.docker-compose'] = 'docker-compose.yml',
   ['yaml.gh-action'] = '.github/workflows/sample.yml',
   ['yaml.gitlab'] = 'sample.gitlab-ci.yml',
-  ['yaml.helm-values'] = 'values.yaml',
+  ['yaml.helm-values'] = 'chart/values.yaml',
   ['yaml.openapi'] = 'openapi.yaml',
 }
 
+--- Files a filetype is only given beside, written ahead of its sample:
+--- `ftdetect` anchors these patterns to their project
+---@type table<string, string[]>
+M.markers_of = {
+  helm = { 'chart/Chart.yaml' },
+  ['yaml.helm-values'] = { 'chart/Chart.yaml' },
+}
+
 --- Pick a file name under `root` that `vim.filetype.match` gives `filetype`
+--- (and the files it is only given beside)
 ---@param filetype string
 ---@param name string Language the filetype belongs to
 ---@param language DyLangSpec
 ---@param root string
 ---@return string?
 function M.sample_of(filetype, name, language, root)
+  for _, marker in ipairs(M.markers_of[filetype] or {}) do
+    local path = vim.fs.joinpath(root, marker)
+    vim.fn.mkdir(vim.fs.dirname(path), 'p')
+    vim.fn.writefile({ '' }, path)
+  end
   local candidates = { 'sample.' .. filetype, 'sample.' .. name }
   if language.ext then
     table.insert(candidates, 1, 'sample.' .. language.ext)

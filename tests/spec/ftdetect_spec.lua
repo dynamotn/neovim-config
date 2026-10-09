@@ -51,7 +51,6 @@ describe('ftdetect', function()
     { '/p/src/app.container.html', 'htmlangular' },
     { '/p/dot_bashrc.tmpl', 'gotmpl' },
     { '/p/helmfile.yaml', 'helm' },
-    { '/p/values-prod.yaml', 'yaml.helm-values' },
     { '/p/.config/hypr/hyprland.conf', 'hyprlang' },
     { '/p/Dockerfile-dev', 'dockerfile' },
   }
@@ -114,6 +113,9 @@ describe('ftdetect', function()
       { { 'chart/Chart.yaml' }, 'chart/templates/_helpers.tpl', 'helm' },
       { { 'chart/Chart.yaml' }, 'chart/templates/deployment.yaml', 'helm' },
       { {}, 'deploy/templates/pipeline.yaml', 'yaml' },
+      { { 'chart/Chart.yaml' }, 'chart/values-prod.yaml', 'yaml.helm-values' },
+      { { 'helmfile.yaml' }, 'env/values.yaml', 'yaml.helm-values' },
+      { {}, 'overlays/values.yaml', 'yaml' },
     }
     for _, case in ipairs(anchored) do
       local files, path, ft = case[1], case[2], case[3]
