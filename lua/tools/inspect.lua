@@ -271,8 +271,20 @@ function M.under_cursor()
   present(nil, 'No certificate, key or JWT under the cursor')
 end
 
+--- What `openssl x509 -checkend` answered: whether the certificate ends
+--- within the time asked, or nil when it did not answer -- not installed,
+--- killed by the timeout, or failed with another exit
+---@param result? vim.SystemCompleted
+---@return boolean?
+local function ends_within(result)
+  if not result or result.signal ~= 0 then return nil end
+  if result.code == 0 then return false end
+  if result.code == 1 then return true end
+  return nil
+end
+
 --- Hand `on_done` how long `pem` has left: 'expired', 'soon' or 'ok', and
---- its end date; nothing when openssl cannot read it
+--- its end date; nothing when openssl cannot read it or does not answer
 ---@param pem string
 ---@param on_done fun(state: 'expired'|'soon'|'ok'|nil, ends: string?)
 function M.expiry(pem, on_done)
@@ -280,13 +292,16 @@ function M.expiry(pem, on_done)
     if not ends or ends.code ~= 0 then return on_done(nil) end
     local when = vim.trim((ends.stdout or ''):gsub('^notAfter=', ''))
     openssl({ 'x509', '-noout', '-checkend', '0' }, pem, function(now)
-      if now and now.code ~= 0 then return on_done('expired', when) end
+      local expired = ends_within(now)
+      if expired == nil then return on_done(nil, when) end
+      if expired then return on_done('expired', when) end
       openssl(
         { 'x509', '-noout', '-checkend', tostring(M.WARN_DAYS * 86400) },
         pem,
         function(soon)
-          if soon and soon.code ~= 0 then return on_done('soon', when) end
-          on_done('ok', when)
+          local ending = ends_within(soon)
+          if ending == nil then return on_done(nil, when) end
+          on_done(ending and 'soon' or 'ok', when)
         end
       )
     end)
@@ -307,7 +322,7 @@ function M.check_expiry(bufnr)
     M.pems(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
   )
   local tick = vim.api.nvim_buf_get_changedtick(bufnr)
-  local diagnostics, index = {}, 0
+  local diagnostics, index, unchecked = {}, 0, 0
   local function next_certificate()
     index = index + 1
     local found = certificates[index]
@@ -321,16 +336,26 @@ function M.check_expiry(bufnr)
         )
       end
       vim.diagnostic.set(ns, bufnr, diagnostics)
-      return notify(
-        ('%d certificates checked, %d expired or ending soon'):format(
-          #certificates,
-          #diagnostics
-        ),
-        #diagnostics > 0 and vim.log.levels.WARN or nil
+      local summary = ('%d certificates checked, %d expired or ending soon'):format(
+        #certificates - unchecked,
+        #diagnostics - unchecked
       )
+      if unchecked > 0 then
+        summary = ('%s, %d could not be checked'):format(summary, unchecked)
+      end
+      return notify(summary, #diagnostics > 0 and vim.log.levels.WARN or nil)
     end
     M.expiry(found.text, function(state, when)
-      if state == 'expired' or state == 'soon' then
+      if not state then
+        unchecked = unchecked + 1
+        table.insert(diagnostics, {
+          lnum = found.first - 1,
+          col = 0,
+          severity = vim.diagnostic.severity.WARN,
+          message = 'Certificate could not be checked',
+          source = 'inspect',
+        })
+      elseif state == 'expired' or state == 'soon' then
         table.insert(diagnostics, {
           lnum = found.first - 1,
           col = 0,

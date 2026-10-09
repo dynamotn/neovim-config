@@ -230,6 +230,46 @@ describe('tools.inspect', function()
     end)
   end)
 
+  it('counts a certificate openssl cannot answer for as unchecked', function()
+    vim.fn.mkdir(dir .. '/bin', 'p')
+    -- Reads the end date, then fails the check with neither 0 nor 1
+    h.write(dir .. '/bin/openssl', {
+      '#!/bin/sh',
+      'cat > /dev/null',
+      'case "$*" in',
+      '  *-enddate*) echo "notAfter=Jan  1 00:00:00 2030 GMT";;',
+      '  *-checkend*) exit 2;;',
+      'esac',
+    })
+    vim.fn.setfperm(dir .. '/bin/openssl', 'rwxr-xr-x')
+    local path = vim.env.PATH
+    vim.env.PATH = dir .. '/bin:' .. path
+    local bufnr = h.buffer({
+      lines = {
+        '-----BEGIN CERTIFICATE-----',
+        'x',
+        '-----END CERTIFICATE-----',
+      },
+    })
+    local notes = {}
+    local restore = h.stub(
+      vim,
+      'notify',
+      function(msg) table.insert(notes, msg) end
+    )
+    inspect.check_expiry(bufnr)
+    assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
+    restore()
+    vim.env.PATH = path
+    assert.equals(
+      '0 certificates checked, 0 expired or ending soon, 1 could not be checked',
+      notes[1]
+    )
+    local diagnostics = vim.diagnostic.get(bufnr)
+    assert.equals(1, #diagnostics)
+    assert.equals('Certificate could not be checked', diagnostics[1].message)
+  end)
+
   it('sets nothing on a buffer edited while it checked', function()
     vim.fn.mkdir(dir .. '/bin', 'p')
     h.write(dir .. '/bin/openssl', {
