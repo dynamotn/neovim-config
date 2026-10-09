@@ -461,7 +461,152 @@ local function write_private(path, text)
   return ok
 end
 
----@alias DyTfMode 'plan'|'drift'|'cost'
+--- The block a reference of an expression points at, as the root module
+--- addresses it: `aws_instance.web.id` -> `aws_instance.web`,
+--- `module.vpc.vpc_id` -> `module.vpc`, `data.aws_ami.x.id` ->
+--- `data.aws_ami.x`; nil for `var.`, `local.` and the like
+---@param ref string
+---@return string?
+function M.ref_address(ref)
+  -- In parentheses: the count `gsub` returns too is no separator
+  local parts = vim.split((ref:gsub('%[.-%]', '')), '.', { plain = true })
+  if parts[1] == 'module' and parts[2] then return 'module.' .. parts[2] end
+  if parts[1] == 'data' and parts[3] then
+    return ('data.%s.%s'):format(parts[2], parts[3])
+  end
+  -- A resource type is `provider_kind`: `var`, `local`, `each`, `count`,
+  -- `path`, `self` and `terraform` are not
+  if parts[2] and parts[1]:find('_', 1, true) then
+    return parts[1] .. '.' .. parts[2]
+  end
+  return nil
+end
+
+--- Every `references` list inside `expressions`, however deep
+---@param expressions any
+---@param out string[]
+local function references(expressions, out)
+  if type(expressions) ~= 'table' then return end
+  for key, value in pairs(expressions) do
+    if key == 'references' and type(value) == 'table' then
+      vim.list_extend(out, value)
+    else
+      references(value, out)
+    end
+  end
+end
+
+--- What depends on each block of the root module, from the `configuration`
+--- of `show -json`: the blocks whose expressions refer to it, or that name
+--- it in `depends_on`
+---@param configuration table
+---@return table<string, string[]> Address to the addresses depending on it
+function M.dependents(configuration)
+  local root = type(configuration) == 'table' and configuration.root_module
+    or {}
+  local blocks = {}
+  for _, resource in
+    ipairs(type(root.resources) == 'table' and root.resources or {})
+  do
+    if type(resource.address) == 'string' then
+      table.insert(blocks, { address = resource.address, node = resource })
+    end
+  end
+  for name, call in
+    pairs(type(root.module_calls) == 'table' and root.module_calls or {})
+  do
+    table.insert(blocks, { address = 'module.' .. name, node = call })
+  end
+  local dependents = {}
+  for _, block in ipairs(blocks) do
+    local refs = {}
+    references(block.node.expressions, refs)
+    vim.list_extend(
+      refs,
+      type(block.node.depends_on) == 'table' and block.node.depends_on or {}
+    )
+    local seen = {}
+    for _, ref in ipairs(refs) do
+      local target = type(ref) == 'string' and M.ref_address(ref)
+      if target and target ~= block.address and not seen[target] then
+        seen[target] = true
+        dependents[target] = dependents[target] or {}
+        table.insert(dependents[target], block.address)
+      end
+    end
+  end
+  return dependents
+end
+
+--- The address of the block a change belongs to, in the root module
+---@param change DyTfChange
+---@return string
+local function block_address(change)
+  if change.module then return 'module.' .. change.module end
+  if change.mode == 'data' then
+    return ('data.%s.%s'):format(change.type, change.name)
+  end
+  return change.type .. '.' .. change.name
+end
+
+--- Every block reached from a replaced or destroyed one through what
+--- depends on it, with the changes it is reached from
+---@param changes DyTfChange[]
+---@param dependents table<string, string[]>
+---@return table<string, string[]> Block to the `address (action)` behind it
+function M.affected(changes, dependents)
+  local reached = {}
+  for _, change in ipairs(changes) do
+    if change.action == 'replace' or change.action == 'destroy' then
+      local origin = ('%s (%s)'):format(block_address(change), change.action)
+      local queue, seen = { block_address(change) }, {}
+      seen[queue[1]] = true
+      while #queue > 0 do
+        local address = table.remove(queue, 1)
+        for _, dependent in ipairs(dependents[address] or {}) do
+          if not seen[dependent] then
+            seen[dependent] = true
+            table.insert(queue, dependent)
+            reached[dependent] = reached[dependent] or {}
+            if not vim.list_contains(reached[dependent], origin) then
+              table.insert(reached[dependent], origin)
+            end
+          end
+        end
+      end
+    end
+  end
+  return reached
+end
+
+--- One entry per block reached, on the block when it is in `blocks`
+---@param reached table<string, string[]>
+---@param blocks table<string, { file: string, line: integer }>
+---@return DyTfEntry[]
+function M.impact_entries(reached, blocks)
+  local entries = {}
+  local addresses = vim.tbl_keys(reached)
+  table.sort(addresses)
+  for _, address in ipairs(addresses) do
+    local origins = reached[address]
+    table.sort(origins)
+    local key = (address:match('^module%.') or address:match('^data%.'))
+        and address
+      or ('resource.' .. address)
+    local where = blocks[key]
+    local text = '↳ depends on ' .. table.concat(origins, ', ')
+    if not where then text = address .. ': ' .. text end
+    table.insert(entries, {
+      file = where and where.file,
+      line = where and where.line,
+      text = text,
+      severity = vim.diagnostic.severity.INFO,
+    })
+  end
+  return entries
+end
+
+---@alias DyTfMode 'plan'|'drift'|'cost'|'impact'
 
 --- Plan the module of the current buffer, and show on its blocks what the
 --- plan does, what drifted, or what it costs
@@ -585,7 +730,18 @@ function M.run(mode)
               end
               local changes = M.changes(plan)
               local summary = M.summary(changes)
-              M.show(M.entries(changes, blocks), 'Terraform plan: ' .. summary)
+              local entries = M.entries(changes, blocks)
+              if mode == 'impact' then
+                local reached =
+                  M.affected(changes, M.dependents(plan.configuration))
+                local count = #vim.tbl_keys(reached)
+                vim.list_extend(entries, M.impact_entries(reached, blocks))
+                summary = summary
+                  .. ('; %d blocks depend on what is replaced or destroyed'):format(
+                    count
+                  )
+              end
+              M.show(entries, 'Terraform plan: ' .. summary)
               notify(summary)
               if mode == 'cost' then
                 price(show.stdout, blocks)
@@ -609,10 +765,13 @@ function M.drift() M.run('drift') end
 --- Plan, and show what each block will cost a month
 function M.cost() M.run('cost') end
 
---- The subcommands of `:TfPlan`
-M.SUBCOMMANDS = { 'clear', 'cost', 'drift' }
+--- Plan, and show what depends on each block replaced or destroyed
+function M.impact() M.run('impact') end
 
---- `:TfPlan [clear|cost|drift]`
+--- The subcommands of `:TfPlan`
+M.SUBCOMMANDS = { 'clear', 'cost', 'drift', 'impact' }
+
+--- `:TfPlan [clear|cost|drift|impact]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub = args.fargs[1]
@@ -620,6 +779,7 @@ function M.command(args)
   if sub == 'clear' then return M.clear() end
   if sub == 'cost' then return M.cost() end
   if sub == 'drift' then return M.drift() end
+  if sub == 'impact' then return M.impact() end
   notify('Unknown subcommand: ' .. sub, vim.log.levels.ERROR)
 end
 
@@ -649,6 +809,12 @@ function M.attach(bufnr)
     '<localleader>c',
     M.cost,
     { buffer = bufnr, desc = 'Cost (Terraform)' }
+  )
+  vim.keymap.set(
+    'n',
+    '<localleader>i',
+    M.impact,
+    { buffer = bufnr, desc = 'Impact Of Replacements (Terraform)' }
   )
   place_costs(bufnr)
 end

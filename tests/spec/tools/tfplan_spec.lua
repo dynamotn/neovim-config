@@ -380,6 +380,139 @@ describe('tools.tfplan', function()
     end)
   end)
 
+  describe('impact', function()
+    local CONFIGURATION = {
+      root_module = {
+        resources = {
+          {
+            address = 'aws_instance.web',
+            expressions = {
+              ami = {
+                references = { 'data.aws_ami.base.id', 'data.aws_ami.base' },
+              },
+            },
+          },
+          {
+            address = 'aws_lb_target_group_attachment.web',
+            expressions = {
+              target_id = {
+                references = { 'aws_instance.web[0].id', 'aws_instance.web' },
+              },
+            },
+          },
+          {
+            address = 'aws_route53_record.web',
+            expressions = {
+              records = {
+                references = {
+                  'aws_lb_target_group_attachment.web.id',
+                  'var.zone',
+                },
+              },
+            },
+          },
+          {
+            address = 'aws_s3_bucket.logs',
+            depends_on = { 'aws_instance.web' },
+          },
+          {
+            address = 'aws_sqs_queue.alone',
+            expressions = { name = { references = { 'local.name' } } },
+          },
+        },
+        module_calls = {
+          dns = {
+            expressions = {
+              target = { references = { 'aws_route53_record.web.fqdn' } },
+            },
+          },
+        },
+      },
+    }
+
+    it('reads the block a reference points at', function()
+      assert.equals(
+        'aws_instance.web',
+        tfplan.ref_address('aws_instance.web[0].id')
+      )
+      assert.equals('module.vpc', tfplan.ref_address('module.vpc.vpc_id'))
+      assert.equals('module.vpc', tfplan.ref_address('module.vpc["a"].id'))
+      assert.equals(
+        'data.aws_ami.base',
+        tfplan.ref_address('data.aws_ami.base.id')
+      )
+      for _, ref in ipairs({
+        'var.zone',
+        'local.name',
+        'each.key',
+        'count.index',
+        'path.module',
+        'self.id',
+      }) do
+        assert.is_nil(tfplan.ref_address(ref), ref)
+      end
+    end)
+
+    it('finds what depends on each block, depends_on included', function()
+      local dependents = tfplan.dependents(CONFIGURATION)
+      table.sort(dependents['aws_instance.web'])
+      assert.same(
+        { 'aws_lb_target_group_attachment.web', 'aws_s3_bucket.logs' },
+        dependents['aws_instance.web']
+      )
+      assert.same({ 'module.dns' }, dependents['aws_route53_record.web'])
+      assert.same({ 'aws_instance.web' }, dependents['data.aws_ami.base'])
+      assert.is_nil(dependents['aws_sqs_queue.alone'])
+      assert.same({}, tfplan.dependents(nil))
+    end)
+
+    it('follows a replacement through everything depending on it', function()
+      local reached = tfplan.affected({
+        {
+          action = 'replace',
+          mode = 'managed',
+          type = 'aws_instance',
+          name = 'web',
+          forces = {},
+        },
+        {
+          action = 'update',
+          mode = 'managed',
+          type = 'aws_sqs_queue',
+          name = 'alone',
+          forces = {},
+        },
+      }, tfplan.dependents(CONFIGURATION))
+      local addresses = vim.tbl_keys(reached)
+      table.sort(addresses)
+      assert.same({
+        'aws_lb_target_group_attachment.web',
+        'aws_route53_record.web',
+        'aws_s3_bucket.logs',
+        'module.dns',
+      }, addresses)
+      assert.same({ 'aws_instance.web (replace)' }, reached['module.dns'])
+
+      local entries = tfplan.impact_entries(
+        reached,
+        { ['module.dns'] = { file = '/m.tf', line = 3 } }
+      )
+      local dns =
+        vim.tbl_filter(function(e) return e.file == '/m.tf' end, entries)[1]
+      assert.equals('↳ depends on aws_instance.web (replace)', dns.text)
+      assert.equals(3, dns.line)
+      assert.is_truthy(
+        vim.tbl_filter(
+          function(e)
+            return e.text
+              == 'aws_s3_bucket.logs: ↳ depends on aws_instance.web (replace)'
+          end,
+          entries
+        )[1]
+      )
+    end)
+  end)
+
   describe('run', function()
     local path, bin, restore_notify, notes
 
@@ -482,6 +615,47 @@ describe('tools.tfplan', function()
       tfplan.cost()
       assert.is_true(vim.wait(10000, function() return #notes >= 3 end, 20))
       assert.equals('Monthly cost: ≈ 0.00 USD/month', notes[3])
+    end)
+
+    it('shows what depends on a replacement, with the plan', function()
+      h.write(dir .. '/plan.json', {
+        vim.json.encode({
+          resource_changes = PLAN.resource_changes,
+          configuration = {
+            root_module = {
+              resources = {
+                {
+                  address = 'aws_s3_bucket.logs',
+                  expressions = {
+                    tags = { references = { 'aws_instance.web.id' } },
+                  },
+                },
+              },
+            },
+          },
+        }),
+      })
+      vim.cmd.edit(dir .. '/main.tf')
+      local bufnr = vim.api.nvim_get_current_buf()
+      tfplan.command({ fargs = { 'impact' } })
+      assert.is_true(vim.wait(10000, function() return #notes >= 2 end, 20))
+      assert.equals(
+        'Plan: 1 to add, 1 to change, 2 to destroy, 2 to replace;'
+          .. ' 1 blocks depend on what is replaced or destroyed',
+        notes[2]
+      )
+      local messages = vim.tbl_map(
+        function(d) return d.lnum .. ' ' .. d.message end,
+        vim.diagnostic.get(bufnr)
+      )
+      assert.is_truthy(
+        vim.list_contains(
+          messages,
+          '0 ↳ depends on aws_instance.web (replace)'
+        )
+      )
+      -- One plan, not one more started from inside it
+      assert.is_false(vim.wait(300, function() return #notes > 2 end, 20))
     end)
 
     it('says when infracost is missing, without planning', function()

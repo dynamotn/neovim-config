@@ -452,6 +452,12 @@ shows what changed or was deleted outside the code, on the blocks that
 declare it.  It runs only when asked: a refresh reads every object of the
 state.
 
+`<localleader>i` (`:TfPlan impact`) plans, and shows besides what each
+block replaced or destroyed takes with it: every block of the module that
+refers to it, or names it in `depends_on`, directly or through another, gets
+`↳ depends on aws_instance.web (replace)`.  The graph is read off the
+configuration the plan carries, the root module only.
+
 `<localleader>c` (`:TfPlan cost`) plans, then hands the plan to `infracost
 breakdown` and puts the monthly cost of each block at the end of its line,
 summed per module call, with the total in a notification.  The plan goes to
@@ -864,6 +870,8 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         `-refresh-only` plan.
 :TfPlan cost            Plan, and show the monthly cost of each block with
                         `infracost`.
+:TfPlan impact          Plan, and show what depends on each block replaced
+                        or destroyed.
 :TfPlan clear           Clear the plan, drift and costs shown.  See
                         |dyneo-tfplan|.
 
