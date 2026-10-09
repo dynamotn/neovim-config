@@ -280,6 +280,14 @@ return {
     -- Claude Code
     'coder/claudecode.nvim',
     opts = {},
+    -- `:DyAi` runs these before any key has loaded the plugin
+    cmd = {
+      'ClaudeCode',
+      'ClaudeCodeFocus',
+      'ClaudeCodeAdd',
+      'ClaudeCodeSend',
+      'ClaudeCodeSelectModel',
+    },
     keys = {
       { '<leader>a', '', desc = '+ai', mode = { 'n', 'v' } },
       { '<leader>ac', '', desc = '+claude', mode = { 'n', 'v' } },
@@ -579,6 +587,7 @@ return {
     -- MCP Hub integration for AI tools
     'ravitemer/mcphub.nvim',
     enabled = vim.fn.executable('npm') == 1,
+    cmd = 'MCPHub',
     build = vim.fn.executable('mise') == 1 and 'mise use -g npm:mcp-hub@latest'
       or 'npm install -g mcp-hub@latest',
     opts = {

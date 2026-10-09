@@ -17,7 +17,9 @@ end
 ---@param name string
 ---@return LazyPlugin?
 function M.get_plugin(name)
-  return require('lazy.core.config').spec.plugins[name]
+  -- No spec before `lazy.setup`, and none under `nvim --clean`
+  local spec = require('lazy.core.config').spec
+  return spec and spec.plugins[name]
 end
 
 --- Return the install directory of `name`, with `path` under it

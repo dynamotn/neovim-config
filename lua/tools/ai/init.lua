@@ -161,6 +161,7 @@ end
 ---@field group string
 ---@field name string
 ---@field key? string Mapping that does the same, shown beside it
+---@field plugin? string The plugin it needs; left out where it is not set up
 ---@field run fun()
 
 --- The actions of the picker other than the prompts
@@ -169,60 +170,70 @@ M.ACTIONS = {
   {
     group = 'Avante',
     name = 'Toggle chat',
+    plugin = 'avante.nvim',
     key = '<leader>avc',
     run = function() require('avante').toggle() end,
   },
   {
     group = 'Avante',
     name = 'New chat',
+    plugin = 'avante.nvim',
     key = '<leader>avC',
     run = function() vim.cmd.AvanteChatNew() end,
   },
   {
     group = 'Avante',
     name = 'Select model',
+    plugin = 'avante.nvim',
     key = '<leader>avm',
     run = function() M.avante_model() end,
   },
   {
     group = 'Avante',
     name = 'Switch provider',
+    plugin = 'avante.nvim',
     key = '<leader>avP',
     run = function() vim.cmd.AvanteSwitchProvider() end,
   },
   {
     group = 'Avante',
     name = 'History',
+    plugin = 'avante.nvim',
     key = '<leader>avh',
     run = function() vim.cmd.AvanteHistory() end,
   },
   {
     group = 'Sidekick',
     name = 'Toggle CLI',
+    plugin = 'sidekick.nvim',
     key = '<leader>aa',
     run = function() require('sidekick.cli').toggle() end,
   },
   {
     group = 'Sidekick',
     name = 'Select CLI',
+    plugin = 'sidekick.nvim',
     key = '<leader>as',
     run = function() require('sidekick.cli').select() end,
   },
   {
     group = 'Claude',
     name = 'Toggle Claude Code',
+    plugin = 'claudecode.nvim',
     key = '<leader>acc',
     run = function() vim.cmd.ClaudeCode() end,
   },
   {
     group = 'Claude',
     name = 'Continue Claude Code',
+    plugin = 'claudecode.nvim',
     key = '<leader>acC',
     run = function() vim.cmd('ClaudeCode --continue') end,
   },
   {
     group = 'MCP',
     name = 'MCP Hub',
+    plugin = 'mcphub.nvim',
     key = '<leader>M',
     run = function() vim.cmd.MCPHub() end,
   },
@@ -263,15 +274,20 @@ function M.items(range, prompts_only)
     })
   end
   if prompts_only then return items end
+  local Plugin = require('util.plugin')
   for _, action in ipairs(M.ACTIONS) do
-    table.insert(items, {
-      text = action.group .. ' ' .. action.name,
-      group = action.group,
-      name = action.name,
-      detail = action.key or '',
-      preview = { text = ('# %s\n\n%s'):format(action.name, action.key or '') },
-      run = action.run,
-    })
+    if not action.plugin or Plugin.has(action.plugin) then
+      table.insert(items, {
+        text = action.group .. ' ' .. action.name,
+        group = action.group,
+        name = action.name,
+        detail = action.key or '',
+        preview = {
+          text = ('# %s\n\n%s'):format(action.name, action.key or ''),
+        },
+        run = action.run,
+      })
+    end
   end
   return items
 end

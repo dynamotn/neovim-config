@@ -130,11 +130,30 @@ describe('tools.ai', function()
   end)
 
   it('lists the prompts before the other actions', function()
+    local Plugin = require('util.plugin')
+    table.insert(restores, h.stub(Plugin, 'has', function() return true end))
     local items = ai.items()
     assert.equals('ask', items[1].name)
     assert.equals('explain', items[2].name)
     assert.equals(2 + #ai.ACTIONS, #items)
     assert.equals(2, #ai.items(nil, true))
+  end)
+
+  it('leaves out the actions of a plugin that is not set up', function()
+    local Plugin = require('util.plugin')
+    table.insert(
+      restores,
+      h.stub(Plugin, 'has', function(name) return name ~= 'mcphub.nvim' end)
+    )
+    local names = vim.tbl_map(function(item) return item.name end, ai.items())
+    assert.is_false(vim.list_contains(names, 'MCP Hub'))
+    assert.is_true(vim.list_contains(names, 'Toggle Claude Code'))
+    -- Every action that needs a plugin says which
+    for _, action in ipairs(ai.ACTIONS) do
+      if action.group ~= 'Git' and action.group ~= 'Guard' then
+        assert.is_string(action.plugin, action.name)
+      end
+    end
   end)
   describe('status', function()
     it('says nothing before Avante has loaded', function()
