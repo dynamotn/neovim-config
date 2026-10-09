@@ -470,6 +470,14 @@ describe('tools.sbom', function()
       notes[1]:find('1 plugins and packages written to', 1, true)
     )
 
+    -- Asked before the file is written over, and left as it was on no
+    h.write(dir .. '/out/sbom.cdx.json', { 'mine' })
+    local restore_confirm = h.stub(vim.fn, 'confirm', function() return 2 end)
+    sbom.command({ fargs = { dir .. '/out/sbom.cdx.json' } })
+    restore_confirm()
+    assert.same({ 'mine' }, vim.fn.readfile(dir .. '/out/sbom.cdx.json'))
+    assert.equals('Not written', notes[#notes])
+
     sbom.command({ fargs = {} })
     assert.equals('json', vim.bo.filetype)
 

@@ -790,6 +790,17 @@ function M.command(args)
   local json = to_json(M.bom(components))
   if not target then return scratch(vim.split(json, '\n'), 'json') end
   local path = vim.fn.fnamemodify(vim.fn.expand(target), ':p')
+  if
+    vim.uv.fs_stat(path)
+    and vim.fn.confirm(
+        ('Overwrite %s?'):format(vim.fn.fnamemodify(path, ':~')),
+        '&Overwrite\n&Cancel',
+        2
+      )
+      ~= 1
+  then
+    return notify('Not written', vim.log.levels.WARN)
+  end
   vim.fn.mkdir(vim.fs.dirname(path), 'p')
   vim.fn.writefile(vim.split(json, '\n'), path)
   notify(('%d plugins and packages written to %s'):format(#components, path))

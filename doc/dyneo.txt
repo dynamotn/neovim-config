@@ -999,7 +999,7 @@ Supply chain and secrets ~
                                                                      *:DySbom*
 :DySbom [{path}]        The plugins and Mason packages installed, as a
                         CycloneDX 1.5 SBOM: shown in a tab, or written to
-                        {path}.
+                        {path}, asking first when it exists.
 :DySbom osv             Ask OSV about every one of them, and list the known
                         vulnerabilities.
 :DySbom lock            Ask OSV about the packages of the project's
