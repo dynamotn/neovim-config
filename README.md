@@ -47,7 +47,7 @@ says what is missing.
 
 | | What | Try |
 | --- | --- | --- |
-| 🔒 | **Quarantine** — Mason and plugin releases wait a week; review what an update adds, flagged; SBOM and OSV check | `:LazyQuarantine review` · `:DySbom osv` |
+| 🔒 | **Quarantine** — Mason and plugin releases wait a week; review what an update adds, flagged; SBOM and OSV check, of the editor and of the project's lockfiles | `:LazyQuarantine review` · `:DySbom osv` · `:DySbom lock` |
 | 🤖 | **AI guard** — `.env`, keys and token-shaped text kept from every AI; masked on screen; every handover logged | `:AiGuardCheck` · `:AiGuardLog` |
 | 🏗 | **Infrastructure** — YAML schemas detected (Kubernetes, CRDs, cloud-init); Kubernetes diff, server dry run, apply, Helm and Kustomize render; policy checks with checkov, kube-linter, conftest and actionlint; `tofu plan` shown on the blocks it changes, with drift and the monthly cost of each block (infracost); Markdown runbooks run in place, destructive steps asking first; SOPS, Ansible Vault and chezmoi `encrypted_` files edited in the clear, written back encrypted | `<localleader>k` · `<localleader>p` · `<localleader>r` · `<leader>cys` |
 | 🌐 | **Forges & trackers** — GitHub (Octo), GitLab merge requests, CI checks, Jira issues to branches and worklogs | `<leader>ph` `pl` `pc` `pj` |

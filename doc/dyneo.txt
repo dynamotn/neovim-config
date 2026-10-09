@@ -335,6 +335,14 @@ receipts as a CycloneDX 1.5 document, and `:DySbom osv` asks OSV
 (https://osv.dev) about them in one request -- names, versions and commits,
 nothing else of the machine.
 
+The project being edited has a supply chain of its own.  `:DySbom lock`
+reads the lockfile of the buffer, or every one git tracks in the project
+(at its top only outside git): `go.mod`, `Cargo.lock`, `package-lock.json`
+(npm 7 and later), `uv.lock` and `poetry.lock`.  Their packages go to OSV in
+batches of a thousand, and each one with a known vulnerability gets a warning
+on its line of the lockfile, its advisories named, and a quickfix entry.  A
+package of the project itself is left out.
+
 5.3 Files kept from AI                                        *dyneo-ai-guard*
 
 A language server is handed the whole text of every buffer it attaches to,
@@ -627,7 +635,10 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         CycloneDX 1.5 SBOM: shown in a tab, or written to
                         {path}.
 :DySbom osv             Ask OSV about every one of them, and list the known
-                        vulnerabilities.  See |dyneo-quarantine|.
+                        vulnerabilities.
+:DySbom lock            Ask OSV about the packages of the project's
+                        lockfiles, and warn on the line of each vulnerable
+                        one.  See |dyneo-quarantine|.
 
                                                *:AiGuardCheck* *:AiGuardAllow*
 :AiGuardCheck           Why this buffer is kept from the AI integrations.

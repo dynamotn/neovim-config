@@ -9,7 +9,7 @@ vim.api.nvim_create_user_command(
       return vim.list_extend(
         vim.tbl_filter(
           function(word) return word:find(lead, 1, true) == 1 end,
-          { 'osv' }
+          { 'osv', 'lock' }
         ),
         vim.fn.getcompletion(lead, 'file')
       )

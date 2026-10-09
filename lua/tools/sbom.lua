@@ -34,7 +34,9 @@ M.OSV_URL = 'https://api.osv.dev/v1/querybatch'
 ---@field name string
 ---@field version string A commit for a plugin, a release for a Mason package
 ---@field purl? string
----@field source 'lazy.nvim'|'mason'
+---@field source 'lazy.nvim'|'mason'|'lockfile'
+---@field file? string The lockfile it was read from
+---@field line? integer Where in it, 1-based
 
 ---@param text string
 ---@return string
@@ -345,6 +347,315 @@ function M.osv_report(findings, asked, total)
   return lines
 end
 
+--- A component read out of a lockfile
+---@param kind string purl type
+---@param name string
+---@param version string
+---@param file string
+---@param line integer
+---@return DySbomComponent
+local function locked(kind, name, version, file, line)
+  local path = vim.tbl_map(encode, vim.split(name, '/', { plain = true }))
+  return {
+    name = name,
+    version = version,
+    purl = ('pkg:%s/%s@%s'):format(
+      kind,
+      table.concat(path, '/'),
+      encode(version)
+    ),
+    source = 'lockfile',
+    file = file,
+    line = line,
+  }
+end
+
+--- The packages of the `[[package]]` tables of a TOML lockfile
+--- (`Cargo.lock`, `uv.lock`, `poetry.lock`), each at its `name` line. A
+--- package of the project itself is left out: it has no `source` in
+--- `Cargo.lock`, and an `editable`, `virtual` or `directory` one in `uv.lock`.
+---@param lines string[]
+---@param need_source boolean Leave out a package without `source`
+---@return { name: string, version: string, line: integer }[]
+local function toml_packages(lines, need_source)
+  local packages, current = {}, nil
+  local function close()
+    if
+      current
+      and current.name
+      and current.version
+      and not current.local_source
+      and (current.source or not need_source)
+    then
+      table.insert(packages, current)
+    end
+    current = nil
+  end
+  for number, line in ipairs(lines) do
+    if line:match('^%[%[package%]%]%s*$') then
+      close()
+      current = {}
+    elseif line:match('^%[') then
+      -- Any other table ends the package and is not one
+      close()
+    elseif current then
+      local key, value = line:match('^([%w_]+)%s*=%s*(.-)%s*$')
+      if key == 'name' and not current.name then
+        current.name = value:match('^"(.*)"$')
+        current.line = number
+      elseif key == 'version' and not current.version then
+        current.version = value:match('^"(.*)"$')
+      elseif key == 'source' then
+        current.source = true
+        if
+          value:match('editable%s*=')
+          or value:match('virtual%s*=')
+          or value:match('directory%s*=')
+        then
+          current.local_source = true
+        end
+      end
+    end
+  end
+  close()
+  return packages
+end
+
+--- A Python package name as PyPI and OSV compare it
+---@param name string
+---@return string
+local function pypi_name(name) return (name:lower():gsub('[%._]+', '-')) end
+
+--- How each lockfile is read, by its name
+---@type table<string, fun(lines: string[], file: string): DySbomComponent[]>
+M.LOCKFILES = {
+  ['go.mod'] = function(lines, file)
+    local components, in_block = {}, false
+    for number, line in ipairs(lines) do
+      local code = line:gsub('//.*$', '')
+      local module, version
+      if code:match('^%s*require%s*%(') then
+        in_block = true
+      elseif in_block and code:match('^%s*%)') then
+        in_block = false
+      elseif in_block then
+        module, version = code:match('^%s*(%S+)%s+(v%S+)')
+      else
+        module, version = code:match('^%s*require%s+(%S+)%s+(v%S+)')
+      end
+      if module then
+        table.insert(
+          components,
+          locked('golang', module, version, file, number)
+        )
+      end
+    end
+    return components
+  end,
+  ['Cargo.lock'] = function(lines, file)
+    return vim.tbl_map(
+      function(p) return locked('cargo', p.name, p.version, file, p.line) end,
+      toml_packages(lines, true)
+    )
+  end,
+  ['uv.lock'] = function(lines, file)
+    return vim.tbl_map(
+      function(p)
+        return locked('pypi', pypi_name(p.name), p.version, file, p.line)
+      end,
+      toml_packages(lines, false)
+    )
+  end,
+  ['poetry.lock'] = function(lines, file)
+    return vim.tbl_map(
+      function(p)
+        return locked('pypi', pypi_name(p.name), p.version, file, p.line)
+      end,
+      toml_packages(lines, false)
+    )
+  end,
+  -- npm 7 and later (lockfile v2 and v3): `packages` keyed by the path
+  -- under `node_modules`, the last part of which is the package
+  ['package-lock.json'] = function(lines, file)
+    local ok, lock = pcall(
+      vim.json.decode,
+      table.concat(lines, '\n'),
+      { luanil = { object = true, array = true } }
+    )
+    if not ok or type(lock) ~= 'table' or type(lock.packages) ~= 'table' then
+      return {}
+    end
+    -- Where each key starts: the JSON says what, the text says where
+    local where = {}
+    for number, line in ipairs(lines) do
+      local key = line:match('^%s*"(node_modules/[^"]+)"%s*:')
+      if key and not where[key] then where[key] = number end
+    end
+    local components = {}
+    for key, entry in pairs(lock.packages) do
+      local name = key:match('.*node_modules/(.+)$')
+      if
+        name
+        and type(entry) == 'table'
+        and type(entry.version) == 'string'
+        and not entry.link
+      then
+        table.insert(
+          components,
+          locked('npm', name, entry.version, file, where[key] or 1)
+        )
+      end
+    end
+    table.sort(components, function(a, b) return a.line < b.line end)
+    return components
+  end,
+}
+
+--- The components of the lockfile at `file`, or nil for a name not known
+---@param file string
+---@param lines? string[] Its lines, read from disk unless given
+---@return DySbomComponent[]?
+function M.lockfile(file, lines)
+  local parse = M.LOCKFILES[vim.fs.basename(file)]
+  if not parse then return nil end
+  if not lines then
+    local ok, read = pcall(vim.fn.readfile, file)
+    lines = ok and read or {}
+  end
+  return parse(lines, file)
+end
+
+--- The lockfiles of the project at `root`: those git tracks, else those at
+--- its top. Walking the tree would go through `node_modules` and `vendor`.
+---@param root string
+---@return string[]
+function M.find_lockfiles(root)
+  local names = vim.tbl_keys(M.LOCKFILES)
+  table.sort(names)
+  local patterns = {}
+  for _, name in ipairs(names) do
+    vim.list_extend(patterns, { name, '**/' .. name })
+  end
+  local ok, result = pcall(
+    function()
+      return vim
+        .system(
+          vim.list_extend({ 'git', 'ls-files', '-z', '--' }, patterns),
+          { cwd = root, text = true }
+        )
+        :wait(10000)
+    end
+  )
+  local files = {}
+  if ok and result.code == 0 then
+    for _, path in
+      ipairs(vim.split(result.stdout or '', '\0', { trimempty = true }))
+    do
+      local file = vim.fs.joinpath(root, path)
+      if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
+    end
+    return files
+  end
+  for _, name in ipairs(names) do
+    local file = vim.fs.joinpath(root, name)
+    if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
+  end
+  return files
+end
+
+local ns = vim.api.nvim_create_namespace('dy_sbom')
+
+--- Show `findings` of lockfiles as warnings on the line of each package, and
+--- in the quickfix list
+---@param findings DySbomVulnerable[]
+---@param title string
+function M.show_findings(findings, title)
+  vim.diagnostic.reset(ns)
+  local per_buffer, items = {}, {}
+  for _, finding in ipairs(findings) do
+    local component = finding.component
+    local text = ('%s %s: %s'):format(
+      component.name,
+      component.version,
+      table.concat(finding.ids, ', ')
+    )
+    if component.file then
+      local bufnr = vim.fn.bufadd(component.file)
+      per_buffer[bufnr] = per_buffer[bufnr] or {}
+      table.insert(per_buffer[bufnr], {
+        lnum = (component.line or 1) - 1,
+        col = 0,
+        message = text,
+        severity = vim.diagnostic.severity.WARN,
+        source = 'osv',
+        code = finding.ids[1],
+      })
+    end
+    table.insert(items, {
+      filename = component.file,
+      lnum = component.line or 1,
+      text = text,
+      type = 'W',
+    })
+  end
+  for bufnr, diagnostics in pairs(per_buffer) do
+    vim.diagnostic.set(ns, bufnr, diagnostics)
+  end
+  vim.fn.setqflist({}, ' ', { title = title, items = items })
+end
+
+--- Most questions OSV takes in one batch
+M.OSV_BATCH = 1000
+
+--- Ask OSV about `queries` in batches, one after the other
+---@param queries table[]
+---@param asked DySbomComponent[]
+---@param on_done fun(findings: DySbomVulnerable[]?, err: string?)
+function M.ask_osv(queries, asked, on_done)
+  local findings = {}
+  local function batch(first)
+    if first > #queries then return on_done(findings) end
+    local last = math.min(first + M.OSV_BATCH - 1, #queries)
+    vim.system({
+      'curl',
+      '--silent',
+      '--show-error',
+      '--fail',
+      '--max-time',
+      '60',
+      '--header',
+      'Content-Type: application/json',
+      '--data-binary',
+      '@-',
+      M.OSV_URL,
+    }, {
+      text = true,
+      stdin = vim.json.encode({
+        queries = vim.list_slice(queries, first, last),
+      }),
+    }, function(result)
+      vim.schedule(function()
+        if result.code ~= 0 then
+          return on_done(
+            nil,
+            'OSV query failed: ' .. vim.trim(result.stderr or '')
+          )
+        end
+        local ok, response = pcall(vim.json.decode, result.stdout or '')
+        if not ok or type(response) ~= 'table' then
+          return on_done(nil, 'OSV answered with something that is not JSON')
+        end
+        vim.list_extend(
+          findings,
+          M.osv_findings(vim.list_slice(asked, first, last), response)
+        )
+        batch(last + 1)
+      end)
+    end)
+  end
+  batch(1)
+end
+
 --- A scratch buffer holding `lines`, in a tab of its own
 ---@param lines string[]
 ---@param filetype string
@@ -382,54 +693,78 @@ function M.osv()
     return notify('curl is not installed', vim.log.levels.ERROR)
   end
   notify(('Asking OSV about %d plugins and packages…'):format(#queries))
-  vim.system({
-    'curl',
-    '--silent',
-    '--show-error',
-    '--fail',
-    '--max-time',
-    '60',
-    '--header',
-    'Content-Type: application/json',
-    '--data-binary',
-    '@-',
-    M.OSV_URL,
-  }, {
-    text = true,
-    stdin = vim.json.encode({ queries = queries }),
-  }, function(result)
-    vim.schedule(function()
-      if result.code ~= 0 then
-        return notify(
-          'OSV query failed: ' .. vim.trim(result.stderr or ''),
-          vim.log.levels.ERROR
+  M.ask_osv(queries, asked, function(findings, err)
+    if not findings then return notify(err, vim.log.levels.ERROR) end
+    if #findings == 0 then
+      return notify(
+        ('No known vulnerabilities in the %d plugins and packages asked'):format(
+          #asked
         )
-      end
-      local ok, response = pcall(vim.json.decode, result.stdout or '')
-      if not ok or type(response) ~= 'table' then
-        return notify(
-          'OSV answered with something that is not JSON',
-          vim.log.levels.ERROR
-        )
-      end
-      local findings = M.osv_findings(asked, response)
-      if #findings == 0 then
-        return notify(
-          ('No known vulnerabilities in the %d plugins and packages asked'):format(
-            #asked
-          )
-        )
-      end
-      scratch(M.osv_report(findings, #asked, #components), 'markdown')
-    end)
+      )
+    end
+    scratch(M.osv_report(findings, #asked, #components), 'markdown')
   end)
 end
 
---- `:DySbom [{path}]`, `:DySbom osv`
+--- Ask OSV about the packages of the project's lockfiles, and show what it
+--- knows on the line of each
+---
+--- The lockfile of the current buffer if it is one, else every lockfile of
+--- the project. Only names and versions leave the machine.
+function M.lock()
+  local name = vim.api.nvim_buf_get_name(0)
+  local files
+  if name ~= '' and M.LOCKFILES[vim.fs.basename(name)] then
+    files = { name }
+  else
+    local root = vim.fs.root(0, { '.git' }) or vim.uv.cwd() --[[@as string]]
+    files = M.find_lockfiles(root)
+  end
+  if #files == 0 then
+    return notify(
+      'No lockfile found: '
+        .. table.concat(vim.tbl_keys(M.LOCKFILES), ', ')
+        .. ' are read'
+    )
+  end
+
+  local components = {}
+  for _, file in ipairs(files) do
+    local bufnr = vim.fn.bufnr(file)
+    -- An open buffer may be ahead of the file
+    local lines = bufnr ~= -1
+        and vim.api.nvim_buf_is_loaded(bufnr)
+        and vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      or nil
+    vim.list_extend(components, M.lockfile(file, lines) or {})
+  end
+  local queries, asked = M.osv_queries(components)
+  if #queries == 0 then
+    return notify('No package in ' .. #files .. ' lockfiles')
+  end
+  if vim.fn.executable('curl') ~= 1 then
+    return notify('curl is not installed', vim.log.levels.ERROR)
+  end
+  notify(
+    ('Asking OSV about %d packages of %d lockfiles…'):format(#queries, #files)
+  )
+  M.ask_osv(queries, asked, function(findings, err)
+    if not findings then return notify(err, vim.log.levels.ERROR) end
+    local summary = ('%d of %d packages with known vulnerabilities'):format(
+      #findings,
+      #asked
+    )
+    M.show_findings(findings, 'OSV: ' .. summary)
+    notify(summary, #findings > 0 and vim.log.levels.WARN or nil)
+  end)
+end
+
+--- `:DySbom [{path}]`, `:DySbom osv`, `:DySbom lock`
 ---@param args { fargs: string[] }
 function M.command(args)
   local target = args.fargs[1]
   if target == 'osv' then return M.osv() end
+  if target == 'lock' then return M.lock() end
 
   local components = M.components()
   local json = to_json(M.bom(components))

@@ -184,6 +184,247 @@ describe('tools.sbom', function()
     end)
   end)
 
+  describe('lockfiles', function()
+    it('reads go.mod, the require block and single lines', function()
+      local components = sbom.lockfile('/p/go.mod', {
+        'module example.com/me',
+        '',
+        'require github.com/single/one v1.0.0',
+        'require (',
+        '\tgolang.org/x/net v0.17.0 // indirect',
+        '\tgithub.com/Foo/bar v2.0.0+incompatible',
+        ')',
+        'replace (',
+        '\tgithub.com/x/y v1.0.0 => ../y',
+        ')',
+      })
+      assert.same({
+        'pkg:golang/github.com/single/one@v1.0.0',
+        'pkg:golang/golang.org/x/net@v0.17.0',
+        'pkg:golang/github.com/Foo/bar@v2.0.0%2Bincompatible',
+      }, vim.tbl_map(function(c) return c.purl end, components))
+      assert.same(
+        { 3, 5, 6 },
+        vim.tbl_map(function(c) return c.line end, components)
+      )
+      assert.equals('lockfile', components[1].source)
+      assert.equals('/p/go.mod', components[1].file)
+    end)
+
+    it('reads Cargo.lock, leaving the workspace crates out', function()
+      local components = sbom.lockfile('/p/Cargo.lock', {
+        'version = 3',
+        '',
+        '[[package]]',
+        'name = "mine"',
+        'version = "0.1.0"',
+        '',
+        '[[package]]',
+        'name = "serde"',
+        'version = "1.0.190"',
+        'source = "registry+https://github.com/rust-lang/crates.io-index"',
+        'checksum = "abc"',
+      })
+      assert.equals(1, #components)
+      assert.equals('pkg:cargo/serde@1.0.190', components[1].purl)
+      assert.equals(8, components[1].line)
+    end)
+
+    it('reads uv.lock and poetry.lock, names as PyPI compares them', function()
+      local uv = sbom.lockfile('/p/uv.lock', {
+        '[[package]]',
+        'name = "my-app"',
+        'version = "0.1.0"',
+        'source = { editable = "." }',
+        '',
+        '[[package]]',
+        'name = "Typing_Extensions"',
+        'version = "4.8.0"',
+        'source = { registry = "https://pypi.org/simple" }',
+        '',
+        '[package.optional-dependencies]',
+        'name = "not-a-package"',
+      })
+      assert.same(
+        { 'pkg:pypi/typing-extensions@4.8.0' },
+        vim.tbl_map(function(c) return c.purl end, uv)
+      )
+      assert.equals(7, uv[1].line)
+
+      local poetry = sbom.lockfile('/p/poetry.lock', {
+        '[[package]]',
+        'name = "requests"',
+        'version = "2.31.0"',
+        'description = "HTTP"',
+        '',
+        '[package.dependencies]',
+        'idna = ">=2.5"',
+      })
+      assert.same(
+        { 'pkg:pypi/requests@2.31.0' },
+        vim.tbl_map(function(c) return c.purl end, poetry)
+      )
+    end)
+
+    it('reads package-lock.json, each package at its key', function()
+      local lines = vim.split(
+        [[{
+  "name": "app",
+  "lockfileVersion": 3,
+  "packages": {
+    "": { "name": "app", "version": "1.0.0" },
+    "node_modules/lodash": {
+      "version": "4.17.20"
+    },
+    "node_modules/@babel/core": {
+      "version": "7.0.0"
+    },
+    "node_modules/a/node_modules/lodash": {
+      "version": "3.0.0"
+    },
+    "node_modules/linked": {
+      "resolved": "../linked",
+      "link": true
+    }
+  }
+}]],
+        '\n'
+      )
+      local components = sbom.lockfile('/p/package-lock.json', lines)
+      assert.same({
+        { 'pkg:npm/lodash@4.17.20', 6 },
+        { 'pkg:npm/%40babel/core@7.0.0', 9 },
+        { 'pkg:npm/lodash@3.0.0', 12 },
+      }, vim.tbl_map(
+        function(c) return { c.purl, c.line } end,
+        components
+      ))
+      assert.same({}, sbom.lockfile('/p/package-lock.json', { 'not json' }))
+    end)
+
+    it(
+      'knows only the lockfiles it can read',
+      function() assert.is_nil(sbom.lockfile('/p/yarn.lock', {})) end
+    )
+
+    it('finds the lockfiles git tracks, at any depth', function()
+      h.write(dir .. '/go.mod', { 'module x' })
+      h.write(dir .. '/web/package-lock.json', { '{}' })
+      h.write(dir .. '/node_modules/x/package-lock.json', { '{}' })
+      vim.system({ 'git', 'init', '-q' }, { cwd = dir }):wait()
+      vim.system({ 'git', 'add', 'go.mod', 'web' }, { cwd = dir }):wait()
+      local files = sbom.find_lockfiles(dir)
+      table.sort(files)
+      assert.same({ dir .. '/go.mod', dir .. '/web/package-lock.json' }, files)
+    end)
+
+    it('looks at the top only outside git', function()
+      h.write(dir .. '/Cargo.lock', {})
+      h.write(dir .. '/sub/go.mod', {})
+      local restore = h.stub(vim, 'system', function()
+        return { wait = function() return { code = 128 } end }
+      end)
+      local files = sbom.find_lockfiles(dir)
+      restore()
+      assert.same({ dir .. '/Cargo.lock' }, files)
+    end)
+  end)
+
+  describe('lock', function()
+    local path, notes, restore_notify
+
+    before_each(function()
+      vim.fn.mkdir(dir .. '/bin', 'p')
+      -- A curl that keeps each request and answers with the next response
+      h.write(dir .. '/bin/curl', {
+        '#!/bin/sh',
+        'n=$(cat "' .. dir .. '/count" 2>/dev/null || echo 0)',
+        'n=$((n + 1))',
+        'echo "$n" > "' .. dir .. '/count"',
+        'cat > "' .. dir .. '/request.$n"',
+        'cat "' .. dir .. '/response.$n"',
+      })
+      vim.fn.setfperm(dir .. '/bin/curl', 'rwxr-xr-x')
+      path = vim.env.PATH
+      vim.env.PATH = dir .. '/bin:' .. path
+      notes = {}
+      restore_notify = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+    end)
+    after_each(function()
+      vim.env.PATH = path
+      restore_notify()
+      vim.diagnostic.reset()
+    end)
+
+    it('asks in batches, and puts findings on their lines', function()
+      sbom.OSV_BATCH = 2
+      h.write(dir .. '/Cargo.lock', {
+        '[[package]]',
+        'name = "a"',
+        'version = "1.0.0"',
+        'source = "registry"',
+        '[[package]]',
+        'name = "b"',
+        'version = "1.0.0"',
+        'source = "registry"',
+        '[[package]]',
+        'name = "c"',
+        'version = "1.0.0"',
+        'source = "registry"',
+      })
+      h.write(dir .. '/response.1', {
+        vim.json.encode({
+          results = { {}, { vulns = { { id = 'RUSTSEC-1' } } } },
+        }),
+      })
+      h.write(dir .. '/response.2', {
+        vim.json.encode({ results = { { vulns = { { id = 'GHSA-c' } } } } }),
+      })
+      vim.cmd.edit(dir .. '/Cargo.lock')
+      local bufnr = vim.api.nvim_get_current_buf()
+      sbom.command({ fargs = { 'lock' } })
+      assert.is_true(vim.wait(10000, function() return #notes >= 2 end, 20))
+      assert.equals('2 of 3 packages with known vulnerabilities', notes[2])
+
+      local first = vim.json.decode(
+        table.concat(vim.fn.readfile(dir .. '/request.1'), '\n')
+      )
+      assert.equals(2, #first.queries)
+      assert.equals('pkg:cargo/a@1.0.0', first.queries[1].package.purl)
+
+      local messages = vim.tbl_map(
+        function(d) return d.lnum .. ' ' .. d.message end,
+        vim.diagnostic.get(bufnr)
+      )
+      table.sort(messages)
+      assert.same({ '5 b 1.0.0: RUSTSEC-1', '9 c 1.0.0: GHSA-c' }, messages)
+      assert.equals(2, #vim.fn.getqflist())
+    end)
+
+    it('stops at a failed batch', function()
+      h.write(dir .. '/bin/curl', { '#!/bin/sh', 'echo boom >&2', 'exit 22' })
+      h.write(dir .. '/go.mod', { 'require x.org/y v1.0.0' })
+      vim.cmd.edit(dir .. '/go.mod')
+      sbom.lock()
+      assert.is_true(vim.wait(10000, function() return #notes >= 2 end, 20))
+      assert.equals('OSV query failed: boom', notes[2])
+    end)
+
+    it('says when there is no lockfile', function()
+      vim.cmd.edit(dir .. '/README.md')
+      local restore = h.stub(vim, 'system', function()
+        return { wait = function() return { code = 128 } end }
+      end)
+      sbom.lock()
+      restore()
+      assert.is_truthy(notes[1]:find('^No lockfile found'))
+    end)
+  end)
+
   it('writes the document to a path, or shows it', function()
     local restore = h.stub(
       sbom,
