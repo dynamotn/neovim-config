@@ -86,6 +86,9 @@ local function aged_ancestor(dir, rev, now)
   return git(dir, {
     'log',
     '-1',
+    -- The main line only: a branch merged today has commits of last week,
+    -- and none of them was ever checked out upstream on its own
+    '--first-parent',
     '--until=' .. os.date('!%Y-%m-%dT%H:%M:%S+00:00', now - M.window()),
     '--format=%H',
     rev,

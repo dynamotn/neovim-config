@@ -14,6 +14,8 @@ trap 'rm -rf "${workdir}"' EXIT
 mkdir -p "${workdir}/config"
 ln -s "${repo}" "${workdir}/config/nvim"
 
-XDG_CONFIG_HOME="${workdir}/config" nvim --headless -i NONE \
+# Only keymaps-doc.lua quits Neovim: an error before it gets there would leave
+# the hook waiting for ever
+XDG_CONFIG_HOME="${workdir}/config" timeout 300 nvim --headless -i NONE \
   --cmd "luafile ${repo}/scripts/keymaps-doc.lua" < /dev/null
 nvim --headless -u NONE -c "helptags ${repo}/doc" -c 'qall!'

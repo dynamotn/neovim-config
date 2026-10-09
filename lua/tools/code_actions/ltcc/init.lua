@@ -13,7 +13,10 @@ return h.make_builtin({
     command = 'ltcc',
     args = { 'check', '-l', 'en-US', '-f', '$FILENAME' },
     format = 'json',
-    to_stdin = true,
+    -- `ltcc` reads a file and has no stdin mode: the buffer goes to a
+    -- temporary copy, so the result matches what is on screen, not the
+    -- saved file the offsets would be wrong for
+    to_temp_file = true,
     ignore_stderr = true,
     timeout = 60000,
     check_exit_code = function(c) return c <= 1 end,

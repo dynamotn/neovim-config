@@ -129,6 +129,22 @@ describe('tools.code_actions.shellcheck', function()
     end)
   end)
 
+  describe('file directive, already listing the code', function()
+    it('leaves it alone', function()
+      local bufnr, actions = actions_for(
+        { '#!/bin/bash', '# shellcheck disable=SC2086', 'true', 'echo $foo' },
+        4
+      )
+      find(actions, 'entire file').action()
+      assert.are.same({
+        '#!/bin/bash',
+        '# shellcheck disable=SC2086',
+        'true',
+        'echo $foo',
+      }, lines_of(bufnr))
+    end)
+  end)
+
   describe('line directive', function()
     it('goes above the line', function()
       local bufnr, actions =

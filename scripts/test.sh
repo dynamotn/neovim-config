@@ -12,9 +12,11 @@ set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 init="${repo}/tests/minimal_init.lua"
-target="${1:-${repo}/tests/spec}"
+# Absolute before the `cd` below, so a path relative to where this was run
+# from still names the same spec
+target="$(realpath "${1:-${repo}/tests/spec}")"
 
-if ! command -v nvim > /dev/null 2>&1; then
+if ! command -v nvim &> /dev/null; then
   echo "test: nvim not found" >&2
   exit 1
 fi

@@ -95,7 +95,9 @@ jobs:
         id: install
         run: |
           for attempt in 1 2 3; do
-            nvim --headless '+Lazy! restore' +qa
+            # A failed round is what the check below is for, not the end of
+            # the step under `bash -e`
+            nvim --headless '+Lazy! restore' +qa || true
             if nvim --headless -c 'luafile scripts/check-plugins.lua'; then
               exit 0
             fi

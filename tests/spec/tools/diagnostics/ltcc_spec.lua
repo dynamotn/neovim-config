@@ -61,6 +61,21 @@ describe('tools.diagnostics.ltcc', function()
         },
       },
     })
-    assert.are.equal('Odd. Try: ', result.offenses[1].message)
+    assert.are.equal('Odd.', result.offenses[1].message)
+  end)
+
+  it('copes with replacements that are null', function()
+    local result = builtin.generator_opts.on_output({
+      output = {
+        {
+          message = 'Odd.',
+          rule = { id = 'X' },
+          moreContext = { line_number = 1, line_offset = 0 },
+          length = 1,
+          replacements = vim.NIL,
+        },
+      },
+    })
+    assert.are.equal('Odd.', result.offenses[1].message)
   end)
 end)

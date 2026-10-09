@@ -21,12 +21,21 @@ return h.make_builtin({
     to_stdin = false,
     multiple_files = true,
     ignore_stderr = true,
-    format = 'json',
+    -- Decoded here rather than by none-ls, which skips `on_output` for an
+    -- empty `[]`: the diagnostics kept from other directories would then be
+    -- dropped the moment this one is clean
+    format = 'raw',
     -- `hcl validate` exits non-zero when it finds a problem, with the JSON on
     -- stdout either way. Any other answer has none-ls move that output into
     -- the error output, which `ignore_stderr` then throws away.
     check_exit_code = function() return true end,
-    on_output = function(params)
+    on_output = function(params, done)
+      local output = params.output
+      if type(output) == 'string' then
+        local ok, decoded = pcall(vim.json.decode, output)
+        output = ok and decoded or nil
+      end
+      if type(output) ~= 'table' then output = {} end
       local combined_diagnostics = {}
 
       -- keep diagnostics from other directories
@@ -57,7 +66,7 @@ return h.make_builtin({
         end
       end
 
-      for _, new_diagnostic in ipairs(params.output) do
+      for _, new_diagnostic in ipairs(output) do
         local message = new_diagnostic.summary
         if new_diagnostic.detail then
           message = message .. ' - ' .. new_diagnostic.detail
@@ -79,6 +88,7 @@ return h.make_builtin({
         end
         table.insert(combined_diagnostics, rewritten_diagnostic)
       end
+      if done then done(combined_diagnostics) end
       return combined_diagnostics
     end,
   },

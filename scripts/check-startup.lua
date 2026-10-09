@@ -228,8 +228,11 @@ local function missing_skipped(msg)
     or lower:find('not installed')
     or lower:find('no such file')
   if not missing then return end
+  -- As a word: `elp` or `jq` is part of many a message about something else
   for _, name in ipairs(installs.mason) do
-    if msg:find(name, 1, true) then return name end
+    if msg:find('%f[%w_-]' .. vim.pesc(name) .. '%f[^%w_-]') then
+      return name
+    end
   end
 end
 

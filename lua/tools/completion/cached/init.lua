@@ -52,7 +52,7 @@ function source:capture(context, on_done)
   -- One capture at a time; whoever asks meanwhile gets its answer
   if self.capturing then return end
   self.capturing = true
-  self.inner:get_completions(context, function(response)
+  local function answered(response)
     self.capturing = false
     self.items = response and response.items or {}
     self.captured = vim.uv.now()
@@ -61,7 +61,11 @@ function source:capture(context, on_done)
     for _, done in ipairs(waiting) do
       done()
     end
-  end)
+  end
+  -- A source that throws would leave `capturing` set, and every later
+  -- request waiting for an answer that never comes
+  local ok = pcall(self.inner.get_completions, self.inner, context, answered)
+  if not ok and self.capturing then answered({ items = {} }) end
 end
 
 --- Fresh tables each time: blink writes its own fields into the items it is

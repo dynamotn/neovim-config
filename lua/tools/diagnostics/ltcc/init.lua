@@ -13,7 +13,10 @@ return h.make_builtin({
     command = 'ltcc',
     args = { 'check', '-l', 'en-US', '-f', '$FILENAME' },
     format = 'json',
-    to_stdin = true,
+    -- `ltcc` reads a file and has no stdin mode: the buffer goes to a
+    -- temporary copy, so the result matches what is on screen, not the
+    -- saved file the offsets would be wrong for
+    to_temp_file = true,
     ignore_stderr = true,
     timeout = 60000,
     check_exit_code = function(c) return c <= 1 end,
@@ -29,16 +32,20 @@ return h.make_builtin({
         local offenses = {}
 
         for _, m in ipairs(file) do
+          -- `"replacements": null` decodes to `vim.NIL`
+          local replacements = type(m.replacements) == 'table'
+              and m.replacements
+            or {}
           local tip = table.concat(
             vim.tbl_map(
               function(r) return '“' .. r.value .. '”' end,
-              m.replacements
+              replacements
             ),
             ', '
           )
 
           table.insert(offenses, {
-            message = m.message .. ' Try: ' .. tip,
+            message = tip == '' and m.message or m.message .. ' Try: ' .. tip,
             ruleId = m.rule.id,
             level = 'ERROR',
             line = m.moreContext.line_number,

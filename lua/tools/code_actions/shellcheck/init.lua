@@ -120,6 +120,11 @@ local disable_action = function(
   local row_start = default_line - 1
   local row_end = default_line - 1
   if existing_directive then
+    -- Already there, as `SC2086` or `2086`: the directive is left alone
+    local bare = tostring(code):gsub('^SC', '')
+    for _, listed in ipairs(vim.split(existing_directive.codes, ',')) do
+      if vim.trim(listed):gsub('^SC', '') == bare then return end
+    end
     codes = existing_directive.codes .. ',' .. codes
     row_start = existing_directive.row - 1
     row_end = existing_directive.row

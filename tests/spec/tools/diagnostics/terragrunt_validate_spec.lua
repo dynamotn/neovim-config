@@ -85,6 +85,28 @@ describe('tools.diagnostics.terragrunt_validate', function()
       }, result)
     end)
 
+    it('decodes the JSON itself, and answers a clean run too', function()
+      local answered
+      local result = opts.on_output({
+        bufname = '/repo/a/terragrunt.hcl',
+        cwd = '/repo/a',
+        output = '[]',
+      }, function(diagnostics) answered = diagnostics end)
+      assert.are.same({}, result)
+      assert.are.same({}, answered)
+      assert.are.same(
+        { 'Deprecated' },
+        vim.tbl_map(
+          function(d) return d.message end,
+          opts.on_output({
+            bufname = '/repo/a/terragrunt.hcl',
+            cwd = '/repo/a',
+            output = '[{"summary":"Deprecated","severity":"warning"}]',
+          })
+        )
+      )
+    end)
+
     it('keeps earlier diagnostics of other directories only', function()
       package.loaded['null-ls.diagnostics'] = {
         get_namespace = function(id) return 'ns' .. id end,
