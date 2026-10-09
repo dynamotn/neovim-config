@@ -331,9 +331,7 @@ return {
   },
   {
     -- Winbar to show context of current position
-    -- 'Bekaboo/dropbar.nvim',
-    'cubewhy/dropbar.nvim',
-    branch = 'fix-event',
+    'Bekaboo/dropbar.nvim',
     event = 'UIEnter',
     keys = {
       {
