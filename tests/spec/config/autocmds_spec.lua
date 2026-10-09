@@ -92,5 +92,14 @@ describe('config.autocmds', function()
       vim.wait(50)
       assert.same({}, vim.fn.maparg('q', 'n', false, true))
     end)
+
+    it('copes with a buffer wiped before `q` is mapped', function()
+      local bufnr = h.buffer({ lines = { 'text' } })
+      vim.bo[bufnr].filetype = 'qf'
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+      vim.v.errmsg = ''
+      vim.wait(50)
+      assert.are.equal('', vim.v.errmsg)
+    end)
   end)
 end)

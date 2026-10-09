@@ -28,9 +28,8 @@ describe('config.globals', function()
   it('enables every language of config.languages', function()
     local expected = vim.tbl_keys(require('config.languages'))
     table.sort(expected)
-    local actual = vim.deepcopy(DyNeo.enabled_languages)
-    table.sort(actual)
-    assert.are.same(expected, actual)
+    -- In order as it is: `pairs` gives a new one each session
+    assert.are.same(expected, DyNeo.enabled_languages)
   end)
 
   it('picks the test strategy from the multiplexer', function()

@@ -41,6 +41,36 @@ describe('config.keymaps', function()
 
   local function map(mode, lhs) return vim.fn.maparg(lhs, mode, false, true) end
 
+  describe('<leader>bR', function()
+    local file, cleanup
+    before_each(function()
+      local dir
+      dir, cleanup = h.tmpdir()
+      file = dir .. '/f.txt'
+      h.write(file, { 'saved' })
+      vim.cmd.edit(file)
+      vim.api.nvim_buf_set_lines(0, 0, -1, false, { 'typed' })
+    end)
+    after_each(function()
+      vim.cmd('bwipeout!')
+      cleanup()
+    end)
+
+    it('keeps the changes unless told to discard them', function()
+      local restore_confirm = h.stub(vim.fn, 'confirm', function() return 2 end)
+      map('n', ' bR').callback()
+      restore_confirm()
+      assert.same({ 'typed' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+    end)
+
+    it('reloads the file once told to', function()
+      local restore_confirm = h.stub(vim.fn, 'confirm', function() return 1 end)
+      map('n', ' bR').callback()
+      restore_confirm()
+      assert.same({ 'saved' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+    end)
+  end)
+
   it('maps the path copiers', function()
     for _, suffix in ipairs({
       'y',

@@ -91,12 +91,16 @@ map(
 )
 map('n', '<leader>bD', '<cmd>:bd<cr>', { desc = 'Delete Buffer and Window' })
 map('n', '<leader>by', '<cmd>%yank +<cr>', { desc = 'Yank Buffer' })
-map(
-  'n',
-  '<leader>bR',
-  '<cmd>edit!<cr>',
-  { desc = 'Reload Buffer (discard changes)' }
-)
+map('n', '<leader>bR', function()
+  -- Changes are only thrown away once that is confirmed
+  if
+    vim.bo.modified
+    and vim.fn.confirm('Discard the changes?', '&Discard\n&Keep', 2) ~= 1
+  then
+    return
+  end
+  vim.cmd.edit({ bang = true })
+end, { desc = 'Reload Buffer (discard changes)' })
 map('n', '<leader>bf', function()
   vim.ui.select(
     vim.fn.getcompletion('', 'filetype'),

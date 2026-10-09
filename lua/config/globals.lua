@@ -70,7 +70,9 @@ DyNeo.enabled_plugins = {
 
 ---@type string[] List enable each language, useful for install only plugins
 --- for needed language. Default is all supported languages.
+--- Sorted: what is built from it walks it in order, and `pairs` has none.
 DyNeo.enabled_languages = vim.tbl_keys(require('config.languages'))
+table.sort(DyNeo.enabled_languages)
 
 ---@type string[] List bundle language, include TS parsers, LSP servers, DAP
 --- adapters, Linters and Formatters. Useful for containerize

@@ -82,6 +82,8 @@ vim.api.nvim_create_autocmd('FileType', {
     end
     vim.bo[event.buf].buflisted = false
     vim.schedule(function()
+      -- Wiped in the meantime: a help or quickfix buffer closed at once
+      if not vim.api.nvim_buf_is_valid(event.buf) then return end
       vim.keymap.set('n', 'q', function()
         -- The last window cannot be closed (E444): the buffer still goes
         pcall(vim.cmd.close)

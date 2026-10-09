@@ -86,7 +86,10 @@ local stale_specs = vim.tbl_map(
 -- otherwise) after a commit or a release, the quarantine the npm, bun, pnpm,
 -- uv and Mason sides of these dotfiles already apply. It goes in ahead of
 -- `setup`, which installs what is missing as it runs.
-require('tools.lazy-quarantine').setup()
+try(
+  function() require('tools.lazy-quarantine').setup() end,
+  { msg = 'Failed setting up the plugin quarantine' }
+)
 
 -- The project's own `.nvim` folder, when it is trusted. Worked out here: the
 -- runtimepath lazy.nvim builds has to name it.
