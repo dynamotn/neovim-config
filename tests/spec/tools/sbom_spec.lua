@@ -175,12 +175,31 @@ describe('tools.sbom', function()
       assert.equals('a', findings[1].component.name)
       assert.same({ 'CVE-1', 'GHSA-2' }, findings[1].ids)
 
+      ---@cast findings -nil
       local lines = sbom.osv_report(findings, #asked, #components)
       assert.equals('# Known vulnerabilities: 1', lines[1])
       assert.is_truthy(vim.tbl_contains(lines, '## a 1 (mason)'))
       assert.is_truthy(
         vim.tbl_contains(lines, '- CVE-1 https://osv.dev/vulnerability/CVE-1')
       )
+    end)
+  end)
+
+  describe('an answer short of results', function()
+    it('is an error, not a clean report', function()
+      local asked = {
+        { name = 'a', version = '1', source = 'mason' },
+        { name = 'b', version = '2', source = 'mason' },
+      }
+      for _, response in ipairs({
+        {},
+        { results = vim.NIL },
+        { results = { { vulns = {} } } },
+      }) do
+        local findings, err = sbom.osv_findings(asked, response)
+        assert.is_nil(findings)
+        assert.is_truthy(err:find('for 2 questions', 1, true))
+      end
     end)
   end)
 

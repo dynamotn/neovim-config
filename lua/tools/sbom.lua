@@ -292,12 +292,25 @@ end
 ---@field ids string[]
 
 --- The components OSV knows a vulnerability of
+---
+--- An answer without a result for every question is an error, not a clean
+--- bill: the results are matched to the questions by position, and the ones
+--- missing would read as "nothing known".
 ---@param asked DySbomComponent[] In the order the queries were sent
 ---@param response table The decoded answer of the batch query
----@return DySbomVulnerable[]
+---@return DySbomVulnerable[]? findings
+---@return string? err
 function M.osv_findings(asked, response)
+  local results = response.results
+  if type(results) ~= 'table' or #results ~= #asked then
+    return nil,
+      ('OSV answered %d results for %d questions'):format(
+        type(results) == 'table' and #results or 0,
+        #asked
+      )
+  end
   local findings = {}
-  for index, result in ipairs(response.results or {}) do
+  for index, result in ipairs(results) do
     local ids = vim.tbl_map(
       function(vuln) return vuln.id end,
       result.vulns or {}
@@ -649,10 +662,10 @@ function M.ask_osv(queries, asked, on_done)
         if not ok or type(response) ~= 'table' then
           return on_done(nil, 'OSV answered with something that is not JSON')
         end
-        vim.list_extend(
-          findings,
+        local found, err =
           M.osv_findings(vim.list_slice(asked, first, last), response)
-        )
+        if not found then return on_done(nil, err) end
+        vim.list_extend(findings, found)
         batch(last + 1)
       end)
     end)
