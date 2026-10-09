@@ -1,6 +1,7 @@
 :AiGuardAllow	dyneo.txt	/*:AiGuardAllow*
 :AiGuardCheck	dyneo.txt	/*:AiGuardCheck*
 :AiGuardLog	dyneo.txt	/*:AiGuardLog*
+:DyLog	dyneo.txt	/*:DyLog*
 :DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
 :DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
 :DyNeoRoot	dyneo.txt	/*:DyNeoRoot*
@@ -49,6 +50,7 @@ dyneo-kube	dyneo.txt	/*dyneo-kube*
 dyneo-languages	dyneo.txt	/*dyneo-languages*
 dyneo-layout	dyneo.txt	/*dyneo-layout*
 dyneo-lazy-install	dyneo.txt	/*dyneo-lazy-install*
+dyneo-logs	dyneo.txt	/*dyneo-logs*
 dyneo-mappings	dyneo.txt	/*dyneo-mappings*
 dyneo-per-machine	dyneo.txt	/*dyneo-per-machine*
 dyneo-policy	dyneo.txt	/*dyneo-policy*

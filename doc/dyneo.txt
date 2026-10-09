@@ -453,6 +453,24 @@ first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
 what is running.  A block that deletes, destroys or reaches for root asks
 first.  See |:Runbook|.
 
+Logs                                                              *dyneo-logs*
+
+|:DyLog| opens a log file, the journal (`journalctl`) or the logs of a pod
+(`kubectl logs`) as records, one per line: time, level, message and request
+id, whatever the source names them.  JSON lines, logfmt and plain text are
+read line by line, and the level is coloured.  At most the last 20000 lines
+of a file are read, and 2000 of the journal or of a pod.  In the buffer:
+
+    `<localleader>l`   Show only a level and louder
+    `<localleader>i`   Show only the request under the cursor; again for all
+    `<localleader>f`   Show only the JSON records a `jq` expression selects,
+                     as in `select(…)`
+    `<localleader>c`   Clear the filters
+    `<localleader>r`   Read the source again
+
+Logs carry tokens and personal data, so the buffer is kept from every AI
+integration (|dyneo-ai-guard|).
+
 Encrypted files                                              *dyneo-encrypted*
 
 A SOPS file, an Ansible Vault, or an `encrypted_*.age` / `encrypted_*.asc`
@@ -659,6 +677,13 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :Runbook clear          Remove every `output` fence.
 :Runbook stop           Stop what the buffer is running.
                         See |dyneo-runbook|.
+
+                                                                      *:DyLog*
+:DyLog {file}           Read {file} as log records.
+:DyLog journal [{args}] Read the journal, {args} passed to `journalctl`.
+:DyLog kube {pod} [{args}]
+                        Read the logs of {pod}, {args} passed to
+                        `kubectl logs`.  See |dyneo-logs|.
 
                                                               *:EncryptedDiff*
 :EncryptedDiff [{rev}]  Diff the clear text of this decrypted buffer with its
