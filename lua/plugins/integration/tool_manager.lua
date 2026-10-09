@@ -72,9 +72,15 @@ return {
       end)
 
       mr.refresh(function()
-        for _, tool in ipairs(opts.ensure_installed) do
-          local p = mr.get_package(tool)
-          if not p:is_installed() then p:install() end
+        -- Several languages may ask for the same tool, and installing one
+        -- twice throws, stopping the rest; nor does an unknown name stop them
+        for _, tool in
+          ipairs(require('util.plugin').dedup(opts.ensure_installed))
+        do
+          local ok, p = pcall(mr.get_package, tool)
+          if ok and not p:is_installed() and not p:is_installing() then
+            p:install()
+          end
         end
       end)
     end,

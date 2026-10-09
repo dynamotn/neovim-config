@@ -139,6 +139,7 @@ return {
             -- `condition`. `vale` looks for its config next to the file and
             -- upwards from there, so asking the working directory answers
             -- the wrong question the moment a buffer lives outside it.
+            if vim.fn.executable('vale') == 0 then return end
             if not has_vale_config(args.buf) then return end
             vim.api.nvim_buf_call(
               args.buf,
@@ -169,6 +170,8 @@ return {
       local function run()
         -- A linter job started while `:wq` is quitting dies mid-write
         if leaving or vim.v.exiting ~= vim.NIL then return end
+        -- A help page, a picker or a hover float is nothing to lint
+        if vim.bo.buftype ~= '' then return end
         -- nvim-lint's own resolution first: the full filetype, else each
         -- part of a dotted one
         local names =
@@ -181,6 +184,9 @@ return {
         local ctx = { filename = vim.api.nvim_buf_get_name(0) }
         ctx.dirname = vim.fn.fnamemodify(ctx.filename, ':h')
         names = vim.tbl_filter(function(name)
+          -- `compiler` runs `makeprg`: with no `:compiler` chosen for the
+          -- buffer that is the global `make`, run on every keystroke
+          if name == 'compiler' then return vim.b.current_compiler ~= nil end
           local linter = lint.linters[name]
           if not linter then
             require('util.plugin').warn(
@@ -188,7 +194,12 @@ return {
               { title = 'nvim-lint' }
             )
           end
+          -- The `*` linters are listed before Mason has installed them, and
+          -- a missing binary would report ENOENT on every lint
           return linter
+            and not (type(linter) == 'table' and type(linter.cmd) == 'string' and vim.fn.executable(
+              linter.cmd
+            ) == 0)
             and not (
               type(linter) == 'table'
               and linter.condition

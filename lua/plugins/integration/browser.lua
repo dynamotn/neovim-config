@@ -36,7 +36,8 @@ return {
           name = 'jira',
           open_fn = function(text)
             local urls = {}
-            for url in text:gmatch('%w+-%d+') do
+            -- An issue key (`OPS-12`), not `utf-8` or `x86-64`
+            for url in text:gmatch('%f[%w]%u[%u%d]+%-%d+%f[%W]') do
               table.insert(
                 urls,
                 (vim.env.JIRA_URL or 'https://jira.atlassian.com/browse/')

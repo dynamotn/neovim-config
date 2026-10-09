@@ -169,10 +169,13 @@ return {
         },
       }
       if vim.fn.executable('fcitx5-remote') == 1 then
+        -- By group, as fcitx5 is set up here (Vietnamese, Japanese, ...):
+        -- what is read on leaving Insert mode is what is set on entering it
+        -- again, so it has to be a group too, not an input method name
         opts.linux = {
-          default_im = 'keyboard-us',
-          get_im_command = { 'fcitx5-remote', '-n' },
-          set_im_command = { 'fcitx5-remote', '-g', 'English' },
+          default_im = 'English',
+          get_im_command = { 'fcitx5-remote', '-q' },
+          set_im_command = { 'fcitx5-remote', '-g' },
         }
       end
       return opts

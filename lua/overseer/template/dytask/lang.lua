@@ -82,6 +82,8 @@ M.to_template = function(lang, runner, file)
                 'default',
                 {
                   'open_output',
+                  -- Its `on_start` default opens it, focused, on every run
+                  on_start = 'never',
                   on_complete = 'failure',
                   direction = 'dock',
                   focus = true,
