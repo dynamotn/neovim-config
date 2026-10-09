@@ -18,6 +18,7 @@
 :Jira	dyneo.txt	/*:Jira*
 :Kube	dyneo.txt	/*:Kube*
 :LazyQuarantine	dyneo.txt	/*:LazyQuarantine*
+:OpenApiDiff	dyneo.txt	/*:OpenApiDiff*
 :OpenApiRequest	dyneo.txt	/*:OpenApiRequest*
 :Runbook	dyneo.txt	/*:Runbook*
 :TfPlan	dyneo.txt	/*:TfPlan*

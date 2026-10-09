@@ -445,6 +445,134 @@ function M.attach(bufnr)
     function() M.open('hurl') end,
     { buffer = bufnr, desc = 'Request For Hurl (OpenAPI)' }
   )
+  vim.keymap.set(
+    'n',
+    '<localleader>d',
+    function() M.diff(bufnr) end,
+    { buffer = bufnr, desc = 'Breaking Changes Since HEAD (OpenAPI)' }
+  )
+end
+
+--- Where the operation `method` of `path` is defined, 1-based: the method
+--- key inside the path's block, else the path key, else nil
+---@param lines string[]
+---@param path? string
+---@param method? string
+---@return integer?
+function M.line_of(lines, path, method)
+  if not path then return nil end
+  local path_line, path_indent
+  for number, line in ipairs(lines) do
+    local indent, key = key_of(line)
+    if path_line then
+      local own = #line:match('^(%s*)')
+      if line:match('%S') and own <= path_indent then break end
+      if key and method and key:lower() == method:lower() then return number end
+    elseif key == path then
+      path_line, path_indent = number, indent
+    end
+  end
+  return path_line
+end
+
+local diff_ns = vim.api.nvim_create_namespace('dy_openapi_diff')
+
+--- How loud each level of oasdiff is: 3 breaks clients, 2 may, 1 is news
+local LEVELS = {
+  [3] = vim.diagnostic.severity.ERROR,
+  [2] = vim.diagnostic.severity.WARN,
+  [1] = vim.diagnostic.severity.INFO,
+}
+
+--- Diagnostics of the changes `oasdiff breaking --format json` reported,
+--- each on the operation it is about
+---@param changes table[]
+---@param lines string[]
+---@return vim.Diagnostic[]
+function M.diff_diagnostics(changes, lines)
+  local diagnostics = {}
+  for _, change in ipairs(changes) do
+    if type(change) == 'table' then
+      local line = M.line_of(lines, change.path, change.operation) or 1
+      table.insert(diagnostics, {
+        lnum = line - 1,
+        col = 0,
+        severity = LEVELS[tonumber(change.level)]
+          or vim.diagnostic.severity.WARN,
+        message = change.text or change.id or 'changed',
+        code = change.id,
+        source = 'oasdiff',
+      })
+    end
+  end
+  return diagnostics
+end
+
+--- Show what the buffer, as it is now, breaks of the spec at `rev`
+---@param bufnr? integer
+---@param rev? string `HEAD` unless given
+function M.diff(bufnr, rev)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
+    or bufnr
+  rev = rev or 'HEAD'
+  if vim.fn.executable('oasdiff') ~= 1 then
+    return notify('oasdiff is not installed', vim.log.levels.ERROR)
+  end
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == '' then
+    return notify('This buffer holds no file', vim.log.levels.WARN)
+  end
+  local dir, name = vim.fs.dirname(file), vim.fs.basename(file)
+  local old = vim
+    .system(
+      { 'git', 'show', ('%s:./%s'):format(rev, name) },
+      { cwd = dir, text = true }
+    )
+    :wait(10000)
+  if old.code ~= 0 then
+    return notify(
+      ('%s is not in git at %s'):format(name, rev),
+      vim.log.levels.WARN
+    )
+  end
+  -- Both sides as files of their own, the extension kept for the format
+  local work = vim.fn.tempname()
+  vim.fn.mkdir(work, 'p', tonumber('700', 8))
+  local base, revision =
+    vim.fs.joinpath(work, 'base-' .. name), vim.fs.joinpath(work, name)
+  vim.fn.writefile(vim.split(old.stdout or '', '\n', { plain = true }), base)
+  vim.fn.writefile(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), revision)
+  vim.system(
+    { 'oasdiff', 'breaking', base, revision, '--format', 'json' },
+    { text = true, timeout = 60000 },
+    function(result)
+      vim.schedule(function()
+        vim.fn.delete(work, 'rf')
+        if not vim.api.nvim_buf_is_valid(bufnr) then return end
+        local ok, changes = pcall(
+          vim.json.decode,
+          result.stdout ~= '' and result.stdout or '[]',
+          { luanil = { object = true, array = true } }
+        )
+        if not ok or type(changes) ~= 'table' then
+          return notify(
+            'oasdiff failed: ' .. vim.trim(result.stderr or ''),
+            vim.log.levels.ERROR
+          )
+        end
+        local diagnostics = M.diff_diagnostics(
+          changes,
+          vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+        )
+        vim.diagnostic.set(diff_ns, bufnr, diagnostics)
+        notify(
+          #diagnostics == 0 and ('Nothing breaks since %s'):format(rev)
+            or ('%d changes since %s'):format(#diagnostics, rev),
+          #diagnostics > 0 and vim.log.levels.WARN or nil
+        )
+      end)
+    end
+  )
 end
 
 return M

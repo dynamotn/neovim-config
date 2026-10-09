@@ -467,6 +467,7 @@ local function requirements()
     jq = 'the jq filter of `:DyLog`',
     yq = '`:OpenApiRequest` on a YAML document',
     openssl = '`:DyInspect` on a certificate',
+    oasdiff = '`:OpenApiDiff` (`:MasonInstall oasdiff`)',
   }
   for _, command in ipairs(required) do
     table.insert(

@@ -289,6 +289,106 @@ describe('tools.openapi', function()
     assert.equals('# showPet', vim.api.nvim_buf_get_lines(0, 0, 1, false)[1])
   end)
 
+  describe('diff', function()
+    it('finds the line of an operation, else of its path', function()
+      assert.equals(8, openapi.line_of(YAML, '/pets/{petId}', 'GET'))
+      assert.equals(17, openapi.line_of(YAML, '/pets/{petId}', 'put'))
+      assert.equals(5, openapi.line_of(YAML, '/pets/{petId}', 'post'))
+      assert.is_nil(openapi.line_of(YAML, '/nope', 'get'))
+      assert.is_nil(openapi.line_of(YAML, nil, nil))
+    end)
+
+    it('puts each change on its operation, as loud as its level', function()
+      local diagnostics = openapi.diff_diagnostics({
+        {
+          id = 'response-property-removed',
+          text = 'removed the property name',
+          level = 3,
+          operation = 'GET',
+          path = '/pets/{petId}',
+        },
+        { id = 'api-path-removed', level = 2, path = '/gone' },
+        { text = 'a note', level = 1 },
+      }, YAML)
+      assert.same({
+        lnum = 7,
+        col = 0,
+        severity = vim.diagnostic.severity.ERROR,
+        message = 'removed the property name',
+        code = 'response-property-removed',
+        source = 'oasdiff',
+      }, diagnostics[1])
+      assert.equals(0, diagnostics[2].lnum)
+      assert.equals('api-path-removed', diagnostics[2].message)
+      assert.equals(vim.diagnostic.severity.INFO, diagnostics[3].severity)
+    end)
+
+    it('compares the buffer with the spec at a revision', function()
+      local dir, cleanup = h.tmpdir()
+      local function git(...)
+        local result = vim
+          .system(
+            vim.list_extend(
+              { 'git', '-c', 'user.name=t', '-c', 'user.email=t@t' },
+              { ... }
+            ),
+            { cwd = dir }
+          )
+          :wait()
+        assert.equals(0, result.code, result.stderr)
+      end
+      git('init', '-q')
+      h.write(dir .. '/openapi.yaml', YAML)
+      git('add', 'openapi.yaml')
+      git('commit', '-q', '-m', 'spec')
+      vim.fn.mkdir(dir .. '/bin', 'p')
+      -- An oasdiff that keeps what it compared, and finds one break
+      h.write(dir .. '/bin/oasdiff', {
+        '#!/bin/sh',
+        'echo "$@" > "' .. dir .. '/args"',
+        'cp "$2" "' .. dir .. '/base.seen"',
+        'cp "$3" "' .. dir .. '/revision.seen"',
+        [[echo '[{"id":"x","text":"broke","level":3,"operation":"PUT","path":"/pets/{petId}"}]']],
+      })
+      vim.fn.setfperm(dir .. '/bin/oasdiff', 'rwxr-xr-x')
+      local path = vim.env.PATH
+      vim.env.PATH = dir .. '/bin:' .. path
+      local notes = {}
+      local restore = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+
+      vim.cmd.edit(dir .. '/openapi.yaml')
+      local bufnr = vim.api.nvim_get_current_buf()
+      vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { 'openapi: 3.1.0' })
+      openapi.diff(bufnr)
+      assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
+      restore()
+      vim.env.PATH = path
+
+      assert.equals('1 changes since HEAD', notes[1])
+      local diagnostics = vim.diagnostic.get(bufnr)
+      assert.equals(1, #diagnostics)
+      assert.equals(16, diagnostics[1].lnum)
+      -- The base is the committed spec, the revision the unsaved buffer
+      assert.equals('openapi: 3.0.3', vim.fn.readfile(dir .. '/base.seen')[1])
+      assert.equals(
+        'openapi: 3.1.0',
+        vim.fn.readfile(dir .. '/revision.seen')[1]
+      )
+      assert.is_truthy(
+        vim.fn.readfile(dir .. '/args')[1]:find('--format json', 1, true)
+      )
+      -- And the copies are gone
+      local base = vim.fn.readfile(dir .. '/args')[1]:match('breaking (%S+)')
+      assert.equals(0, vim.fn.filereadable(base))
+      vim.diagnostic.reset()
+      cleanup()
+    end)
+  end)
+
   it('reads YAML through yq', function()
     if vim.fn.executable('yq') ~= 1 then
       return pending('yq is not installed')

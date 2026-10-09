@@ -480,6 +480,12 @@ request, or from its schema.  `$ref`s inside the document are followed.  A
 YAML document is read through `yq`.  The request opens in a new buffer, to
 save where it belongs.
 
+`<localleader>d` (|:OpenApiDiff|) compares the document as it is in the
+buffer, written or not, with itself at `HEAD` or at any revision given,
+through `oasdiff breaking`: each change that breaks a client is an error on
+its operation, one that may break it a warning, and the rest notes.  Install
+`oasdiff` once with `:MasonInstall oasdiff`.
+
 CI pipelines                                                        *dyneo-ci*
 
 In a `.gitlab-ci.yml` or a GitHub Actions workflow, `<localleader>s` (or
@@ -798,6 +804,10 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :OpenApiRequest [http]  Open the OpenAPI operation under the cursor as a
                         kulala request.
 :OpenApiRequest hurl    The same, as a Hurl request.  See |dyneo-openapi|.
+
+                                                                *:OpenApiDiff*
+:OpenApiDiff [{rev}]    The breaking changes of this OpenAPI document since
+                        {rev}, `HEAD` unless given.
 
                                                                   *:DyInspect*
 :DyInspect              Decode the certificate, key or JWT under the cursor.

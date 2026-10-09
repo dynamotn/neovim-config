@@ -10,6 +10,17 @@ vim.api.nvim_create_user_command(
   }
 )
 
+-- `:OpenApiDiff [{rev}]`: what this document, as it is now, breaks of
+-- itself at {rev}
+vim.api.nvim_create_user_command(
+  'OpenApiDiff',
+  function(args) require('tools.openapi').diff(0, args.fargs[1]) end,
+  {
+    nargs = '?',
+    desc = 'The breaking changes of this OpenAPI document since a revision',
+  }
+)
+
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('dy_openapi', { clear = true }),
   pattern = { 'yaml.openapi', 'json.openapi' },
