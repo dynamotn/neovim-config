@@ -11,6 +11,8 @@
 -- - Headless, the notifier has no UI to draw on and drops what it is sent, so
 --   an error a handler reports through `vim.notify` never reaches the output.
 --   Errors are copied to stderr, where the shell script looks for them.
+--   Those raised while `init.lua` loads, before this file runs, were recorded
+--   by `scripts/lib/notify-watch.lua`, which the shell script loads first.
 -- - Opening a file installs whatever its language is missing. A check must
 --   not download tools behind the user's back, so installs are recorded and
 --   skipped instead -- and the names they were asked for are checked, since a
@@ -68,7 +70,10 @@ local quick_languages = {
   'typescript',
 }
 
-local errors = {} ---@type string[]
+-- Shared with `scripts/lib/notify-watch.lua`, which filled it while the
+-- configuration loaded
+local errors = _G._dy_check_errors or {} ---@type string[]
+_G._dy_check_errors = errors
 ---@type DyInstalls Filled in by `samples.skip_installs()` below
 local installs
 
@@ -87,6 +92,7 @@ local function watch_notify()
   end
   vim.notify = _G._dy_check_notify
 end
+watch_notify()
 
 --- Keep Copilot's sign-in state out of the errors
 ---
