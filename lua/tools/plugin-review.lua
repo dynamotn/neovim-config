@@ -480,43 +480,21 @@ end
 --- Put `lines` in the read-only buffer `bufnr`, if it is still there
 ---@param bufnr integer
 ---@param lines string[]
-function M.fill(bufnr, lines)
-  if not vim.api.nvim_buf_is_valid(bufnr) then return end
-  vim.bo[bufnr].modifiable = true
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.bo[bufnr].modifiable = false
-end
+function M.fill(bufnr, lines) require('util.scratch').set(bufnr, lines) end
 
---- A scratch buffer holding `lines`, in a window of its own
+--- A scratch buffer holding `lines`, in a tab of its own
 ---@param lines string[]
 ---@param filetype string
----@param open string The command that makes the window
 ---@return integer bufnr
-local function scratch(lines, filetype, open)
-  vim.cmd(open)
-  local bufnr = vim.api.nvim_get_current_buf()
-  vim.bo[bufnr].buftype = 'nofile'
-  vim.bo[bufnr].bufhidden = 'wipe'
-  vim.bo[bufnr].swapfile = false
-  M.fill(bufnr, lines)
-  vim.bo[bufnr].filetype = filetype
-  vim.keymap.set(
-    'n',
-    'q',
-    '<cmd>close<cr>',
-    { buffer = bufnr, desc = 'Close', nowait = true }
-  )
-  return bufnr
+local function scratch(lines, filetype)
+  return require('util.scratch').open(lines, { filetype = filetype })
 end
 
 --- The whole of what `row` brings in, commit by commit, in a tab
 ---@param row DyPendingUpdate
 function M.open_diff(row)
-  local bufnr = scratch(
-    { ('Reading the commits of %s…'):format(row.name) },
-    'git',
-    'tabnew'
-  )
+  local bufnr =
+    scratch({ ('Reading the commits of %s…'):format(row.name) }, 'git')
   git(row.dir, {
     'log',
     '--no-color',
@@ -571,7 +549,7 @@ function M.show(rows, window, name)
     waiting,
     { '', ('Reading the updates of %d plugins…'):format(#rows) }
   )
-  local bufnr = scratch(waiting, 'markdown', 'tabnew')
+  local bufnr = scratch(waiting, 'markdown')
   M.report(rows, window, function(lines) M.fill(bufnr, lines) end)
   vim.keymap.set('n', '<CR>', function()
     local plugin = section_at_cursor(bufnr)

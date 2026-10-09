@@ -679,19 +679,7 @@ end
 ---@param lines string[]
 ---@param filetype string
 local function scratch(lines, filetype)
-  vim.cmd('tabnew')
-  local bufnr = vim.api.nvim_get_current_buf()
-  vim.bo[bufnr].buftype = 'nofile'
-  vim.bo[bufnr].bufhidden = 'wipe'
-  vim.bo[bufnr].swapfile = false
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.bo[bufnr].filetype = filetype
-  vim.keymap.set(
-    'n',
-    'q',
-    '<cmd>close<cr>',
-    { buffer = bufnr, desc = 'Close', nowait = true }
-  )
+  require('util.scratch').open(lines, { filetype = filetype })
 end
 
 local notify = require('util.notify').titled('SBOM')

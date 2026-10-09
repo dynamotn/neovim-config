@@ -122,27 +122,12 @@ end
 ---@param filetype string
 ---@param name string
 local function show(text, filetype, name)
-  vim.cmd('tabnew')
-  local bufnr = vim.api.nvim_get_current_buf()
-  require('util.sensitive').mark(
-    bufnr,
-    'Kubernetes output, which can hold Secret data'
-  )
-  vim.bo[bufnr].buftype = 'nofile'
-  vim.bo[bufnr].bufhidden = 'wipe'
-  vim.bo[bufnr].swapfile = false
-  -- A second diff of the same file is open beside the first one
-  pcall(vim.api.nvim_buf_set_name, bufnr, name)
-  vim.api.nvim_buf_set_lines(
-    bufnr,
-    0,
-    -1,
-    false,
-    vim.split(text, '\n', { trimempty = true })
-  )
-  vim.bo[bufnr].modifiable = false
-  vim.bo[bufnr].filetype = filetype
-  vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = bufnr, nowait = true })
+  -- Named, so a second diff of the same file opens beside the first one
+  require('util.scratch').open(vim.split(text, '\n', { trimempty = true }), {
+    name = name,
+    filetype = filetype,
+    sensitive = 'Kubernetes output, which can hold Secret data',
+  })
 end
 
 --- The target of the current buffer, or nil when it holds no file

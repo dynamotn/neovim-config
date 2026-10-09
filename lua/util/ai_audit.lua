@@ -190,19 +190,9 @@ function M.show(entries, title)
   end
   if #entries == 0 then table.insert(lines, 'Nothing was handed over.') end
 
-  vim.cmd('botright new')
-  local bufnr = vim.api.nvim_get_current_buf()
-  vim.bo[bufnr].buftype = 'nofile'
-  vim.bo[bufnr].bufhidden = 'wipe'
-  vim.bo[bufnr].swapfile = false
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.bo[bufnr].modifiable = false
-  vim.bo[bufnr].filetype = 'dyneo-ai-audit'
-  vim.keymap.set(
-    'n',
-    'q',
-    '<cmd>close<cr>',
-    { buffer = bufnr, desc = 'Close', nowait = true }
+  require('util.scratch').open(
+    lines,
+    { split = 'horizontal', filetype = 'dyneo-ai-audit' }
   )
 end
 

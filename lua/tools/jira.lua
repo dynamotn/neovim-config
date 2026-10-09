@@ -300,19 +300,9 @@ function M.view(key)
     { 'issue', 'view', key, '--plain', '--comments', '5' },
     function(ok, lines, err)
       if not ok then return notify(err, vim.log.levels.ERROR) end
-      vim.cmd('botright new')
-      local bufnr = vim.api.nvim_get_current_buf()
-      vim.bo[bufnr].buftype = 'nofile'
-      vim.bo[bufnr].bufhidden = 'wipe'
-      vim.bo[bufnr].swapfile = false
-      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-      vim.bo[bufnr].modifiable = false
-      vim.bo[bufnr].filetype = 'markdown'
-      vim.keymap.set(
-        'n',
-        'q',
-        '<cmd>close<cr>',
-        { buffer = bufnr, nowait = true }
+      require('util.scratch').open(
+        lines,
+        { split = 'horizontal', filetype = 'markdown' }
       )
     end
   )
