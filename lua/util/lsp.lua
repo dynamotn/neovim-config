@@ -34,11 +34,12 @@ end
 
 ---@param opts? { timeout_ms?: number, format_options?: table }|vim.lsp.get_clients.Filter
 function M.format(opts)
+  -- What the caller asked for wins over the defaults
   opts = vim.tbl_deep_extend(
     'force',
     {},
-    opts or {},
-    Plugin.opts('nvim-lspconfig').format or {}
+    Plugin.opts('nvim-lspconfig').format or {},
+    opts or {}
   )
   local ok, conform = pcall(require, 'conform')
   -- conform diffs the result better. `formatters` must be nil, or it skips

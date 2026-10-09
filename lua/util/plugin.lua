@@ -92,7 +92,7 @@ function M.extend(t, key, values)
   for i = 1, #keys do
     local k = keys[i]
     t[k] = t[k] or {}
-    if type(t) ~= 'table' then return end
+    if type(t[k]) ~= 'table' then return end
     t = t[k]
   end
   return vim.list_extend(t, values)

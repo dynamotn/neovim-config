@@ -182,11 +182,10 @@ describe('util.json_schema', function()
 
     before_each(function()
       attached = true
-      restore_attached = h.stub(
-        vim.lsp,
-        'buf_is_attached',
-        function() return attached end
-      )
+      restore_attached = h.stub(vim.lsp, 'buf_is_attached', function(...)
+        if type(attached) == 'function' then return attached(...) end
+        return attached
+      end)
     end)
     after_each(function() restore_attached() end)
 
@@ -220,6 +219,15 @@ describe('util.json_schema', function()
       json_schema.on_init(fake_client({ id = 2 }))
       local autocmds = vim.api.nvim_get_autocmds({ group = 'util.json_schema' })
       assert.are.equal(2, #autocmds)
+      report(h.buffer(), { unreachable('https://a.example/s.json') })
+      assert.are.equal(1, #deferred)
+    end)
+
+    it('keeps watching a client of another project', function()
+      local first = fake_client({ id = 1 })
+      json_schema.on_init(first)
+      json_schema.on_init(fake_client({ id = 2 }))
+      attached = function(_, id) return id == 1 end
       report(h.buffer(), { unreachable('https://a.example/s.json') })
       assert.are.equal(1, #deferred)
     end)

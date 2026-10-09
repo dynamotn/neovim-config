@@ -160,7 +160,7 @@ function M.setup()
     { desc = 'DyNeo roots for the current buffer' }
   )
   vim.api.nvim_create_autocmd(
-    { 'LspAttach', 'BufWritePost', 'DirChanged', 'BufEnter' },
+    { 'LspAttach', 'BufWritePost', 'DirChanged', 'BufEnter', 'BufWipeout' },
     {
       group = vim.api.nvim_create_augroup('dyneo_root_cache', { clear = true }),
       callback = function(event) M.cache[event.buf] = nil end,
@@ -173,7 +173,10 @@ end
 ---@return string
 function M.get(opts)
   opts = opts or {}
-  local buf = opts.buf or vim.api.nvim_get_current_buf()
+  -- `0` is cached under the real number, which the autocmds above clear
+  local buf = (opts.buf == nil or opts.buf == 0)
+      and vim.api.nvim_get_current_buf()
+    or opts.buf
   local ret = M.cache[buf]
   if not ret then
     local roots = M.detect({ all = false, buf = buf })

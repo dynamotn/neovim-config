@@ -81,17 +81,27 @@ function M.retry_failed(client, bufnr)
   return failed
 end
 
+--- The clients `on_init` watches, by id
+---@type table<integer, vim.lsp.Client>
+local clients = {}
+
 --- Watch the diagnostics of the buffers `client` is attached to, and fetch
 --- again every schema it reports as unreachable
 ---@param client vim.lsp.Client
 function M.on_init(client)
+  -- One client starts per project: each is watched, not only the last
+  clients[client.id] = client
   vim.api.nvim_clear_autocmds({ group = group })
   vim.api.nvim_create_autocmd('DiagnosticChanged', {
     group = group,
     callback = function(ev)
-      if client:is_stopped() then return end
-      if not vim.lsp.buf_is_attached(ev.buf, client.id) then return end
-      M.retry_failed(client, ev.buf)
+      for id, c in pairs(clients) do
+        if c:is_stopped() then
+          clients[id] = nil
+        elseif vim.lsp.buf_is_attached(ev.buf, c.id) then
+          M.retry_failed(c, ev.buf)
+        end
+      end
     end,
   })
   vim.api.nvim_create_autocmd('BufDelete', {

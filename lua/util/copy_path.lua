@@ -15,8 +15,8 @@ end
 function M.absolute()
   local p = M.bufpath()
   if not p then return nil end
-  -- Expand `~` and environment variables, and normalize
-  return Plugin.norm(vim.fn.expand(p)) or p
+  -- Already absolute: `expand` would read `$VAR` or `[id]` in a file name
+  return Plugin.norm(p) or p
 end
 
 --- Parent directory of the current buffer's file.

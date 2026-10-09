@@ -129,7 +129,8 @@ local function load_crds(callback)
       local ok, tree = pcall(vim.json.decode, out.stdout or '')
       if out.code ~= 0 or not ok or type(tree.tree) ~= 'table' then
         notify('Cannot fetch the CRDs catalog', vim.log.levels.WARN)
-        crds = cached
+        -- Not again this session: offline, each pick would wait 20 s
+        crds = cached or {}
         return callback(crds)
       end
       local paths = {}
@@ -334,7 +335,11 @@ function M.detect(bufnr)
     { vim.uri_from_bufnr(bufnr) },
     function(err, result)
       if err or (result and #result > 0) then return end
-      if vim.api.nvim_buf_is_valid(bufnr) then M.set(bufnr, matched, true) end
+      if not vim.api.nvim_buf_is_valid(bufnr) then return end
+      -- Picked by hand while the server was asked: that choice stands
+      local now = vim.b[bufnr].yaml_schema_choice
+      if now and not now.auto then return end
+      M.set(bufnr, matched, true)
     end,
     bufnr
   )

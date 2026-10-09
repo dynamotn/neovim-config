@@ -317,12 +317,15 @@ M.guard_sidekick = function()
     'sidekick status',
     function(get, buf, ...)
       local result = get(buf, ...)
-      if result or not sensitive.is_sensitive(buf) then return result end
+      if result then return result end
+      -- The statusline asks on every redraw: the cheap checks go first, and
+      -- the buffer is only scanned when Copilot runs at all
       local ok_config, config = pcall(require, 'sidekick.config')
       if
         ok_config
         and config.copilot.status.enabled
         and #config.get_clients() > 0
+        and sensitive.is_sensitive(buf)
       then
         return { busy = false, kind = 'Inactive', message = 'sensitive file' }
       end
