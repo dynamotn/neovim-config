@@ -139,14 +139,17 @@ M.watch_copilot = function()
   ---
   --- There is no public call that re-runs the resolution behind an enabled
   --- LSP configuration -- `root_dir`, the root markers, the whole of it --
-  --- but the `FileType` event does, since that is what starts a server in
-  --- the first place. The handlers of `util.lazy_install` are written to run
-  --- on every matching event, and an ftplugin guards itself with
-  --- `b:did_ftplugin`, so firing it again asks the question without redoing
-  --- the work.
+  --- but the `FileType` handler of `vim.lsp.enable` does, since that is what
+  --- starts a server in the first place. Only that one is fired: the rest
+  --- would set the buffer up again, and `ftplugin.vim` runs `b:undo_ftplugin`
+  --- before sourcing the ftplugins anew, undoing local options set by hand.
   ---@param bufnr integer
   local function reconsider(bufnr)
-    vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, modeline = false })
+    pcall(vim.api.nvim_exec_autocmds, 'FileType', {
+      group = 'nvim.lsp.enable',
+      buffer = bufnr,
+      modeline = false,
+    })
   end
 
   ---@param bufnr integer

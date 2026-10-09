@@ -439,18 +439,29 @@ describe('util.ai_guard', function()
       settle('TextChanged', buf)
       assert.same({ { buf, 42 } }, detached)
 
-      local reconsidered = 0
-      local group = vim.api.nvim_create_augroup('dy_spec_reattach', {})
-      vim.api.nvim_create_autocmd('FileType', {
-        group = group,
+      local reconsidered, set_up_again = 0, 0
+      -- Where `vim.lsp.enable` starts its servers from, and where the rest of
+      -- a buffer's setup (ftplugins, `util.lazy_install`) hangs
+      local lsp =
+        vim.api.nvim_create_augroup('nvim.lsp.enable', { clear = false })
+      local id = vim.api.nvim_create_autocmd('FileType', {
+        group = lsp,
         buffer = buf,
         callback = function() reconsidered = reconsidered + 1 end,
+      })
+      local other = vim.api.nvim_create_augroup('dy_spec_reattach', {})
+      vim.api.nvim_create_autocmd('FileType', {
+        group = other,
+        buffer = buf,
+        callback = function() set_up_again = set_up_again + 1 end,
       })
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'nothing here' })
       vim.api.nvim_exec_autocmds('TextChanged', { buffer = buf })
       vim.wait(2000, function() return reconsidered > 0 end, 20)
-      vim.api.nvim_del_augroup_by_id(group)
+      vim.api.nvim_del_autocmd(id)
+      vim.api.nvim_del_augroup_by_id(other)
       assert.are.equal(1, reconsidered)
+      assert.are.equal(0, set_up_again)
     end)
 
     it('leaves a buffer it never took Copilot from alone', function()
