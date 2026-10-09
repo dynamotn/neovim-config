@@ -22,6 +22,6 @@ Staged files:
 
 The staged diff:
 
-```diff
+{fence}diff
 {diff}
-```
+{fence}

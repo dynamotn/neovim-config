@@ -922,7 +922,9 @@ the shape of a credential, or when `betterleaks` finds a secret in it or
 cannot run.  A diff over 512 KiB is cut, and the prompt says so.  The
 message goes where nothing has been typed yet; one already written is
 replaced only when you say so.  The prompt is `prompts/git/commit.md`, and a
-trusted project may replace it.
+trusted project may replace it; it is given `{files}`, `{history}`,
+`{convention}`, `{diff}` and `{fence}`, a code fence longer than any run of
+backticks in the diff.
 
 ------------------------------------------------------------------------------
 9. MAPPINGS                                                   *dyneo-mappings*

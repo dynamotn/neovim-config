@@ -116,6 +116,26 @@ describe('tools.ai.prompts', function()
       assert.is_truthy(text:find('cut at', 1, true))
     end)
 
+    it('fences code that holds fences of its own', function()
+      local md = h.buffer({
+        filetype = 'markdown',
+        lines = { 'Run:', '```sh', 'make', '```' },
+      })
+      local text = prompts.expand({ body = '{selection}' }, { bufnr = md })
+      assert.equals('````markdown\nRun:\n```sh\nmake\n```\n````', text)
+    end)
+
+    it('cuts between characters, never inside one', function()
+      local utf8 = h.buffer({ lines = { 'aé' } })
+      prompts.MAX_BYTES = 2
+      local text, cut = prompts.expand(
+        { body = '{selection}' },
+        { bufnr = utf8 }
+      )
+      assert.is_true(cut)
+      assert.is_truthy(text:find('```\na\n```', 1, true))
+    end)
+
     it('leaves unknown words and percent signs alone', function()
       local text = prompts.expand(
         { body = '{input} {other} 100%' },

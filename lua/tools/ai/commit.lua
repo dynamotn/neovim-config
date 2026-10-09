@@ -149,6 +149,8 @@ function M.build(prompt, ctx)
     diff = ctx.diff .. (ctx.cut and ('\n(diff cut at %d KiB)'):format(
       M.MAX_DIFF / 1024
     ) or ''),
+    -- Longer than any backticks of the diff, which a Markdown change has
+    fence = require('tools.ai.prompts').fence(ctx.diff),
   }
   return (prompt.body:gsub('{(%a+)}', values))
 end

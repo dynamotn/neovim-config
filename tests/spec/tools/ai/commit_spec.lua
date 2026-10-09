@@ -211,4 +211,21 @@ describe('tools.ai.commit', function()
     assert.is_truthy(text:find('(no commits yet)', 1, true))
     assert.is_truthy(text:find('+100%\n(diff cut at 512 KiB)', 1, true))
   end)
+
+  it('fences a diff of Markdown longer than its own fences', function()
+    local text = commit.build({ body = '{fence}diff\n{diff}\n{fence}' }, {
+      diff = '+```lua\n+x\n+```',
+      cut = false,
+      paths = { 'README.md' },
+      subjects = {},
+      conventional = false,
+    })
+    assert.equals('````diff\n+```lua\n+x\n+```\n````', text)
+  end)
+
+  it('ships a prompt that fences the diff that way', function()
+    local prompts = require('tools.ai.prompts')
+    local shipped = prompts.read(prompts.BUILTIN .. '/git/commit.md', false)
+    assert.is_truthy(shipped.body:find('{fence}diff\n{diff}\n{fence}', 1, true))
+  end)
 end)

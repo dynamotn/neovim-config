@@ -88,6 +88,18 @@ function M.get(name)
   end
 end
 
+--- A Markdown fence for `text`: longer than any run of backticks in it, so
+--- code that holds fences of its own (Markdown, a README) stays inside
+---@param text string
+---@return string
+function M.fence(text)
+  local longest = 2
+  for run in text:gmatch('`+') do
+    longest = math.max(longest, #run)
+  end
+  return ('`'):rep(longest + 1)
+end
+
 --- Lines of the selection, or of the whole buffer, cut at `M.MAX_BYTES`
 ---@param ctx DyAiContext
 ---@return string text
@@ -102,7 +114,10 @@ local function code(ctx)
     '\n'
   )
   if #text <= M.MAX_BYTES then return text, false end
-  return text:sub(1, M.MAX_BYTES), true
+  -- Never in the middle of a character: back to the start of the one the
+  -- cut falls in
+  local last = M.MAX_BYTES + vim.str_utf_start(text, M.MAX_BYTES + 1)
+  return text:sub(1, last), true
 end
 
 --- Diagnostics of the selection, or of the whole buffer, one a line
@@ -155,10 +170,13 @@ function M.expand(prompt, ctx)
       local where = ctx.range
           and (' (lines %d-%d)'):format(ctx.range[1], ctx.range[2])
         or ''
-      return ('```%s%s\n%s\n```%s'):format(
+      local fence = M.fence(text)
+      return ('%s%s%s\n%s\n%s%s'):format(
+        fence,
         vim.bo[ctx.bufnr].filetype,
         where,
         text,
+        fence,
         cut and ('\n(cut at %d KiB)'):format(M.MAX_BYTES / 1024) or ''
       )
     end,
