@@ -120,9 +120,12 @@ A new language or tool is an entry in `lua/config/languages.lua`.
 
 Every one of these came from a bug that shipped. Keep to them.
 
-- **Never block the main loop.** Run external commands with `vim.system` and a
-  callback, not `:wait()` on the UI path; do git and network work in the
-  background with a cap on concurrent jobs.
+- **Never block the main loop.** Run external commands with
+  `util.system.run` (deadline, output cap, answer on the main loop), not
+  `vim.system():wait()` on the UI path; do git and network work in the
+  background, a few at a time with `util.system.each`. Where a caller must
+  wait (`BufWriteCmd`, a server request), use `util.system.sync`: a bare
+  `:wait()` returns nil when a child outlives the deadline.
 - **Every external call has a timeout** and a way to fail quietly: a hung CLI
   must not stall typing, a commit, or a quit. A tool that may prompt runs with
   `detach = true` so it cannot fight the TUI for the terminal.
