@@ -61,6 +61,16 @@ describe('tools.plugin-review', function()
       assert.is_true(#found > 0)
     end)
 
+    it('reads a path holding ` b/`, which git does not quote', function()
+      local found = review.scan({
+        'diff --git a/plugin/x b/tests/evil.lua b/plugin/x b/tests/evil.lua',
+        '@@ -0,0 +1 @@',
+        '+vim.system({ "sh", "-c", "x" })',
+      })
+      assert.is_true(#found > 0)
+      assert.equals('plugin/x b/tests/evil.lua', found[1].file)
+    end)
+
     it('reads past a block comment closed on the line', function()
       local found = review.scan({
         'diff --git a/lua/x.lua b/lua/x.lua',

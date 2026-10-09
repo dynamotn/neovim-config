@@ -132,6 +132,7 @@ end
 --- The branch checked out, or nil outside a repository and when detached
 ---@return string?
 function M.current_branch()
+  if vim.fn.executable('git') ~= 1 then return nil end
   local result = vim
     .system({ 'git', '-C', repository(), 'branch', '--show-current' }, { text = true })
     :wait(5000)
@@ -239,13 +240,18 @@ function M.branch(issue)
         })
         :wait(5000).code == 0
       local args = exists and { 'switch', name } or { 'switch', '-c', name }
-      local result = vim
-        .system(vim.list_extend({ 'git', '-C', dir }, args), { text = true })
-        :wait(10000)
-      if result.code ~= 0 then
-        return notify(vim.trim(result.stderr or ''), vim.log.levels.ERROR)
-      end
-      notify((exists and 'Switched to ' or 'Started ') .. name)
+      -- Asynchronous and with no deadline: `:wait()` SIGKILLs on timeout,
+      -- and a checkout killed half-way leaves `index.lock` behind
+      vim.system(
+        vim.list_extend({ 'git', '-C', dir }, args),
+        { text = true },
+        vim.schedule_wrap(function(result)
+          if result.code ~= 0 then
+            return notify(vim.trim(result.stderr or ''), vim.log.levels.ERROR)
+          end
+          notify((exists and 'Switched to ' or 'Started ') .. name)
+        end)
+      )
     end
   )
 end

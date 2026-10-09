@@ -84,6 +84,17 @@ describe('tools.runbook', function()
     end
   )
 
+  it('runs the code of an indented fence without its indent', function()
+    local block = runbook.block_at({
+      '- step',
+      '  ```python',
+      '  if True:',
+      '      print(1)',
+      '  ```',
+    }, 3)
+    assert.equals('if True:\n    print(1)', runbook.code_of(block))
+  end)
+
   it('asks before what deletes, destroys or reaches for root', function()
     -- The line it found, to show in the question
     assert.equals(
@@ -111,6 +122,9 @@ describe('tools.runbook', function()
       'find /var/data -delete',
       'kubectl scale deploy/web --replicas=0',
       'echo ok\nsudo reboot',
+      -- One command over several lines
+      'kubectl -n prod \\\n  delete deploy api',
+      'git push origin main \\\n  --force',
     }) do
       assert.is_truthy(runbook.danger(code), code)
     end

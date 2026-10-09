@@ -93,7 +93,9 @@ end
 function M.index(dir)
   local blocks = {}
   for name, kind in vim.fs.dir(dir) do
-    if kind == 'file' and (name:match('%.tf$') or name:match('%.tofu$')) then
+    -- A symlinked `providers.tf` is as much a part of the module
+    local is_file = kind == 'file' or kind == 'link'
+    if is_file and (name:match('%.tf$') or name:match('%.tofu$')) then
       local file = vim.fs.joinpath(dir, name)
       local ok, lines = pcall(vim.fn.readfile, file)
       for number, line in ipairs(ok and lines or {}) do
@@ -339,7 +341,7 @@ function M.plan()
       if result.code ~= 0 then return failed('plan', result) end
       vim.system(
         { bin, 'show', '-json', planfile },
-        { cwd = dir, text = true },
+        { cwd = dir, text = true, timeout = M.TIMEOUT },
         function(show)
           vim.schedule(function()
             if show.code ~= 0 then return failed('show', show) end

@@ -179,13 +179,18 @@ function M.write(bufnr)
     if id then vim.list_extend(command, { '--encrypt-vault-id', id }) end
   end
 
-  local ok, result = pcall(
-    function()
-      return vim
-        .system(command, { text = true, env = env, timeout = M.TIMEOUT })
-        :wait()
-    end
-  )
+  local ok, result = pcall(function()
+    return vim
+      .system(command, {
+        text = true,
+        env = env,
+        timeout = M.TIMEOUT,
+        -- No controlling terminal: a password prompt on /dev/tty would
+        -- fight the TUI for keys while the editor waits
+        detach = true,
+      })
+      :wait()
+  end)
   vim.fn.delete(copy)
   for _, path in ipairs(extra) do
     vim.fn.delete(path)
@@ -230,7 +235,9 @@ function M.open(bufnr)
   end
   local ok, result = pcall(
     function()
-      return vim.system(command, { text = true, timeout = M.TIMEOUT }):wait()
+      return vim
+        .system(command, { text = true, timeout = M.TIMEOUT, detach = true })
+        :wait()
     end
   )
   if not ok or result.code ~= 0 then
@@ -261,6 +268,10 @@ end
 --- may have filled are kept out of the shada file
 local decrypted_any = false
 
+--- The `clipboard` value to restore on leaving each guarded buffer
+---@type table<integer, string>
+local saved_clipboard = {}
+
 --- Write `bufnr` encrypted, and keep its clear text out of the system
 --- clipboard while it is the current buffer
 ---
@@ -278,29 +289,32 @@ function M.guard(bufnr)
     callback = function(args) M.write(args.buf) end,
   })
   -- `unnamedplus` would put every yank of a password into the system
-  -- clipboard, and from there into a clipboard manager's history
-  local saved
+  -- clipboard, and from there into a clipboard manager's history. The value
+  -- to restore is kept per buffer, outside this call: `:e!` guards the buffer
+  -- again while the clipboard is already cleared, and must not take that ''
+  -- for the user's setting.
+  local function clear()
+    if saved_clipboard[bufnr] == nil then
+      saved_clipboard[bufnr] = vim.o.clipboard
+    end
+    vim.o.clipboard = ''
+  end
   vim.api.nvim_create_autocmd('BufEnter', {
     group = group,
     buffer = bufnr,
-    callback = function()
-      saved = vim.o.clipboard
-      vim.o.clipboard = ''
-    end,
+    callback = clear,
   })
   vim.api.nvim_create_autocmd({ 'BufLeave', 'BufWipeout' }, {
     group = group,
     buffer = bufnr,
     callback = function()
-      if saved then
-        vim.o.clipboard, saved = saved, nil
+      if saved_clipboard[bufnr] ~= nil then
+        vim.o.clipboard = saved_clipboard[bufnr]
+        saved_clipboard[bufnr] = nil
       end
     end,
   })
-  if vim.api.nvim_get_current_buf() == bufnr then
-    saved = vim.o.clipboard
-    vim.o.clipboard = ''
-  end
+  if vim.api.nvim_get_current_buf() == bufnr then clear() end
 
   if not decrypted_any then
     decrypted_any = true
@@ -308,7 +322,16 @@ function M.guard(bufnr)
     -- quitting: after clear text was in a buffer, neither is kept
     vim.api.nvim_create_autocmd('VimLeavePre', {
       group = vim.api.nvim_create_augroup('dy_encrypted_shada', {}),
-      callback = function() vim.opt.shada:append({ '<0', '/0', '@0' }) end,
+      -- Neovim reads the first `<` item, so the default `<50` has to go
+      -- rather than have `<0` appended after it
+      callback = function()
+        local items = vim.tbl_filter(
+          function(item) return not item:match('^[<"/@]') end,
+          vim.split(vim.o.shada, ',', { plain = true, trimempty = true })
+        )
+        vim.list_extend(items, { '<0', '/0', '@0' })
+        vim.o.shada = table.concat(items, ',')
+      end,
     })
   end
 end

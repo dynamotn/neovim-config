@@ -378,6 +378,9 @@ function M.osv()
   local components = M.components()
   local queries, asked = M.osv_queries(components)
   if #queries == 0 then return notify('Nothing to ask OSV about') end
+  if vim.fn.executable('curl') ~= 1 then
+    return notify('curl is not installed', vim.log.levels.ERROR)
+  end
   notify(('Asking OSV about %d plugins and packages…'):format(#queries))
   vim.system({
     'curl',

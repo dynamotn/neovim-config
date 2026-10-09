@@ -132,9 +132,18 @@ end
 ---@param block DyRunbookBlock
 ---@return string
 function M.code_of(block)
-  if block.lang ~= 'console' then return table.concat(block.code, '\n') end
+  -- A fence inside a list item is indented, and Python takes that indent
+  -- for an `unexpected indent`
+  local indent = block.indent or ''
+  local code = vim.tbl_map(
+    function(line)
+      return line:sub(1, #indent) == indent and line:sub(#indent + 1) or line
+    end,
+    block.code
+  )
+  if block.lang ~= 'console' then return table.concat(code, '\n') end
   local commands = {}
-  for _, line in ipairs(block.code) do
+  for _, line in ipairs(code) do
     local command = line:match('^%s*%$%s?(.*)$')
     if command then table.insert(commands, command) end
   end
@@ -145,6 +154,9 @@ end
 ---@param code string
 ---@return string?
 function M.danger(code)
+  -- `kubectl -n prod \` with `delete deploy api` on the next line is one
+  -- command, and has to be matched as one
+  code = code:gsub('\\\r?\n%s*', ' ')
   for _, line in ipairs(vim.split(code, '\n', { plain = true })) do
     local lower = line:lower()
     for _, pattern in ipairs(M.DANGEROUS) do
@@ -263,7 +275,8 @@ local running = {}
 ---@param process vim.SystemObj
 local function kill(process)
   if not process.pid then return end
-  if not pcall(vim.uv.kill, -process.pid, 'sigterm') then
+  -- `vim.uv.kill` returns an error rather than raising one
+  if not vim.uv.kill(-process.pid, 'sigterm') then
     pcall(process.kill, process, 'sigterm')
   end
 end
@@ -363,7 +376,9 @@ function M.run_block(bufnr, block, on_done)
   local command = vim.list_extend(vim.deepcopy(runner), { code })
 
   local timer = assert(vim.uv.new_timer())
-  local ok, process = pcall(vim.system, command, {
+  -- Declared ahead, so the exit callback can find itself in `running`
+  local ok, process
+  ok, process = pcall(vim.system, command, {
     cwd = cwd,
     text = true,
     -- A session of its own, so stopping it reaches what it started
@@ -373,7 +388,8 @@ function M.run_block(bufnr, block, on_done)
       timer:stop()
       timer:close()
       running[bufnr] = vim.tbl_filter(
-        function(p) return p.pid ~= result.pid end,
+        -- `vim.SystemCompleted` carries no pid: compare the object itself
+        function(p) return p ~= process end,
         running[bufnr] or {}
       )
       local done = pcall(place, bufnr, mark, block.indent, M.render(result))

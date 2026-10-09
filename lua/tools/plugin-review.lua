@@ -148,6 +148,23 @@ end
 ---@field rule string
 ---@field text? string
 
+--- The path of an unquoted `diff --git a/P b/P` header that names one file
+---
+--- git does not quote a space, so `a/plugin/x b/tests/y.lua` cannot be split
+--- at the first ` b/`: the header is read as the same path twice instead.
+--- nil for a rename, whose two paths differ.
+---@param raw string
+---@return string?
+local function same_path(raw)
+  local rest = raw:match('^diff %-%-git (a/.*)$')
+  if not rest or rest:sub(1, 1) == '"' then return nil end
+  -- `a/P b/P`: 2 + #P + 3 + #P characters
+  local len = (#rest - 5) / 2
+  if len < 1 or len % 1 ~= 0 then return nil end
+  local a, b = rest:sub(3, 2 + len), rest:sub(-len)
+  if a == b and rest:sub(3 + len, 5 + len) == ' b/' then return b end
+end
+
 --- Flag the lines a diff adds
 ---
 --- `diff` is the output of `git diff --unified=0`, as lines.
@@ -159,7 +176,8 @@ function M.scan(diff)
   local file, line, in_hunk, skip = nil, 0, false, false
 
   for _, raw in ipairs(diff) do
-    local b_path = raw:match('^diff %-%-git a/.- b/(.*)$')
+    local b_path = same_path(raw)
+      or raw:match('^diff %-%-git a/.- b/(.*)$')
       -- git quotes a path it would not print as it is (`core.quotePath`)
       or raw:match('^diff %-%-git "a/.-" "b/(.*)"$')
     if not b_path and raw:find('^diff %-%-git ') then

@@ -274,6 +274,8 @@ describe('tools.jira', function()
       local issue =
         { key = 'OPS-12', type = 'Bug', status = '', summary = 'Login fails' }
       jira.branch(issue)
+      -- The switch runs in the background
+      vim.wait(5000, function() return #notes > 0 end)
       assert.equals(
         'fix/OPS-12-login-fails',
         git({ 'branch', '--show-current' })
@@ -281,7 +283,9 @@ describe('tools.jira', function()
       assert.equals('OPS-12', jira.current_key())
 
       git({ 'switch', '--quiet', 'main' })
+      local before = #notes
       jira.branch(issue)
+      vim.wait(5000, function() return #notes > before end)
       restore()
       assert.equals(
         'fix/OPS-12-login-fails',

@@ -215,6 +215,19 @@ describe('tools.encrypted', function()
     vim.o.clipboard = saved
   end)
 
+  it('gives the clipboard back after the buffer was guarded again', function()
+    local saved = vim.o.clipboard
+    vim.o.clipboard = 'unnamedplus'
+    local file = dir .. '/values.yaml'
+    h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+    local bufnr = open(file)
+    -- What `:e!` does, with the clipboard already cleared
+    encrypted.guard(bufnr)
+    vim.cmd.enew()
+    assert.equals('unnamedplus', vim.o.clipboard)
+    vim.o.clipboard = saved
+  end)
+
   it('keeps the vault id of an Ansible Vault', function()
     local file = dir .. '/vault.yml'
     h.write(file, { '$ANSIBLE_VAULT;1.2;AES256;prod', 'enc:db_password: x' })
