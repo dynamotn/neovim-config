@@ -60,7 +60,10 @@ return {
           -- sidekick's next edit suggestions have anything to send to.
           -- `on_dir()` without a root leaves `root_markers` to find it.
           root_dir = function(bufnr, on_dir)
-            if not require('util.sensitive').is_sensitive(bufnr) then
+            if
+              not require('util.sensitive').is_sensitive(bufnr)
+              and not require('util.ai_policy').local_only(bufnr)
+            then
               on_dir()
             end
           end,

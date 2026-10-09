@@ -8,30 +8,52 @@
 local M = {}
 
 --- Subcommands other than the names of prompts
-M.SUBCOMMANDS = { 'pick', 'prompts', 'commit', 'model' }
+M.SUBCOMMANDS = { 'pick', 'prompts', 'commit', 'staged', 'pr', 'ci', 'model' }
 
 local notify = require('util.notify').titled('AI')
 
---- Hand `text` to the AI of `DyNeo.ai.target`, unless `bufnr`, the buffer
---- it was taken from, is kept from AI
+--- Log a handover of `what`, a buffer or a path
+---@param action 'sent'|'refused'
+---@param what integer|string
+---@param detail? string
+local function record(action, what, detail)
+  local audit = require('util.ai_audit')
+  if type(what) == 'number' then
+    audit.record_buffer('dyai', action, what, detail)
+  else
+    audit.record('dyai', action, what, detail)
+  end
+end
+
+--- Hand `text` to the AI of `DyNeo.ai.target`
+---
+--- `what` is the buffer or the path the text was taken from: it decides
+--- whether the project keeps AI local (`util.ai_policy`), and it is what the
+--- audit log names. Whatever it holds has been checked already.
 ---@param text string
----@param bufnr integer
+---@param what integer|string
 ---@param detail? string What was taken, for the audit log
 ---@return boolean sent
-function M.send(text, bufnr, detail)
-  local sensitive = require('util.sensitive')
-  local audit = require('util.ai_audit')
-  if sensitive.is_sensitive(bufnr) then
-    audit.record_buffer('dyai', 'refused', bufnr, detail)
-    notify(
-      'Kept from AI: '
-        .. table.concat(sensitive.reasons(bufnr), '; ')
-        .. '. See :DyAiGuardCheck.',
-      vim.log.levels.WARN
-    )
-    return false
-  end
+function M.deliver(text, what, detail)
   local target = DyNeo.ai and DyNeo.ai.target or 'avante'
+  local policy = require('util.ai_policy')
+  local reason = policy.local_only(what)
+  if reason then
+    -- The CLIs of sidekick answer from a service, never from this machine
+    local provider = target == 'avante' and require('avante.config').provider
+      or ''
+    if not policy.is_local_provider(provider) then
+      record('refused', what, detail)
+      notify(
+        ('%s: switch Avante to %s (:AvanteSwitchProvider)'):format(
+          reason,
+          table.concat((DyNeo.ai or {}).local_providers or {}, ' or ')
+        ),
+        vim.log.levels.WARN
+      )
+      return false
+    end
+  end
   if target == 'sidekick' then
     local lines = vim.tbl_map(
       function(line) return { { line } } end,
@@ -50,8 +72,66 @@ function M.send(text, bufnr, detail)
     )
     return false
   end
-  audit.record_buffer('dyai', 'sent', bufnr, detail)
+  record('sent', what, detail)
   return true
+end
+
+--- Hand `text` to the AI of `DyNeo.ai.target`, unless `bufnr`, the buffer
+--- it was taken from, is kept from AI
+---@param text string
+---@param bufnr integer
+---@param detail? string What was taken, for the audit log
+---@return boolean sent
+function M.send(text, bufnr, detail)
+  local sensitive = require('util.sensitive')
+  if sensitive.is_sensitive(bufnr) then
+    record('refused', bufnr, detail)
+    notify(
+      'Kept from AI: '
+        .. table.concat(sensitive.reasons(bufnr), '; ')
+        .. '. See :DyAiGuardCheck.',
+      vim.log.levels.WARN
+    )
+    return false
+  end
+  return M.deliver(text, bufnr, detail)
+end
+
+--- Bytes of answer kept from a headless command
+M.MAX_ANSWER = 64 * 1024
+
+--- Have the command of `util.ai_policy` -- `DyNeo.ai.commit_command`, or
+--- `local_command` where AI stays local -- write from `text` in `root`, and
+--- hand `on_done` its answer
+---@param text string
+---@param root string
+---@param label string What is being written, for the log and the notices
+---@param on_done fun(answer: string)
+function M.headless(text, root, label, on_done)
+  local cmd, why = require('util.ai_policy').command(root)
+  if not cmd then
+    record('refused', root, label)
+    return notify(why --[[@as string]], vim.log.levels.WARN)
+  end
+  local system = require('util.system')
+  record('sent', root, label)
+  notify(('Writing the %s with %s...'):format(label, cmd[1]))
+  system.run(cmd, {
+    cwd = root,
+    stdin = text,
+    timeout = (DyNeo.ai or {}).commit_timeout,
+    max_bytes = M.MAX_ANSWER,
+    -- A CLI that wants to ask something must not take over the terminal
+    detach = true,
+  }, function(result)
+    if result.code ~= 0 then
+      return notify(system.failure(result, cmd[1]), vim.log.levels.ERROR)
+    end
+    if vim.trim(result.stdout) == '' then
+      return notify(cmd[1] .. ' gave an empty answer', vim.log.levels.WARN)
+    end
+    on_done(result.stdout)
+  end)
 end
 
 --- Expand prompt `name` for the current buffer and send it
@@ -244,6 +324,24 @@ M.ACTIONS = {
     run = function() require('tools.ai.commit').write() end,
   },
   {
+    group = 'Git',
+    name = 'Review staged changes',
+    key = '<leader>ag',
+    run = function() require('tools.ai.review').staged() end,
+  },
+  {
+    group = 'Git',
+    name = 'Describe the branch for its pull request',
+    key = '<leader>aG',
+    run = function() require('tools.ai.pr').describe() end,
+  },
+  {
+    group = 'CI',
+    name = 'Explain the failed job',
+    key = '<localleader>e',
+    run = function() require('tools.ai.ci').explain() end,
+  },
+  {
     group = 'Guard',
     name = 'Why is this buffer kept from AI',
     key = '<leader>ka',
@@ -336,6 +434,12 @@ function M.command(args)
     M.pick(range, true)
   elseif sub == 'commit' then
     require('tools.ai.commit').write()
+  elseif sub == 'staged' then
+    require('tools.ai.review').staged()
+  elseif sub == 'pr' then
+    require('tools.ai.pr').describe(args.fargs[2])
+  elseif sub == 'ci' then
+    require('tools.ai.ci').explain()
   elseif sub == 'model' then
     M.avante_model()
   else
@@ -345,8 +449,11 @@ end
 
 --- Completion of `:DyAi`: the subcommands, then every prompt's name
 ---@param lead string
+---@param line? string The command line so far
 ---@return string[]
-function M.complete(lead)
+function M.complete(lead, line)
+  -- Only the first word is completed: `pr` takes a branch, typed
+  if line and line:match('^%S+%s+%S+%s') then return {} end
   local words = vim.deepcopy(M.SUBCOMMANDS)
   for _, prompt in ipairs(require('tools.ai.prompts').list()) do
     table.insert(words, prompt.name)

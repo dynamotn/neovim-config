@@ -336,6 +336,16 @@ return {
         command = 'git',
         mason = { enabled = false },
       },
+      -- Runs inside Neovim, as `trail_space` does; `remote` keeps it off
+      -- buffers whose text must stay on the machine
+      {
+        'ai_fix',
+        type = 'code_actions',
+        command = 'lua',
+        custom = true,
+        remote = true,
+        mason = { enabled = false },
+      },
     },
     dial = function(augend)
       local logical_alias = augend.constant.new({

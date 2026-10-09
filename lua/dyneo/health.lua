@@ -475,6 +475,7 @@ local function requirements()
     ['codex-acp'] = "Avante's `codex` provider",
     npm = 'installing the ACP adapters and mcphub.nvim',
     ['mcp-hub'] = 'mcphub.nvim, the MCP servers of Avante',
+    ollama = "Avante's `ollama` provider, and `DyNeo.ai.local_command` where AI stays local",
   }
   for _, command in ipairs(required) do
     table.insert(

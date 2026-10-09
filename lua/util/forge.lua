@@ -143,4 +143,28 @@ function M.api(remote, endpoint, on_done)
   end)
 end
 
+--- Call `endpoint` of the API of `remote`, through its CLI, for text rather
+--- than JSON -- a job's log -- and hand `on_done` at most `max_bytes` of it
+---@param remote DyForgeRemote
+---@param endpoint string
+---@param max_bytes integer
+---@param on_done fun(text: string?, cut: boolean, err: string?)
+function M.api_text(remote, endpoint, max_bytes, on_done)
+  local cli = remote.kind == 'github' and 'gh' or 'glab'
+  if vim.fn.executable(cli) ~= 1 then
+    return on_done(nil, false, cli .. ' is not installed')
+  end
+  local system = require('util.system')
+  system.run(
+    { cli, 'api', '--hostname', remote.host, endpoint },
+    { timeout = M.TIMEOUT, max_bytes = max_bytes },
+    function(result)
+      if result.code ~= 0 and not result.cut then
+        return on_done(nil, false, system.failure(result, cli .. ' api'))
+      end
+      on_done(result.stdout or '', result.cut)
+    end
+  )
+end
+
 return M

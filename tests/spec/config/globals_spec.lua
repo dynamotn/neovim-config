@@ -27,6 +27,8 @@ describe('config.globals', function()
       target = 'avante',
       commit_command = { 'claude', '-p' },
       commit_timeout = 90 * 1000,
+      local_only = {},
+      local_providers = { 'ollama' },
     }, DyNeo.ai)
   end)
 

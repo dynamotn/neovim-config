@@ -62,7 +62,14 @@ describe('tools.ai.commit', function()
         current = function() return nil end,
       }),
     }
-    h.unload('tools.ai.commit', 'tools.ai.prompts')
+    h.unload(
+      'tools.ai',
+      'tools.ai.commit',
+      'tools.ai.git',
+      'tools.ai.check',
+      'tools.ai.prompts',
+      'util.ai_policy'
+    )
     commit = require('tools.ai.commit')
   end)
   after_each(function()
@@ -154,19 +161,25 @@ describe('tools.ai.commit', function()
     assert.equals('', vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1])
   end)
 
-  describe('refusal', function()
-    it('finds a credential on any line of the diff', function()
-      local reason = commit.refusal(
-        repo,
-        { 'a.txt' },
-        '-token = "ghp_' .. ('a'):rep(36) .. '"'
-      )
-      assert.is_not_nil(reason)
-    end)
+  it('writes with the local command where AI stays local', function()
+    h.write(repo .. '/.nvim/ai.json', { '{ "local_only": true }' })
+    h.write(repo .. '/a.txt', { 'one', 'two' })
+    git('add', 'a.txt')
+    local bufnr = message_buffer()
+    commit.write()
+    wait_for(function() return #notes > 0 end, 'said why')
+    assert.is_truthy(notes[1]:find('local_command', 1, true))
+    assert.is_false(vim.uv.fs_stat(dir .. '/sent') ~= nil)
 
-    it(
-      'lets a plain diff through',
-      function() assert.is_nil(commit.refusal(repo, { 'a.txt' }, '+two')) end
+    DyNeo.ai.local_command = { 'claude', '--local' }
+    commit.write()
+    wait_for(
+      function() return vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1] ~= '' end,
+      'wrote the message'
+    )
+    assert.equals(
+      'feat(a): add two',
+      vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
     )
   end)
 

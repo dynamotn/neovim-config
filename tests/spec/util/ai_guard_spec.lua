@@ -25,7 +25,12 @@ describe('util.ai_guard', function()
       'notify',
       function(msg, level) table.insert(notes, { msg = msg, level = level }) end
     )
-    h.unload('util.ai_guard', 'util.ai_audit', unpack(plugin_modules))
+    h.unload(
+      'util.ai_guard',
+      'util.ai_audit',
+      'util.ai_policy',
+      unpack(plugin_modules)
+    )
     ai_guard = require('util.ai_guard')
   end)
   after_each(function()
@@ -227,6 +232,67 @@ describe('util.ai_guard', function()
       assert.equals(get_result, status.get(h.buffer({ name = secret })))
       get_result = nil
       assert.is_nil(status.get(h.buffer({ name = plain })))
+    end)
+  end)
+
+  describe('in a project keeping AI local', function()
+    local kept
+
+    before_each(function()
+      kept = dir .. '/kept/main.lua'
+      h.write(dir .. '/kept/.nvim/ai.json', { '{ "local_only": true }' })
+      _G.DyNeo.ai = { local_providers = { 'ollama' } }
+    end)
+    after_each(function()
+      _G.DyNeo.ai = nil
+      package.loaded['avante.config'] = nil
+    end)
+
+    it('sends nothing to a CLI of sidekick', function()
+      local cli = {}
+      local calls
+      cli.send, calls = fn('sent')
+      package.loaded['sidekick.cli'] = cli
+      ai_guard.guard_sidekick()
+      edit(kept)
+      assert.is_nil(cli.send({ msg = '{this}' }))
+      assert.equals(0, #calls)
+      assert.is_true(refused())
+      edit(plain)
+      assert.equals('sent', cli.send())
+    end)
+
+    it('lets Avante ask only a local provider', function()
+      local api = {}
+      local calls
+      api.ask, calls = fn('asked')
+      api.edit = fn('edited')
+      package.loaded['avante.api'] = api
+      package.loaded['avante.config'] = { provider = 'claude-code' }
+      ai_guard.guard_avante()
+      edit(kept)
+      assert.is_nil(api.ask())
+      assert.equals(0, #calls)
+      package.loaded['avante.config'].provider = 'ollama'
+      assert.equals('asked', api.ask())
+    end)
+
+    it('mentions none of its files to Claude Code', function()
+      local claudecode = {}
+      local calls
+      claudecode.send_at_mention, calls = fn(true)
+      package.loaded['claudecode'] = claudecode
+      package.loaded['claudecode.selection'] = {
+        update_selection = fn(),
+        send_selection_update = fn(),
+        get_latest_selection = fn({ filePath = kept }),
+      }
+      ai_guard.guard_claudecode()
+      assert.is_false((claudecode.send_at_mention(kept, 1, 2)))
+      assert.equals(0, #calls)
+      assert.is_nil(
+        package.loaded['claudecode.selection'].get_latest_selection()
+      )
     end)
   end)
 

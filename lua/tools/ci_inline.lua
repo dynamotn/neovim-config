@@ -178,6 +178,7 @@ function M.defined_as(name)
 end
 
 ---@class DyCiJob
+---@field id? integer
 ---@field name string
 ---@field status? string
 ---@field conclusion? string
@@ -287,7 +288,9 @@ function M.fetch(remote, branch, file, on_done)
           status = last.status,
           url = last.web_url,
           jobs = vim.tbl_map(
-            function(row) return { name = row.name, status = row.status } end,
+            function(row)
+              return { id = row.id, name = row.name, status = row.status }
+            end,
             type(rows) == 'table' and rows or {}
           ),
         })
@@ -319,6 +322,7 @@ function M.fetch(remote, branch, file, on_done)
         jobs = vim.tbl_map(
           function(row)
             return {
+              id = row.id,
               name = row.name,
               status = row.status,
               conclusion = row.conclusion,
@@ -342,7 +346,7 @@ end
 --- branch it is on; say why and hand nothing when one is missing
 ---@param bufnr integer
 ---@param on_context fun(ctx: DyCiContext)
-local function context(bufnr, on_context)
+function M.context(bufnr, on_context)
   local kind = M.kind(bufnr)
   if not kind then
     return notify('Not a GitLab CI or GitHub Actions file', vim.log.levels.WARN)
@@ -380,7 +384,7 @@ end
 function M.status(bufnr)
   bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
     or bufnr
-  context(bufnr, function(ctx) M.show_status(bufnr, ctx) end)
+  M.context(bufnr, function(ctx) M.show_status(bufnr, ctx) end)
 end
 
 --- Fetch and show the last pipeline of `ctx` on `bufnr`
@@ -457,7 +461,7 @@ function M.lint(bufnr)
   if vim.fn.executable('glab') ~= 1 then
     return notify('glab is not installed', vim.log.levels.ERROR)
   end
-  context(bufnr, function(ctx)
+  M.context(bufnr, function(ctx)
     require('util.system').run(
       { 'glab', 'ci', 'lint', ctx.file },
       { cwd = ctx.dir, timeout = forge.TIMEOUT },
@@ -515,6 +519,12 @@ function M.attach(bufnr)
     '<localleader>x',
     function() M.clear(bufnr) end,
     { buffer = bufnr, desc = 'Clear Status (CI)' }
+  )
+  vim.keymap.set(
+    'n',
+    '<localleader>e',
+    function() require('tools.ai.ci').explain(bufnr) end,
+    { buffer = bufnr, desc = 'Explain Failed Job (AI)' }
   )
   if M.kind(bufnr) == 'gitlab' then
     vim.keymap.set(

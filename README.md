@@ -138,9 +138,10 @@ below follow the sections of `:help dyneo`.
 - **Spelling** — Vietnamese, Chinese and technical word lists; code comments
   too. `:DySpell vi`
 - **Integrations** — Obsidian, chezmoi templates, firenvim, zellij, AI CLIs.
-- **AI actions** — explain, review, test, document or fix the selection;
-  prompts per project; a commit message from the staged diff. `<leader>ai` ·
-  `:DyAi commit`
+- **AI actions** — explain, review, test, document or fix the selection, or
+  a diagnostic from its code action; prompts per project; a commit message,
+  a review of the staged diff, a pull request, why a CI job failed; projects
+  that keep AI local. `<leader>ai` · `:DyAi commit` · `:DyAi pr`
 
 <details>
 <summary><b>42 languages · 13 frameworks · 38 tools</b> —

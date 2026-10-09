@@ -7,7 +7,7 @@ describe('tools.ai', function()
     dir, cleanup = h.tmpdir()
     notes, audit, asked, sent = {}, {}, {}, {}
     sensitive = false
-    _G.DyNeo.ai = { target = 'avante' }
+    _G.DyNeo.ai = { target = 'avante', local_providers = { 'ollama' } }
     restores = {
       h.stub(vim, 'notify', function(msg) table.insert(notes, msg) end),
       h.stub(package.loaded, 'util.sensitive', {
@@ -19,7 +19,12 @@ describe('tools.ai', function()
           table.insert(audit, { action, detail })
           return true
         end,
+        record = function(_, action, _, detail)
+          table.insert(audit, { action, detail })
+          return true
+        end,
       }),
+      h.stub(package.loaded, 'avante.config', { provider = 'claude-code' }),
       h.stub(package.loaded, 'avante.api', {
         ask = function(opts) table.insert(asked, opts) end,
       }),
@@ -30,7 +35,7 @@ describe('tools.ai', function()
         current = function() return nil end,
       }),
     }
-    h.unload('tools.ai', 'tools.ai.prompts')
+    h.unload('tools.ai', 'tools.ai.prompts', 'util.ai_policy')
     ai = require('tools.ai')
     require('tools.ai.prompts').BUILTIN = dir
     h.write(dir .. '/explain.md', { 'Explain {selection}' })
@@ -127,6 +132,7 @@ describe('tools.ai', function()
   it('completes subcommands and prompt names', function()
     assert.same({ 'explain' }, ai.complete('ex'))
     assert.same({ 'commit' }, ai.complete('comm'))
+    assert.same({}, ai.complete('', 'DyAi pr '))
   end)
 
   it('lists the prompts before the other actions', function()
@@ -150,11 +156,35 @@ describe('tools.ai', function()
     assert.is_true(vim.list_contains(names, 'Toggle Claude Code'))
     -- Every action that needs a plugin says which
     for _, action in ipairs(ai.ACTIONS) do
-      if action.group ~= 'Git' and action.group ~= 'Guard' then
+      if not vim.list_contains({ 'Git', 'CI', 'Guard' }, action.group) then
         assert.is_string(action.plugin, action.name)
       end
     end
   end)
+
+  describe('in a project keeping AI local', function()
+    before_each(
+      function() h.write(dir .. '/.nvim/ai.json', { '{ "local_only": true }' }) end
+    )
+
+    it('asks Avante only on a local provider', function()
+      local bufnr = code_buffer()
+      assert.is_false(ai.deliver('text', bufnr, 'x'))
+      assert.same({}, asked)
+      assert.equals('refused', audit[1][1])
+      assert.is_truthy(notes[1]:find('ollama', 1, true))
+      package.loaded['avante.config'].provider = 'ollama'
+      assert.is_true(ai.deliver('text', bufnr, 'x'))
+      assert.equals(1, #asked)
+    end)
+
+    it('sends nothing to the CLIs of sidekick', function()
+      DyNeo.ai.target = 'sidekick'
+      assert.is_false(ai.deliver('text', dir .. '/a.lua'))
+      assert.same({}, sent)
+    end)
+  end)
+
   describe('status', function()
     it('says nothing before Avante has loaded', function()
       table.insert(restores, h.stub(package.loaded, 'avante.config', nil))

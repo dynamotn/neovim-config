@@ -58,9 +58,13 @@ DyNeo.yaml_schema_dirs	dyneo.txt	/*DyNeo.yaml_schema_dirs*
 dyneo	dyneo.txt	/*dyneo*
 dyneo-adr	dyneo.txt	/*dyneo-adr*
 dyneo-ai	dyneo.txt	/*dyneo-ai*
+dyneo-ai-ci	dyneo.txt	/*dyneo-ai-ci*
 dyneo-ai-commit	dyneo.txt	/*dyneo-ai-commit*
 dyneo-ai-guard	dyneo.txt	/*dyneo-ai-guard*
+dyneo-ai-local	dyneo.txt	/*dyneo-ai-local*
+dyneo-ai-pr	dyneo.txt	/*dyneo-ai-pr*
 dyneo-ai-prompts	dyneo.txt	/*dyneo-ai-prompts*
+dyneo-ai-review	dyneo.txt	/*dyneo-ai-review*
 dyneo-architecture	dyneo.txt	/*dyneo-architecture*
 dyneo-channels	dyneo.txt	/*dyneo-channels*
 dyneo-ci	dyneo.txt	/*dyneo-ci*

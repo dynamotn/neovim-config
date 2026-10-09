@@ -62,6 +62,12 @@ DyNeo.quarantine_window = 7 * 24 * 60 * 60
 --- prompt and the staged diff on its standard input. It runs with no terminal,
 --- so it must answer on standard output without asking anything.
 ---@field commit_timeout integer Milliseconds `commit_command` may take
+---@field local_only string[] Folders whose code may only go to an AI on this
+--- machine, besides any project with a `.nvim/ai.json` saying so
+---@field local_providers string[] Avante providers that run on this machine
+---@field local_command? string[] What writes a commit message or a pull
+--- request in a folder kept local, as `commit_command` does elsewhere: a
+--- model of Ollama, say. Unset, those are refused there.
 
 ---@type DyAi The AI actions of `tools.ai`. Avante speaks to every provider
 --- it knows, so it is where prompts go unless a machine prefers the CLI in
@@ -71,6 +77,9 @@ DyNeo.ai = {
   target = 'avante',
   commit_command = { 'claude', '-p' },
   commit_timeout = 90 * 1000,
+  local_only = {},
+  local_providers = { 'ollama' },
+  local_command = nil,
 }
 
 ---@class DyEnabledPlugins

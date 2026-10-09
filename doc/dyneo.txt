@@ -227,6 +227,15 @@ defaulted in `lua/config/globals.lua`.
         on standard output without asking anything.
 `DyNeo.ai.commit_timeout`      (default 90 seconds, in milliseconds)
         How long `commit_command` may take.
+`DyNeo.ai.local_only`          (default `{}`)
+        Folders whose code may only go to an AI on this machine, besides
+        any project that says so itself; see |dyneo-ai-local|.
+`DyNeo.ai.local_providers`     (default `{ 'ollama' }`)
+        Avante providers that run on this machine.
+`DyNeo.ai.local_command`       (default unset)
+        What writes a commit message or a pull request where AI stays
+        local, in place of `commit_command`: `{ 'ollama', 'run',`
+        `'qwen2.5-coder' }`, say.  Unset, those are refused there.
 
 3.3 Plugin channels                                           *dyneo-channels*
 
@@ -422,7 +431,8 @@ handed a file, a selection following the cursor into a CLI tool, a prompt on
 its way out.
 
 A wrapper that no longer finds what it wraps leaves the plugin as it is and
-says so, rather than breaking it on an upstream rename.
+says so, rather than breaking it on an upstream rename.  A whole project can
+keep its code on the machine, sensitive or not, see |dyneo-ai-local|.
 
 `<leader>ka` (|:DyAiGuardCheck|) says why the buffer is held back.  A pattern
 that matched something that is not a credential is let past with
@@ -712,7 +722,8 @@ puts the status of each job at the end of the line defining it: `✓` passed,
 counted on their one line, the worst of them shown.  `<localleader>x` clears
 them.  The forge is the first of the remotes `upstream`, `gh`, `github` and
 `origin` on GitHub or GitLab, asked through `gh` or `glab`, which keep the
-token.
+token.  `<localleader>e` asks an AI why a failed job failed, see
+|dyneo-ai-ci|.
 
 In a `.gitlab-ci.yml`, `<localleader>l` (or |:DyCiLint|) has GitLab check the
 saved file with `glab ci lint`, and puts what it finds on the jobs it names.
@@ -887,6 +898,13 @@ sent is logged by path and line range.  A tool an AI calls through MCP Hub
     `<leader>ax`       n, x   Fix its diagnostics
     `<leader>al`       n, x   Pick a prompt
     `<leader>ai`       n, x   Pick any AI action
+    `<leader>ag`       n      Review the staged changes, |dyneo-ai-review|
+    `<leader>aG`       n      Describe the branch for its pull request,
+                            |dyneo-ai-pr|
+
+A line with a diagnostic also offers "Fix with AI" among its code actions
+(`<leader>ca`), on the line or on the selection: the `fix` prompt run over
+those lines, as `<leader>ax` does.
 
 Avante's sidebar is dressed like the other panels: the editor's background
 and separator, no number or colour columns, and a plain title naming its
@@ -927,6 +945,57 @@ replaced only when you say so.  The prompt is `prompts/git/commit.md`, and a
 trusted project may replace it; it is given `{files}`, `{history}`,
 `{convention}`, `{diff}` and `{fence}`, a code fence longer than any run of
 backticks in the diff.
+
+Reviewing the staged changes                                *dyneo-ai-review*
+
+`<leader>ag` (|:DyAi| `staged`) sends the staged diff to the chat of
+|DyNeo.ai| `target` for a review before the commit, where the answer can be
+talked over.  The diff is read and checked as for |dyneo-ai-commit|: a
+staged file |dyneo-ai-guard| holds back, text shaped like a credential, or a
+finding of `betterleaks` -- or `betterleaks` not running -- refuses it.  The
+prompt is `prompts/git/review.md`.
+
+Pull request descriptions                                      *dyneo-ai-pr*
+
+`<leader>aG` (|:DyAi| `pr`) writes the title and description of a pull
+request for the current branch, from its commits and its diff since the
+merge base with the branch it goes into: the remote's default branch, else
+`main` or `master`, or the one given to `:DyAi pr {base}`.  The diff is
+checked as for |dyneo-ai-commit|, and written up by |DyNeo.ai|
+`commit_command`.  The answer opens in a Markdown buffer to edit;
+`<localleader>y` there copies it.  Nothing is sent to the forge.  The prompt
+is `prompts/git/pr.md`.
+
+Failed CI jobs                                                 *dyneo-ai-ci*
+
+In a pipeline file, `<localleader>e` (|:DyAi| `ci`) asks why a job of the
+last run on the branch failed, picking one when several did, with the end
+of its log and the file itself.  The log is fetched as |dyneo-ci| fetches
+the status, through `gh` or `glab`; colours, timestamps and GitLab's section
+markers are taken out, and only its last 48 KiB are sent, once the checks
+of |dyneo-ai-commit| have passed over them, since a log may print whatever
+the job had in its environment.  The prompt is `prompts/ci/failure.md`.
+
+Keeping AI local                                            *dyneo-ai-local*
+
+A project whose code must not leave the machine -- a client's, or one
+under an agreement -- says so with a `.nvim/ai.json` holding
+`{ "local_only": true }`, or is named in |DyNeo.ai| `local_only`.  Inside
+it, everything that would send text away is refused, with the reason:
+
+    Copilot             does not attach
+    Claude Code         is handed no selection and no file
+    sidekick            sends nothing to its CLIs
+    Avante, |:DyAi|       only ask a provider of `local_providers`
+    commit messages,    only run `local_command`, and are refused while
+    pull requests       it is unset
+
+The file is read without asking for trust, unlike the rest of `.nvim`: it
+can only keep AI local, never let anything out, so a repository gains
+nothing by writing one.  A file that does not read keeps AI local all the
+same; `{ "local_only": false }` lets a folder inside such a project out
+again.  Claude Code and the CLIs still read files themselves when started
+inside the project: the guard covers what Neovim hands them.
 
 ------------------------------------------------------------------------------
 9. MAPPINGS                                                   *dyneo-mappings*
@@ -1003,6 +1072,8 @@ AI ~
     `<leader>ae` `ar` `au` `ao` `ax`
                      n, x   Explain, review, test, document, fix the
                             selection; see |dyneo-ai|
+    `<leader>ag`       n      Review the staged changes
+    `<leader>aG`       n      Describe the branch for its pull request
 
 Editing ~
     `<leader>fy`       n      Copy the path of the file: relative or
@@ -1262,6 +1333,12 @@ AI ~
 :[range]DyAi prompts    Pick among the prompts only.
 :DyAi commit            Write the commit message of the staged diff into the
                         commit message being edited.  See |dyneo-ai-commit|.
+:DyAi staged            Review the staged changes in the chat.  See
+                        |dyneo-ai-review|.
+:DyAi pr [{base}]       Write the pull request of the branch into {base},
+                        the default branch unless given.  See |dyneo-ai-pr|.
+:DyAi ci                Explain a failed job of the last pipeline of the
+                        branch, from the pipeline file.  See |dyneo-ai-ci|.
 :DyAi model             Pick a model for Avante's provider.
 
 Language servers ~

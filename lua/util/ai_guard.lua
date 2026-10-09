@@ -12,6 +12,7 @@
 --- it is and says so, rather than breaking it on an upstream rename.
 
 local audit = require('util.ai_audit')
+local policy = require('util.ai_policy')
 local sensitive = require('util.sensitive')
 
 local M = {}
@@ -38,6 +39,25 @@ end
 local function refuse(what, integration, target)
   say(what .. ' refused: the file is sensitive', vim.log.levels.WARN)
   log(integration, 'refused', target)
+end
+
+--- Say that `what` was turned down because its project keeps AI on this
+--- machine, and log it
+---@param what string Shown in the notification
+---@param integration string Logged as
+---@param target string|integer The path or the buffer turned down
+---@param reason string From `util.ai_policy`
+local function refuse_local(what, integration, target, reason)
+  say(('%s refused: %s'):format(what, reason), vim.log.levels.WARN)
+  log(integration, 'refused', target, 'local only')
+end
+
+--- Why `target` must not reach Avante's current provider, if it must not
+---@param target integer|string
+---@return string?
+local function avante_kept_local(target)
+  if policy.is_local_provider() then return nil end
+  return policy.local_only(target)
 end
 
 --- What became of each wrapper, for `:checkhealth dyneo`
@@ -103,7 +123,7 @@ M.filter_copilot = function(client)
       bufnr
       and CONTENT_METHODS[method]
       and vim.api.nvim_buf_is_valid(bufnr)
-      and sensitive.is_sensitive(bufnr)
+      and (sensitive.is_sensitive(bufnr) or policy.local_only(bufnr))
     then
       vim.schedule(function() M.detach_copilot(bufnr) end)
       return true
@@ -222,6 +242,10 @@ M.guard_avante = function()
       if sensitive.is_sensitive(0) then
         return refuse('Avante ' .. key, 'Avante', 0)
       end
+      local reason = avante_kept_local(0)
+      if reason then
+        return refuse_local('Avante ' .. key, 'Avante', 0, reason)
+      end
       log('Avante', 'sent', 0, key)
       return original(...)
     end)
@@ -241,6 +265,12 @@ M.guard_avante = function()
       then
         return refuse('Avante', 'Avante', filepath)
       end
+      local reason = type(filepath) == 'string'
+        and filepath ~= ''
+        and avante_kept_local(filepath)
+      if reason then
+        return refuse_local('Avante', 'Avante', filepath, reason)
+      end
       log('Avante', 'sent', filepath, 'added to chat')
       return add(self, filepath, ...)
     end
@@ -255,7 +285,10 @@ M.guard_avante = function()
     'Avante tool permission',
     function(allowed, abs_path, ...)
       if
-        type(abs_path) == 'string' and sensitive.is_sensitive_path(abs_path)
+        type(abs_path) == 'string'
+        and (
+          sensitive.is_sensitive_path(abs_path) or avante_kept_local(abs_path)
+        )
       then
         log('Avante', 'refused', abs_path, 'tool')
         return false
@@ -274,11 +307,16 @@ M.guard_avante = function()
     'read_file_from_buf_or_disk',
     'Avante file reader',
     function(read, filepath, ...)
-      if
-        type(filepath) == 'string' and sensitive.is_sensitive_path(filepath)
-      then
-        log('Avante', 'refused', filepath, 'read')
-        return nil, 'the file is sensitive'
+      if type(filepath) == 'string' then
+        if sensitive.is_sensitive_path(filepath) then
+          log('Avante', 'refused', filepath, 'read')
+          return nil, 'the file is sensitive'
+        end
+        local reason = avante_kept_local(filepath)
+        if reason then
+          log('Avante', 'refused', filepath, 'local only')
+          return nil, reason
+        end
       end
       return read(filepath, ...)
     end
@@ -293,6 +331,9 @@ M.guard_sidekick = function()
     if sensitive.is_sensitive(0) then
       return refuse('sidekick', 'sidekick', 0)
     end
+    -- The CLIs it runs answer from a service, never from this machine
+    local reason = policy.local_only(0)
+    if reason then return refuse_local('sidekick', 'sidekick', 0, reason) end
     local prompt = type(opts) == 'table' and opts.prompt
     log(
       'sidekick',
@@ -322,9 +363,12 @@ M.guard_sidekick = function()
         ok_config
         and config.copilot.status.enabled
         and #config.get_clients() > 0
-        and sensitive.is_sensitive(buf)
       then
-        return { busy = false, kind = 'Inactive', message = 'sensitive file' }
+        if sensitive.is_sensitive(buf) then
+          return { busy = false, kind = 'Inactive', message = 'sensitive file' }
+        elseif policy.local_only(buf) then
+          return { busy = false, kind = 'Inactive', message = 'AI kept local' }
+        end
       end
     end
   )
@@ -337,9 +381,13 @@ local function selection_is_sensitive(sel)
   if type(sel) ~= 'table' then return false end
   local path = sel.filePath
   if type(path) ~= 'string' or path == '' then
-    return sensitive.is_sensitive(0)
+    return sensitive.is_sensitive(0) or policy.local_only(0) ~= nil
   end
-  if sensitive.is_sensitive_path(path) then return true end
+  -- Claude Code answers from a service, so a project kept local is held
+  -- back as a sensitive file is
+  if sensitive.is_sensitive_path(path) or policy.local_only(path) then
+    return true
+  end
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_get_name(bufnr) == path then
       return sensitive.is_sensitive(bufnr)
@@ -360,7 +408,7 @@ M.guard_claudecode = function()
     'update_selection',
     'claudecode selection',
     function(update, ...)
-      if sensitive.is_sensitive(0) then
+      if sensitive.is_sensitive(0) or policy.local_only(0) then
         return log('Claude Code', 'refused', 0, 'selection')
       end
       log('Claude Code', 'sent', 0, 'selection')
@@ -401,6 +449,11 @@ M.guard_claudecode = function()
       if file_path and sensitive.is_sensitive_path(file_path) then
         refuse('Claude Code', 'Claude Code', file_path)
         return false, 'the file is sensitive'
+      end
+      local reason = file_path and policy.local_only(file_path)
+      if reason then
+        refuse_local('Claude Code', 'Claude Code', file_path, reason)
+        return false, reason
       end
       log(
         'Claude Code',

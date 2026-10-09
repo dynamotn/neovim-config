@@ -80,6 +80,20 @@ function M.list()
   return prompts
 end
 
+--- A prompt a command of `tools.ai` is built on, such as `git/commit.md`:
+--- the trusted project's own, else the one shipped. These sit in folders, out
+--- of the list of prompts to pick from.
+---@param path string Relative to a `prompts/` folder
+---@return DyAiPrompt?
+function M.template(path)
+  local project = require('util.project_rtp').current()
+  if project then
+    local own = M.read(project .. '/prompts/' .. path, true)
+    if own then return own end
+  end
+  return M.read(M.BUILTIN .. '/' .. path, false)
+end
+
 ---@param name string
 ---@return DyAiPrompt?
 function M.get(name)

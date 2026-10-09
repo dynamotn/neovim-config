@@ -388,6 +388,8 @@ map("n", "<leader>ao", "<cmd>DyAi docs<cr>", { desc = "AI Document" })
 map("x", "<leader>ao", ":DyAi docs<cr>", { desc = "AI Document" })
 map("n", "<leader>ax", "<cmd>DyAi fix<cr>", { desc = "AI Fix Diagnostics" })
 map("x", "<leader>ax", ":DyAi fix<cr>", { desc = "AI Fix Diagnostics" })
+map("n", "<leader>ag", "<cmd>DyAi staged<cr>", { desc = "AI Review Staged Changes" })
+map("n", "<leader>aG", "<cmd>DyAi pr<cr>", { desc = "AI Pull Request Description" })
 
 -- spell files from the word lists (`plugin/spell.lua`); the list is typed
 map("n", "<leader>zm", function() vim.api.nvim_feedkeys(":DySpell ", "n", false) end, { desc = "Make Spell File" })
