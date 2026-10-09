@@ -78,9 +78,7 @@ local function refresh_name_later(bufnr)
   end, 1500)
 end
 
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'YAML schema' })
-end
+local notify = require('util.notify').titled('YAML schema')
 
 --- SchemaStore catalog, when the plugin is loaded
 ---@return {name: string, description?: string, url: string, fileMatch?: string[]}[]

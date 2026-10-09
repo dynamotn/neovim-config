@@ -9,7 +9,7 @@ local M = {}
 ---@param msg string
 ---@param level? integer
 local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.WARN, { title = 'Rename' })
+  require('util.notify').titled('Rename')(msg, level or vim.log.levels.WARN)
 end
 
 --- Rename `from` to `to` once both pass the checks

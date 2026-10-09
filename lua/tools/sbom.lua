@@ -694,11 +694,7 @@ local function scratch(lines, filetype)
   )
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'SBOM' })
-end
+local notify = require('util.notify').titled('SBOM')
 
 --- Ask OSV about every component, and show what it knows
 ---

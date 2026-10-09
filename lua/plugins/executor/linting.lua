@@ -191,7 +191,7 @@ return {
           if not linter then
             require('util.plugin').warn(
               'Linter not found: ' .. name,
-              { title = 'nvim-lint' }
+              { title = require('util.notify').title('Lint') }
             )
           end
           -- The `*` linters are listed before Mason has installed them, and

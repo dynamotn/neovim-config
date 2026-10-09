@@ -254,11 +254,7 @@ function M.visible(records, filter)
   return out
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Logs' })
-end
+local notify = require('util.notify').titled('Logs')
 
 ---@class DyLogView
 ---@field title string

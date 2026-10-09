@@ -22,11 +22,7 @@ M.WARN_DAYS = 30
 --- Milliseconds `openssl` may take
 M.TIMEOUT = 5000
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Inspect' })
-end
+local notify = require('util.notify').titled('Inspect')
 
 --- base64 or base64url text decoded, or nil when it is not
 ---@param text string

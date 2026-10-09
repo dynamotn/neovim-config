@@ -437,11 +437,7 @@ function M.show(entries, title, source)
   vim.fn.setqflist({}, ' ', { title = title, items = items })
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Terraform plan' })
-end
+local notify = require('util.notify').titled('Terraform plan')
 
 --- The binary to plan with: OpenTofu when it is there
 ---@return string?

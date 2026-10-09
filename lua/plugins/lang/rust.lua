@@ -88,7 +88,7 @@ return vim.list_contains(DyNeo.enabled_languages, 'rust')
           if vim.fn.executable('rust-analyzer') == 0 then
             require('util.plugin').error(
               '**rust-analyzer** not found in PATH, please install it.\nhttps://rust-analyzer.github.io/',
-              { title = 'rustaceanvim' }
+              { title = require('util.notify').title('Rust') }
             )
           end
         end,

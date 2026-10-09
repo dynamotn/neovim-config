@@ -16,6 +16,8 @@ local sensitive = require('util.sensitive')
 
 local M = {}
 
+local say = require('util.notify').titled('AI guard')
+
 --- Log a handover to `util.ai_audit`, of a path or of a buffer
 ---@param integration string
 ---@param action 'sent'|'refused'
@@ -34,11 +36,7 @@ end
 ---@param integration string Logged as
 ---@param target string|integer The path or the buffer turned down
 local function refuse(what, integration, target)
-  vim.notify(
-    what .. ' refused: the file is sensitive',
-    vim.log.levels.WARN,
-    { title = 'AI guard' }
-  )
+  say(what .. ' refused: the file is sensitive', vim.log.levels.WARN)
   log(integration, 'refused', target)
 end
 
@@ -54,11 +52,7 @@ M.status = {}
 local function wrap(tbl, key, name, wrapper)
   if type(tbl) ~= 'table' or type(tbl[key]) ~= 'function' then
     M.status[name] = 'missing'
-    vim.notify(
-      name .. ' not found, left unguarded',
-      vim.log.levels.WARN,
-      { title = 'AI guard' }
-    )
+    say(name .. ' not found, left unguarded', vim.log.levels.WARN)
     return
   end
   M.status[name] = 'guarded'
@@ -458,19 +452,14 @@ M.commands = function()
     local waived = sensitive.is_allowed(bufnr)
     local reasons = sensitive.reasons(bufnr, { ignore_waiver = true })
     if #reasons == 0 then
-      return vim.notify(
-        'Nothing holding this buffer back',
-        vim.log.levels.INFO,
-        { title = 'AI guard' }
-      )
+      return say('Nothing holding this buffer back', vim.log.levels.INFO)
     end
     local headline = waived
         and 'Waived by :DyAiGuardAllow, and otherwise held back for:'
       or 'Held back from every AI integration:'
-    vim.notify(
+    say(
       headline .. '\n- ' .. table.concat(reasons, '\n- '),
-      waived and vim.log.levels.INFO or vim.log.levels.WARN,
-      { title = 'AI guard' }
+      waived and vim.log.levels.INFO or vim.log.levels.WARN
     )
   end, { desc = 'Why this buffer is kept from the AI integrations' })
 
@@ -478,33 +467,29 @@ M.commands = function()
     local bufnr = vim.api.nvim_get_current_buf()
     if args.bang then
       sensitive.allow(bufnr, false)
-      return vim.notify(
+      return say(
         'The content check is back on for this buffer',
-        vim.log.levels.INFO,
-        { title = 'AI guard' }
+        vim.log.levels.INFO
       )
     end
     if sensitive.is_sensitive_path(vim.api.nvim_buf_get_name(bufnr)) then
-      return vim.notify(
+      return say(
         'Refused: this file is sensitive by its name, not by what is in it',
-        vim.log.levels.ERROR,
-        { title = 'AI guard' }
+        vim.log.levels.ERROR
       )
     end
     local marked = sensitive.marked(bufnr)
     if marked then
-      return vim.notify(
+      return say(
         'Refused: this buffer is sensitive as ' .. marked,
-        vim.log.levels.ERROR,
-        { title = 'AI guard' }
+        vim.log.levels.ERROR
       )
     end
     sensitive.allow(bufnr)
-    vim.notify(
+    say(
       'This buffer may now be sent to the AI integrations; :DyAiGuardAllow! '
         .. 'takes it back',
-      vim.log.levels.WARN,
-      { title = 'AI guard' }
+      vim.log.levels.WARN
     )
   end, {
     bang = true,

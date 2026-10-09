@@ -17,11 +17,7 @@ M.PARALLEL = 4
 
 local forge = require('util.forge')
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Actions' })
-end
+local notify = require('util.notify').titled('Actions')
 
 ---@class DyActionsUses
 ---@field head string What comes before the action: `  - uses: `

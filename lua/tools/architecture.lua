@@ -14,11 +14,7 @@
 --- - docker-compose: each service, and its `depends_on`.
 local M = {}
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Architecture' })
-end
+local notify = require('util.notify').titled('Architecture')
 
 ---@class DyArchNode
 ---@field id string

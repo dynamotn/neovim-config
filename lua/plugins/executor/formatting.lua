@@ -297,10 +297,9 @@ return {
             )
             vim.schedule(
               function()
-                vim.notify(
+                require('util.notify').titled('Format')(
                   message,
-                  vim.log.levels.WARN,
-                  { title = 'conform: injected' }
+                  vim.log.levels.WARN
                 )
               end
             )

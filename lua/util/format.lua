@@ -82,10 +82,11 @@ function M.info(buf)
   if not have then
     lines[#lines + 1] = '\n***No formatters available for this buffer.***'
   end
-  Plugin[enabled and 'info' or 'warn'](
-    table.concat(lines, '\n'),
-    { title = 'DyFormat (' .. (enabled and 'enabled' or 'disabled') .. ')' }
-  )
+  Plugin[enabled and 'info' or 'warn'](table.concat(lines, '\n'), {
+    title = require('util.notify').title(
+      'Format (' .. (enabled and 'enabled' or 'disabled') .. ')'
+    ),
+  })
 end
 
 --- Whether to format `buf` on save: its own `b:autoformat`, else

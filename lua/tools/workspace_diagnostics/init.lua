@@ -15,6 +15,8 @@
 --- - the number of files sent to one server is capped.
 local M = {}
 
+local notify = require('util.notify').titled('Workspace diagnostics')
+
 ---@class tools.workspace_diagnostics.Config
 M.config = {
   -- Most documents one server is sent. Every one of them is held in memory
@@ -185,11 +187,7 @@ end
 ---@param message string
 ---@param level? integer
 local function say(client, message, level)
-  vim.notify(
-    ('%s: %s'):format(client.name, message),
-    level or vim.log.levels.INFO,
-    { title = 'Workspace diagnostics' }
-  )
+  notify(('%s: %s'):format(client.name, message), level or vim.log.levels.INFO)
 end
 
 --- Send every file of the project that `client` handles to it, so that it

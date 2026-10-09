@@ -358,11 +358,7 @@ function M.hurl(request)
   return lines
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'OpenAPI' })
-end
+local notify = require('util.notify').titled('OpenAPI')
 
 --- Hand `on_doc` the document of `bufnr`, decoded: JSON as it is, YAML
 --- through `yq` off the main loop

@@ -35,7 +35,9 @@ describe('tools.diagram.d2.snacks', function()
     stub(
       vim,
       'notify',
-      function(msg, level) table.insert(notified, { msg = msg, level = level }) end
+      function(msg, level, opts)
+        table.insert(notified, { msg = msg, level = level, title = opts.title })
+      end
     )
     stub(vim.env, 'ZELLIJ', nil)
 
@@ -100,7 +102,8 @@ describe('tools.diagram.d2.snacks', function()
     executables.d2 = 0
     preview({ 'a -> b' })
     assert.are.same({}, commands)
-    assert.are.equal('[d2] d2 not found in PATH', notified[1].msg)
+    assert.are.equal('d2 not found in PATH', notified[1].msg)
+    assert.are.equal('DyNeo D2', notified[1].title)
     assert.are.equal(vim.log.levels.ERROR, notified[1].level)
   end)
 
@@ -188,7 +191,7 @@ describe('tools.diagram.d2.snacks', function()
     results.d2 = { code = 1, stderr = 'syntax error' }
     preview({ 'a -> ' })
     vim.wait(1000, function() return #notified > 0 end)
-    assert.are.equal('[d2] failed to render:\nsyntax error', notified[1].msg)
+    assert.are.equal('failed to render:\nsyntax error', notified[1].msg)
     assert.is_nil(command_of('rsvg-convert'))
   end)
 
@@ -247,7 +250,7 @@ describe('tools.diagram.d2.snacks', function()
     )
     preview({ 'a -> b' })
     vim.wait(1000, function() return #notified > 0 end)
-    assert.are.equal('[d2] failed to render:\nbad svg', notified[1].msg)
+    assert.are.equal('failed to render:\nbad svg', notified[1].msg)
     assert.are.same({}, vim.fn.glob(cache_dir .. '/*.svg', true, true))
   end)
 

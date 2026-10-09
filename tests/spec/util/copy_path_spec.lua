@@ -90,7 +90,7 @@ describe('util.copy_path', function()
       vim.fn.setreg('+', 'before')
       copy_path.copy_relative()
       assert.equals('warn', messages[1].level)
-      assert.equals('Copy Path', messages[1].title)
+      assert.equals('DyNeo Copy Path', messages[1].title)
     end)
 
     for _, fn in ipairs({
@@ -103,7 +103,7 @@ describe('util.copy_path', function()
         vim.fn.setreg('+', 'before')
         copy_path[fn]()
         assert.equals('warn', messages[1].level)
-        assert.equals('Copy Path', messages[1].title)
+        assert.equals('DyNeo Copy Path', messages[1].title)
         assert.equals('before', vim.fn.getreg('+'))
       end)
     end

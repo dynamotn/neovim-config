@@ -220,11 +220,7 @@ function M.text(mark)
   return text
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'CI' })
-end
+local notify = require('util.notify').titled('CI')
 
 --- Which forge a pipeline file is for, by its filetype
 ---@param bufnr integer

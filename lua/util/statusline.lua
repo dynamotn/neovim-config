@@ -10,6 +10,8 @@ local languages = require('util.languages')
 
 local M = {}
 
+local notify = require('util.notify').titled('Statusline')
+
 --- Commands that run inside Neovim (`lua`) or come with every system, the
 --- ones `config.languages` marks `mason.enabled = false`: nothing installs
 --- them, so they are neither counted nor listed
@@ -194,10 +196,9 @@ end
 local function mason_install(name, package)
   local ok, registry = pcall(require, 'mason-registry')
   if not (ok and package and registry.has_package(package)) then
-    return vim.notify(
+    return notify(
       ('No Mason package for `%s`, install it by hand'):format(name),
-      vim.log.levels.WARN,
-      { title = 'Statusline' }
+      vim.log.levels.WARN
     )
   end
   vim.cmd.MasonInstall(package)
@@ -336,11 +337,7 @@ function M.pick_lsp(bufnr)
   if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   local candidates = M.lsp_candidates(bufnr)
   if #candidates == 0 then
-    return vim.notify(
-      'No language server for this buffer',
-      vim.log.levels.INFO,
-      { title = 'Statusline' }
-    )
+    return notify('No language server for this buffer', vim.log.levels.INFO)
   end
   -- Worked out here rather than kept as the client: the picker copies its
   -- items, and a client holds userdata that cannot be copied.
@@ -391,11 +388,7 @@ function M.pick_tools(bufnr)
   if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   local candidates = M.tool_candidates(vim.bo[bufnr].filetype)
   if #candidates == 0 then
-    return vim.notify(
-      'No formatter or linter for this buffer',
-      vim.log.levels.INFO,
-      { title = 'Statusline' }
-    )
+    return notify('No formatter or linter for this buffer', vim.log.levels.INFO)
   end
   local items = vim.tbl_map(
     function(candidate)

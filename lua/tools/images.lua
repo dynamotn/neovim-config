@@ -21,11 +21,7 @@ local ns = vim.api.nvim_create_namespace('dy_images')
 --- vulnerability database
 M.TIMEOUT = 10 * 60 * 1000
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Images' })
-end
+local notify = require('util.notify').titled('Images')
 
 ---@class DyImageRef
 ---@field line integer 1-based

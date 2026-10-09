@@ -99,20 +99,21 @@ return {
               vim.list_extend(command, { '--config', vim.env.VALE_CONFIG_PATH })
             end
             table.insert(command, 'sync')
-            vim.notify('Syncing vale styles', vim.log.levels.INFO, {
-              title = 'mason.nvim',
-            })
+            require('util.notify').titled('Mason')(
+              'Syncing vale styles',
+              vim.log.levels.INFO
+            )
             local system = require('util.system')
             system.run(command, { timeout = 5 * 60 * 1000 }, function(result)
               if result.code == 0 then
-                vim.notify('Synced vale styles', vim.log.levels.INFO, {
-                  title = 'mason.nvim',
-                })
+                require('util.notify').titled('Mason')(
+                  'Synced vale styles',
+                  vim.log.levels.INFO
+                )
               else
-                vim.notify(
+                require('util.notify').titled('Mason')(
                   'vale sync failed:\n' .. system.failure(result, 'vale'),
-                  vim.log.levels.ERROR,
-                  { title = 'mason.nvim' }
+                  vim.log.levels.ERROR
                 )
               end
             end)

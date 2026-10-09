@@ -14,6 +14,8 @@
 --- again: a runbook is read in a hurry, and `<localleader>r` is a short key.
 local M = {}
 
+local notify = require('util.notify').titled('Runbook')
+
 --- The command a block of each language runs with, its code appended
 ---@type table<string, string[]>
 M.RUNNERS = {
@@ -234,19 +236,11 @@ end
 function M.allowed(bufnr)
   local name = vim.api.nvim_buf_get_name(bufnr)
   if name == '' or vim.bo[bufnr].buftype ~= '' then
-    vim.notify(
-      'Only the blocks of a Markdown file run',
-      vim.log.levels.WARN,
-      { title = 'Runbook' }
-    )
+    notify('Only the blocks of a Markdown file run', vim.log.levels.WARN)
     return false
   end
   if not vim.bo[bufnr].modifiable then
-    vim.notify(
-      'The buffer cannot take the output',
-      vim.log.levels.WARN,
-      { title = 'Runbook' }
-    )
+    notify('The buffer cannot take the output', vim.log.levels.WARN)
     return false
   end
   if vim.b[bufnr].dy_runbook_allowed then return true end
@@ -459,11 +453,7 @@ record = function(bufnr, run)
   local path = vim.api.nvim_buf_is_valid(bufnr) and vim.b[bufnr].dy_runbook_log
   if not path then return end
   if not append(path, M.log_entry(run)) then
-    vim.notify(
-      'Could not add to the record ' .. path,
-      vim.log.levels.ERROR,
-      { title = 'Runbook' }
-    )
+    notify('Could not add to the record ' .. path, vim.log.levels.ERROR)
   end
 end
 
@@ -489,18 +479,16 @@ function M.record()
   local path = vim.b[bufnr].dy_runbook_log
   if path then
     vim.b[bufnr].dy_runbook_log = nil
-    return vim.notify(
+    return notify(
       'Recording stopped: ' .. vim.fn.fnamemodify(path, ':~'),
-      vim.log.levels.INFO,
-      { title = 'Runbook' }
+      vim.log.levels.INFO
     )
   end
   local file = vim.api.nvim_buf_get_name(bufnr)
   if file == '' then
-    return vim.notify(
+    return notify(
       'Only the runs of a Markdown file are recorded',
-      vim.log.levels.WARN,
-      { title = 'Runbook' }
+      vim.log.levels.WARN
     )
   end
   local now = os.time()
@@ -513,24 +501,16 @@ function M.record()
     '',
   }
   if not append(path, header) then
-    return vim.notify(
-      'Could not start the record ' .. path,
-      vim.log.levels.ERROR,
-      { title = 'Runbook' }
-    )
+    return notify('Could not start the record ' .. path, vim.log.levels.ERROR)
   end
   vim.b[bufnr].dy_runbook_log = path
-  vim.notify(
-    'Recording to ' .. vim.fn.fnamemodify(path, ':~'),
-    vim.log.levels.INFO,
-    { title = 'Runbook' }
-  )
+  notify('Recording to ' .. vim.fn.fnamemodify(path, ':~'), vim.log.levels.INFO)
 end
 
 --- Forget the inputs typed for the buffer, so the next run asks again
 function M.forget_inputs()
   vim.b[vim.api.nvim_get_current_buf()].dy_runbook_inputs = nil
-  vim.notify('Inputs forgotten', vim.log.levels.INFO, { title = 'Runbook' })
+  notify('Inputs forgotten', vim.log.levels.INFO)
 end
 
 --- Run `block` of `bufnr`, and call `on_done` with whether it went well
@@ -541,19 +521,14 @@ function M.run_block(bufnr, block, on_done)
   on_done = on_done or function() end
   local runner = M.RUNNERS[block.lang]
   if not runner then
-    vim.notify(
+    notify(
       ('No runner for a `%s` block'):format(block.lang),
-      vim.log.levels.WARN,
-      { title = 'Runbook' }
+      vim.log.levels.WARN
     )
     return on_done(false)
   end
   if vim.fn.executable(runner[1]) ~= 1 then
-    vim.notify(
-      runner[1] .. ' is not installed',
-      vim.log.levels.ERROR,
-      { title = 'Runbook' }
-    )
+    notify(runner[1] .. ' is not installed', vim.log.levels.ERROR)
     return on_done(false)
   end
   if not M.allowed(bufnr) then return on_done(false) end
@@ -636,11 +611,7 @@ start = function(bufnr, block, runner, code, on_done, written)
   end)
   if not process then
     vim.api.nvim_buf_del_extmark(bufnr, ns, mark)
-    vim.notify(
-      ('%s cannot run'):format(command[1]),
-      vim.log.levels.ERROR,
-      { title = 'Runbook' }
-    )
+    notify(('%s cannot run'):format(command[1]), vim.log.levels.ERROR)
     return on_done(false)
   end
   running[bufnr] = running[bufnr] or {}
@@ -653,11 +624,7 @@ function M.run()
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local block = M.block_at(lines, vim.api.nvim_win_get_cursor(0)[1])
   if not block then
-    return vim.notify(
-      'The cursor is in no code block',
-      vim.log.levels.WARN,
-      { title = 'Runbook' }
-    )
+    return notify('The cursor is in no code block', vim.log.levels.WARN)
   end
   M.run_block(bufnr, block)
 end
@@ -673,9 +640,7 @@ function M.run_all(first)
   local bufnr = vim.api.nvim_get_current_buf()
   local count = #M.blocks(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
   if count < first then
-    return vim.notify('No block to run', vim.log.levels.WARN, {
-      title = 'Runbook',
-    })
+    return notify('No block to run', vim.log.levels.WARN)
   end
   if not M.allowed(bufnr) then return end
   local question = first == 1
@@ -693,18 +658,16 @@ function M.run_all(first)
     local blocks = M.blocks(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
     local block = blocks[index]
     if not block then
-      return vim.notify(
+      return notify(
         ('Ran %d blocks'):format(index - first),
-        vim.log.levels.INFO,
-        { title = 'Runbook' }
+        vim.log.levels.INFO
       )
     end
     M.run_block(bufnr, block, function(ok)
       if ok then return next_block() end
-      vim.notify(
+      notify(
         ('Stopped at block %d, on line %d'):format(index, block.open),
-        vim.log.levels.WARN,
-        { title = 'Runbook' }
+        vim.log.levels.WARN
       )
     end)
   end
@@ -722,11 +685,7 @@ function M.run_from()
     -- The block under the cursor, or the first one below it
     if block.close >= row then return M.run_all(index) end
   end
-  vim.notify(
-    'No block from the cursor down',
-    vim.log.levels.WARN,
-    { title = 'Runbook' }
-  )
+  notify('No block from the cursor down', vim.log.levels.WARN)
 end
 
 --- Remove every `output` fence of the buffer
@@ -763,11 +722,7 @@ function M.command(args)
     inputs = M.forget_inputs,
   }
   if not actions[sub] then
-    return vim.notify(
-      'Unknown subcommand: ' .. sub,
-      vim.log.levels.ERROR,
-      { title = 'Runbook' }
-    )
+    return notify('Unknown subcommand: ' .. sub, vim.log.levels.ERROR)
   end
   actions[sub]()
 end

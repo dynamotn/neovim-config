@@ -14,11 +14,7 @@ local M = {}
 --- Milliseconds a `state` command may take: it reads a remote backend
 M.TIMEOUT = 2 * 60 * 1000
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Terraform state' })
-end
+local notify = require('util.notify').titled('Terraform state')
 
 ---@class DyTfBlock
 ---@field kind 'resource'|'data'|'module'

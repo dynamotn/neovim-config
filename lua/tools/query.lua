@@ -49,11 +49,7 @@ function M.argv(tool, expr)
   return { 'jq', expr }
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Query' })
-end
+local notify = require('util.notify').titled('Query')
 
 --- Lines to show for what a run printed, cut at `M.MAX_OUTPUT`
 ---@param text string

@@ -20,6 +20,8 @@
 --- lazy.nvim resolved it, since the alternative is not installing it at all.
 local M = {}
 
+local notify = require('util.notify').titled('Quarantine')
+
 --- The wait when `DyNeo.quarantine_window` says nothing, the same week the npm,
 --- bun, pnpm and uv configurations give the rest of these dotfiles
 local DEFAULT_WINDOW = 7 * 24 * 60 * 60
@@ -429,19 +431,14 @@ function M.command()
         args.fargs[2]
       )
     elseif args.fargs[1] then
-      return vim.notify(
+      return notify(
         'Unknown subcommand: ' .. args.fargs[1],
-        vim.log.levels.ERROR,
-        { title = 'Quarantine' }
+        vim.log.levels.ERROR
       )
     end
     local rows = M.held()
     if #rows == 0 then
-      return vim.notify(
-        'Nothing is being held back',
-        vim.log.levels.INFO,
-        { title = 'Quarantine' }
-      )
+      return notify('Nothing is being held back', vim.log.levels.INFO)
     end
     local lines = vim.tbl_map(function(row)
       local hours = math.ceil(row.clears / 3600)
@@ -454,11 +451,10 @@ function M.command()
         left
       )
     end, rows)
-    vim.notify(
+    notify(
       ('Held back for %d days:\n'):format(M.window() / 86400)
         .. table.concat(lines, '\n'),
-      vim.log.levels.INFO,
-      { title = 'Quarantine' }
+      vim.log.levels.INFO
     )
   end, {
     nargs = '*',

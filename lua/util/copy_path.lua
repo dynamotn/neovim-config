@@ -122,7 +122,7 @@ function M.copy(get_path, desc)
   if not text then
     Plugin.warn(
       'Current buffer is not attached to a file!',
-      { title = 'Copy Path' }
+      { title = require('util.notify').title('Copy Path') }
     )
     return
   end

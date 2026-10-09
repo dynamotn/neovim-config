@@ -13,11 +13,7 @@ M.DIRS = { 'docs/adr', 'doc/adr', 'docs/decisions', 'adr' }
 --- The statuses a record can have
 M.STATUSES = { 'Proposed', 'Accepted', 'Deprecated', 'Superseded' }
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'ADR' })
-end
+local notify = require('util.notify').titled('ADR')
 
 --- A title as a file name: `Use Postgres for jobs` -> `use-postgres-for-jobs`
 ---@param title string

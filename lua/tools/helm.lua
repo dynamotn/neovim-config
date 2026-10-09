@@ -13,11 +13,7 @@ local M = {}
 
 local ns = vim.api.nvim_create_namespace('dy_helm')
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Helm' })
-end
+local notify = require('util.notify').titled('Helm')
 
 --- Every `.Values.a.b` path of `text`, `$.Values` included, as dotted strings
 ---@param text string

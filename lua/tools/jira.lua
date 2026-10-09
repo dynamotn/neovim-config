@@ -46,11 +46,7 @@ M.RUN_TIMEOUT = 30000
 ---@field status string
 ---@field summary string
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Jira' })
-end
+local notify = require('util.notify').titled('Jira')
 
 --- The columns `parse` reads, in this order; the summary comes last so a
 --- delimiter inside it stays part of it

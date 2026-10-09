@@ -90,11 +90,7 @@ function M.decrypt_command(kind, file)
   return { 'ansible-vault', 'decrypt', '--output', '-', file }
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Encrypted file' })
-end
+local notify = require('util.notify').titled('Encrypted file')
 
 --- What to say when the tool of `kind` failed
 ---@param kind DyEncryptedKind

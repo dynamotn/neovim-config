@@ -12,6 +12,8 @@
 --- flag nobody expected in a plugin that never did it before.
 local M = {}
 
+local notify = require('util.notify').titled('Quarantine')
+
 --- What a line added by an update is flagged for, by Lua pattern
 ---@type { name: string, patterns: string[] }[]
 M.rules = {
@@ -559,11 +561,7 @@ function M.show(rows, window, name)
 
   if name and name ~= '' then
     if not by_name[name] then
-      return vim.notify(
-        name .. ' has no update waiting',
-        vim.log.levels.WARN,
-        { title = 'Quarantine' }
-      )
+      return notify(name .. ' has no update waiting', vim.log.levels.WARN)
     end
     return M.open_diff(by_name[name])
   end

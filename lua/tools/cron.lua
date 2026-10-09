@@ -10,6 +10,8 @@
 --- scan of the buffer, and that is capped at `M.MAX_LINES`.
 local M = {}
 
+local notify = require('util.notify').titled('Cron')
+
 --- Namespace of the text at the end of each line
 M.NAMESPACE = vim.api.nvim_create_namespace('dy_cron')
 --- Namespace of the diagnostics
@@ -609,11 +611,7 @@ function M.command(args)
     M.attach(0)
   end
   if not entry then
-    return vim.notify(
-      'No cron schedule on this line',
-      vim.log.levels.WARN,
-      { title = 'Cron' }
-    )
+    return notify('No cron schedule on this line', vim.log.levels.WARN)
   end
   local text, problems = M.explain(entry, os.time())
   local lines = { '`' .. entry.expr .. '`' }
@@ -627,7 +625,7 @@ function M.command(args)
         or vim.log.levels.WARN
     )
   end
-  vim.notify(table.concat(lines, '\n'), level, { title = 'Cron' })
+  notify(table.concat(lines, '\n'), level)
 end
 
 return M

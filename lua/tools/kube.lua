@@ -80,11 +80,7 @@ function M.kubectl_command(verb, target)
   return vim.list_extend(command, { '-f', target.file })
 end
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'Kubernetes' })
-end
+local notify = require('util.notify').titled('Kubernetes')
 
 --- Run `command` in `dir`, and hand its result over on the main loop
 ---@param command string[]

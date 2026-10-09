@@ -26,11 +26,7 @@ M.MAX_IMPORTS = 200
 local preview_buf = nil
 local preview_win = nil
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify('[d2] ' .. msg, level or vim.log.levels.INFO)
-end
+local notify = require('util.notify').titled('D2')
 
 --- Where renders are kept, made on first use
 ---@return string

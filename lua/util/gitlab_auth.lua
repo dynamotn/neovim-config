@@ -9,6 +9,8 @@
 --- kept or shown here.
 local M = {}
 
+local notify = require('util.notify').titled('GitLab')
+
 --- The host of a git remote URL, for `https://`, `ssh://` and scp-like URLs
 ---@param url string
 ---@return string?
@@ -86,7 +88,7 @@ function M.auth(fallback, remote)
     local err = ('No GitLab token for %s: run `glab auth login`, or set GITLAB_TOKEN'):format(
       host or remote
     )
-    vim.notify(err, vim.log.levels.ERROR, { title = 'GitLab' })
+    notify(err, vim.log.levels.ERROR)
     return nil, nil, err
   end
   return token, url

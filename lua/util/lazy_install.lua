@@ -10,6 +10,8 @@
 
 local M = {}
 
+local notify = require('util.notify').titled('Install')
+
 ---@alias DyFileTypeHandler fun(args: vim.api.keyset.create_autocmd.callback_args)
 
 ---@type table<string, DyFileTypeHandler[]>
@@ -46,13 +48,7 @@ M.on_filetype = function(filetypes, handler)
           -- A single dispatcher has to keep that up on its own, or one broken
           -- handler takes every later one down with it.
           local ok, err = pcall(matched, args)
-          if not ok then
-            vim.notify(
-              tostring(err),
-              vim.log.levels.ERROR,
-              { title = 'lazy install' }
-            )
-          end
+          if not ok then notify(tostring(err), vim.log.levels.ERROR) end
         end
       end
     end,
