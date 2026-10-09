@@ -17,6 +17,9 @@ local TIMEOUT = 5000
 --- the word, and the next one is tried as usual.
 local BACKOFF = 5 * 60 * 1000
 
+--- Issue bodies read at once, all from the one Jira
+local PARALLEL = 4
+
 --- `vim.uv.now()` before which the source answers nothing, without asking
 local quiet_until = 0
 
@@ -28,13 +31,11 @@ local quiet_until = 0
 ---@param args string[]
 ---@param on_output fun(lines: string[], hung: boolean)
 local function jira(args, on_output)
-  local ok = pcall(
-    vim.system,
+  require('util.system').run(
     vim.list_extend({ 'jira' }, args),
-    { text = true, timeout = TIMEOUT },
+    { timeout = TIMEOUT },
     function(result)
-      -- Killed for the timeout: a signal, and 124 as `timeout(1)` reports it
-      local hung = (result.signal or 0) ~= 0 or result.code == 124
+      local hung = result.timed_out or result.missing
       if result.code ~= 0 then return on_output({}, hung) end
       on_output(
         vim.split(result.stdout or '', '\n', { trimempty = true }),
@@ -42,7 +43,6 @@ local function jira(args, on_output)
       )
     end
   )
-  if not ok then on_output({}, true) end
 end
 
 --- Split one `--plain` row into the two columns the candidate is built from
@@ -124,8 +124,10 @@ local function search(word, on_items)
     -- Nothing to read still has to answer, or the request never completes
     if #keys == 0 then return finish(items) end
 
-    local pending = #keys
-    for _, key in ipairs(keys) do
+    -- A few reads at a time, all to one Jira. Every item is settled before
+    -- anything is handed over, so nothing is still being written to after.
+    table.sort(keys)
+    require('util.system').each(keys, PARALLEL, function(key, done)
       jira({ 'issue', 'view', '--plain', key }, function(lines)
         if #lines > 0 then
           local body = table.concat(
@@ -136,12 +138,9 @@ local function search(word, on_items)
             item.documentation.value = body
           end
         end
-        pending = pending - 1
-        -- Every item is settled before anything is handed over, so
-        -- nothing is still being written to afterwards
-        if pending == 0 then finish(items) end
+        done()
       end)
-    end
+    end, function() finish(items) end)
   end
 
   local rows = {}

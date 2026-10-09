@@ -140,7 +140,7 @@ function M.run(cmd, opts, on_done)
       missing = false,
     })
   end)
-  if not ok then
+  if not ok or not started then
     never_started(tostring(started))
     return nil
   end

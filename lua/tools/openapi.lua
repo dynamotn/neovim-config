@@ -383,23 +383,24 @@ function M.decode(bufnr, on_doc)
   if vim.fn.executable('yq') ~= 1 then
     return on_doc(nil, 'yq is needed to read an OpenAPI document in YAML')
   end
-  local ok, err = pcall(
-    vim.system,
+  local system = require('util.system')
+  system.run(
     { 'yq', '-o=json', '.' },
-    { stdin = source, text = true, timeout = 10000 },
+    { stdin = source, timeout = 10000 },
     function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then
-          return on_doc(
-            nil,
-            'yq could not read it: ' .. vim.trim(result.stderr or '')
-          )
-        end
-        decode(result.stdout or '')
-      end)
+      if result.code ~= 0 or result.cut then
+        return on_doc(
+          nil,
+          'yq could not read it: '
+            .. (
+              result.cut and 'more output than can be read'
+              or system.failure(result, 'yq')
+            )
+        )
+      end
+      decode(result.stdout or '')
     end
   )
-  if not ok then on_doc(nil, 'yq could not run: ' .. tostring(err)) end
 end
 
 --- Open the request of the operation under the cursor, for `kind`
@@ -537,23 +538,22 @@ function M.diff(bufnr, rev)
   -- The buffer as it is now: what is compared, however long the lookup takes
   local current = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local modified = vim.bo[bufnr].modified
-  local ok_show = pcall(
-    vim.system,
+  require('util.system').run(
     { 'git', 'show', ('%s:./%s'):format(rev, name) },
-    { cwd = dir, text = true, timeout = 10000 },
+    { cwd = dir, timeout = 10000 },
     function(old)
-      vim.schedule(function()
-        if old.code ~= 0 then
-          return notify(
-            ('%s is not in git at %s'):format(name, rev),
-            vim.log.levels.WARN
-          )
-        end
-        M.compare(bufnr, rev, file, old.stdout or '', current, modified)
-      end)
+      if old.missing then
+        return notify('git could not run', vim.log.levels.ERROR)
+      end
+      if old.code ~= 0 or old.cut then
+        return notify(
+          ('%s is not in git at %s'):format(name, rev),
+          vim.log.levels.WARN
+        )
+      end
+      M.compare(bufnr, rev, file, old.stdout or '', current, modified)
     end
   )
-  if not ok_show then notify('git could not run', vim.log.levels.ERROR) end
 end
 
 --- Compare `base_text`, the document at `rev`, with `current`, and show what
@@ -605,47 +605,45 @@ function M.compare(bufnr, rev, file, base_text, current, modified)
       end
     end,
   })
-  local started = pcall(
-    vim.system,
+  local system = require('util.system')
+  local started = system.run(
     { 'oasdiff', 'breaking', base, revision, '--format', 'json' },
-    { text = true, timeout = 60000 },
+    { timeout = 60000 },
     function(result)
-      vim.schedule(function()
-        remove()
-        if not vim.api.nvim_buf_is_valid(bufnr) then return end
-        -- A failed run says nothing about breaking: never an all-clear
-        if result.code ~= 0 then
-          return notify(
-            'oasdiff failed: '
-              .. vim.trim(
-                result.stderr ~= '' and result.stderr
-                  or ('exit ' .. result.code)
-              ),
-            vim.log.levels.ERROR
-          )
-        end
-        local ok, changes = pcall(
-          vim.json.decode,
-          result.stdout ~= '' and result.stdout or '[]',
-          { luanil = { object = true, array = true } }
+      remove()
+      if result.missing or not vim.api.nvim_buf_is_valid(bufnr) then return end
+      -- A failed run says nothing about breaking: never an all-clear
+      if result.code ~= 0 or result.cut then
+        return notify(
+          'oasdiff failed: '
+            .. (
+              result.cut and 'more output than can be read'
+              or system.failure(result, 'oasdiff')
+            ),
+          vim.log.levels.ERROR
         )
-        if not ok or type(changes) ~= 'table' then
-          return notify(
-            'oasdiff printed something that is not JSON',
-            vim.log.levels.ERROR
-          )
-        end
-        local diagnostics = M.diff_diagnostics(
-          changes,
-          vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      end
+      local ok, changes = pcall(
+        vim.json.decode,
+        result.stdout ~= '' and result.stdout or '[]',
+        { luanil = { object = true, array = true } }
+      )
+      if not ok or type(changes) ~= 'table' then
+        return notify(
+          'oasdiff printed something that is not JSON',
+          vim.log.levels.ERROR
         )
-        vim.diagnostic.set(diff_ns, bufnr, diagnostics)
-        notify(
-          #diagnostics == 0 and ('Nothing breaks since %s'):format(rev)
-            or ('%d changes since %s'):format(#diagnostics, rev),
-          #diagnostics > 0 and vim.log.levels.WARN or nil
-        )
-      end)
+      end
+      local diagnostics = M.diff_diagnostics(
+        changes,
+        vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      )
+      vim.diagnostic.set(diff_ns, bufnr, diagnostics)
+      notify(
+        #diagnostics == 0 and ('Nothing breaks since %s'):format(rev)
+          or ('%d changes since %s'):format(#diagnostics, rev),
+        #diagnostics > 0 and vim.log.levels.WARN or nil
+      )
     end
   )
   if not started then

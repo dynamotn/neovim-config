@@ -114,41 +114,43 @@ local function load_crds(callback)
   end
   if vim.fn.executable('curl') == 0 then return callback(cached) end
   notify('Fetching the CRDs catalog…')
-  vim.system(
-    {
-      'curl',
-      '-fsSL',
-      '--max-time',
-      '20',
-      '-H',
-      'Accept: application/vnd.github+json',
-      CRDS_TREE,
-    },
-    { text = true },
-    vim.schedule_wrap(function(out)
-      local ok, tree = pcall(vim.json.decode, out.stdout or '')
-      if out.code ~= 0 or not ok or type(tree.tree) ~= 'table' then
-        notify('Cannot fetch the CRDs catalog', vim.log.levels.WARN)
-        -- Not again this session: offline, each pick would wait 20 s
-        crds = cached or {}
-        return callback(crds)
+  require('util.system').run({
+    'curl',
+    '-fsSL',
+    '--max-time',
+    '20',
+    '-H',
+    'Accept: application/vnd.github+json',
+    CRDS_TREE,
+  }, { timeout = 30000, max_bytes = 32 * 1024 * 1024 }, function(out)
+    local ok, tree = pcall(vim.json.decode, out.stdout or '')
+    if
+      out.code ~= 0
+      or out.cut
+      or not ok
+      or type(tree) ~= 'table'
+      or type(tree.tree) ~= 'table'
+    then
+      notify('Cannot fetch the CRDs catalog', vim.log.levels.WARN)
+      -- Not again this session: offline, each pick would wait 20 s
+      crds = cached or {}
+      return callback(crds)
+    end
+    local paths = {}
+    for _, node in ipairs(tree.tree) do
+      if node.path:match('^[^/]+/[^/]+%.json$') then
+        table.insert(paths, node.path)
       end
-      local paths = {}
-      for _, node in ipairs(tree.tree) do
-        if node.path:match('^[^/]+/[^/]+%.json$') then
-          table.insert(paths, node.path)
-        end
-      end
-      vim.fn.mkdir(vim.fs.dirname(CRDS_CACHE), 'p')
-      local fd = io.open(CRDS_CACHE, 'w')
-      if fd then
-        fd:write(vim.json.encode(paths))
-        fd:close()
-      end
-      crds = paths
-      callback(crds)
-    end)
-  )
+    end
+    vim.fn.mkdir(vim.fs.dirname(CRDS_CACHE), 'p')
+    local fd = io.open(CRDS_CACHE, 'w')
+    if fd then
+      fd:write(vim.json.encode(paths))
+      fd:close()
+    end
+    crds = paths
+    callback(crds)
+  end)
 end
 
 -- Kubernetes -----------------------------------------------------------------
@@ -451,14 +453,12 @@ local function find_local(bufnr, callback)
     }
     vim.list_extend(cmd, dirs)
     -- A project as large as `$HOME` must not hold the picker back
-    vim.system(
+    require('util.system').run(
       cmd,
-      { text = true, timeout = 3000 },
-      vim.schedule_wrap(
-        function(out)
-          finish(vim.split(out.stdout or '', '\n', { trimempty = true }))
-        end
-      )
+      { timeout = 3000 },
+      function(out)
+        finish(vim.split(out.stdout or '', '\n', { trimempty = true }))
+      end
     )
     return
   end

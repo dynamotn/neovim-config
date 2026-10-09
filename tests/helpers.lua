@@ -31,6 +31,36 @@ M.stub = function(tbl, key, value)
   return function() tbl[key] = original end
 end
 
+--- A stand-in for `vim.system`, to `stub` in its place
+---
+--- `reply(cmd, opts)` gives the result. Its output reaches the readers the
+--- caller gave, the way `vim.system` streams it, and the exit callback gets
+--- what is left, so `util.system.run` and plain callers both read it.
+---@param reply fun(cmd: string[], opts: table): table?
+---@return fun(cmd: string[], opts?: table, on_exit?: fun(result: table)): table
+M.system_double = function(reply)
+  return function(cmd, opts, on_exit)
+    opts = opts or {}
+    local result = vim.tbl_extend(
+      'keep',
+      vim.deepcopy(reply(cmd, opts) or {}),
+      { code = 0, signal = 0 }
+    )
+    for _, stream in ipairs({ 'stdout', 'stderr' }) do
+      if type(opts[stream]) == 'function' then
+        if result[stream] then opts[stream](nil, result[stream]) end
+        opts[stream](nil, nil)
+        result[stream] = nil
+      end
+    end
+    if on_exit then on_exit(result) end
+    return {
+      kill = function() end,
+      wait = function() return result end,
+    }
+  end
+end
+
 --- Make a scratch directory, removed by the returned function
 ---@return string path
 ---@return fun() cleanup

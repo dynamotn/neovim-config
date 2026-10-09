@@ -11,13 +11,15 @@ describe('tools.completion.jira', function()
     commands, options, replies = {}, {}, {}
     installed = true
     -- Answers by the first argument after `jira issue`, or by the JQL
-    restore = h.stub(vim, 'system', function(cmd, opts, on_exit)
-      table.insert(commands, cmd)
-      table.insert(options, opts)
-      local reply = replies[cmd[#cmd]] or replies[cmd[3]] or { code = 1 }
-      on_exit(reply)
-      return {}
-    end)
+    restore = h.stub(
+      vim,
+      'system',
+      h.system_double(function(cmd, opts)
+        table.insert(commands, cmd)
+        table.insert(options, opts)
+        return replies[cmd[#cmd]] or replies[cmd[3]] or { code = 1 }
+      end)
+    )
     local executable = vim.fn.executable
     restore_executable = h.stub(vim.fn, 'executable', function(name)
       if name == 'jira' then return installed and 1 or 0 end

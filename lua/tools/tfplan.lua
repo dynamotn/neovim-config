@@ -25,6 +25,9 @@ M.TIMEOUT = 15 * 60 * 1000
 --- Milliseconds `infracost` may take to price a plan
 M.COST_TIMEOUT = 5 * 60 * 1000
 
+--- The most of `show -json` read; the plan of a large state runs to many MiB
+M.MAX_PLAN = 256 * 1024 * 1024
+
 ---@alias DyTfAction 'create'|'update'|'replace'|'destroy'|'read'|'forget'
 
 ---@class DyTfChange
@@ -646,6 +649,9 @@ function M.run(mode)
     cleanup()
     local err = vim.trim(result.stderr or '')
     if err == '' then err = vim.trim(result.stdout or '') end
+    if result.timed_out then err = 'no answer in time' end
+    if result.cut then err = 'more output than can be read' end
+    if result.missing then err = result.stderr end
     notify(what .. ' failed:\n' .. err, vim.log.levels.ERROR)
   end
 
@@ -660,7 +666,7 @@ function M.run(mode)
         vim.log.levels.ERROR
       )
     end
-    vim.system({
+    require('util.system').run({
       'infracost',
       'breakdown',
       '--path',
@@ -668,28 +674,26 @@ function M.run(mode)
       '--format',
       'json',
       '--no-color',
-    }, { cwd = dir, text = true, timeout = M.COST_TIMEOUT }, function(
-      result
-    )
-      vim.schedule(function()
-        if result.code ~= 0 then return failed('infracost', result) end
-        cleanup()
-        -- A `null` is nil, not a truthy `vim.NIL` that `ipairs` chokes on
-        local ok, breakdown = pcall(
-          vim.json.decode,
-          result.stdout or '',
-          { luanil = { object = true, array = true } }
+    }, { cwd = dir, timeout = M.COST_TIMEOUT }, function(result)
+      if result.code ~= 0 or result.cut then
+        return failed('infracost', result)
+      end
+      cleanup()
+      -- A `null` is nil, not a truthy `vim.NIL` that `ipairs` chokes on
+      local ok, breakdown = pcall(
+        vim.json.decode,
+        result.stdout or '',
+        { luanil = { object = true, array = true } }
+      )
+      if not ok or type(breakdown) ~= 'table' then
+        return notify(
+          'infracost printed something that is not JSON',
+          vim.log.levels.ERROR
         )
-        if not ok or type(breakdown) ~= 'table' then
-          return notify(
-            'infracost printed something that is not JSON',
-            vim.log.levels.ERROR
-          )
-        end
-        local costs = M.costs(breakdown)
-        M.show_costs(costs, blocks)
-        notify('Monthly cost: ' .. M.cost_text(costs.total, costs.currency))
-      end)
+      end
+      local costs = M.costs(breakdown)
+      M.show_costs(costs, blocks)
+      notify('Monthly cost: ' .. M.cost_text(costs.total, costs.currency))
     end)
   end
 
@@ -697,64 +701,61 @@ function M.run(mode)
   if mode == 'drift' then table.insert(command, '-refresh-only') end
   table.insert(command, '-out=' .. planfile)
 
-  vim.system(
+  require('util.system').run(
     command,
-    { cwd = dir, text = true, timeout = M.TIMEOUT },
+    { cwd = dir, timeout = M.TIMEOUT },
     function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then return failed('plan', result) end
-        vim.system(
-          { bin, 'show', '-json', planfile },
-          { cwd = dir, text = true, timeout = M.TIMEOUT },
-          function(show)
-            vim.schedule(function()
-              if show.code ~= 0 then return failed('show', show) end
-              -- The binary plan is read; only `price` still needs the JSON
-              vim.fn.delete(planfile)
-              local ok, plan = pcall(vim.json.decode, show.stdout or '')
-              if not ok or type(plan) ~= 'table' then
-                cleanup()
-                return notify(
-                  'show -json printed something that is not JSON',
-                  vim.log.levels.ERROR
-                )
-              end
-              local blocks = M.index(dir)
-              if mode == 'drift' then
-                cleanup()
-                local changes = M.changes(plan, 'resource_drift')
-                local summary = M.drift_summary(changes)
-                M.show(
-                  M.entries(changes, blocks, true),
-                  'Terraform drift: ' .. summary,
-                  'drift'
-                )
-                return notify(summary)
-              end
-              local changes = M.changes(plan)
-              local summary = M.summary(changes)
-              local entries = M.entries(changes, blocks)
-              if mode == 'impact' then
-                local reached =
-                  M.affected(changes, M.dependents(plan.configuration))
-                local count = #vim.tbl_keys(reached)
-                vim.list_extend(entries, M.impact_entries(reached, blocks))
-                summary = summary
-                  .. ('; %d blocks depend on what is replaced or destroyed'):format(
-                    count
-                  )
-              end
-              M.show(entries, 'Terraform plan: ' .. summary)
-              notify(summary)
-              if mode == 'cost' then
-                price(show.stdout, blocks)
-              else
-                cleanup()
-              end
-            end)
+      if result.code ~= 0 then return failed('plan', result) end
+      require('util.system').run(
+        { bin, 'show', '-json', planfile },
+        { cwd = dir, timeout = M.TIMEOUT, max_bytes = M.MAX_PLAN },
+        function(show)
+          -- Half a plan would show fewer changes than there are
+          if show.code ~= 0 or show.cut then return failed('show', show) end
+          -- The binary plan is read; only `price` still needs the JSON
+          vim.fn.delete(planfile)
+          local ok, plan = pcall(vim.json.decode, show.stdout or '')
+          if not ok or type(plan) ~= 'table' then
+            cleanup()
+            return notify(
+              'show -json printed something that is not JSON',
+              vim.log.levels.ERROR
+            )
           end
-        )
-      end)
+          local blocks = M.index(dir)
+          if mode == 'drift' then
+            cleanup()
+            local changes = M.changes(plan, 'resource_drift')
+            local summary = M.drift_summary(changes)
+            M.show(
+              M.entries(changes, blocks, true),
+              'Terraform drift: ' .. summary,
+              'drift'
+            )
+            return notify(summary)
+          end
+          local changes = M.changes(plan)
+          local summary = M.summary(changes)
+          local entries = M.entries(changes, blocks)
+          if mode == 'impact' then
+            local reached =
+              M.affected(changes, M.dependents(plan.configuration))
+            local count = #vim.tbl_keys(reached)
+            vim.list_extend(entries, M.impact_entries(reached, blocks))
+            summary = summary
+              .. ('; %d blocks depend on what is replaced or destroyed'):format(
+                count
+              )
+          end
+          M.show(entries, 'Terraform plan: ' .. summary)
+          notify(summary)
+          if mode == 'cost' then
+            price(show.stdout, blocks)
+          else
+            cleanup()
+          end
+        end
+      )
     end
   )
 end

@@ -81,10 +81,10 @@ function M.run(query)
   ) .. '\n'
   query.generation = query.generation + 1
   local generation = query.generation
-  local ok, job = pcall(
-    vim.system,
+  -- Read no further than is shown: `repeat(.)` prints for as long as it may
+  query.job = require('util.system').run(
     M.argv(query.tool, expr),
-    { stdin = input, text = true, timeout = M.TIMEOUT },
+    { stdin = input, timeout = M.TIMEOUT, max_bytes = M.MAX_OUTPUT + 1 },
     function(result)
       vim.schedule(function()
         -- A later run took over, or the playground was closed
@@ -94,15 +94,16 @@ function M.run(query)
         query.job = nil
         local status
         local lines, cut
-        if result.code == 0 then
+        if result.code == 0 or result.cut then
           lines, cut = M.output(result.stdout or '')
+          cut = cut or result.cut
           status = ('%s: %d lines'):format(query.tool, #lines)
           if cut then
             status = status .. (', cut at %d KiB'):format(M.MAX_OUTPUT / 1024)
           end
         else
           lines = M.output(result.stderr or '')
-          status = result.code == 124 and query.tool .. ': timed out'
+          status = result.timed_out and query.tool .. ': timed out'
             or query.tool .. ': error'
         end
         require('util.scratch').set(query.result, lines)
@@ -112,8 +113,6 @@ function M.run(query)
       end)
     end
   )
-  if not ok then return notify(tostring(job), vim.log.levels.ERROR) end
-  query.job = job
 end
 
 --- Run once the typing has stopped

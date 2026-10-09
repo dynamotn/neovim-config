@@ -252,36 +252,15 @@ local function git(dir, args, callback)
   -- Paths as they are, never quoted, for `scan` to read
   local command = { 'git', '-c', 'core.quotePath=false', '-C', dir }
   vim.list_extend(command, args)
-  local chunks, size, cut = {}, 0, false
-  ---@type vim.SystemObj
-  local process
-  local ok = pcall(function()
-    process = vim.system(command, {
-      text = true,
-      timeout = M.TIMEOUT,
-      stdout = function(_, data)
-        if not data or cut then return end
-        size = size + #data
-        if size > M.MAX_OUTPUT then
-          cut = true
-          table.insert(chunks, data:sub(1, #data - (size - M.MAX_OUTPUT)))
-          process:kill('sigterm')
-        else
-          table.insert(chunks, data)
-        end
-      end,
-    }, function(result)
-      vim.schedule(function()
-        -- Stopped for its size is not a failure
-        if not cut and result.code ~= 0 then return callback(nil) end
-        callback(
-          vim.split(table.concat(chunks), '\n', { trimempty = true }),
-          cut
-        )
-      end)
-    end)
-  end)
-  if not ok then vim.schedule(function() callback(nil) end) end
+  require('util.system').run(
+    command,
+    { timeout = M.TIMEOUT, max_bytes = M.MAX_OUTPUT },
+    function(result)
+      -- Stopped for its size is not a failure
+      if not result.cut and result.code ~= 0 then return callback(nil) end
+      callback(vim.split(result.stdout, '\n', { trimempty = true }), result.cut)
+    end
+  )
 end
 
 --- The commits `row` would bring in, newest first, as `short date subject`

@@ -1030,10 +1030,14 @@ describe('util.yaml_schema', function()
           if name == 'fd' or name == 'fdfind' then return 0 end
           return executable(name)
         end)
-        stub(vim, 'system', function(cmd, _, on_exit)
-          table.insert(system_calls, cmd)
-          on_exit(curl_output)
-        end)
+        stub(
+          vim,
+          'system',
+          h.system_double(function(cmd)
+            table.insert(system_calls, cmd)
+            return curl_output
+          end)
+        )
       end)
 
       it('is read from a fresh cache without fetching', function()
