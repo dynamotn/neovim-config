@@ -148,15 +148,21 @@ return {
       -- run through `uri_from_fname` a second time. `git check-ignore` answers
       -- through its exit status -- 0 ignored, 1 not ignored, 128 no repository
       -- -- and it is run from the file's own folder, so the answer follows the
-      -- file instead of wherever Neovim happens to be.
+      -- file instead of wherever Neovim happens to be. The server waits on
+      -- the answer, so it is waited for here, but not for long: a git that
+      -- hangs (a lock, a slow filesystem) answers "not ignored".
       local path = vim.uri_to_fname(file_uri)
-      local git = vim
-        .system(
-          { 'git', 'check-ignore', '--quiet', path },
-          { cwd = vim.fs.dirname(path) }
-        )
-        :wait()
-      return git.code == 0
+      local ok, git = pcall(
+        function()
+          return vim
+            .system(
+              { 'git', 'check-ignore', '--quiet', path },
+              { cwd = vim.fs.dirname(path) }
+            )
+            :wait(2000)
+        end
+      )
+      return ok and git.code == 0
     end,
     ['sonarlint/listFilesInFolder'] = function(_, params, _, _)
       local folder = vim.uri_to_fname(params.folderUri)
