@@ -561,6 +561,17 @@ main loop, so a big repository does not freeze the editor, and each document
 is closed again before Neovim opens the same file for real, so no server ever
 sees two `didOpen` for one URI.
 
+Project overview                                               *dyneo-project*
+
+`<leader>pp`, or |:DyProject|, opens one page on the state of the project
+of the current buffer: the branch, how far ahead and behind its upstream,
+and the files changed; the diagnostics of its open buffers, by file; the
+tasks overseer ran; the open merge or pull requests and the last pipeline of
+the branch, from the forge of |dyneo-ci|; and the Jira issues assigned
+(|:Jira|).  Each section fills in as its answer comes, or says why it
+cannot.  `<CR>` opens the file, the page or the issue of the line, `r` asks
+everything again, `q` closes it.
+
 5.9 Integrations                                          *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
@@ -713,6 +724,10 @@ Command-line abbreviations, which only fire as a whole command line, so a
 
                                                                      *:CiLint*
 :CiLint                 Have GitLab check this saved `.gitlab-ci.yml`.
+
+                                                                  *:DyProject*
+:DyProject              The state of the project on one page.  See
+                        |dyneo-project|.
 
                                                                       *:DyLog*
 :DyLog {file}           Read {file} as log records.

@@ -7,6 +7,7 @@
 :DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
 :DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
 :DyNeoRoot	dyneo.txt	/*:DyNeoRoot*
+:DyProject	dyneo.txt	/*:DyProject*
 :DySbom	dyneo.txt	/*:DySbom*
 :DySpell	dyneo.txt	/*:DySpell*
 :EncryptedDiff	dyneo.txt	/*:EncryptedDiff*
@@ -59,6 +60,7 @@ dyneo-mappings	dyneo.txt	/*dyneo-mappings*
 dyneo-openapi	dyneo.txt	/*dyneo-openapi*
 dyneo-per-machine	dyneo.txt	/*dyneo-per-machine*
 dyneo-policy	dyneo.txt	/*dyneo-policy*
+dyneo-project	dyneo.txt	/*dyneo-project*
 dyneo-quarantine	dyneo.txt	/*dyneo-quarantine*
 dyneo-requirements	dyneo.txt	/*dyneo-requirements*
 dyneo-runbook	dyneo.txt	/*dyneo-runbook*

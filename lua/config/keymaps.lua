@@ -316,6 +316,9 @@ map({"n", "x" }, "<leader>gY", function()
   Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
 end, { desc = "Git Browse (copy)" })
 
+-- the state of the project on one page (`tools.project`)
+map("n", "<leader>pp", "<cmd>DyProject<cr>", { desc = "Project Overview" })
+
 -- jira, on the issue the branch is named after or one picked (`tools.jira`)
 map("n", "<leader>pjj", "<cmd>Jira<cr>", { desc = "My Issues" })
 map("n", "<leader>pjs", "<cmd>Jira search<cr>", { desc = "Search Issues (JQL)" })
