@@ -529,9 +529,26 @@ describe('tools.runbook', function()
       )
       local text = table.concat(lines, '\n')
       assert.is_truthy(text:find('line 1 (sh): exit 4', 1, true))
-      -- What ran, the input filled in, and what it printed
-      assert.is_truthy(text:find('```sh\necho "typed"; exit 4\n```', 1, true))
+      -- The code as written, the value typed nowhere but in what it printed
+      assert.is_truthy(
+        text:find('```sh\necho "${input:x}"; exit 4\n```', 1, true)
+      )
+      assert.is_falsy(text:find('echo "typed"', 1, true))
       assert.is_truthy(text:find('```output\ntyped\n[exit 4]\n```', 1, true))
+    end)
+
+    it('runs nothing of a buffer gone while an input was typed', function()
+      local bufnr = buffer({ '```sh', 'echo ${input:x}', '```' })
+      local block =
+        runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2)
+      local restore = h.stub(vim.ui, 'input', function(_, on_confirm)
+        vim.api.nvim_buf_delete(bufnr, { force = true })
+        on_confirm('late')
+      end)
+      local finished
+      runbook.run_block(bufnr, block, function(ok) finished = ok end)
+      restore()
+      assert.is_false(finished)
     end)
   end)
 

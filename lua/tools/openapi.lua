@@ -54,7 +54,9 @@ function M.operation_at(lines, row)
       local own = #line:match('^(%s*)')
       if own < bound then
         local _, key = key_of(line)
-        if key and not method and METHODS[key:lower()] then
+        -- The outermost one wins: a property of a body may well be called
+        -- `options` or `delete`, the operation is the key right under the path
+        if key and METHODS[key:lower()] then
           method = key:lower()
         elseif key and key:sub(1, 1) == '/' then
           return { path = key, method = method }

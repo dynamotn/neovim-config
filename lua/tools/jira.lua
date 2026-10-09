@@ -182,10 +182,11 @@ function M.run(args, on_done)
   )
 end
 
---- The issues matching `jql`
+--- The issues matching `jql`; none and why when listing failed
 ---@param jql string
----@param on_done fun(issues: DyJiraIssue[])
-function M.list(jql, on_done)
+---@param on_done fun(issues: DyJiraIssue[], err: string?)
+---@param opts? { quiet?: boolean } `quiet`: leave saying a failure to the caller
+function M.list(jql, on_done, opts)
   M.run({
     'issue',
     'list',
@@ -199,8 +200,10 @@ function M.list(jql, on_done)
     jql,
   }, function(ok, lines, err)
     if not ok then
-      notify('Listing issues failed: ' .. err, vim.log.levels.ERROR)
-      return on_done({})
+      if not (opts and opts.quiet) then
+        notify('Listing issues failed: ' .. err, vim.log.levels.ERROR)
+      end
+      return on_done({}, err)
     end
     on_done(M.parse(lines))
   end)

@@ -403,7 +403,7 @@ end
 ---@class DyRunbookRun
 ---@field line integer Where the block opens
 ---@field lang string
----@field code string As it ran, inputs filled in
+---@field code string As written, `${input:…}` left in
 ---@field output string[] As `M.render` made it
 ---@field code_status integer
 ---@field signal? integer
@@ -556,9 +556,14 @@ function M.run_block(bufnr, block, on_done)
 
   local code = M.code_of(block)
   M.ask_inputs(bufnr, M.inputs(code), function(values)
-    if not values then return on_done(false) end
-    -- Expanded first: what is checked is what runs
-    start(bufnr, block, runner, M.expand(code, values), on_done)
+    -- The buffer may have gone while an input was being typed
+    if not values or not vim.api.nvim_buf_is_valid(bufnr) then
+      return on_done(false)
+    end
+    -- Expanded first: what is checked is what runs. The record keeps the
+    -- code as written, so no typed value -- a password, a token -- is
+    -- written to disk
+    start(bufnr, block, runner, M.expand(code, values), on_done, code)
   end)
 end
 
@@ -566,9 +571,10 @@ end
 ---@param bufnr integer
 ---@param block DyRunbookBlock
 ---@param runner string[]
----@param code string
+---@param code string As it runs, inputs filled in
 ---@param on_done fun(ok: boolean)
-start = function(bufnr, block, runner, code, on_done)
+---@param written? string As written, what the record keeps
+start = function(bufnr, block, runner, code, on_done, written)
   local danger = M.danger(code)
   if danger then
     local answer = vim.fn.confirm(
@@ -636,7 +642,7 @@ start = function(bufnr, block, runner, code, on_done)
       record(bufnr, {
         line = block.open,
         lang = block.lang,
-        code = code,
+        code = written or code,
         output = output,
         code_status = result.code,
         signal = result.signal,

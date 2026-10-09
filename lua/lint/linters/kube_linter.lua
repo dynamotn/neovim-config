@@ -62,7 +62,7 @@ end
 
 --- Lint only Kubernetes manifests
 ---@return boolean
-function M.condition() return require('tools.kube').is_kube(0) end
+function M.condition() return require('tools.kube').is_manifest(0) end
 
 M.linter = {
   name = 'kube_linter',

@@ -284,7 +284,9 @@ function M.reviews(remote, set)
         url = row.html_url or row.web_url,
       })
     end
-    set('done', ('%d open on %s'):format(#items, remote.slug), items)
+    -- One more is asked for than is listed, to know there are more
+    local count = #items > M.LIMIT and (M.LIMIT .. '+') or tostring(#items)
+    set('done', ('%s open on %s'):format(count, remote.slug), items)
   end)
 end
 
@@ -334,7 +336,8 @@ function M.jira(set)
     return set('skipped', 'the jira CLI is not installed')
   end
   local jira = require('tools.jira')
-  jira.list(jira.DEFAULT_JQL, function(issues)
+  jira.list(jira.DEFAULT_JQL, function(issues, err)
+    if err then return set('failed', err) end
     local items = {}
     for _, issue in ipairs(issues) do
       table.insert(items, {
@@ -343,7 +346,7 @@ function M.jira(set)
       })
     end
     set('done', ('%d assigned'):format(#items), items)
-  end)
+  end, { quiet = true })
 end
 
 --- Ask every section again

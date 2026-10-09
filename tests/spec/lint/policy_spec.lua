@@ -107,6 +107,19 @@ describe('policy linters', function()
       vim.api.nvim_set_current_buf(h.buffer({ filetype = 'terraform' }))
       assert.is_true(linter.condition())
     end)
+
+    it('leaves the values and the Chart.yaml of a chart alone', function()
+      h.write(dir .. '/chart/Chart.yaml', { 'apiVersion: v2', 'name: web' })
+      h.write(dir .. '/chart/values.yaml', { 'replicas: 2' })
+      for _, file in ipairs({ 'Chart.yaml', 'values.yaml' }) do
+        vim.cmd.edit(dir .. '/chart/' .. file)
+        vim.bo.filetype = 'yaml'
+        -- What the kube mappings are for, but no manifest to check
+        assert.is_true(require('tools.kube').is_kube(0))
+        assert.is_false(linter.condition(), file)
+        assert.is_false(require('lint.linters.kube_linter').condition(), file)
+      end
+    end)
   end)
 
   describe('kube_linter', function()

@@ -55,7 +55,7 @@ end
 --- Lint only Kubernetes manifests of a project that has policies
 ---@return boolean
 function M.condition()
-  return require('tools.kube').is_kube(0)
+  return require('tools.kube').is_manifest(0)
     and M.policy_dir(vim.api.nvim_buf_get_name(0)) ~= nil
 end
 

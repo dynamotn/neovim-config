@@ -150,6 +150,41 @@ describe('tools.project', function()
     )
   end)
 
+  it('says there are more requests than it lists', function()
+    project.LIMIT = 2
+    cli('gh', { [[echo '[{"number":1},{"number":2},{"number":3}]']] })
+    local got
+    project.reviews(
+      { kind = 'github', host = 'github.com', slug = 'o/r' },
+      function(...) got = { ... } end
+    )
+    assert.is_true(vim.wait(5000, function() return got ~= nil end, 10))
+    assert.equals('2+ open on o/r', got[2])
+  end)
+
+  it('tells a Jira that failed from one with nothing assigned', function()
+    cli('jira', { 'exit 1' })
+    local jira = require('tools.jira')
+    local restore = h.stub(
+      jira,
+      'run',
+      function(_, on_done) on_done(false, {}, 'not logged in') end
+    )
+    local notes = {}
+    local restore_notify = h.stub(
+      vim,
+      'notify',
+      function(msg) table.insert(notes, msg) end
+    )
+    local got
+    project.jira(function(...) got = { ... } end)
+    restore_notify()
+    restore()
+    assert.same({ 'failed', 'not logged in' }, { got[1], got[2] })
+    -- The page says it, no toast on top
+    assert.same({}, notes)
+  end)
+
   it('says why a section is empty', function()
     local got = {}
     local function into(key)

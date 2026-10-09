@@ -374,6 +374,22 @@ describe('tools.encrypted', function()
       assert.equals(0, vim.fn.isdirectory(vim.fs.dirname(copy)))
     end)
 
+    it('leaves diff mode once the old text is closed', function()
+      local bufnr = open(repo .. '/values.yaml')
+      encrypted.diff(bufnr)
+      local wins = vim.api.nvim_tabpage_list_wins(0)
+      local scratch_win = wins[1]
+      assert.are_not.equal(bufnr, vim.api.nvim_win_get_buf(scratch_win))
+      vim.api.nvim_win_close(scratch_win, true)
+      assert.is_true(
+        vim.wait(
+          1000,
+          function() return not vim.wo[vim.fn.bufwinid(bufnr)].diff end,
+          10
+        )
+      )
+    end)
+
     it('says when the file is not in git at the revision', function()
       h.write(repo .. '/new.yaml', {
         'plain: a',

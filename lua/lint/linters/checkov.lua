@@ -6,7 +6,8 @@
 --- from fetching anything from its platform; it runs on its own checks only.
 ---
 --- Kubernetes YAML is only handed over when it is a manifest, see
---- `tools.kube.is_kube`: every other YAML file would be read for nothing.
+--- `tools.kube.is_manifest`: values, charts and every other YAML file are
+--- not.
 
 local M = {}
 
@@ -62,7 +63,7 @@ end
 function M.condition()
   local ft = vim.bo.filetype
   if ft ~= 'yaml' and not ft:match('^yaml%.') then return true end
-  return require('tools.kube').is_kube(0)
+  return require('tools.kube').is_manifest(0)
 end
 
 M.linter = {

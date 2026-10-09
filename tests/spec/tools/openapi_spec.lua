@@ -112,6 +112,25 @@ describe('tools.openapi', function()
       assert.is_nil(openapi.operation_at(YAML, 1))
     end)
 
+    it('takes the operation, not a property named like a method', function()
+      local lines = {
+        'paths:',
+        '  /pets:',
+        '    post:',
+        '      requestBody:',
+        '        content:',
+        '          application/json:',
+        '            schema:',
+        '              properties:',
+        '                delete:',
+        '                  type: boolean',
+      }
+      assert.same(
+        { path = '/pets', method = 'post' },
+        openapi.operation_at(lines, 10)
+      )
+    end)
+
     it('finds them in pretty-printed JSON', function()
       local json = vim.split(
         [[{

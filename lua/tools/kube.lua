@@ -402,6 +402,15 @@ function M.is_kube(bufnr)
   if file == '' then return false end
   local target = M.target(file)
   if target.kind ~= 'manifest' then return true end
+  return M.is_manifest(bufnr)
+end
+
+--- Whether `bufnr` holds a Kubernetes object itself, `apiVersion` and
+--- `kind` at the top level -- not a chart's values or a kustomization
+---@param bufnr integer
+---@return boolean
+function M.is_manifest(bufnr)
+  if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   local api, kind = false, false
   for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, 200, false)) do
     api = api or line:match('^apiVersion:') ~= nil

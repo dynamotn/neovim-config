@@ -455,10 +455,23 @@ function M.diff(bufnr, rev)
     scratch,
     ('%s@%s'):format(vim.fs.basename(vim.api.nvim_buf_get_name(bufnr)), rev)
   )
-  M.hold(
-    scratch,
+  local group =
     vim.api.nvim_create_augroup('dy_encrypted_' .. scratch, { clear = true })
-  )
+  M.hold(scratch, group)
+  -- Gone with the old text: the window of the buffer leaves diff mode too
+  vim.api.nvim_create_autocmd('BufWipeout', {
+    group = group,
+    buffer = scratch,
+    once = true,
+    callback = function()
+      vim.schedule(function()
+        local original = vim.fn.bufwinid(bufnr)
+        if original ~= -1 then
+          vim.api.nvim_win_call(original, function() vim.cmd('diffoff') end)
+        end
+      end)
+    end,
+  })
   vim.keymap.set(
     'n',
     'q',

@@ -106,6 +106,19 @@ describe('tools.ci_inline', function()
     assert.equals('● running', ci.text(marks[2]))
   end)
 
+  it('finds where a job of a matrix or a parallel run is defined', function()
+    assert.equals('build', ci.defined_as('build (ubuntu, 22)'))
+    assert.equals('call', ci.defined_as('call / inner'))
+    assert.equals('rspec', ci.defined_as('rspec 1/3'))
+    assert.equals('deploy', ci.defined_as('deploy: [aws, us-east-1]'))
+    assert.equals('plain', ci.defined_as('plain'))
+    local marks = ci.marks({
+      { name = 'build 1/2', status = 'success' },
+      { name = 'build 2/2', status = 'failed' },
+    }, ci.job_lines(GITLAB, 'gitlab'))
+    assert.same({ { line = 6, bucket = 'fail', count = 2 } }, marks)
+  end)
+
   it('reads the problems glab ci lint names', function()
     local diagnostics = ci.lint_diagnostics(
       table.concat({

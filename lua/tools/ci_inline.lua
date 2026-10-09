@@ -165,11 +165,16 @@ function M.job_lines(lines, kind)
 end
 
 --- The name a job of a run is defined under: without the matrix values of
---- `build (ubuntu, 22)`, and the caller of a reusable workflow in `ci / test`
+--- `build (ubuntu, 22)` (GitHub) or `deploy: [aws, eu]` (GitLab), the index
+--- of a GitLab `parallel` job in `rspec 1/3`, and the caller of a reusable
+--- workflow in `ci / test`
 ---@param name string
 ---@return string
 function M.defined_as(name)
-  return (name:gsub('%s+%b()$', ''):gsub('%s+/%s+.*$', ''))
+  name = name:gsub('%s+%b()$', '')
+  name = name:gsub(':%s*%b[]$', '')
+  name = name:gsub('%s+%d+/%d+$', '')
+  return (name:gsub('%s+/%s+.*$', ''))
 end
 
 ---@class DyCiJob

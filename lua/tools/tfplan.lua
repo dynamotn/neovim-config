@@ -526,7 +526,12 @@ function M.run(mode)
       vim.schedule(function()
         if result.code ~= 0 then return failed('infracost', result) end
         cleanup()
-        local ok, breakdown = pcall(vim.json.decode, result.stdout or '')
+        -- A `null` is nil, not a truthy `vim.NIL` that `ipairs` chokes on
+        local ok, breakdown = pcall(
+          vim.json.decode,
+          result.stdout or '',
+          { luanil = { object = true, array = true } }
+        )
         if not ok or type(breakdown) ~= 'table' then
           return notify(
             'infracost printed something that is not JSON',

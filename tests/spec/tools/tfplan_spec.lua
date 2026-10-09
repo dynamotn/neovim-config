@@ -473,6 +473,17 @@ describe('tools.tfplan', function()
       assert.is_true(#vim.diagnostic.get(bufnr) > 0)
     end)
 
+    it('takes a project infracost priced nothing of as free', function()
+      h.write(bin .. '/infracost', {
+        '#!/bin/sh',
+        [[echo '{"currency":null,"projects":[{"breakdown":{"resources":null}}]}']],
+      })
+      vim.cmd.edit(dir .. '/main.tf')
+      tfplan.cost()
+      assert.is_true(vim.wait(10000, function() return #notes >= 3 end, 20))
+      assert.equals('Monthly cost: ≈ 0.00 USD/month', notes[3])
+    end)
+
     it('says when infracost is missing, without planning', function()
       vim.fn.delete(bin .. '/infracost')
       local restore = h.stub(vim.fn, 'executable', function(name)
