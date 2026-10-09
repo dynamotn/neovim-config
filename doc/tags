@@ -3,6 +3,7 @@
 :AiGuardLog	dyneo.txt	/*:AiGuardLog*
 :CiLint	dyneo.txt	/*:CiLint*
 :CiStatus	dyneo.txt	/*:CiStatus*
+:DyInspect	dyneo.txt	/*:DyInspect*
 :DyLog	dyneo.txt	/*:DyLog*
 :DyNeoFormat	dyneo.txt	/*:DyNeoFormat*
 :DyNeoFormatInfo	dyneo.txt	/*:DyNeoFormatInfo*
@@ -47,6 +48,7 @@ dyneo-encrypted	dyneo.txt	/*dyneo-encrypted*
 dyneo-features	dyneo.txt	/*dyneo-features*
 dyneo-globals	dyneo.txt	/*dyneo-globals*
 dyneo-infra	dyneo.txt	/*dyneo-infra*
+dyneo-inspect	dyneo.txt	/*dyneo-inspect*
 dyneo-install	dyneo.txt	/*dyneo-install*
 dyneo-integrations	dyneo.txt	/*dyneo-integrations*
 dyneo-keymaps	dyneo-keymaps.txt	/*dyneo-keymaps*

@@ -466,6 +466,7 @@ local function requirements()
     glab = '`:CiStatus` and `:CiLint` on GitLab',
     jq = 'the jq filter of `:DyLog`',
     yq = '`:OpenApiRequest` on a YAML document',
+    openssl = '`:DyInspect` on a certificate',
   }
   for _, command in ipairs(required) do
     table.insert(

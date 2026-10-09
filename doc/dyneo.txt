@@ -514,6 +514,19 @@ of a file are read, and 2000 of the journal or of a pod.  In the buffer:
 Logs carry tokens and personal data, so the buffer is kept from every AI
 integration (|dyneo-ai-guard|).
 
+Certificates and tokens                                        *dyneo-inspect*
+
+|:DyInspect| decodes what is under the cursor into a split held back from
+every AI integration: a certificate -- a PEM block, or its base64 in a
+Kubernetes Secret -- through `openssl x509` (subject, issuer, names, key
+usage, validity, fingerprint), a certificate request or a public key the
+same way, and a JWT read in place: its header, its claims, and `iat`, `nbf`
+and `exp` as dates.  The signature of a JWT is never shown, and a private
+key is named, never decoded.
+
+`:DyInspect expiry` checks every certificate of the buffer and puts an error
+on one that expired, a warning on one ending within 30 days.
+
 Encrypted files                                              *dyneo-encrypted*
 
 A SOPS file, an Ansible Vault, or an `encrypted_*.age` / `encrypted_*.asc`
@@ -758,6 +771,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :OpenApiRequest [http]  Open the OpenAPI operation under the cursor as a
                         kulala request.
 :OpenApiRequest hurl    The same, as a Hurl request.  See |dyneo-openapi|.
+
+                                                                  *:DyInspect*
+:DyInspect              Decode the certificate, key or JWT under the cursor.
+:DyInspect expiry       Warn on each certificate of the buffer expired or
+                        ending soon.  See |dyneo-inspect|.
 
                                                               *:EncryptedDiff*
 :EncryptedDiff [{rev}]  Diff the clear text of this decrypted buffer with its
