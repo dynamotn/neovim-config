@@ -2004,6 +2004,16 @@ return {
           condition = function() return vim.bo.filetype == 'yaml.gh-action' end,
         },
       },
+      -- The security of a workflow: unpinned actions, template injection,
+      -- credentials left to the checkout. Offline: a lint on every save
+      -- asks GitHub nothing
+      {
+        'zizmor',
+        opts = {
+          condition = function() return vim.bo.filetype == 'yaml.gh-action' end,
+          prepend_args = { '--offline' },
+        },
+      },
     },
     formatters = {
       'yamlfmt',
