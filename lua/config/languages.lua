@@ -1497,7 +1497,7 @@ return {
     parser = 'dockerfile',
     injected_parsers = { 'bash' },
     lsp_servers = { 'dockerls' },
-    linters = { 'hadolint' },
+    linters = { 'hadolint', 'checkov' },
     formatters = { 'dockerfmt' },
     null_ls = {
       ltcc_code_action,
@@ -1892,7 +1892,7 @@ return {
     parser = 'terraform',
     ext = 'tf',
     lsp_servers = { 'terraformls' },
-    linters = { 'tflint', 'trivy' },
+    linters = { 'tflint', 'trivy', 'checkov' },
     formatters = {
       { 'tofu_fmt', command = 'tofu', mason = { package = 'opentofu' } },
     },
@@ -1985,7 +1985,26 @@ return {
       { 'helm_ls', filetypes = { 'yaml.helm-values' } },
       { 'vacuum', filetypes = { 'yaml.openapi' } },
     },
-    linters = { 'yamllint', 'trivy' },
+    -- Policy checks of a Kubernetes manifest (`checkov`, `kube_linter`, and
+    -- `conftest` where the project keeps a `policy/` directory) decide in
+    -- their own `condition`, see `lua/lint/linters/`
+    linters = {
+      'yamllint',
+      'trivy',
+      'checkov',
+      {
+        'kube_linter',
+        command = 'kube-linter',
+        mason = { package = 'kube-linter' },
+      },
+      'conftest',
+      {
+        'actionlint',
+        opts = {
+          condition = function() return vim.bo.filetype == 'yaml.gh-action' end,
+        },
+      },
+    },
     formatters = {
       'yamlfmt',
       injected_formatter,

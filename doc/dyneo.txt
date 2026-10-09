@@ -393,6 +393,24 @@ of a chart is rendered first and piped in, with the values file being edited
 as its values.  A diff or a render can hold Secret data, so its buffer is
 kept from every AI integration.
 
+Policy checks                                                  *dyneo-policy*
+
+Infrastructure code is linted against policies as well as for style, each
+checker installed by Mason the first time a file of its kind opens:
+
+    `checkov`       Terraform, Dockerfiles and Kubernetes manifests, with its
+                  own checks only (`--skip-download`)
+    `kube-linter`   Kubernetes manifests, reading `.kube-linter.yaml`
+    `conftest`      Kubernetes manifests, against the Rego policies of the
+                  nearest `policy/` directory above the file; nowhere else
+    `actionlint`    GitHub Actions workflows
+
+A YAML file is only handed to the first three when it is a manifest, as
+|dyneo-kube| tells one apart.  kube-linter and conftest name an object or a
+policy, not a line: a finding lands on the line naming its object, or on the
+first line.  A checkov check is silenced with `# checkov:skip=<ID>: <why>`
+inside the block it is about.
+
 Terraform plan                                                  *dyneo-tfplan*
 
 In a Terraform buffer, `<localleader>p` (or |:TfPlan|) runs `tofu plan`,

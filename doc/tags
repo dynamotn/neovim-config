@@ -50,6 +50,7 @@ dyneo-layout	dyneo.txt	/*dyneo-layout*
 dyneo-lazy-install	dyneo.txt	/*dyneo-lazy-install*
 dyneo-mappings	dyneo.txt	/*dyneo-mappings*
 dyneo-per-machine	dyneo.txt	/*dyneo-per-machine*
+dyneo-policy	dyneo.txt	/*dyneo-policy*
 dyneo-quarantine	dyneo.txt	/*dyneo-quarantine*
 dyneo-requirements	dyneo.txt	/*dyneo-requirements*
 dyneo-runbook	dyneo.txt	/*dyneo-runbook*
