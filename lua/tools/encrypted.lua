@@ -350,25 +350,24 @@ function M.hold(bufnr, group)
   end
 end
 
---- Run `command` and wait for it, never raising
+--- Run `command` off the main loop, never raising, and hand `on_done` what
+--- it did; nil when it could not start
 ---@param command string[]
 ---@param opts table `vim.system` options
----@return vim.SystemCompleted?
-local function run(command, opts)
-  local ok, result = pcall(
-    function()
-      return vim
-        .system(
-          command,
-          vim.tbl_extend('force', { timeout = M.TIMEOUT, detach = true }, opts)
-        )
-        :wait()
+---@param on_done fun(result: vim.SystemCompleted?)
+local function run(command, opts, on_done)
+  local ok = pcall(
+    vim.system,
+    command,
+    vim.tbl_extend('force', { timeout = M.TIMEOUT, detach = true }, opts),
+    function(result)
+      vim.schedule(function() on_done(result) end)
     end
   )
-  return ok and result or nil
+  if not ok then vim.schedule(function() on_done(nil) end) end
 end
 
---- The clear text of the file of `bufnr` as it was at `rev`
+--- Hand `on_done` the clear text of the file of `bufnr` as it was at `rev`
 ---
 --- The blob goes to a directory of its own only this user can read, under
 --- the name of the file -- sops tells the format from the extension -- and
@@ -376,46 +375,53 @@ end
 --- is written anywhere.
 ---@param bufnr integer
 ---@param rev string
----@return string[]? lines
----@return string? err
-function M.clear_at(bufnr, rev)
+---@param on_done fun(lines: string[]?, err: string?)
+function M.clear_at(bufnr, rev, on_done)
   local kind = vim.b[bufnr].dy_encrypted
   local file = vim.api.nvim_buf_get_name(bufnr)
   local dir, name = vim.fs.dirname(file), vim.fs.basename(file)
-  local blob = run(
+  run(
     { 'git', 'show', ('%s:./%s'):format(rev, name) },
-    { cwd = dir, text = false }
-  )
-  if not blob or blob.code ~= 0 then
-    return nil,
-      ('%s is not in git at %s%s'):format(
-        name,
-        rev,
-        blob and blob.stderr ~= '' and (': ' .. vim.trim(blob.stderr)) or ''
-      )
-  end
-
-  local private = vim.fn.tempname()
-  vim.fn.mkdir(private, 'p', tonumber('700', 8))
-  local copy = vim.fs.joinpath(private, name)
-  local fd = vim.uv.fs_open(copy, 'w', tonumber('600', 8))
-  if not fd then
-    vim.fn.delete(private, 'rf')
-    return nil, 'could not write a private copy'
-  end
-  vim.uv.fs_write(fd, blob.stdout or '')
-  vim.uv.fs_close(fd)
-
-  local result = run(M.decrypt_command(kind, copy), { text = true })
-  vim.fn.delete(private, 'rf')
-  if not result or result.code ~= 0 then
-    return nil,
-      'could not decrypt it: ' .. (result and failure(kind, result) or 'failed')
-  end
-  return vim.split(
-    (result.stdout or ''):gsub('\n$', ''),
-    '\n',
-    { plain = true }
+    { cwd = dir, text = false },
+    function(blob)
+      if not blob or blob.code ~= 0 then
+        return on_done(
+          nil,
+          ('%s is not in git at %s%s'):format(
+            name,
+            rev,
+            blob and blob.stderr ~= '' and (': ' .. vim.trim(blob.stderr)) or ''
+          )
+        )
+      end
+      local private = vim.fn.tempname()
+      vim.fn.mkdir(private, 'p', tonumber('700', 8))
+      local copy = vim.fs.joinpath(private, name)
+      local fd = vim.uv.fs_open(copy, 'w', tonumber('600', 8))
+      if not fd then
+        vim.fn.delete(private, 'rf')
+        return on_done(nil, 'could not write a private copy')
+      end
+      vim.uv.fs_write(fd, blob.stdout or '')
+      vim.uv.fs_close(fd)
+      run(M.decrypt_command(kind, copy), { text = true }, function(result)
+        vim.fn.delete(private, 'rf')
+        if not result or result.code ~= 0 then
+          return on_done(
+            nil,
+            'could not decrypt it: '
+              .. (result and failure(kind, result) or 'failed')
+          )
+        end
+        on_done(
+          vim.split(
+            (result.stdout or ''):gsub('\n$', ''),
+            '\n',
+            { plain = true }
+          )
+        )
+      end)
+    end
   )
 end
 
@@ -431,9 +437,19 @@ function M.diff(bufnr, rev)
   if not kind then
     return notify('This buffer is not a decrypted file', vim.log.levels.ERROR)
   end
-  local lines, err = M.clear_at(bufnr, rev)
-  if not lines then return notify(err, vim.log.levels.ERROR) end
+  M.clear_at(bufnr, rev, function(lines, err)
+    if not lines then return notify(err, vim.log.levels.ERROR) end
+    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    M.open_diff(bufnr, rev, kind, lines)
+  end)
+end
 
+--- Open `lines`, the clear text at `rev`, beside `bufnr`, both in diff mode
+---@param bufnr integer
+---@param rev string
+---@param kind DyEncryptedKind
+---@param lines string[]
+function M.open_diff(bufnr, rev, kind, lines)
   local win = vim.fn.bufwinid(bufnr)
   if win ~= -1 then vim.api.nvim_set_current_win(win) end
   vim.cmd('leftabove vnew')
@@ -610,19 +626,29 @@ function M.rotate(how)
     2
   )
   if answer ~= 1 then return end
-  local result = run(M.ROTATIONS[how](file), {
+  local done = how == 'rotate' and 'New data key' or 'Recipients updated'
+  run(M.ROTATIONS[how](file), {
     cwd = vim.fs.dirname(file),
     text = true,
-  })
-  if not result or result.code ~= 0 then
-    return notify(
-      'sops failed: ' .. (result and failure('sops', result) or 'not run'),
-      vim.log.levels.ERROR
-    )
-  end
-  -- Read again, which decrypts the file as rotated
-  vim.api.nvim_buf_call(bufnr, function() vim.cmd('edit!') end)
-  notify(how == 'rotate' and 'New data key' or 'Recipients updated')
+  }, function(result)
+    if not result or result.code ~= 0 then
+      return notify(
+        'sops failed: ' .. (result and failure('sops', result) or 'not run'),
+        vim.log.levels.ERROR
+      )
+    end
+    if not vim.api.nvim_buf_is_valid(bufnr) then return notify(done) end
+    -- Edited while sops ran: reading the file again would lose the edits
+    if vim.bo[bufnr].modified then
+      return notify(
+        done .. '; the buffer has changes, so it was not read again',
+        vim.log.levels.WARN
+      )
+    end
+    -- Read again, which decrypts the file as rotated
+    vim.api.nvim_buf_call(bufnr, function() vim.cmd('edit!') end)
+    notify(done)
+  end)
 end
 
 return M

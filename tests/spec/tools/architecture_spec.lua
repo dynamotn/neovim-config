@@ -226,14 +226,29 @@ describe('tools.architecture', function()
     h.write(dir .. '/broken.yaml', { 'a: [' })
     vim.cmd.edit(dir .. '/app.yaml')
     vim.bo.filetype = 'yaml'
-    local graph, title, skipped = arch.read()
+    local graph, title, skipped, done
+    arch.read(function(g, t, s)
+      graph, title, skipped, done = g, t, s, true
+    end)
+    -- yq runs off the main loop
+    assert.is_nil(done)
+    assert.is_true(vim.wait(5000, function() return done end, 10))
     assert.equals('Kubernetes: ' .. vim.fn.fnamemodify(dir, ':~'), title)
     assert.same({ 'Service/web -> Deployment/web' }, edges(graph))
     assert.same({ 'broken.yaml', 'template.yaml' }, skipped)
 
-    local restore = h.stub(vim, 'notify', function() end)
+    local notes = {}
+    local restore = h.stub(
+      vim,
+      'notify',
+      function(msg) table.insert(notes, msg) end
+    )
     arch.open()
+    assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
     restore()
+    assert.is_truthy(
+      notes[1]:find('left out: broken.yaml, template.yaml', 1, true)
+    )
     assert.equals('d2', vim.bo.filetype)
     assert.is_truthy(
       vim.list_contains(

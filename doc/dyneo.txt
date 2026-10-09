@@ -609,7 +609,9 @@ keys, PGP fingerprints, GCP, Azure and Vault keys its metadata names, read
 off the ciphertext on disk.  |:EncryptedRotate| puts a change in place:
 `updatekeys` (the default) sets the recipients to what `.sops.yaml` says
 now, after someone joined or left; `rotate` gives the file a new data key.
-Both ask first, need the buffer written, and open the file again.  Ansible
+Both ask first, need the buffer written, run sops in the background, and
+open the file again -- unless it was edited meanwhile, which they say rather
+than lose the edits.  Ansible
 Vault is left out: rekeying it asks for passwords Neovim cannot type.
 
 5.5 Buffer servers and tools                                *dyneo-statusline*

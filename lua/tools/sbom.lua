@@ -525,42 +525,46 @@ function M.lockfile(file, lines)
   return parse(lines, file)
 end
 
---- The lockfiles of the project at `root`: those git tracks, else those at
---- its top. Walking the tree would go through `node_modules` and `vendor`.
+--- Hand `on_files` the lockfiles of the project at `root`: those git
+--- tracks, else those at its top. Walking the tree would go through
+--- `node_modules` and `vendor`.
 ---@param root string
----@return string[]
-function M.find_lockfiles(root)
+---@param on_files fun(files: string[])
+function M.find_lockfiles(root, on_files)
   local names = vim.tbl_keys(M.LOCKFILES)
   table.sort(names)
   local patterns = {}
   for _, name in ipairs(names) do
     vim.list_extend(patterns, { name, '**/' .. name })
   end
-  local ok, result = pcall(
-    function()
-      return vim
-        .system(
-          vim.list_extend({ 'git', 'ls-files', '-z', '--' }, patterns),
-          { cwd = root, text = true }
-        )
-        :wait(10000)
-    end
-  )
-  local files = {}
-  if ok and result.code == 0 then
-    for _, path in
-      ipairs(vim.split(result.stdout or '', '\0', { trimempty = true }))
-    do
-      local file = vim.fs.joinpath(root, path)
+  --- The lockfiles at the top of `root` only, when git cannot list them
+  local function at_top()
+    local files = {}
+    for _, name in ipairs(names) do
+      local file = vim.fs.joinpath(root, name)
       if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
     end
-    return files
+    on_files(files)
   end
-  for _, name in ipairs(names) do
-    local file = vim.fs.joinpath(root, name)
-    if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
-  end
-  return files
+  local ok = pcall(
+    vim.system,
+    vim.list_extend({ 'git', 'ls-files', '-z', '--' }, patterns),
+    { cwd = root, text = true, timeout = 10000 },
+    function(result)
+      vim.schedule(function()
+        if result.code ~= 0 then return at_top() end
+        local files = {}
+        for _, path in
+          ipairs(vim.split(result.stdout or '', '\0', { trimempty = true }))
+        do
+          local file = vim.fs.joinpath(root, path)
+          if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
+        end
+        on_files(files)
+      end)
+    end
+  )
+  if not ok then vim.schedule(at_top) end
 end
 
 local ns = vim.api.nvim_create_namespace('dy_sbom')
@@ -713,13 +717,16 @@ end
 --- the project. Only names and versions leave the machine.
 function M.lock()
   local name = vim.api.nvim_buf_get_name(0)
-  local files
   if name ~= '' and M.LOCKFILES[vim.fs.basename(name)] then
-    files = { name }
-  else
-    local root = vim.fs.root(0, { '.git' }) or vim.uv.cwd() --[[@as string]]
-    files = M.find_lockfiles(root)
+    return M.ask_lockfiles({ name })
   end
+  local root = vim.fs.root(0, { '.git' }) or vim.uv.cwd() --[[@as string]]
+  M.find_lockfiles(root, M.ask_lockfiles)
+end
+
+--- Ask OSV about the packages of `files`, and show what it knows
+---@param files string[]
+function M.ask_lockfiles(files)
   if #files == 0 then
     return notify(
       'No lockfile found: '

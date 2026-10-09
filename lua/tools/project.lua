@@ -365,10 +365,16 @@ function M.refresh(bufnr)
   M.git(root, setter(bufnr, generation, 'git'))
   M.diagnostics(root, setter(bufnr, generation, 'diagnostics'))
   M.tasks(setter(bufnr, generation, 'tasks'))
-  local remote = forge.remote(root)
-  M.reviews(remote, setter(bufnr, generation, 'reviews'))
-  M.pipeline(remote, forge.branch(root), setter(bufnr, generation, 'pipeline'))
   M.jira(setter(bufnr, generation, 'jira'))
+  forge.remote(root, function(remote)
+    M.reviews(remote, setter(bufnr, generation, 'reviews'))
+    forge.branch(
+      root,
+      function(branch)
+        M.pipeline(remote, branch, setter(bufnr, generation, 'pipeline'))
+      end
+    )
+  end)
 end
 
 --- Open what the line under the cursor is about

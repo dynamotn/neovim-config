@@ -367,38 +367,57 @@ function M.d2(graph, title)
   return lines
 end
 
---- The YAML documents of `files`, decoded through `yq`
+--- Hand `on_done` the YAML documents of `files`, decoded through `yq` one
+--- file after the other, off the main loop
 ---@param files string[]
----@return table[]? docs
----@return string? err
-function M.yaml_docs(files)
+---@param on_done fun(docs: table[]?, err: string?, skipped: string[]?)
+function M.yaml_docs(files, on_done)
   if vim.fn.executable('yq') ~= 1 then
-    return nil, 'yq is needed to read YAML'
+    return on_done(nil, 'yq is needed to read YAML')
   end
   -- One file at a time: a template of a chart (`{{ }}`) or a broken file
   -- is no YAML yq reads, and must not take the others down with it
-  local docs, skipped = {}, {}
-  for _, file in ipairs(files) do
+  local docs, skipped, index = {}, {}, 0
+  local function next_file()
+    index = index + 1
+    local file = files[index]
+    if not file then return on_done(docs, nil, skipped) end
     local ok_read, lines = pcall(vim.fn.readfile, file)
     local text = ok_read and table.concat(lines, '\n') or ''
-    local result = not text:find('{{', 1, true)
-      and vim
-        .system({ 'yq', '-o=json', '-I=0', '.', file }, { text = true })
-        :wait(30000)
-    if not result or result.code ~= 0 then
+    if not ok_read or text:find('{{', 1, true) then
       table.insert(skipped, vim.fs.basename(file))
-    else
-      for line in (result.stdout or ''):gmatch('[^\n]+') do
-        local ok, doc = pcall(
-          vim.json.decode,
-          line,
-          { luanil = { object = true, array = true } }
-        )
-        if ok and type(doc) == 'table' then table.insert(docs, doc) end
+      return next_file()
+    end
+    local ok = pcall(
+      vim.system,
+      { 'yq', '-o=json', '-I=0', '.', file },
+      { text = true, timeout = 30000 },
+      function(result)
+        vim.schedule(function()
+          if result.code ~= 0 then
+            table.insert(skipped, vim.fs.basename(file))
+          else
+            for line in (result.stdout or ''):gmatch('[^\n]+') do
+              local decoded, doc = pcall(
+                vim.json.decode,
+                line,
+                { luanil = { object = true, array = true } }
+              )
+              if decoded and type(doc) == 'table' then
+                table.insert(docs, doc)
+              end
+            end
+          end
+          next_file()
+        end)
       end
+    )
+    if not ok then
+      table.insert(skipped, vim.fs.basename(file))
+      vim.schedule(next_file)
     end
   end
-  return docs, nil, skipped
+  next_file()
 end
 
 --- The files of `dir` whose name matches one of `patterns`
@@ -421,11 +440,10 @@ local function files_of(dir, patterns)
   return found
 end
 
---- The graph of the directory of the current buffer, by what it holds
----@return DyArchGraph? graph
----@return string? title
----@return string[]? skipped The files left out: templates, unreadable
-function M.read()
+--- Hand `on_graph` the graph of the directory of the current buffer, by
+--- what it holds
+---@param on_graph fun(graph: DyArchGraph?, title: string?, skipped: string[]?)
+function M.read(on_graph)
   local file = vim.api.nvim_buf_get_name(0)
   local dir = file ~= '' and vim.fs.dirname(file) or vim.uv.cwd() --[[@as string]]
   local ft = vim.bo.filetype
@@ -434,32 +452,55 @@ function M.read()
     for _, path in ipairs(files_of(dir, { '%.tf$', '%.tofu$' })) do
       files[path] = vim.fn.readfile(path)
     end
-    return M.terraform(files), 'Terraform: ' .. vim.fn.fnamemodify(dir, ':~')
+    return on_graph(
+      M.terraform(files),
+      'Terraform: ' .. vim.fn.fnamemodify(dir, ':~')
+    )
   end
   if ft == 'yaml.docker-compose' or vim.fs.basename(file):match('compose') then
-    local docs, err, skipped = M.yaml_docs({ file })
-    if not docs then return nil, err end
-    if #skipped > 0 then return nil, 'yq could not read ' .. skipped[1] end
-    return M.compose(docs[1] or {}),
-      'Compose: ' .. vim.fn.fnamemodify(file, ':~')
+    return M.yaml_docs({ file }, function(docs, err, skipped)
+      if not docs then return on_graph(nil, err) end
+      if #skipped > 0 then
+        return on_graph(nil, 'yq could not read ' .. skipped[1])
+      end
+      on_graph(
+        M.compose(docs[1] or {}),
+        'Compose: ' .. vim.fn.fnamemodify(file, ':~')
+      )
+    end)
   end
   if ft == 'yaml' or ft:match('^yaml%.') or ft == 'helm' then
-    local docs, err, skipped = M.yaml_docs(files_of(dir, { '%.ya?ml$' }))
-    if not docs then return nil, err end
-    docs = vim.tbl_filter(
-      function(doc) return type(doc.kind) == 'string' and doc.apiVersion ~= nil end,
-      docs
+    return M.yaml_docs(
+      files_of(dir, { '%.ya?ml$' }),
+      function(docs, err, skipped)
+        if not docs then return on_graph(nil, err) end
+        docs = vim.tbl_filter(
+          function(doc)
+            return type(doc.kind) == 'string' and doc.apiVersion ~= nil
+          end,
+          docs
+        )
+        on_graph(
+          M.kube(docs),
+          'Kubernetes: ' .. vim.fn.fnamemodify(dir, ':~'),
+          skipped
+        )
+      end
     )
-    return M.kube(docs),
-      'Kubernetes: ' .. vim.fn.fnamemodify(dir, ':~'),
-      skipped
   end
-  return nil, 'Draws Terraform, Kubernetes manifests and compose files'
+  on_graph(nil, 'Draws Terraform, Kubernetes manifests and compose files')
 end
 
 --- Draw the directory of the current buffer, in a new D2 buffer
 function M.open()
-  local graph, title, skipped = M.read()
+  M.read(function(graph, title, skipped) M.draw(graph, title, skipped) end)
+end
+
+--- Open the D2 of `graph` in a new buffer, or say why there is none
+---@param graph? DyArchGraph
+---@param title? string
+---@param skipped? string[]
+function M.draw(graph, title, skipped)
   if not graph then
     return notify(title or 'Nothing to draw', vim.log.levels.WARN)
   end

@@ -387,8 +387,12 @@ describe('tools.encrypted', function()
         once = true,
         callback = function(args) encrypted.open(args.buf) end,
       })
+      local before = #notes
       encrypted.rotate('rotate')
       restore()
+      -- sops runs off the main loop
+      assert.equals(before, #notes)
+      assert.is_true(vim.wait(5000, function() return #notes > before end, 10))
       assert.is_truthy(
         vim.tbl_contains(calls(), 'sops rotate --in-place ' .. file)
       )
@@ -397,6 +401,29 @@ describe('tools.encrypted', function()
         vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
       )
       assert.equals('New data key', notes[#notes])
+    end)
+
+    it('keeps edits made while sops ran', function()
+      local file = dir .. '/values.yaml'
+      h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+      local bufnr = open(file)
+      tool('sops', {
+        'case "$1" in',
+        '  decrypt) sed -n "s/^plain: //p" "$2";;',
+        '  updatekeys) sleep 0.3;;',
+        'esac',
+      })
+      local restore = h.stub(vim.fn, 'confirm', function() return 1 end)
+      local before = #notes
+      encrypted.rotate()
+      restore()
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'typed meanwhile' })
+      assert.is_true(vim.wait(5000, function() return #notes > before end, 10))
+      assert.same(
+        { 'typed meanwhile' },
+        vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      )
+      assert.is_truthy(notes[#notes]:find('was not read again', 1, true))
     end)
 
     it('rotates nothing modified, nor any other kind', function()
@@ -460,6 +487,15 @@ describe('tools.encrypted', function()
       )
 
       encrypted.command({ fargs = {} })
+      -- git and the decryption run off the main loop
+      assert.equals(1, #vim.api.nvim_tabpage_list_wins(0))
+      assert.is_true(
+        vim.wait(
+          5000,
+          function() return #vim.api.nvim_tabpage_list_wins(0) == 2 end,
+          10
+        )
+      )
       -- The cursor is back on the buffer being edited, the old text beside it
       assert.equals(bufnr, vim.api.nvim_get_current_buf(), vim.inspect(notes))
       local wins = vim.api.nvim_tabpage_list_wins(0)
@@ -490,6 +526,13 @@ describe('tools.encrypted', function()
     it('leaves diff mode once the old text is closed', function()
       local bufnr = open(repo .. '/values.yaml')
       encrypted.diff(bufnr)
+      assert.is_true(
+        vim.wait(
+          5000,
+          function() return #vim.api.nvim_tabpage_list_wins(0) == 2 end,
+          10
+        )
+      )
       local wins = vim.api.nvim_tabpage_list_wins(0)
       local scratch_win = wins[1]
       assert.are_not.equal(bufnr, vim.api.nvim_win_get_buf(scratch_win))
@@ -510,7 +553,9 @@ describe('tools.encrypted', function()
         'sops:',
       })
       local bufnr = open(repo .. '/new.yaml')
+      local before = #notes
       encrypted.diff(bufnr)
+      assert.is_true(vim.wait(5000, function() return #notes > before end, 10))
       assert.equals(bufnr, vim.api.nvim_get_current_buf())
       assert.is_truthy(
         notes[#notes]:find('new.yaml is not in git at HEAD', 1, true)

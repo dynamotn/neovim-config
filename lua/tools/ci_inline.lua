@@ -335,41 +335,48 @@ function M.fetch(remote, branch, file, on_done)
   end)
 end
 
---- Where the file of `bufnr` lives, and the forge and branch it is on
+---@class DyCiContext
+---@field dir string
+---@field file string
+---@field kind DyForgeKind
+---@field remote DyForgeRemote
+---@field branch string
+
+--- Hand `on_context` where the file of `bufnr` lives, and the forge and
+--- branch it is on; say why and hand nothing when one is missing
 ---@param bufnr integer
----@return { dir: string, file: string, kind: DyForgeKind, remote: DyForgeRemote, branch: string }?
-local function context(bufnr)
+---@param on_context fun(ctx: DyCiContext)
+local function context(bufnr, on_context)
   local kind = M.kind(bufnr)
   if not kind then
-    notify('Not a GitLab CI or GitHub Actions file', vim.log.levels.WARN)
-    return nil
+    return notify('Not a GitLab CI or GitHub Actions file', vim.log.levels.WARN)
   end
   local file = vim.api.nvim_buf_get_name(bufnr)
   if file == '' then
-    notify('This buffer holds no file', vim.log.levels.WARN)
-    return nil
+    return notify('This buffer holds no file', vim.log.levels.WARN)
   end
   local dir = vim.fs.dirname(file)
-  local remote = forge.remote(dir)
-  if not remote or remote.kind ~= kind then
-    notify(
-      ('No %s remote in %s'):format(kind, table.concat(forge.REMOTES, ', ')),
-      vim.log.levels.WARN
-    )
-    return nil
-  end
-  local branch = forge.branch(dir)
-  if not branch then
-    notify('Not on a branch', vim.log.levels.WARN)
-    return nil
-  end
-  return {
-    dir = dir,
-    file = file,
-    kind = kind,
-    remote = remote,
-    branch = branch,
-  }
+  forge.remote(dir, function(remote)
+    if not remote or remote.kind ~= kind then
+      return notify(
+        ('No %s remote in %s'):format(kind, table.concat(forge.REMOTES, ', ')),
+        vim.log.levels.WARN
+      )
+    end
+    forge.branch(dir, function(branch)
+      if not branch then
+        return notify('Not on a branch', vim.log.levels.WARN)
+      end
+      if not vim.api.nvim_buf_is_valid(bufnr) then return end
+      on_context({
+        dir = dir,
+        file = file,
+        kind = kind,
+        remote = remote,
+        branch = branch,
+      })
+    end)
+  end)
 end
 
 --- Show the last pipeline of the branch on the jobs of the current buffer
@@ -377,8 +384,13 @@ end
 function M.status(bufnr)
   bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
     or bufnr
-  local ctx = context(bufnr)
-  if not ctx then return end
+  context(bufnr, function(ctx) M.show_status(bufnr, ctx) end)
+end
+
+--- Fetch and show the last pipeline of `ctx` on `bufnr`
+---@param bufnr integer
+---@param ctx DyCiContext
+function M.show_status(bufnr, ctx)
   M.fetch(ctx.remote, ctx.branch, ctx.file, function(pipeline, err)
     if not vim.api.nvim_buf_is_valid(bufnr) then return end
     if not pipeline then return notify(err or 'failed', vim.log.levels.WARN) end
@@ -446,42 +458,42 @@ function M.lint(bufnr)
   if vim.bo[bufnr].modified then
     return notify('Write the file first: GitLab is sent what is saved')
   end
-  local ctx = context(bufnr)
-  if not ctx then return end
   if vim.fn.executable('glab') ~= 1 then
     return notify('glab is not installed', vim.log.levels.ERROR)
   end
-  vim.system(
-    { 'glab', 'ci', 'lint', ctx.file },
-    { cwd = ctx.dir, text = true, timeout = forge.TIMEOUT },
-    function(result)
-      vim.schedule(function()
-        if not vim.api.nvim_buf_is_valid(bufnr) then return end
-        local output = (result.stdout or '') .. '\n' .. (result.stderr or '')
-        local diagnostics = M.lint_diagnostics(
-          output,
-          vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-        )
-        if result.code ~= 0 and #diagnostics == 0 then
-          diagnostics = {
-            {
-              lnum = 0,
-              col = 0,
-              message = vim.trim(output),
-              severity = vim.diagnostic.severity.ERROR,
-              source = 'gitlab ci lint',
-            },
-          }
-        end
-        vim.diagnostic.set(lint_ns, bufnr, diagnostics)
-        notify(
-          #diagnostics == 0 and 'GitLab says the file is valid'
-            or ('GitLab found %d problems'):format(#diagnostics),
-          #diagnostics > 0 and vim.log.levels.WARN or nil
-        )
-      end)
-    end
-  )
+  context(bufnr, function(ctx)
+    vim.system(
+      { 'glab', 'ci', 'lint', ctx.file },
+      { cwd = ctx.dir, text = true, timeout = forge.TIMEOUT },
+      function(result)
+        vim.schedule(function()
+          if not vim.api.nvim_buf_is_valid(bufnr) then return end
+          local output = (result.stdout or '') .. '\n' .. (result.stderr or '')
+          local diagnostics = M.lint_diagnostics(
+            output,
+            vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+          )
+          if result.code ~= 0 and #diagnostics == 0 then
+            diagnostics = {
+              {
+                lnum = 0,
+                col = 0,
+                message = vim.trim(output),
+                severity = vim.diagnostic.severity.ERROR,
+                source = 'gitlab ci lint',
+              },
+            }
+          end
+          vim.diagnostic.set(lint_ns, bufnr, diagnostics)
+          notify(
+            #diagnostics == 0 and 'GitLab says the file is valid'
+              or ('GitLab found %d problems'):format(#diagnostics),
+            #diagnostics > 0 and vim.log.levels.WARN or nil
+          )
+        end)
+      end
+    )
+  end)
 end
 
 --- The subcommands of `:Ci`-style commands

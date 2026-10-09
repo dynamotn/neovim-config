@@ -48,41 +48,61 @@ end
 --- Run git in `dir` and wait, the first line of its output or nil
 ---@param dir string
 ---@param args string[]
----@return string?
-local function git(dir, args)
-  local ok, result = pcall(
-    function()
-      return vim
-        .system(vim.list_extend({ 'git' }, args), { cwd = dir, text = true })
-        :wait(5000)
+---@param on_done fun(output: string?) Its output trimmed, nil on failure
+local function git(dir, args, on_done)
+  local ok = pcall(
+    vim.system,
+    vim.list_extend({ 'git' }, args),
+    { cwd = dir, text = true, timeout = 5000 },
+    function(result)
+      vim.schedule(function()
+        local output = vim.trim(result.stdout or '')
+        on_done(result.code == 0 and output ~= '' and output or nil)
+      end)
     end
   )
-  if not ok or result.code ~= 0 then return nil end
-  local line = vim.trim(result.stdout or '')
-  return line ~= '' and line or nil
+  -- Answered later even when git cannot start, as every other answer is
+  if not ok then vim.schedule(function() on_done(nil) end) end
 end
 
---- The first remote of `dir` on a forge this knows
----@param dir string
+--- The first remote of `urls` on a forge this knows, in `M.REMOTES` order
+---@param urls table<string, string> Clone URL by remote name
 ---@return DyForgeRemote?
-function M.remote(dir)
+function M.pick_remote(urls)
   for _, name in ipairs(M.REMOTES) do
-    local url = git(dir, { 'remote', 'get-url', name })
-    if url then
-      local host, slug = M.parse_url(url)
-      local kind = host and M.kind_of(host)
-      if kind then
-        return { name = name, host = host, slug = slug, kind = kind }
-      end
+    -- Not `urls[name] and M.parse_url(…)`: `and` keeps only the host
+    local host, slug
+    if urls[name] then
+      host, slug = M.parse_url(urls[name])
+    end
+    local kind = host and M.kind_of(host)
+    if kind then
+      return { name = name, host = host, slug = slug, kind = kind }
     end
   end
   return nil
 end
 
---- The branch checked out in `dir`, nil when detached
+--- Hand `on_done` the first remote of `dir` on a forge this knows
 ---@param dir string
----@return string?
-function M.branch(dir) return git(dir, { 'symbolic-ref', '--short', 'HEAD' }) end
+---@param on_done fun(remote: DyForgeRemote?)
+function M.remote(dir, on_done)
+  -- Every remote in one call, rather than one call per name tried
+  git(dir, { 'config', '--get-regexp', [[^remote\..*\.url$]] }, function(output)
+    local urls = {}
+    for name, url in (output or ''):gmatch('remote%.(%S+)%.url%s+(%S+)') do
+      urls[name] = url
+    end
+    on_done(M.pick_remote(urls))
+  end)
+end
+
+--- Hand `on_done` the branch checked out in `dir`, nil when detached
+---@param dir string
+---@param on_done fun(branch: string?)
+function M.branch(dir, on_done)
+  git(dir, { 'symbolic-ref', '--short', 'HEAD' }, on_done)
+end
 
 --- Percent-encode `text` for a path segment of a URL
 ---@param text string

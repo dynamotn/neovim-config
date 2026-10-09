@@ -360,36 +360,42 @@ local function notify(msg, level)
   vim.notify(msg, level or vim.log.levels.INFO, { title = 'OpenAPI' })
 end
 
---- The document of `bufnr`, decoded: JSON as it is, YAML through `yq`
+--- Hand `on_doc` the document of `bufnr`, decoded: JSON as it is, YAML
+--- through `yq` off the main loop
 ---@param bufnr integer
----@return table? doc
----@return string? err
-function M.decode(bufnr)
+---@param on_doc fun(doc: table?, err: string?)
+function M.decode(bufnr, on_doc)
   local source =
     table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), '\n')
-  local json = source
-  if not vim.bo[bufnr].filetype:match('^json') then
-    if vim.fn.executable('yq') ~= 1 then
-      return nil, 'yq is needed to read an OpenAPI document in YAML'
+  local function decode(json)
+    local ok, doc =
+      pcall(vim.json.decode, json, { luanil = { object = true, array = true } })
+    if not ok or type(doc) ~= 'table' then
+      return on_doc(nil, 'Not a JSON document')
     end
-    local ok, result = pcall(
-      function()
-        return vim
-          .system({ 'yq', '-o=json', '.' }, { stdin = source, text = true })
-          :wait(10000)
-      end
-    )
-    if not ok or result.code ~= 0 then
-      return nil,
-        'yq could not read it: '
-          .. (ok and vim.trim(result.stderr or '') or tostring(result))
-    end
-    json = result.stdout or ''
+    on_doc(doc)
   end
-  local ok, doc =
-    pcall(vim.json.decode, json, { luanil = { object = true, array = true } })
-  if not ok or type(doc) ~= 'table' then return nil, 'Not a JSON document' end
-  return doc
+  if vim.bo[bufnr].filetype:match('^json') then return decode(source) end
+  if vim.fn.executable('yq') ~= 1 then
+    return on_doc(nil, 'yq is needed to read an OpenAPI document in YAML')
+  end
+  local ok, err = pcall(
+    vim.system,
+    { 'yq', '-o=json', '.' },
+    { stdin = source, text = true, timeout = 10000 },
+    function(result)
+      vim.schedule(function()
+        if result.code ~= 0 then
+          return on_doc(
+            nil,
+            'yq could not read it: ' .. vim.trim(result.stderr or '')
+          )
+        end
+        decode(result.stdout or '')
+      end)
+    end
+  )
+  if not ok then on_doc(nil, 'yq could not run: ' .. tostring(err)) end
 end
 
 --- Open the request of the operation under the cursor, for `kind`
@@ -402,22 +408,23 @@ function M.open(kind)
   if not op then
     return notify('The cursor is in no operation', vim.log.levels.WARN)
   end
-  local doc, err = M.decode(bufnr)
-  if not doc then return notify(err, vim.log.levels.ERROR) end
-  local request, why = M.request(doc, op)
-  if not request then return notify(why, vim.log.levels.WARN) end
+  M.decode(bufnr, function(doc, err)
+    if not doc then return notify(err, vim.log.levels.ERROR) end
+    local request, why = M.request(doc, op)
+    if not request then return notify(why, vim.log.levels.WARN) end
 
-  vim.cmd('botright new')
-  local out = vim.api.nvim_get_current_buf()
-  vim.api.nvim_buf_set_lines(
-    out,
-    0,
-    -1,
-    false,
-    kind == 'hurl' and M.hurl(request) or M.http(request)
-  )
-  vim.bo[out].filetype = kind
-  vim.bo[out].modified = false
+    vim.cmd('botright new')
+    local out = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_set_lines(
+      out,
+      0,
+      -1,
+      false,
+      kind == 'hurl' and M.hurl(request) or M.http(request)
+    )
+    vim.bo[out].filetype = kind
+    vim.bo[out].modified = false
+  end)
 end
 
 --- `:OpenApiRequest [http|hurl]`
@@ -523,29 +530,49 @@ function M.diff(bufnr, rev)
     return notify('This buffer holds no file', vim.log.levels.WARN)
   end
   local dir, name = vim.fs.dirname(file), vim.fs.basename(file)
-  local old = vim
-    .system(
-      { 'git', 'show', ('%s:./%s'):format(rev, name) },
-      { cwd = dir, text = true }
-    )
-    :wait(10000)
-  if old.code ~= 0 then
-    return notify(
-      ('%s is not in git at %s'):format(name, rev),
-      vim.log.levels.WARN
-    )
-  end
+  -- The buffer as it is now: what is compared, however long the lookup takes
+  local current = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local modified = vim.bo[bufnr].modified
+  local ok_show = pcall(
+    vim.system,
+    { 'git', 'show', ('%s:./%s'):format(rev, name) },
+    { cwd = dir, text = true, timeout = 10000 },
+    function(old)
+      vim.schedule(function()
+        if old.code ~= 0 then
+          return notify(
+            ('%s is not in git at %s'):format(name, rev),
+            vim.log.levels.WARN
+          )
+        end
+        M.compare(bufnr, rev, file, old.stdout or '', current, modified)
+      end)
+    end
+  )
+  if not ok_show then notify('git could not run', vim.log.levels.ERROR) end
+end
+
+--- Compare `base_text`, the document at `rev`, with `current`, and show what
+--- breaks on `bufnr`
+---@param bufnr integer
+---@param rev string
+---@param file string
+---@param base_text string
+---@param current string[]
+---@param modified boolean Whether `current` differs from the file
+function M.compare(bufnr, rev, file, base_text, current, modified)
+  local dir, name = vim.fs.dirname(file), vim.fs.basename(file)
   -- Beside the document, under hidden names that keep its extension, so a
   -- relative `$ref` resolves from either side; the file itself stands for
   -- the buffer when they agree
   local base = vim.fs.joinpath(dir, '.oasdiff-base-' .. name)
   local revision = file
   local written = { base }
-  vim.fn.writefile(vim.split(old.stdout or '', '\n', { plain = true }), base)
-  if vim.bo[bufnr].modified then
+  vim.fn.writefile(vim.split(base_text, '\n', { plain = true }), base)
+  if modified then
     revision = vim.fs.joinpath(dir, '.oasdiff-revision-' .. name)
     table.insert(written, revision)
-    vim.fn.writefile(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), revision)
+    vim.fn.writefile(current, revision)
   end
   vim.system(
     { 'oasdiff', 'breaking', base, revision, '--format', 'json' },

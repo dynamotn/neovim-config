@@ -106,13 +106,14 @@ describe('tools.inspect', function()
     end)
 
     it('names a private key, never decodes it', function()
-      local lines = inspect.pem({
+      local lines
+      inspect.pem({
         kind = 'pem',
         label = 'PRIVATE KEY',
         text = 'x',
         first = 1,
         last = 1,
-      })
+      }, function(out) lines = out end)
       assert.same({
         '# PRIVATE KEY',
         '',
@@ -157,8 +158,16 @@ describe('tools.inspect', function()
           vim.api.nvim_set_current_buf(bufnr)
           vim.api.nvim_win_set_cursor(0, { 3, 0 })
           inspect.command({ fargs = {} })
+          -- Read off the main loop: the buffer opens when openssl answers
+          assert.are.equal(bufnr, vim.api.nvim_get_current_buf())
+          assert.is_true(
+            vim.wait(
+              5000,
+              function() return vim.api.nvim_get_current_buf() ~= bufnr end,
+              10
+            )
+          )
           local out = vim.api.nvim_get_current_buf()
-          assert.are_not.equal(bufnr, out)
           assert.is_truthy(require('util.sensitive').marked(out))
           local text =
             table.concat(vim.api.nvim_buf_get_lines(out, 0, -1, false), '\n')
@@ -170,8 +179,14 @@ describe('tools.inspect', function()
       it('warns on a certificate ending within the window', function()
         if not cert then return pending('openssl is not installed') end
         local bufnr = h.buffer({ lines = vim.list_extend({ 'a: 1' }, cert) })
-        local restore = h.stub(vim, 'notify', function() end)
+        local notes = {}
+        local restore = h.stub(
+          vim,
+          'notify',
+          function(msg) table.insert(notes, msg) end
+        )
         inspect.check_expiry(bufnr)
+        assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
         restore()
         local diagnostics = vim.diagnostic.get(bufnr)
         assert.equals(1, #diagnostics)
@@ -195,8 +210,14 @@ describe('tools.inspect', function()
       local path = vim.env.PATH
       vim.env.PATH = dir .. '/bin:' .. path
       local bufnr = h.buffer({ lines = PEM })
-      local restore = h.stub(vim, 'notify', function() end)
+      local notes = {}
+      local restore = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
       inspect.check_expiry(bufnr)
+      assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
       restore()
       vim.env.PATH = path
       local diagnostics = vim.diagnostic.get(bufnr)
@@ -207,6 +228,42 @@ describe('tools.inspect', function()
         diagnostics[1].message
       )
     end)
+  end)
+
+  it('sets nothing on a buffer edited while it checked', function()
+    vim.fn.mkdir(dir .. '/bin', 'p')
+    h.write(dir .. '/bin/openssl', {
+      '#!/bin/sh',
+      'cat > /dev/null',
+      'sleep 0.2',
+      'case "$*" in',
+      '  *-enddate*) echo "notAfter=Jan  1 00:00:00 2020 GMT";;',
+      '  *-checkend*) exit 1;;',
+      'esac',
+    })
+    vim.fn.setfperm(dir .. '/bin/openssl', 'rwxr-xr-x')
+    local path = vim.env.PATH
+    vim.env.PATH = dir .. '/bin:' .. path
+    local bufnr = h.buffer({
+      lines = {
+        '-----BEGIN CERTIFICATE-----',
+        'x',
+        '-----END CERTIFICATE-----',
+      },
+    })
+    local notes = {}
+    local restore = h.stub(
+      vim,
+      'notify',
+      function(msg) table.insert(notes, msg) end
+    )
+    inspect.check_expiry(bufnr)
+    vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, { '# moved' })
+    assert.is_true(vim.wait(5000, function() return #notes > 0 end, 10))
+    restore()
+    vim.env.PATH = path
+    assert.equals('The buffer changed meanwhile: check again', notes[1])
+    assert.same({}, vim.diagnostic.get(bufnr))
   end)
 
   it('says when nothing is under the cursor', function()

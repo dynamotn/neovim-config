@@ -174,67 +174,86 @@ function M.jwt(token, now)
   return lines
 end
 
---- Run `openssl` with `pem` on its input, never raising
+--- Run `openssl` with `pem` on its input, off the main loop, never raising
 ---@param args string[]
 ---@param pem string
----@return vim.SystemCompleted?
-local function openssl(args, pem)
-  if vim.fn.executable('openssl') ~= 1 then return nil end
-  local ok, result = pcall(
-    function()
-      return vim
-        .system(vim.list_extend({ 'openssl' }, args), { stdin = pem, text = true })
-        :wait(M.TIMEOUT)
+---@param on_done fun(result: vim.SystemCompleted?) Nil when it cannot run
+local function openssl(args, pem, on_done)
+  if vim.fn.executable('openssl') ~= 1 then
+    return vim.schedule(function() on_done(nil) end)
+  end
+  local ok = pcall(
+    vim.system,
+    vim.list_extend({ 'openssl' }, args),
+    { stdin = pem, text = true, timeout = M.TIMEOUT },
+    function(result)
+      vim.schedule(function() on_done(result) end)
     end
   )
-  return ok and result or nil
+  if not ok then vim.schedule(function() on_done(nil) end) end
 end
 
---- What a PEM block says, for reading
+--- The `openssl` arguments that print what a block of `label` says
+local READERS = {
+  CERTIFICATE = {
+    'x509',
+    '-noout',
+    '-subject',
+    '-issuer',
+    '-dates',
+    '-serial',
+    '-ext',
+    'subjectAltName,keyUsage,extendedKeyUsage,basicConstraints',
+    '-fingerprint',
+    '-sha256',
+  },
+  ['CERTIFICATE REQUEST'] = { 'req', '-noout', '-subject', '-text' },
+  ['PUBLIC KEY'] = { 'pkey', '-pubin', '-noout', '-text' },
+}
+
+--- Hand `on_done` what a PEM block says, for reading
 ---@param found DyInspectFound
----@return string[]? lines
----@return string? err
-function M.pem(found)
+---@param on_done fun(lines: string[]?, err: string?)
+function M.pem(found, on_done)
   local label = found.label or ''
   if label:match('PRIVATE KEY') then
-    return {
+    return on_done({
       '# ' .. label,
       '',
       'A private key: it is not decoded or shown here.',
-    }
+    })
   end
-  local args
-  if label == 'CERTIFICATE' then
-    args = {
-      'x509',
-      '-noout',
-      '-subject',
-      '-issuer',
-      '-dates',
-      '-serial',
-      '-ext',
-      'subjectAltName,keyUsage,extendedKeyUsage,basicConstraints',
-      '-fingerprint',
-      '-sha256',
-    }
-  elseif label == 'CERTIFICATE REQUEST' then
-    args = { 'req', '-noout', '-subject', '-text' }
-  elseif label == 'PUBLIC KEY' then
-    args = { 'pkey', '-pubin', '-noout', '-text' }
-  else
-    return nil, ('No reader for a %s block'):format(label)
+  local args = READERS[label]
+  if not args then
+    return on_done(nil, ('No reader for a %s block'):format(label))
   end
-  local result = openssl(args, found.text)
-  if not result then return nil, 'openssl is not installed' end
-  if result.code ~= 0 then
-    return nil, 'openssl could not read it: ' .. vim.trim(result.stderr or '')
-  end
-  local lines = { '# ' .. label, '' }
-  vim.list_extend(
-    lines,
-    vim.split(vim.trim(result.stdout or ''), '\n', { plain = true })
-  )
-  return lines
+  openssl(args, found.text, function(result)
+    if not result then return on_done(nil, 'openssl is not installed') end
+    if result.code ~= 0 then
+      return on_done(
+        nil,
+        'openssl could not read it: ' .. vim.trim(result.stderr or '')
+      )
+    end
+    local lines = { '# ' .. label, '' }
+    vim.list_extend(
+      lines,
+      vim.split(vim.trim(result.stdout or ''), '\n', { plain = true })
+    )
+    on_done(lines)
+  end)
+end
+
+--- Show `lines`, or why there are none
+---@param lines? string[]
+---@param err? string
+local function present(lines, err)
+  if not lines then return notify(err, vim.log.levels.WARN) end
+  scratch.open(lines, {
+    split = 'horizontal',
+    filetype = 'markdown',
+    sensitive = 'decoded from a certificate, a key or a token',
+  })
 end
 
 --- Show what the certificate, key or token under the cursor says
@@ -242,49 +261,40 @@ function M.under_cursor()
   local bufnr = vim.api.nvim_get_current_buf()
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  local text, err
   local token = M.jwt_at(lines[row] or '', col + 1)
-  if token then
-    text, err = M.jwt(token)
-  else
-    for _, found in ipairs(M.pems(lines)) do
-      if row >= found.first and row <= found.last then
-        text, err = M.pem(found)
-        break
-      end
-    end
-    if not text and not err then
-      err = 'No certificate, key or JWT under the cursor'
+  if token then return present(M.jwt(token)) end
+  for _, found in ipairs(M.pems(lines)) do
+    if row >= found.first and row <= found.last then
+      return M.pem(found, present)
     end
   end
-  if not text then return notify(err, vim.log.levels.WARN) end
-  scratch.open(text, {
-    split = 'horizontal',
-    filetype = 'markdown',
-    sensitive = 'decoded from a certificate, a key or a token',
-  })
+  present(nil, 'No certificate, key or JWT under the cursor')
 end
 
---- How long `pem` has left: 'expired', 'soon' or 'ok', and its end date
+--- Hand `on_done` how long `pem` has left: 'expired', 'soon' or 'ok', and
+--- its end date; nothing when openssl cannot read it
 ---@param pem string
----@return 'expired'|'soon'|'ok'|nil state
----@return string? ends
-function M.expiry(pem)
-  local ends = openssl({ 'x509', '-noout', '-enddate' }, pem)
-  if not ends or ends.code ~= 0 then return nil end
-  local when = vim.trim((ends.stdout or ''):gsub('^notAfter=', ''))
-  local now = openssl({ 'x509', '-noout', '-checkend', '0' }, pem)
-  if now and now.code ~= 0 then return 'expired', when end
-  local soon = openssl(
-    { 'x509', '-noout', '-checkend', tostring(M.WARN_DAYS * 86400) },
-    pem
-  )
-  if soon and soon.code ~= 0 then return 'soon', when end
-  return 'ok', when
+---@param on_done fun(state: 'expired'|'soon'|'ok'|nil, ends: string?)
+function M.expiry(pem, on_done)
+  openssl({ 'x509', '-noout', '-enddate' }, pem, function(ends)
+    if not ends or ends.code ~= 0 then return on_done(nil) end
+    local when = vim.trim((ends.stdout or ''):gsub('^notAfter=', ''))
+    openssl({ 'x509', '-noout', '-checkend', '0' }, pem, function(now)
+      if now and now.code ~= 0 then return on_done('expired', when) end
+      openssl(
+        { 'x509', '-noout', '-checkend', tostring(M.WARN_DAYS * 86400) },
+        pem,
+        function(soon)
+          if soon and soon.code ~= 0 then return on_done('soon', when) end
+          on_done('ok', when)
+        end
+      )
+    end)
+  end)
 end
 
 --- Warn on the line of each certificate of the buffer expired or ending
---- soon
+--- soon, the certificates checked one after the other off the main loop
 ---@param bufnr? integer
 function M.check_expiry(bufnr)
   bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf()
@@ -292,12 +302,34 @@ function M.check_expiry(bufnr)
   if vim.fn.executable('openssl') ~= 1 then
     return notify('openssl is not installed', vim.log.levels.ERROR)
   end
-  local diagnostics, checked = {}, 0
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  for _, found in ipairs(M.pems(lines)) do
-    if found.label == 'CERTIFICATE' then
-      checked = checked + 1
-      local state, when = M.expiry(found.text)
+  local certificates = vim.tbl_filter(
+    function(found) return found.label == 'CERTIFICATE' end,
+    M.pems(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false))
+  )
+  local tick = vim.api.nvim_buf_get_changedtick(bufnr)
+  local diagnostics, index = {}, 0
+  local function next_certificate()
+    index = index + 1
+    local found = certificates[index]
+    if not found then
+      if not vim.api.nvim_buf_is_valid(bufnr) then return end
+      -- Edited meanwhile: the lines found may point elsewhere now
+      if vim.api.nvim_buf_get_changedtick(bufnr) ~= tick then
+        return notify(
+          'The buffer changed meanwhile: check again',
+          vim.log.levels.WARN
+        )
+      end
+      vim.diagnostic.set(ns, bufnr, diagnostics)
+      return notify(
+        ('%d certificates checked, %d expired or ending soon'):format(
+          #certificates,
+          #diagnostics
+        ),
+        #diagnostics > 0 and vim.log.levels.WARN or nil
+      )
+    end
+    M.expiry(found.text, function(state, when)
       if state == 'expired' or state == 'soon' then
         table.insert(diagnostics, {
           lnum = found.first - 1,
@@ -313,16 +345,10 @@ function M.check_expiry(bufnr)
           source = 'inspect',
         })
       end
-    end
+      next_certificate()
+    end)
   end
-  vim.diagnostic.set(ns, bufnr, diagnostics)
-  notify(
-    ('%d certificates checked, %d expired or ending soon'):format(
-      checked,
-      #diagnostics
-    ),
-    #diagnostics > 0 and vim.log.levels.WARN or nil
-  )
+  next_certificate()
 end
 
 --- `:DyInspect [expiry]`

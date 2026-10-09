@@ -419,7 +419,14 @@ describe('tools.openapi', function()
       return pending('yq is not installed')
     end
     local bufnr = h.buffer({ lines = YAML, filetype = 'yaml.openapi' })
-    local doc = assert(openapi.decode(bufnr))
+    local doc, err, done
+    openapi.decode(bufnr, function(d, e)
+      doc, err, done = d, e, true
+    end)
+    -- yq runs off the main loop
+    assert.is_nil(done)
+    assert.is_true(vim.wait(5000, function() return done end, 10))
+    assert.is_nil(err)
     assert.equals('showPet', doc.paths['/pets/{petId}'].get.operationId)
   end)
 end)

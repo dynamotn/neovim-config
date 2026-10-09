@@ -251,6 +251,7 @@ describe('tools.ci_inline', function()
       vim.cmd.edit(repo .. '/.github/workflows/ci.yml')
       vim.bo.filetype = 'yaml.gh-action'
       ci.status(0)
+      assert.is_true(vim.wait(5000, function() return #notes > 1 end, 20))
       assert.is_truthy(notes[2]:find('^No github remote'))
     end)
 

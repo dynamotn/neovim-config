@@ -43,12 +43,36 @@ describe('util.forge', function()
     git('remote', 'add', 'origin', 'git@gitlab.com:g/p.git')
     git('remote', 'add', 'upstream', 'https://codeberg.org/x/y')
     git('remote', 'add', 'gh', 'https://github.com/o/r')
+
+    --- What an asynchronous lookup hands back, waited for
+    local function await(fn, path)
+      local done, value = false, nil
+      fn(path, function(result)
+        done, value = true, result
+      end)
+      -- Nothing is answered before the main loop turns
+      assert.is_false(done)
+      assert.is_true(vim.wait(5000, function() return done end, 10))
+      return value
+    end
     assert.same(
       { name = 'gh', host = 'github.com', slug = 'o/r', kind = 'github' },
-      forge.remote(dir)
+      await(forge.remote, dir)
     )
-    assert.equals('trunk', forge.branch(dir))
-    assert.is_nil(forge.remote(dir .. '/nowhere'))
+    assert.equals('trunk', await(forge.branch, dir))
+    vim.fn.mkdir(dir .. '/nowhere', 'p')
+    assert.is_nil(await(forge.remote, vim.fn.tempname()))
+  end)
+
+  it('picks the remote in order, the slug kept', function()
+    assert.same(
+      { name = 'origin', host = 'gitlab.com', slug = 'g/p', kind = 'gitlab' },
+      forge.pick_remote({
+        origin = 'git@gitlab.com:g/p.git',
+        upstream = 'https://codeberg.org/x/y',
+      })
+    )
+    assert.is_nil(forge.pick_remote({}))
   end)
 
   it(
