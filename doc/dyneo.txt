@@ -401,6 +401,20 @@ of a chart is rendered first and piped in, with the values file being edited
 as its values.  A diff or a render can hold Secret data, so its buffer is
 kept from every AI integration.
 
+Container images                                               *dyneo-images*
+
+A Dockerfile names its bases in `FROM`, a manifest or a compose file in
+`image:`; build stages, `scratch` and names holding a variable are left out.
+|:ImageScan| asks `trivy image` (or `grype`) about each image once, and puts
+what it knows on each line naming it: how many vulnerabilities by severity
+and the worst of their ids, an error with any critical or high one.  The
+first scan downloads the vulnerability database.
+
+|:ImagePin| pins each tag to the digest it points at now, through `crane` or
+`skopeo`: `nginx:1.27` becomes `nginx:1.27@sha256:…`, so a tag pushed again
+does not change what runs.  An image pinned already is left alone, and
+nothing is pinned if the file was edited while the registry answered.
+
 Policy checks                                                  *dyneo-policy*
 
 Infrastructure code is linted against policies as well as for style, each
@@ -852,6 +866,12 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         `infracost`.
 :TfPlan clear           Clear the plan, drift and costs shown.  See
                         |dyneo-tfplan|.
+
+                                                                  *:ImageScan*
+:ImageScan              Scan the images this file names for known
+                        vulnerabilities.
+                                                                   *:ImagePin*
+:ImagePin               Pin them to their digests.  See |dyneo-images|.
 
                                                                        *:Kube*
 :Kube [diff]            Diff this manifest, kustomization or chart with the

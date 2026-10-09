@@ -468,6 +468,7 @@ local function requirements()
     yq = '`:OpenApiRequest` on a YAML document',
     openssl = '`:DyInspect` on a certificate',
     oasdiff = '`:OpenApiDiff` (`:MasonInstall oasdiff`)',
+    crane = '`:ImagePin` (or `skopeo`)',
   }
   for _, command in ipairs(required) do
     table.insert(
