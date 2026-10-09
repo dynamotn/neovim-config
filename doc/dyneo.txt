@@ -44,7 +44,8 @@ CONTENTS                                                      *dyneo-contents*
        6.4 Container images ................................... |dyneo-images|
        6.5 Policy checks ...................................... |dyneo-policy|
        6.6 Terraform plan ..................................... |dyneo-tfplan|
-       6.7 Architecture diagrams ........................ |dyneo-architecture|
+       6.7 Terraform state ................................... |dyneo-tfstate|
+       6.8 Architecture diagrams ........................ |dyneo-architecture|
     7. Operations ................................................ |dyneo-ops|
        7.1 Runbooks .......................................... |dyneo-runbook|
        7.2 Logs ................................................. |dyneo-logs|
@@ -584,7 +585,28 @@ summed per module call, with the total in a notification.  The plan goes to
 resource priced by usage alone adds nothing.  `infracost` keeps its own API
 key: run `infracost auth login` once.
 
-6.7 Architecture diagrams                                 *dyneo-architecture*
+6.7 Terraform state                                            *dyneo-tfstate*
+
+In a Terraform buffer, `<localleader>s` (|:DyTfState|) shows what the state
+holds for the block under the cursor, as `state show` prints it; a block
+with a `count` or a `for_each` asks for the instance first, and a module
+lists the addresses under it.  `<localleader>o` (`:DyTfState orphans`) lists
+what the state holds that no block of the module declares any more -- the
+objects the next plan destroys, unless a `removed` or a `moved` block says
+otherwise.
+
+`<localleader>I` (`:DyTfState import`) brings an object that exists already
+under the resource under the cursor: it asks for the ID and writes an
+`import` block above the resource, for the next plan to carry out.  It says
+so instead when the state holds the resource already, and asks for the key
+of `to` when the resource has a `count` or a `for_each`.
+
+Only `state list` and `state show` run, which read the state and never write
+it, with `TF_INPUT=0` so a backend cannot stop to ask for input.  The state
+holds every attribute in plain text, so what is shown of it is held back from
+every AI integration.
+
+6.8 Architecture diagrams                                 *dyneo-architecture*
 
 `<leader>ia` (|:DyArchitecture|) draws what the directory of the buffer
 declares, as D2 in a new buffer to preview (|dyneo-diagram|) or to keep:
@@ -920,8 +942,8 @@ Editing ~
 
 Mappings under `<localleader>` belong to one kind of buffer and are listed
 with the feature they drive: |dyneo-encrypted|, |dyneo-kube|, |dyneo-helm|,
-|dyneo-tfplan|, |dyneo-runbook|, |dyneo-logs|, |dyneo-ci| and
-|dyneo-openapi|.
+|dyneo-tfplan|, |dyneo-tfstate|, |dyneo-runbook|, |dyneo-logs|, |dyneo-ci|
+and |dyneo-openapi|.
 
 Command-line abbreviations, which only fire as a whole command line, so a
 `/W` in a search is left alone:
@@ -1058,6 +1080,13 @@ Infrastructure ~
                         or destroyed.
 :DyTfPlan clear         Clear the plan, drift and costs shown.  See
                         |dyneo-tfplan|.
+
+                                                                  *:DyTfState*
+:DyTfState [show]       What the state holds for the block under the cursor.
+:DyTfState orphans      What the state holds that the module no longer
+                        declares.
+:DyTfState import       Write an `import` block above the resource under the
+                        cursor.  See |dyneo-tfstate|.
 
                                                              *:DyArchitecture*
 :DyArchitecture         Draw what this directory declares -- Terraform,

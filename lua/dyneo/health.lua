@@ -469,6 +469,7 @@ local function requirements()
     openssl = '`:DyInspect` on a certificate',
     oasdiff = '`:DyOpenApiDiff` (`:MasonInstall oasdiff`)',
     crane = '`:DyImagePin` (or `skopeo`)',
+    tofu = '`:DyTfPlan` and `:DyTfState` (or `terraform`)',
   }
   for _, command in ipairs(required) do
     table.insert(

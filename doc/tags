@@ -35,6 +35,7 @@
 :DySpell	dyneo.txt	/*:DySpell*
 :DySudoWrite	dyneo.txt	/*:DySudoWrite*
 :DyTfPlan	dyneo.txt	/*:DyTfPlan*
+:DyTfState	dyneo.txt	/*:DyTfState*
 :DyYamlSchema	dyneo.txt	/*:DyYamlSchema*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*
 DyNeo.completion_sources	dyneo.txt	/*DyNeo.completion_sources*
@@ -96,6 +97,7 @@ dyneo-security	dyneo.txt	/*dyneo-security*
 dyneo-spell	dyneo.txt	/*dyneo-spell*
 dyneo-statusline	dyneo.txt	/*dyneo-statusline*
 dyneo-tfplan	dyneo.txt	/*dyneo-tfplan*
+dyneo-tfstate	dyneo.txt	/*dyneo-tfstate*
 dyneo-troubleshooting	dyneo.txt	/*dyneo-troubleshooting*
 dyneo-update	dyneo.txt	/*dyneo-update*
 dyneo-workspace	dyneo.txt	/*dyneo-workspace*

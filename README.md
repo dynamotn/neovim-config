@@ -95,6 +95,9 @@ below follow the sections of `:help dyneo`.
 - **Terraform plan** shown on the blocks it changes, with drift, the monthly
   cost of each block (infracost) and what depends on each replacement.
   `<localleader>p`
+- **Terraform state** of the block under the cursor, what the state holds
+  that the code no longer declares, and `import` blocks written for you.
+  `<localleader>s`
 - **Architecture diagrams** drawn from Terraform, manifests and compose
   files. `:DyArchitecture`
 
