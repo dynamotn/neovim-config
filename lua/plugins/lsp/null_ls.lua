@@ -134,16 +134,12 @@ return {
             end
             -- and the others once a buffer of their language opens
             if vim.list_contains(DyNeo.enabled_languages, name) then
-              vim.api.nvim_create_autocmd({ 'FileType' }, {
-                pattern = language.filetypes,
-                group = vim.api.nvim_create_augroup(
-                  'mason_nullls_' .. name .. '_' .. tool_package,
-                  {}
-                ),
-                callback = function()
+              require('util.lazy_install').on_filetype(
+                language.filetypes,
+                function()
                   require('util.lazy_install').install_once(tool_package)
-                end,
-              })
+                end
+              )
             end
           end
         end

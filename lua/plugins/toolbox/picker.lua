@@ -140,7 +140,7 @@ return {
             { 'gI', function() Snacks.picker.lsp_implementations() end, desc = 'Goto Implementation' },
             { 'gy', function() Snacks.picker.lsp_type_definitions() end, desc = 'Goto T[y]pe Definition' },
             { '<leader>ss', function() Snacks.picker.lsp_symbols({ filter = require('config.defaults').kind_filter }) end, desc = 'LSP Symbols', has = 'documentSymbol' },
-            { '<leader>sS', function() Snacks.picker.lsp_workspace_symbols({ filter = require('config.defaults').kind_filter }) end, desc = 'LSP Workspace Symbols', has = 'workspace/symbols' },
+            { '<leader>sS', function() Snacks.picker.lsp_workspace_symbols({ filter = require('config.defaults').kind_filter }) end, desc = 'LSP Workspace Symbols', has = 'workspace/symbol' },
             { '<leader>cki', function() Snacks.picker.lsp_incoming_calls() end, desc = 'C[a]lls Incoming', has = 'callHierarchy/incomingCalls' },
             { '<leader>cko', function() Snacks.picker.lsp_outgoing_calls() end, desc = 'C[a]lls Outgoing', has = 'callHierarchy/outgoingCalls' },
           },

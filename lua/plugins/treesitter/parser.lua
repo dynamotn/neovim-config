@@ -1,6 +1,10 @@
 local TS = require('util.treesitter')
 local Plugin = require('util.plugin')
 
+--- Parsers an install was started for this session
+---@type table<string, true>
+local attempted = {}
+
 return {
   {
     'nvim-treesitter/nvim-treesitter',
@@ -107,14 +111,26 @@ return {
                   function(parser) return not installed[parser] end,
                   wanted
                 )
+                -- Tried once a session: a parser that fails to build would
+                -- otherwise be built again on every buffer of the language
+                missing = vim.tbl_filter(
+                  function(parser) return not attempted[parser] end,
+                  missing
+                )
                 if #missing > 0 then
+                  for _, parser in ipairs(missing) do
+                    attempted[parser] = true
+                  end
                   treesitter
                     .install(missing, { summary = true })
                     :await(function()
                       -- refresh the installed langs
                       TS.get_installed(true)
-                      vim.cmd(string.format('%dbuffer', ev.buf))
-                      vim.cmd('e!')
+                      -- Set up the buffer again rather than `:e!` it, which
+                      -- would drop what was typed while the parser built
+                      if vim.api.nvim_buf_is_loaded(ev.buf) then
+                        vim.bo[ev.buf].filetype = vim.bo[ev.buf].filetype
+                      end
                     end)
                 end
               end

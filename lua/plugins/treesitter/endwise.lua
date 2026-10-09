@@ -7,26 +7,13 @@ for _, config in pairs(languages_list) do
   vim.list_extend(supported_filetypes, config.filetypes)
 end
 
+-- The plugin attaches through a `FileType` autocmd of its own, which lazy.nvim
+-- replays for the buffer that loaded it: loading on those filetypes alone is
+-- enough. nvim-treesitter's `main` branch has no modules to set up.
 return {
-  {
-    'nvim-treesitter',
-    opts = {
-      endwise = {
-        enable = true,
-      },
-    },
-  },
   {
     -- Automatically insert end keyword
     'RRethy/nvim-treesitter-endwise',
-    event = { 'BufReadPost', 'BufNewFile' },
     ft = supported_filetypes,
-    config = function()
-      if require('util.plugin').is_loaded('nvim-treesitter') then
-        local opts = require('util.plugin').opts('nvim-treesitter')
-        ---@diagnostic disable-next-line: missing-fields
-        require('nvim-treesitter').setup({ endwise = opts.endwise })
-      end
-    end,
   },
 }

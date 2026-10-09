@@ -1,6 +1,37 @@
 local Plugin = require('util.plugin')
 local Lsp = require('util.lsp')
 
+--- Read the project's settings (`.vscode/settings.json` and the like) into
+--- the config of a server about to start
+---@param config vim.lsp.ClientConfig
+local function with_local_settings(_, config)
+  require('codesettings').with_local_settings(config.name, config)
+end
+
+--- The servers nvim-lspconfig ships with a `before_init` of their own
+local OWN_BEFORE_INIT = {
+  astro = true,
+  eslint = true,
+  golangci_lint_ls = true,
+  mdx_analyzer = true,
+  oxlint = true,
+  tailwindcss = true,
+}
+
+--- The `before_init` of `lsp/<server>.lua` on the runtimepath, if any
+---@param server string
+---@return function?
+local function shipped_before_init(server)
+  for _, file in
+    ipairs(vim.api.nvim_get_runtime_file('lsp/' .. server .. '.lua', true))
+  do
+    local ok, config = pcall(dofile, file)
+    if ok and type(config) == 'table' and config.before_init then
+      return config.before_init
+    end
+  end
+end
+
 --- Defaults under whatever the specs loaded ahead of this one set
 ---@return PluginLspOpts
 local function default_opts()
@@ -192,10 +223,7 @@ return {
       opts = vim.tbl_deep_extend('keep', opts, defaults)
       opts.servers['*'].keys = vim.list_extend(defaults.servers['*'].keys, keys)
       opts.folds.enabled = false
-      opts.servers['*'].before_init = function(_, config)
-        local codesettings = require('codesettings')
-        codesettings.with_local_settings(config.name, config)
-      end
+      opts.servers['*'].before_init = with_local_settings
       return opts
     end,
     ---@param opts PluginLspOpts
@@ -256,15 +284,7 @@ return {
         )
       end
 
-      -- diagnostics signs and virtual text
-      if type(opts.diagnostics.signs) ~= 'boolean' then
-        for severity, icon in pairs(opts.diagnostics.signs.text) do
-          local name =
-            vim.diagnostic.severity[severity]:lower():gsub('^%l', string.upper)
-          name = 'DiagnosticSign' .. name
-          vim.fn.sign_define(name, { text = icon, texthl = name, numhl = '' })
-        end
-      end
+      -- Diagnostic signs come from `vim.diagnostic.config` alone since 0.12
       if
         type(opts.diagnostics.virtual_text) == 'table'
         and opts.diagnostics.virtual_text.prefix == 'icons'
@@ -437,6 +457,17 @@ return {
         if server_opts.enabled == false then
           table.insert(mason_exclude, server)
           return
+        end
+        -- A server shipping a `before_init` of its own has it laid over the
+        -- one of `*`, and would never read the project's settings
+        if server_opts.before_init == nil and OWN_BEFORE_INIT[server] then
+          local own = shipped_before_init(server)
+          server_opts = vim.tbl_extend('force', server_opts, {
+            before_init = function(params, config)
+              if own then own(params, config) end
+              with_local_settings(params, config)
+            end,
+          })
         end
         -- Merged into what was set for the server so far, not into its
         -- resolved config: resolving it here would search the runtimepath
