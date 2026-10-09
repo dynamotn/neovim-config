@@ -1,0 +1,281 @@
+local h = require('helpers')
+
+local YAML = {
+  'openapi: 3.0.3',
+  'servers:',
+  '  - url: https://api.example.com/v1/',
+  'paths:',
+  '  /pets/{petId}:',
+  '    parameters:',
+  '      - $ref: "#/components/parameters/PetId"',
+  '    get:',
+  '      operationId: showPet',
+  '      parameters:',
+  '        - name: verbose',
+  '          in: query',
+  '          schema: { type: boolean }',
+  '      responses:',
+  '        "200":',
+  '          description: ok',
+  '    put:',
+  '      requestBody:',
+  '        content:',
+  '          application/json:',
+  '            schema:',
+  '              $ref: "#/components/schemas/Pet"',
+  'components:',
+  '  parameters:',
+  '    PetId:',
+  '      name: petId',
+  '      in: path',
+  '      example: 7',
+}
+
+local DOC = {
+  openapi = '3.0.3',
+  servers = { { url = 'https://api.example.com/v1/' } },
+  paths = {
+    ['/pets/{petId}'] = {
+      parameters = { { ['$ref'] = '#/components/parameters/PetId' } },
+      get = {
+        operationId = 'showPet',
+        parameters = {
+          { name = 'verbose', ['in'] = 'query', schema = { type = 'boolean' } },
+          { name = 'X-Trace', ['in'] = 'header', example = 'abc' },
+          { name = 'petId', ['in'] = 'path', example = 9 },
+        },
+      },
+      put = {
+        requestBody = {
+          content = {
+            ['application/json'] = {
+              schema = { ['$ref'] = '#/components/schemas/Pet' },
+            },
+          },
+        },
+      },
+    },
+  },
+  components = {
+    parameters = {
+      PetId = { name = 'petId', ['in'] = 'path', example = 7 },
+    },
+    schemas = {
+      Pet = {
+        type = 'object',
+        properties = {
+          name = { type = 'string' },
+          born = { type = 'string', format = 'date' },
+          tags = { type = 'array', items = { type = 'string', enum = { 'a' } } },
+          owner = { ['$ref'] = '#/components/schemas/Owner' },
+        },
+      },
+      Owner = {
+        allOf = {
+          { properties = { id = { type = 'integer' } } },
+          { properties = { email = { type = 'string', format = 'email' } } },
+        },
+      },
+      Loop = {
+        properties = { next = { ['$ref'] = '#/components/schemas/Loop' } },
+      },
+    },
+  },
+}
+
+describe('tools.openapi', function()
+  local openapi
+
+  before_each(function()
+    h.unload('tools.openapi')
+    openapi = require('tools.openapi')
+  end)
+  after_each(function() vim.cmd('silent! %bwipeout!') end)
+
+  describe('operation_at', function()
+    it('finds the method and path holding a line of YAML', function()
+      assert.same(
+        { path = '/pets/{petId}', method = 'get' },
+        openapi.operation_at(YAML, 16)
+      )
+      assert.same(
+        { path = '/pets/{petId}', method = 'get' },
+        openapi.operation_at(YAML, 8)
+      )
+      assert.same(
+        { path = '/pets/{petId}', method = 'put' },
+        openapi.operation_at(YAML, 22)
+      )
+      -- On the path, or among its own parameters: no method yet
+      assert.same({ path = '/pets/{petId}' }, openapi.operation_at(YAML, 7))
+      assert.is_nil(openapi.operation_at(YAML, 28))
+      assert.is_nil(openapi.operation_at(YAML, 1))
+    end)
+
+    it('finds them in pretty-printed JSON', function()
+      local json = vim.split(
+        [[{
+  "paths": {
+    "/users": {
+      "post": {
+        "summary": "add",
+        "requestBody": {
+        }
+      }
+    }
+  }
+}]],
+        '\n'
+      )
+      assert.same(
+        { path = '/users', method = 'post' },
+        openapi.operation_at(json, 5)
+      )
+      assert.same(
+        { path = '/users', method = 'post' },
+        openapi.operation_at(json, 7)
+      )
+    end)
+  end)
+
+  it('follows local refs, and stops at a loop', function()
+    assert.equals(
+      'petId',
+      openapi.resolve(DOC, { ['$ref'] = '#/components/parameters/PetId' }).name
+    )
+    local outside = { ['$ref'] = 'other.yaml#/x' }
+    assert.equals(outside, openapi.resolve(DOC, outside))
+    local loop = { ['$ref'] = '#/a' }
+    assert.equals('table', type(openapi.resolve({ a = loop }, loop)))
+    assert.equals(
+      'table',
+      type(openapi.example(DOC, DOC.components.schemas.Loop))
+    )
+  end)
+
+  it('makes an example out of a schema', function()
+    assert.same({
+      name = 'string',
+      born = '2026-01-01',
+      tags = { 'a' },
+      owner = { id = 0, email = 'user@example.com' },
+    }, openapi.example(DOC, { ['$ref'] = '#/components/schemas/Pet' }))
+    assert.equals(5, openapi.example(DOC, { type = 'integer', example = 5 }))
+    assert.equals('x', openapi.example(DOC, { oneOf = { { enum = { 'x' } } } }))
+  end)
+
+  describe('request', function()
+    it('takes the operation parameters over the path ones', function()
+      local request =
+        openapi.request(DOC, { path = '/pets/{petId}', method = 'get' })
+      assert.equals('showPet', request.name)
+      assert.equals('GET', request.method)
+      assert.equals('https://api.example.com/v1', request.base)
+      assert.equals('/pets/{{petId}}', request.path)
+      assert.same({ { name = 'petId', value = '9' } }, request.vars)
+      assert.same({ { name = 'verbose', value = 'false' } }, request.query)
+      assert.same({ { name = 'X-Trace', value = 'abc' } }, request.headers)
+      assert.is_nil(request.body)
+    end)
+
+    it('makes a JSON body, and names an unnamed operation', function()
+      local request =
+        openapi.request(DOC, { path = '/pets/{petId}', method = 'put' })
+      assert.equals('PUT /pets/{petId}', request.name)
+      assert.same({ { name = 'petId', value = '7' } }, request.vars)
+      assert.equals('application/json', request.content_type)
+      assert.same({
+        name = 'string',
+        born = '2026-01-01',
+        tags = { 'a' },
+        owner = { id = 0, email = 'user@example.com' },
+      }, vim.json.decode(request.body))
+    end)
+
+    it(
+      'takes the first method of a path when none is under the cursor',
+      function()
+        assert.equals(
+          'GET',
+          openapi.request(DOC, { path = '/pets/{petId}' }).method
+        )
+        assert.is_nil(openapi.request(DOC, { path = '/nope' }))
+        assert.is_nil(
+          openapi.request({ paths = { ['/x'] = {} } }, { path = '/x' })
+        )
+      end
+    )
+  end)
+
+  it('writes it for kulala and for Hurl', function()
+    local request =
+      openapi.request(DOC, { path = '/pets/{petId}', method = 'get' })
+    assert.same({
+      '@baseUrl = https://api.example.com/v1',
+      '@petId = 9',
+      '@verbose = false',
+      '@X-Trace = abc',
+      '',
+      '### showPet',
+      'GET {{baseUrl}}/pets/{{petId}}?verbose={{verbose}}',
+      'X-Trace: {{X-Trace}}',
+    }, openapi.http(request))
+    assert.same({
+      '# showPet',
+      '# hurl --variable baseUrl=https://api.example.com/v1 --variable petId=9'
+        .. ' --variable verbose=false --variable X-Trace=abc',
+      'GET {{baseUrl}}/pets/{{petId}}',
+      'X-Trace: {{X-Trace}}',
+      '[QueryStringParams]',
+      'verbose: {{verbose}}',
+    }, openapi.hurl(request))
+
+    local put = openapi.http(
+      openapi.request(DOC, { path = '/pets/{petId}', method = 'put' })
+    )
+    -- The body comes after its type and a blank line
+    local at = vim.fn.index(put, 'Content-Type: application/json') + 1
+    assert.is_true(at > 0)
+    assert.equals('', put[at + 1])
+    assert.equals('{', put[at + 2])
+  end)
+
+  it('opens the request of the operation under the cursor', function()
+    local bufnr = h.buffer({
+      lines = vim.split(vim.json.encode(DOC), '\n'),
+      filetype = 'json.openapi',
+    })
+    vim.api.nvim_set_current_buf(bufnr)
+    local notes = {}
+    local restore = h.stub(
+      vim,
+      'notify',
+      function(msg) table.insert(notes, msg) end
+    )
+    -- One line of JSON: the cursor is in no operation
+    openapi.command({ fargs = { 'hurl' } })
+    restore()
+    assert.equals('The cursor is in no operation', notes[1])
+
+    local pretty = vim.split(vim.json.encode(DOC, { indent = '  ' }), '\n')
+    bufnr = h.buffer({ lines = pretty, filetype = 'json.openapi' })
+    vim.api.nvim_set_current_buf(bufnr)
+    local row
+    for number, line in ipairs(pretty) do
+      if line:find('"operationId"', 1, true) then row = number end
+    end
+    vim.api.nvim_win_set_cursor(0, { row, 0 })
+    openapi.command({ fargs = { 'hurl' } })
+    assert.equals('hurl', vim.bo.filetype)
+    assert.equals('# showPet', vim.api.nvim_buf_get_lines(0, 0, 1, false)[1])
+  end)
+
+  it('reads YAML through yq', function()
+    if vim.fn.executable('yq') ~= 1 then
+      return pending('yq is not installed')
+    end
+    local bufnr = h.buffer({ lines = YAML, filetype = 'yaml.openapi' })
+    local doc = assert(openapi.decode(bufnr))
+    assert.equals('showPet', doc.paths['/pets/{petId}'].get.operationId)
+  end)
+end)

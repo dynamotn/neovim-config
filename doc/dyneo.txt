@@ -453,6 +453,18 @@ first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
 what is running.  A block that deletes, destroys or reaches for root asks
 first.  See |:Runbook|.
 
+OpenAPI requests                                               *dyneo-openapi*
+
+In an OpenAPI document (`openapi*.yaml`, `openapi*.json`), `<localleader>h`
+opens the operation under the cursor as a kulala request, and
+`<localleader>H` as a Hurl one (|:OpenApiRequest|).  The cursor may be
+anywhere inside the method, or on the path for its first method.  The first
+server becomes `baseUrl`; each path, query and header parameter becomes a
+variable holding its example; a JSON body is made from the example of the
+request, or from its schema.  `$ref`s inside the document are followed.  A
+YAML document is read through `yq`.  The request opens in a new buffer, to
+save where it belongs.
+
 CI pipelines                                                        *dyneo-ci*
 
 In a `.gitlab-ci.yml` or a GitHub Actions workflow, `<localleader>s` (or
@@ -708,6 +720,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :DyLog kube {pod} [{args}]
                         Read the logs of {pod}, {args} passed to
                         `kubectl logs`.  See |dyneo-logs|.
+
+                                                             *:OpenApiRequest*
+:OpenApiRequest [http]  Open the OpenAPI operation under the cursor as a
+                        kulala request.
+:OpenApiRequest hurl    The same, as a Hurl request.  See |dyneo-openapi|.
 
                                                               *:EncryptedDiff*
 :EncryptedDiff [{rev}]  Diff the clear text of this decrypted buffer with its

@@ -464,6 +464,8 @@ local function requirements()
   local on_demand = {
     infracost = '`:TfPlan cost`',
     glab = '`:CiStatus` and `:CiLint` on GitLab',
+    jq = 'the jq filter of `:DyLog`',
+    yq = '`:OpenApiRequest` on a YAML document',
   }
   for _, command in ipairs(required) do
     table.insert(

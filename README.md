@@ -55,7 +55,7 @@ says what is missing.
 | 🛠 | **Tasks** — run, build and test the current file or project in ~50 languages | `<leader>oo` |
 | 🖼 | **Previews** — D2 diagrams inline on kitty-graphics terminals, Markdown, Typst | `<leader>cp` |
 | 📚 | **Spelling** — Vietnamese, Chinese and technical word lists; code comments too | `:DySpell vi` |
-| 🔌 | **Integrations** — Obsidian, chezmoi templates, firenvim, zellij, AI CLIs | |
+| 🔌 | **Integrations** — Obsidian, chezmoi templates, firenvim, zellij, AI CLIs; the OpenAPI operation under the cursor as a kulala or Hurl request | `:OpenApiRequest` |
 
 <details>
 <summary><b>42 languages · 13 frameworks · 38 tools</b> — 126 filetypes in all</summary>
