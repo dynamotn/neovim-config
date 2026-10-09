@@ -152,17 +152,11 @@ return {
       -- the answer, so it is waited for here, but not for long: a git that
       -- hangs (a lock, a slow filesystem) answers "not ignored".
       local path = vim.uri_to_fname(file_uri)
-      local ok, git = pcall(
-        function()
-          return vim
-            .system(
-              { 'git', 'check-ignore', '--quiet', path },
-              { cwd = vim.fs.dirname(path) }
-            )
-            :wait(2000)
-        end
+      local git = require('util.system').sync(
+        { 'git', 'check-ignore', '--quiet', path },
+        { cwd = vim.fs.dirname(path), timeout = 2000 }
       )
-      return ok and git.code == 0
+      return git.code == 0
     end,
     ['sonarlint/listFilesInFolder'] = function(_, params, _, _)
       local folder = vim.uri_to_fname(params.folderUri)

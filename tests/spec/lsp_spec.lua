@@ -76,6 +76,21 @@ describe('lsp', function()
     end
   end)
 
+  it('sonarlint answers a hung git as not ignored, in time', function()
+    vim.fn.mkdir(dir .. '/bin', 'p')
+    h.write(dir .. '/bin/git', { '#!/bin/sh', 'sleep 10' })
+    vim.fn.setfperm(dir .. '/bin/git', 'rwxr-xr-x')
+    local path = vim.env.PATH
+    vim.env.PATH = dir .. '/bin:' .. path
+    local handler = load('sonarlint', dir).handlers['sonarlint/isIgnoredByScm']
+    local start = vim.uv.hrtime()
+    local ignored = handler(nil, vim.uri_from_fname(dir .. '/a.py'))
+    local took = (vim.uv.hrtime() - start) / 1e9
+    vim.env.PATH = path
+    assert.is_false(ignored)
+    assert.is_true(took < 5, ('took %.1f s'):format(took))
+  end)
+
   describe('harper_ls', function()
     local config
     before_each(function() config = load('harper_ls', dir) end)

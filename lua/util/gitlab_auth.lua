@@ -26,9 +26,10 @@ end
 ---@param remote string
 ---@return string?
 function M.remote_url(dir, remote)
-  local result = vim
-    .system({ 'git', '-C', dir, 'remote', 'get-url', remote }, { text = true })
-    :wait(5000)
+  local result = require('util.system').sync(
+    { 'git', '-C', dir, 'remote', 'get-url', remote },
+    { text = true }
+  )
   local url = result.code == 0 and vim.trim(result.stdout or '') or ''
   return url ~= '' and url or nil
 end
@@ -38,9 +39,10 @@ end
 ---@return string?
 function M.glab_token(host)
   if vim.fn.executable('glab') ~= 1 then return nil end
-  local result = vim
-    .system({ 'glab', 'config', 'get', 'token', '--host', host }, { text = true })
-    :wait(5000)
+  local result = require('util.system').sync(
+    { 'glab', 'config', 'get', 'token', '--host', host },
+    { text = true }
+  )
   local token = result.code == 0 and vim.trim(result.stdout or '') or ''
   return token ~= '' and token or nil
 end

@@ -119,9 +119,10 @@ return {
       local host = forge.host
       forge.host = function()
         for _, name in ipairs(remotes) do
-          local r = vim
-            .system({ 'git', 'remote', 'get-url', name }, { text = true })
-            :wait(2000)
+          local r = require('util.system').sync(
+            { 'git', 'remote', 'get-url', name },
+            { text = true, timeout = 2000 }
+          )
           local url = r.code == 0 and vim.trim(r.stdout or '') or ''
           if url ~= '' then return forge.host_of(url) or host() end
         end

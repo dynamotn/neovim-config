@@ -179,18 +179,14 @@ function M.write(bufnr)
     if id then vim.list_extend(command, { '--encrypt-vault-id', id }) end
   end
 
-  local ok, result = pcall(function()
-    return vim
-      .system(command, {
-        text = true,
-        env = env,
-        timeout = M.TIMEOUT,
-        -- No controlling terminal: a password prompt on /dev/tty would
-        -- fight the TUI for keys while the editor waits
-        detach = true,
-      })
-      :wait()
-  end)
+  local ok, result = pcall(require('util.system').sync, command, {
+    text = true,
+    env = env,
+    timeout = M.TIMEOUT,
+    -- No controlling terminal: a password prompt on /dev/tty would
+    -- fight the TUI for keys while the editor waits
+    detach = true,
+  })
   vim.fn.delete(copy)
   for _, path in ipairs(extra) do
     vim.fn.delete(path)
@@ -234,11 +230,9 @@ function M.open(bufnr)
     return false
   end
   local ok, result = pcall(
-    function()
-      return vim
-        .system(command, { text = true, timeout = M.TIMEOUT, detach = true })
-        :wait()
-    end
+    require('util.system').sync,
+    command,
+    { text = true, timeout = M.TIMEOUT, detach = true }
   )
   if not ok or result.code ~= 0 then
     notify(

@@ -46,10 +46,9 @@ end
 local function git(dir, args)
   local command = { 'git', '-C', dir }
   vim.list_extend(command, args)
-  local ok, result = pcall(
-    function() return vim.system(command, { text = true }):wait(10000) end
-  )
-  if not ok or result.code ~= 0 then return nil, false end
+  local result =
+    require('util.system').sync(command, { text = true, timeout = 10000 })
+  if result.code ~= 0 then return nil, false end
   local out = vim.trim(result.stdout or '')
   return out ~= '' and out or nil, true
 end

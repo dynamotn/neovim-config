@@ -133,9 +133,10 @@ end
 ---@return string?
 function M.current_branch()
   if vim.fn.executable('git') ~= 1 then return nil end
-  local result = vim
-    .system({ 'git', '-C', repository(), 'branch', '--show-current' }, { text = true })
-    :wait(5000)
+  local result = require('util.system').sync(
+    { 'git', '-C', repository(), 'branch', '--show-current' },
+    { text = true }
+  )
   local branch = result.code == 0 and vim.trim(result.stdout or '') or ''
   return branch ~= '' and branch or nil
 end
@@ -231,17 +232,15 @@ function M.branch(issue)
       if not name or vim.trim(name) == '' then return end
       name = vim.trim(name)
       local dir = repository()
-      local exists = vim
-        .system({
-          'git',
-          '-C',
-          dir,
-          'rev-parse',
-          '--verify',
-          '--quiet',
-          'refs/heads/' .. name,
-        })
-        :wait(5000).code == 0
+      local exists = require('util.system').sync({
+        'git',
+        '-C',
+        dir,
+        'rev-parse',
+        '--verify',
+        '--quiet',
+        'refs/heads/' .. name,
+      }).code == 0
       local args = exists and { 'switch', name } or { 'switch', '-c', name }
       -- Asynchronous and with no deadline: `:wait()` SIGKILLs on timeout,
       -- and a checkout killed half-way leaves `index.lock` behind

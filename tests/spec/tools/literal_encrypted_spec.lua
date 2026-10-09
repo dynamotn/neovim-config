@@ -303,6 +303,22 @@ describe('tools.encrypted', function()
     )
   end)
 
+  it('leaves the ciphertext when sops hangs past the deadline', function()
+    -- A child holding the output open, as a `gpg-agent` started by sops does
+    tool('sops', { 'sleep 5 &', 'wait' })
+    local restore = h.stub(encrypted, 'TIMEOUT', 200)
+    local file = dir .. '/values.yaml'
+    h.write(file, { 'a: ENC[AES256_GCM,data:x]', 'sops:' })
+    local bufnr, decrypted = open(file)
+    restore()
+    assert.is_false(decrypted)
+    assert.same(
+      { 'a: ENC[AES256_GCM,data:x]', 'sops:' },
+      vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    )
+    assert.is_truthy(notes[#notes]:find('timed out', 1, true))
+  end)
+
   it('never writes the clear text when encryption fails', function()
     local file = dir .. '/encrypted_dot_token.age'
     h.write(file, { 'age:secret' })
