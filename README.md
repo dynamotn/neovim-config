@@ -125,24 +125,24 @@ Measured with `nvim --startuptime` over 10 runs on AMD Ryzen 9 5950X 16-Core Pro
 
 | Command | Median | Mean ± σ | Min | Max | Wall clock |
 | ------- | -----: | -------: | --: | --: | ---------: |
-| `nvim --headless +q` | 45.7 ms | 46.5 ± 2.3 ms | 44.9 ms | 52.6 ms | 49.9 ms |
-| `nvim --headless README.md +q` | 257.7 ms | 256.9 ± 2.9 ms | 252.9 ms | 261.3 ms | 335.4 ms |
-| `nvim --headless init.lua +q` | 150.8 ms | 150.7 ± 2.3 ms | 147.3 ms | 154.2 ms | 212.1 ms |
+| `nvim --headless +q` | 49.2 ms | 49.0 ± 2.0 ms | 46.4 ms | 51.4 ms | 52.4 ms |
+| `nvim --headless README.md +q` | 273.1 ms | 272.8 ± 6.3 ms | 263.1 ms | 282.4 ms | 367.0 ms |
+| `nvim --headless init.lua +q` | 167.1 ms | 168.8 ± 11.3 ms | 154.3 ms | 197.2 ms | 231.3 ms |
 
 Slowest steps of `nvim --headless +q` (self + sourced, mean):
 
 ```
 step                            time percent  plot
-init.lua                       43.10   92.61  ████████████████████████▏
-config.lazy                    42.06   90.38  ███████████████████████▌
-catppuccin.vim                  2.41    5.17  █▍
-catppuccin                      1.74    3.74  █
-vim.filetype                    1.60    3.44  ▉
-lazy.core.handler.event         1.24    2.66  ▊
-filetype.lua                    1.03    2.21  ▋
-vim._core.defaults              0.92    1.98  ▌
-config.globals                  0.89    1.91  ▌
-lazy.core.loader                0.89    1.90  ▌
+init.lua                       45.81   93.50  ████████████████████████▎
+config.lazy                    44.81   91.45  ███████████████████████▊
+catppuccin.vim                  3.25    6.64  █▊
+catppuccin                      1.89    3.85  █
+vim.filetype                    1.59    3.25  ▉
+lazy.core.handler.event         1.33    2.72  ▊
+filetype.lua                    1.01    2.06  ▌
+lazy.core.loader                0.98    2.01  ▌
+config.globals                  0.87    1.77  ▌
+vim._core.defaults              0.81    1.64  ▍
 ```
 <!-- bench:end -->
 
