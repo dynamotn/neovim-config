@@ -47,6 +47,11 @@ return condition
                   function() require('util.yaml_schema').select(0, true) end,
                   desc = 'Insert YAML Schema Modeline',
                 },
+                {
+                  '<leader>cyr',
+                  function() require('util.yaml_schema').reset(0) end,
+                  desc = 'Reset YAML Schema',
+                },
               },
               settings = {
                 redhat = { telemetry = { enabled = false } },

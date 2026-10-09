@@ -131,7 +131,7 @@ describe('util.root', function()
     root.cache[buf] = '/stale'
     vim.api.nvim_exec_autocmds('BufEnter', { buffer = buf })
     assert.is_nil(root.cache[buf])
-    assert.is_not_nil(vim.api.nvim_get_commands({}).DyNeoRoot)
+    assert.is_not_nil(vim.api.nvim_get_commands({}).DyRoot)
   end)
 
   it('reports every root found, the one in use first', function()

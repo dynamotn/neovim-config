@@ -768,10 +768,10 @@ end
 --- Stop whatever the buffer is running; its output so far is shown as usual
 function M.stop() stop_buffer(vim.api.nvim_get_current_buf()) end
 
---- The subcommands of `:Runbook`
+--- The subcommands of `:DyRunbook`
 M.SUBCOMMANDS = { 'run', 'all', 'from', 'clear', 'stop', 'record', 'inputs' }
 
---- `:Runbook [run|all|from|clear|stop|record|inputs]`
+--- `:DyRunbook [run|all|from|clear|stop|record|inputs]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub = args.fargs[1] or 'run'
@@ -806,6 +806,7 @@ function M.attach(bufnr)
   map('<localleader>L', M.record, 'Record Runs (Runbook)')
   map('<localleader>x', M.clear, 'Clear Outputs (Runbook)')
   map('<localleader>s', M.stop, 'Stop Running (Runbook)')
+  map('<localleader>I', M.forget_inputs, 'Forget Inputs (Runbook)')
 end
 
 return M

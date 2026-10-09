@@ -1,7 +1,7 @@
--- `:TfPlan`: a Terraform or OpenTofu plan, shown on the blocks it changes.
+-- `:DyTfPlan`: a Terraform or OpenTofu plan, shown on the blocks it changes.
 -- The module only loads when asked, or when a Terraform buffer opens.
 vim.api.nvim_create_user_command(
-  'TfPlan',
+  'DyTfPlan',
   function(args) require('tools.tfplan').command(args) end,
   {
     nargs = '?',

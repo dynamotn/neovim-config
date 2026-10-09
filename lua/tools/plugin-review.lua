@@ -562,7 +562,7 @@ local function section_at_cursor(bufnr)
   end
 end
 
---- `:LazyQuarantine review [{plugin}]`
+--- `:DyQuarantine review [{plugin}]`
 ---
 --- Without a plugin, the report on every update waiting; with one, its full
 --- diff. A `git log` and a `git diff` per plugin, which is why it is a

@@ -771,10 +771,10 @@ function M.cost() M.run('cost') end
 --- Plan, and show what depends on each block replaced or destroyed
 function M.impact() M.run('impact') end
 
---- The subcommands of `:TfPlan`
+--- The subcommands of `:DyTfPlan`
 M.SUBCOMMANDS = { 'clear', 'cost', 'drift', 'impact' }
 
---- `:TfPlan [clear|cost|drift|impact]`
+--- `:DyTfPlan [clear|cost|drift|impact]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub = args.fargs[1]

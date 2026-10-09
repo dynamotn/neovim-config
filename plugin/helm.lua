@@ -1,18 +1,18 @@
--- `:HelmValue`, `:HelmUsages`, `:HelmUnused`: the values of a Helm chart
+-- `:DyHelmValue`, `:DyHelmUsages`, `:DyHelmUnused`: the values of a Helm chart
 -- and the templates using them, one key away. The module only loads when
 -- asked, or when a template or the values of a chart open.
 vim.api.nvim_create_user_command(
-  'HelmValue',
+  'DyHelmValue',
   function() require('tools.helm').value() end,
   { desc = 'Go to the value under the cursor in values.yaml' }
 )
 vim.api.nvim_create_user_command(
-  'HelmUsages',
+  'DyHelmUsages',
   function() require('tools.helm').show_usages() end,
   { desc = 'List the template lines using the key under the cursor' }
 )
 vim.api.nvim_create_user_command(
-  'HelmUnused',
+  'DyHelmUnused',
   function() require('tools.helm').unused(0) end,
   { desc = 'Mark the values no template uses' }
 )

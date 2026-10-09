@@ -1274,11 +1274,11 @@ describe('util.yaml_schema', function()
       assert.are.same({}, client.sent)
     end)
 
-    it('adds :YamlSchema to the buffers yamlls attaches to', function()
+    it('adds :DyYamlSchema to the buffers yamlls attaches to', function()
       yaml_schema.on_init(client)
       local bufnr = open(dir .. '/a.yaml', { 'apiVersion: v1', 'kind: Pod' })
       attach(bufnr, client)
-      assert.is_not_nil(vim.api.nvim_buf_get_commands(bufnr, {}).YamlSchema)
+      assert.is_not_nil(vim.api.nvim_buf_get_commands(bufnr, {}).DyYamlSchema)
       -- Detection ran, then the statusline name was asked for
       assert.are.equal('kubernetes', vim.b[bufnr].yaml_schema_choice.uri)
       assert.are.equal(2, #client.requests)
@@ -1290,10 +1290,10 @@ describe('util.yaml_schema', function()
       local other = fake_client({ name = 'jsonls' })
       local bufnr = open(dir .. '/a.yaml', {})
       attach(bufnr, other)
-      assert.is_nil(vim.api.nvim_buf_get_commands(bufnr, {}).YamlSchema)
+      assert.is_nil(vim.api.nvim_buf_get_commands(bufnr, {}).DyYamlSchema)
     end)
 
-    describe(':YamlSchema', function()
+    describe(':DyYamlSchema', function()
       local bufnr, calls
 
       before_each(function()
@@ -1311,8 +1311,8 @@ describe('util.yaml_schema', function()
       end)
 
       it('opens the picker', function()
-        vim.cmd('YamlSchema')
-        vim.cmd('YamlSchema modeline')
+        vim.cmd('DyYamlSchema')
+        vim.cmd('DyYamlSchema modeline')
         assert.are.same(
           { { 'select', bufnr, false }, { 'select', bufnr, true } },
           calls
@@ -1320,13 +1320,13 @@ describe('util.yaml_schema', function()
       end)
 
       it('resets', function()
-        vim.cmd('YamlSchema reset')
+        vim.cmd('DyYamlSchema reset')
         assert.are.same({ { 'reset', bufnr } }, calls)
       end)
 
       it('uses a file given by path', function()
-        vim.cmd('YamlSchema some\\ dir/s.json')
-        vim.cmd('YamlSchema modeline s.json')
+        vim.cmd('DyYamlSchema some\\ dir/s.json')
+        vim.cmd('DyYamlSchema modeline s.json')
         assert.are.same({
           { 'use_file', bufnr, 'some dir/s.json', false },
           { 'use_file', bufnr, 's.json', true },
@@ -1337,9 +1337,10 @@ describe('util.yaml_schema', function()
         h.write(dir .. '/models.json', { '{}' })
         local cwd = vim.fn.getcwd()
         vim.cmd.cd(dir)
-        local first = vim.fn.getcompletion('YamlSchema ', 'cmdline')
-        local lead = vim.fn.getcompletion('YamlSchema mo', 'cmdline')
-        local second = vim.fn.getcompletion('YamlSchema modeline mo', 'cmdline')
+        local first = vim.fn.getcompletion('DyYamlSchema ', 'cmdline')
+        local lead = vim.fn.getcompletion('DyYamlSchema mo', 'cmdline')
+        local second =
+          vim.fn.getcompletion('DyYamlSchema modeline mo', 'cmdline')
         vim.cmd.cd(cwd)
         assert.are.same({ 'modeline', 'reset' }, { first[1], first[2] })
         assert.is_true(vim.list_contains(first, 'models.json'))

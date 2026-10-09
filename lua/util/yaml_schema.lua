@@ -838,8 +838,8 @@ function M.on_init(client)
     callback = function(ev)
       local attached = vim.lsp.get_client_by_id(ev.data.client_id)
       if not attached or attached.name ~= 'yamlls' then return end
-      -- :YamlSchema [modeline] [path], or :YamlSchema reset
-      vim.api.nvim_buf_create_user_command(ev.buf, 'YamlSchema', function(cmd)
+      -- :DyYamlSchema [modeline] [path], or :DyYamlSchema reset
+      vim.api.nvim_buf_create_user_command(ev.buf, 'DyYamlSchema', function(cmd)
         local args = vim.deepcopy(cmd.fargs)
         if args[1] == 'reset' then return M.reset(ev.buf) end
         local modeline = args[1] == 'modeline'

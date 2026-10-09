@@ -363,9 +363,9 @@ describe('tools.lazy-quarantine', function()
     end)
   end)
 
-  describe(':LazyQuarantine', function()
+  describe(':DyQuarantine', function()
     after_each(function()
-      pcall(vim.api.nvim_del_user_command, 'LazyQuarantine')
+      pcall(vim.api.nvim_del_user_command, 'DyQuarantine')
       h.unload('tools.lazy-quarantine', 'tools.plugin-review')
     end)
 
@@ -379,11 +379,11 @@ describe('tools.lazy-quarantine', function()
       })
       assert.are.same(
         { 'review' },
-        vim.fn.getcompletion('LazyQuarantine ', 'cmdline')
+        vim.fn.getcompletion('DyQuarantine ', 'cmdline')
       )
       assert.are.same(
         { 'a.nvim', 'b.nvim' },
-        vim.fn.getcompletion('LazyQuarantine review ', 'cmdline')
+        vim.fn.getcompletion('DyQuarantine review ', 'cmdline')
       )
       restore()
     end)
@@ -398,7 +398,7 @@ describe('tools.lazy-quarantine', function()
         function(rows, window, name) shown = { rows, window, name } end
       )
       require('tools.lazy-quarantine').command()
-      vim.cmd('LazyQuarantine review spec.nvim')
+      vim.cmd('DyQuarantine review spec.nvim')
       restore()
       assert.are.same({ {}, 7 * DAY, 'spec.nvim' }, shown)
     end)

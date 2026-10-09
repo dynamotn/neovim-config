@@ -228,6 +228,25 @@ describe('tools.encrypted', function()
     vim.o.clipboard = saved
   end)
 
+  it('maps the recipients and rotations on a sops file only', function()
+    local file = dir .. '/values.yaml'
+    h.write(file, { 'plain: a: 1', 'x: ENC[AES256_GCM,data:x]', 'sops:' })
+    local bufnr = open(file)
+    for _, lhs in ipairs({
+      '<localleader>K',
+      '<localleader>U',
+      '<localleader>N',
+    }) do
+      local map = vim.fn.maparg(lhs, 'n', false, true)
+      assert.equals(bufnr, map.buffer == 1 and bufnr or -1)
+    end
+
+    local vault = dir .. '/vault.yml'
+    h.write(vault, { '$ANSIBLE_VAULT;1.2;AES256', 'enc:db_password: x' })
+    open(vault)
+    assert.same({}, vim.fn.maparg('<localleader>K', 'n', false, true))
+  end)
+
   it('keeps the vault id of an Ansible Vault', function()
     local file = dir .. '/vault.yml'
     h.write(file, { '$ANSIBLE_VAULT;1.2;AES256;prod', 'enc:db_password: x' })

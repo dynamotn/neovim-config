@@ -84,7 +84,7 @@ function M.info(buf)
   end
   Plugin[enabled and 'info' or 'warn'](
     table.concat(lines, '\n'),
-    { title = 'DyNeoFormat (' .. (enabled and 'enabled' or 'disabled') .. ')' }
+    { title = 'DyFormat (' .. (enabled and 'enabled' or 'disabled') .. ')' }
   )
 end
 
@@ -136,19 +136,19 @@ function M.format(opts)
   if not done and opts.force then Plugin.warn('No formatter available') end
 end
 
---- Format on save, and add `:DyNeoFormat` and `:DyNeoFormatInfo`
+--- Format on save, and add `:DyFormat` and `:DyFormatInfo`
 function M.setup()
   vim.api.nvim_create_autocmd('BufWritePre', {
     group = vim.api.nvim_create_augroup('dyneo_format', {}),
     callback = function(event) M.format({ buf = event.buf }) end,
   })
   vim.api.nvim_create_user_command(
-    'DyNeoFormat',
+    'DyFormat',
     function() M.format({ force = true }) end,
     { desc = 'Format the buffer' }
   )
   vim.api.nvim_create_user_command(
-    'DyNeoFormatInfo',
+    'DyFormatInfo',
     function() M.info() end,
     { desc = 'Show info about the formatters for the current buffer' }
   )

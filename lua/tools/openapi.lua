@@ -427,7 +427,7 @@ function M.open(kind)
   end)
 end
 
---- `:OpenApiRequest [http|hurl]`
+--- `:DyOpenApiRequest [http|hurl]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local kind = args.fargs[1] or 'http'

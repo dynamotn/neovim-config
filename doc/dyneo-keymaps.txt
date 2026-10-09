@@ -173,6 +173,7 @@ one of the same keys in those buffers.
 <leader>cy  yaml
 
 `<leader>cym`          n      Insert YAML Schema Modeline  (LSP: yamlls)
+`<leader>cyr`          n      Reset YAML Schema  (LSP: yamlls)
 `<leader>cys`          n      Select YAML Schema  (LSP: yamlls)
 
 ==============================================================================
@@ -282,6 +283,33 @@ one of the same keys in those buffers.
 `<leader>ghw`          n      Toggle Word Diff  (buffer)
 
 ==============================================================================
+<leader>i  infra
+
+`<leader>ia`           n      Architecture Diagram
+`<leader>ic`           n      Switch Kube Context
+`<leader>ie`           n      Certificate Expiry
+`<leader>ii`           n      Decode Certificate, Key or JWT
+`<leader>ij`           n      Journal
+`<leader>il`           n      Read File as Log
+`<leader>in`           n      Switch Kube Namespace
+`<leader>ip`           n      Pod Logs
+
+==============================================================================
+<leader>k  security
+
+`<leader>kA`           n      Allow Buffer for AI
+`<leader>kL`           n      AI Handover Log
+`<leader>kR`           n      Recheck Buffer for AI
+`<leader>ka`           n      Why Kept From AI
+`<leader>ki`           n      Scan Images
+`<leader>kl`           n      Vulnerable Dependencies (OSV)
+`<leader>ko`           n      Vulnerable Plugins (OSV)
+`<leader>kp`           n      Pin Images to Digests
+`<leader>kq`           n      Held Back Updates
+`<leader>kr`           n      Review Pending Updates
+`<leader>ks`           n      SBOM of the Editor
+
+==============================================================================
 <leader>o  overseer
 
 `<leader>ol`           n      Restart last task
@@ -292,6 +320,7 @@ one of the same keys in those buffers.
 ==============================================================================
 <leader>p  project
 
+`<leader>pR`           n      Project Roots
 `<leader>pa`           n      Open alternative file
 `<leader>pc`           n      CI Checks
 `<leader>pp`           n      Project Overview
@@ -320,12 +349,14 @@ one of the same keys in those buffers.
 <leader>pj  jira
 
 `<leader>pjb`          n      Branch From Issue
+`<leader>pji`          n      Insert Issue Key
 `<leader>pjj`          n      My Issues
 `<leader>pjm`          n      Move Issue
 `<leader>pjo`          n      Open Issue in Browser
 `<leader>pjs`          n      Search Issues (JQL)
 `<leader>pjv`          n      View Issue
 `<leader>pjw`          n      Log Work
+`<leader>pjy`          n      Copy Issue Key
 
 ==============================================================================
 <leader>pl  gitlab
@@ -345,6 +376,14 @@ one of the same keys in those buffers.
 `<leader>plp`          n      Pipeline (GitLab)
 `<leader>pls`          n      MR Summary (GitLab)
 `<leader>plu`          n      Copy MR URL (GitLab)
+
+==============================================================================
+<leader>pr  decision records
+
+`<leader>prS`          n      Supersede This Decision
+`<leader>prn`          n      New Decision
+`<leader>prr`          n      Decision Records
+`<leader>prs`          n      Set Status
 
 ==============================================================================
 <leader>ps  settings (codesettings)
@@ -559,6 +598,7 @@ one of the same keys in those buffers.
 ==============================================================================
 <leader>z  dictionary
 
+`<leader>zm`           n      Make Spell File
 `<leader>zp`           nx     Add word to proper nouns
 `<leader>zt`           nx     Add word to technical
 `<leader>zz`           n      Spelling Suggestions

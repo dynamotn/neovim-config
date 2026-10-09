@@ -23,10 +23,10 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   end,
 })
 
--- `:EncryptedDiff [{rev}]`: the clear text of this decrypted buffer against
+-- `:DyEncryptedDiff [{rev}]`: the clear text of this decrypted buffer against
 -- its clear text at {rev}, `HEAD` unless given
 vim.api.nvim_create_user_command(
-  'EncryptedDiff',
+  'DyEncryptedDiff',
   function(args) require('tools.encrypted').command(args) end,
   {
     nargs = '?',
@@ -34,15 +34,15 @@ vim.api.nvim_create_user_command(
   }
 )
 
--- `:EncryptedKeys`, `:EncryptedRotate [updatekeys|rotate]`: the recipients
+-- `:DyEncryptedKeys`, `:DyEncryptedRotate [updatekeys|rotate]`: the recipients
 -- of this sops file, and putting new ones or a new data key in place
 vim.api.nvim_create_user_command(
-  'EncryptedKeys',
+  'DyEncryptedKeys',
   function() require('tools.encrypted').keys() end,
   { desc = 'The recipients of this sops file' }
 )
 vim.api.nvim_create_user_command(
-  'EncryptedRotate',
+  'DyEncryptedRotate',
   function(args) require('tools.encrypted').rotate(args.fargs[1]) end,
   {
     nargs = '?',

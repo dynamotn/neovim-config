@@ -187,7 +187,7 @@ end
 --- by what it looks like: a file decrypted for editing, a Helm chart rendered
 --- with its Secrets. Like the name rules, it cannot be waived.
 ---@param bufnr integer
----@param reason string Said by `:AiGuardCheck`
+---@param reason string Said by `:DyAiGuardCheck`
 M.mark = function(bufnr, reason)
   if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   vim.b[bufnr].dy_sensitive = reason
@@ -206,7 +206,7 @@ end
 --- Why a buffer must not leave the machine, in words, or nothing when it may
 ---
 --- `opts.ignore_waiver` reports what a waived buffer would be held back for,
---- which is what `:AiGuardCheck` says over a buffer that has been allowed.
+--- which is what `:DyAiGuardCheck` says over a buffer that has been allowed.
 ---@param bufnr? integer
 ---@param opts? { ignore_waiver?: boolean }
 ---@return string[]

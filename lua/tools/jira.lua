@@ -14,7 +14,7 @@ local M = {}
 --- How an issue key looks: a project key, a dash, a number
 M.KEY_PATTERN = '%u[%u%d_]+%-%d+'
 
---- The issues `:Jira` lists when asked nothing else
+--- The issues `:DyJira` lists when asked nothing else
 M.DEFAULT_JQL =
   'assignee = currentUser() AND resolution = Unresolved ORDER BY updated DESC'
 
@@ -468,11 +468,11 @@ function M.on_issue(action, key)
   M.pick({ action = action, title = 'Jira: ' .. action })
 end
 
---- The subcommands of `:Jira`
+--- The subcommands of `:DyJira`
 M.SUBCOMMANDS =
   { 'search', 'branch', 'worklog', 'move', 'open', 'view', 'insert', 'copy' }
 
---- `:Jira [{subcommand} [{args}]]`
+--- `:DyJira [{subcommand} [{args}]]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub, rest = args.fargs[1], vim.list_slice(args.fargs, 2)

@@ -266,7 +266,7 @@ return {
   on_attach = function(client, bufnr)
     vim.api.nvim_buf_create_user_command(
       bufnr,
-      'SonarlintDeactivateRule',
+      'DySonarlintDeactivateRule',
       function(opts)
         did_change_configuration(client, {
           sonarlint = {
@@ -283,7 +283,7 @@ return {
     )
     vim.api.nvim_buf_create_user_command(
       bufnr,
-      'SonarlintToken',
+      'DySonarlintToken',
       function(opts) input_token(opts.args) end,
       {
         desc = 'Input Sonarlint token for the organization / cloud',

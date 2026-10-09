@@ -19,6 +19,7 @@
 
 local root = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':p:h:h')
 local readme = root .. '/README.md'
+local wrap = dofile(root .. '/scripts/lib/wrap.lua')
 local runs = tonumber(vim.env.BENCH_RUNS) or 10
 local threshold = tonumber(vim.env.BENCH_THRESHOLD) or 20
 local force = vim.env.BENCH_FORCE == '1'
@@ -324,6 +325,8 @@ local ok, err = pcall(function()
   vim.list_extend(lines, top_steps(results[1].samples, results[1].startup.mean))
   vim.list_extend(lines, { '```', end_marker })
 
+  -- Prose filled to 80 columns, as the rest of the README is
+  lines = wrap.prose(lines)
   local updated = splice(text, table.concat(lines, '\n'))
   if updated ~= text then
     vim.fn.writefile(vim.split(updated, '\n', { plain = true }), readme, 'b')

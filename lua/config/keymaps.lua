@@ -320,13 +320,55 @@ end, { desc = "Git Browse (copy)" })
 map("n", "<leader>pp", "<cmd>DyProject<cr>", { desc = "Project Overview" })
 
 -- jira, on the issue the branch is named after or one picked (`tools.jira`)
-map("n", "<leader>pjj", "<cmd>Jira<cr>", { desc = "My Issues" })
-map("n", "<leader>pjs", "<cmd>Jira search<cr>", { desc = "Search Issues (JQL)" })
-map("n", "<leader>pjb", "<cmd>Jira branch<cr>", { desc = "Branch From Issue" })
-map("n", "<leader>pjm", "<cmd>Jira move<cr>", { desc = "Move Issue" })
-map("n", "<leader>pjw", "<cmd>Jira worklog<cr>", { desc = "Log Work" })
-map("n", "<leader>pjv", "<cmd>Jira view<cr>", { desc = "View Issue" })
-map("n", "<leader>pjo", "<cmd>Jira open<cr>", { desc = "Open Issue in Browser" })
+map("n", "<leader>pjj", "<cmd>DyJira<cr>", { desc = "My Issues" })
+map("n", "<leader>pjs", "<cmd>DyJira search<cr>", { desc = "Search Issues (JQL)" })
+map("n", "<leader>pjb", "<cmd>DyJira branch<cr>", { desc = "Branch From Issue" })
+map("n", "<leader>pjm", "<cmd>DyJira move<cr>", { desc = "Move Issue" })
+map("n", "<leader>pjw", "<cmd>DyJira worklog<cr>", { desc = "Log Work" })
+map("n", "<leader>pjv", "<cmd>DyJira view<cr>", { desc = "View Issue" })
+map("n", "<leader>pjo", "<cmd>DyJira open<cr>", { desc = "Open Issue in Browser" })
+map("n", "<leader>pji", "<cmd>DyJira insert<cr>", { desc = "Insert Issue Key" })
+map("n", "<leader>pjy", "<cmd>DyJira copy<cr>", { desc = "Copy Issue Key" })
+
+-- decision records of the project (`tools.adr`)
+map("n", "<leader>prr", "<cmd>DyAdr list<cr>", { desc = "Decision Records" })
+map("n", "<leader>prn", "<cmd>DyAdr new<cr>", { desc = "New Decision" })
+map("n", "<leader>prs", "<cmd>DyAdr status<cr>", { desc = "Set Status" })
+map("n", "<leader>prS", "<cmd>DyAdr supersede<cr>", { desc = "Supersede This Decision" })
+map("n", "<leader>pR", "<cmd>DyRoot<cr>", { desc = "Project Roots" })
+
+-- infrastructure beyond the buffer: what a directory declares, what a
+-- certificate or a token says, logs, and the cluster in use
+map("n", "<leader>ia", "<cmd>DyArchitecture<cr>", { desc = "Architecture Diagram" })
+map("n", "<leader>ii", "<cmd>DyInspect<cr>", { desc = "Decode Certificate, Key or JWT" })
+map("n", "<leader>ie", "<cmd>DyInspect expiry<cr>", { desc = "Certificate Expiry" })
+map("n", "<leader>il", function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == "" then return vim.notify("The buffer has no file", vim.log.levels.WARN, { title = "DyNeo" }) end
+  vim.cmd({ cmd = "DyLog", args = { file } })
+end, { desc = "Read File as Log" })
+map("n", "<leader>ij", "<cmd>DyLog journal<cr>", { desc = "Journal" })
+-- The pod is typed on the command line, where it completes
+map("n", "<leader>ip", function() vim.api.nvim_feedkeys(":DyLog kube ", "n", false) end, { desc = "Pod Logs" })
+map("n", "<leader>ic", "<cmd>DyKube context<cr>", { desc = "Switch Kube Context" })
+map("n", "<leader>in", "<cmd>DyKube namespace<cr>", { desc = "Switch Kube Namespace" })
+
+-- supply chain and the AI guard (`tools.lazy-quarantine`, `tools.sbom`,
+-- `tools.images`, `util.ai_guard`)
+map("n", "<leader>kq", "<cmd>DyQuarantine<cr>", { desc = "Held Back Updates" })
+map("n", "<leader>kr", "<cmd>DyQuarantine review<cr>", { desc = "Review Pending Updates" })
+map("n", "<leader>ks", "<cmd>DySbom<cr>", { desc = "SBOM of the Editor" })
+map("n", "<leader>ko", "<cmd>DySbom osv<cr>", { desc = "Vulnerable Plugins (OSV)" })
+map("n", "<leader>kl", "<cmd>DySbom lock<cr>", { desc = "Vulnerable Dependencies (OSV)" })
+map("n", "<leader>ki", "<cmd>DyImageScan<cr>", { desc = "Scan Images" })
+map("n", "<leader>kp", "<cmd>DyImagePin<cr>", { desc = "Pin Images to Digests" })
+map("n", "<leader>ka", "<cmd>DyAiGuardCheck<cr>", { desc = "Why Kept From AI" })
+map("n", "<leader>kA", "<cmd>DyAiGuardAllow<cr>", { desc = "Allow Buffer for AI" })
+map("n", "<leader>kR", "<cmd>DyAiGuardAllow!<cr>", { desc = "Recheck Buffer for AI" })
+map("n", "<leader>kL", "<cmd>DyAiGuardLog<cr>", { desc = "AI Handover Log" })
+
+-- spell files from the word lists (`plugin/spell.lua`); the list is typed
+map("n", "<leader>zm", function() vim.api.nvim_feedkeys(":DySpell ", "n", false) end, { desc = "Make Spell File" })
 
 -- quit
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
@@ -382,11 +424,14 @@ end
 -- buffer is written to a private temporary file instead, and copied over the
 -- file by `sudo cp` in a terminal of its own -- `cp` onto an existing file
 -- keeps its owner and mode.
-vim.api.nvim_create_user_command('SudoWrite', function()
+vim.api.nvim_create_user_command('DySudoWrite', function()
   local bufnr = vim.api.nvim_get_current_buf()
   local target = vim.api.nvim_buf_get_name(bufnr)
   if target == '' then
-    return vim.notify('SudoWrite: the buffer has no file', vim.log.levels.ERROR)
+    return vim.notify(
+      'DySudoWrite: the buffer has no file',
+      vim.log.levels.ERROR
+    )
   end
   local tmp = vim.fn.tempname()
   vim.cmd('silent noautocmd keepalt write! ' .. vim.fn.fnameescape(tmp))
@@ -399,7 +444,7 @@ vim.api.nvim_create_user_command('SudoWrite', function()
       vim.schedule(function()
         vim.fn.delete(tmp)
         if code ~= 0 then
-          return vim.notify('SudoWrite failed', vim.log.levels.ERROR)
+          return vim.notify('DySudoWrite failed', vim.log.levels.ERROR)
         end
         pcall(vim.api.nvim_buf_delete, term, { force = true })
         if vim.api.nvim_buf_is_valid(bufnr) then
@@ -414,7 +459,7 @@ end, { desc = 'Write the buffer with root permission' })
 
 -- This used to be a `c` mapping, which fires on `ww` typed anywhere including
 -- a `/` search, so `:e foo/ww` turned itself into a `sudo tee`.
-cabbrev('ww', 'SudoWrite')
+cabbrev('ww', 'DySudoWrite')
 
 -- No one is really happy until you have these shortcuts
 cabbrev('W!', 'w!')

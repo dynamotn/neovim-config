@@ -1,7 +1,7 @@
--- `:Adr`: the architecture decision records of the project. The module only
+-- `:DyAdr`: the architecture decision records of the project. The module only
 -- loads when asked.
 vim.api.nvim_create_user_command(
-  'Adr',
+  'DyAdr',
   function(args) require('tools.adr').command(args) end,
   {
     nargs = '*',

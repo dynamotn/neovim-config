@@ -171,7 +171,10 @@ describe('tools.adr', function()
 
     it('picks among the records', function()
       adr.pick()
-      assert.equals('No decision recorded yet: `:Adr new` starts one', notes[1])
+      assert.equals(
+        'No decision recorded yet: `:DyAdr new` starts one',
+        notes[1]
+      )
       adr.new('A')
       adr.new('B')
       local shown

@@ -2,9 +2,9 @@
 --- the digest to pin them to
 ---
 --- A Dockerfile names its bases in `FROM`, a manifest or a compose file in
---- `image:`. `:ImageScan` asks `trivy image` (or `grype`) about each one and
+--- `image:`. `:DyImageScan` asks `trivy image` (or `grype`) about each one and
 --- puts what it found on its line: how many vulnerabilities, by severity,
---- and the worst of their ids. `:ImagePin` pins each tag to the digest it
+--- and the worst of their ids. `:DyImagePin` pins each tag to the digest it
 --- points at now, `nginx:1.27@sha256:…`, through `crane` or `skopeo`, so a
 --- tag pushed again does not change what runs.
 local M = {}

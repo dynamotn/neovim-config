@@ -504,7 +504,7 @@ describe('util.ai_guard', function()
 
     it('says when nothing holds a buffer back', function()
       edit(plain)
-      vim.cmd('AiGuardCheck')
+      vim.cmd('DyAiGuardCheck')
       assert.is_truthy(said():find('Nothing holding', 1, true))
     end)
 
@@ -513,7 +513,7 @@ describe('util.ai_guard', function()
       vim.api.nvim_buf_set_lines(0, 0, -1, false, {
         'token = "ghp_0123456789abcdefghij"',
       })
-      vim.cmd('AiGuardCheck')
+      vim.cmd('DyAiGuardCheck')
       assert.is_truthy(said():find('GitHub token on line 1', 1, true))
     end)
 
@@ -522,20 +522,20 @@ describe('util.ai_guard', function()
       vim.api.nvim_buf_set_lines(0, 0, -1, false, {
         'token = "ghp_0123456789abcdefghij"',
       })
-      vim.cmd('AiGuardAllow')
+      vim.cmd('DyAiGuardAllow')
       assert.is_false(sensitive.is_sensitive(0))
 
-      vim.cmd('AiGuardCheck')
-      assert.is_truthy(said():find('Waived by :AiGuardAllow', 1, true))
+      vim.cmd('DyAiGuardCheck')
+      assert.is_truthy(said():find('Waived by :DyAiGuardAllow', 1, true))
 
-      vim.cmd('AiGuardAllow!')
+      vim.cmd('DyAiGuardAllow!')
       assert.is_true(sensitive.is_sensitive(0))
       assert.is_truthy(said():find('back on', 1, true))
     end)
 
     it('refuses to waive a file sensitive by its name', function()
       edit(secret)
-      vim.cmd('AiGuardAllow')
+      vim.cmd('DyAiGuardAllow')
       assert.is_true(sensitive.is_sensitive(0))
       assert.is_truthy(said():find('sensitive by its name', 1, true))
     end)

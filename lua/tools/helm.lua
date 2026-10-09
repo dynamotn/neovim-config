@@ -1,10 +1,10 @@
 --- A Helm chart's values and the templates that use them, one key away
 ---
 --- A template says `.Values.image.tag`; the value lives in `values.yaml` of
---- the chart, many files away. In a template, `<localleader>v` (`:HelmValue`)
+--- the chart, many files away. In a template, `<localleader>v` (`:DyHelmValue`)
 --- goes to the line of the value under the cursor. In `values.yaml`,
---- `<localleader>u` (`:HelmUsages`) lists every template line using the key
---- under the cursor, and `:HelmUnused` marks the keys no template uses.
+--- `<localleader>u` (`:DyHelmUsages`) lists every template line using the key
+--- under the cursor, and `:DyHelmUnused` marks the keys no template uses.
 ---
 --- A key counts as used when a template names it, a parent of it -- `toYaml
 --- .Values.resources` uses all of `resources` -- or a child. `global` and
@@ -293,6 +293,12 @@ function M.attach(bufnr)
       '<localleader>u',
       M.show_usages,
       { buffer = bufnr, desc = 'Template Usages (Helm)' }
+    )
+    vim.keymap.set(
+      'n',
+      '<localleader>U',
+      function() M.unused(bufnr) end,
+      { buffer = bufnr, desc = 'Unused Values (Helm)' }
     )
   end
 end

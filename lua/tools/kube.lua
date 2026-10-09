@@ -382,7 +382,7 @@ M.SUBCOMMANDS = {
   namespace = M.namespace,
 }
 
---- `:Kube {subcommand}`
+--- `:DyKube {subcommand}`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub = args.fargs[1] or 'diff'

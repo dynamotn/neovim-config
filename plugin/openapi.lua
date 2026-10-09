@@ -1,7 +1,7 @@
--- `:OpenApiRequest`: the OpenAPI operation under the cursor as a kulala or
+-- `:DyOpenApiRequest`: the OpenAPI operation under the cursor as a kulala or
 -- Hurl request. The module only loads when asked, or when such a file opens.
 vim.api.nvim_create_user_command(
-  'OpenApiRequest',
+  'DyOpenApiRequest',
   function(args) require('tools.openapi').command(args) end,
   {
     nargs = '?',
@@ -10,10 +10,10 @@ vim.api.nvim_create_user_command(
   }
 )
 
--- `:OpenApiDiff [{rev}]`: what this document, as it is now, breaks of
+-- `:DyOpenApiDiff [{rev}]`: what this document, as it is now, breaks of
 -- itself at {rev}
 vim.api.nvim_create_user_command(
-  'OpenApiDiff',
+  'DyOpenApiDiff',
   function(args) require('tools.openapi').diff(0, args.fargs[1]) end,
   {
     nargs = '?',

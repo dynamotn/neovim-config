@@ -294,6 +294,22 @@ function M.guard(bufnr)
     function() M.diff(bufnr) end,
     { buffer = bufnr, desc = 'Diff With HEAD (Encrypted)' }
   )
+  -- Only sops keeps its recipients in the file, readable without a password
+  if vim.b[bufnr].dy_encrypted == 'sops' then
+    for lhs, map in pairs({
+      ['<localleader>K'] = { M.keys, 'Recipients (sops)' },
+      ['<localleader>U'] = {
+        function() M.rotate('updatekeys') end,
+        'Update Recipients (sops)',
+      },
+      ['<localleader>N'] = {
+        function() M.rotate('rotate') end,
+        'New Data Key (sops)',
+      },
+    }) do
+      vim.keymap.set('n', lhs, map[1], { buffer = bufnr, desc = map[2] })
+    end
+  end
   M.hold(bufnr, group)
 end
 
@@ -499,7 +515,7 @@ function M.open_diff(bufnr, rev, kind, lines)
   vim.cmd('diffthis')
 end
 
---- `:EncryptedDiff [{rev}]`
+--- `:DyEncryptedDiff [{rev}]`
 ---@param args { fargs: string[] }
 function M.command(args) M.diff(0, args.fargs[1]) end
 
@@ -575,8 +591,8 @@ function M.keys()
   end
   vim.list_extend(out, {
     '',
-    '`:EncryptedRotate updatekeys` applies the recipients of `.sops.yaml`,',
-    '`:EncryptedRotate rotate` makes a new data key.',
+    '`:DyEncryptedRotate updatekeys` applies the recipients of `.sops.yaml`,',
+    '`:DyEncryptedRotate rotate` makes a new data key.',
   })
   require('util.scratch').open(out, {
     split = 'horizontal',

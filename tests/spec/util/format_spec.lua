@@ -55,8 +55,8 @@ describe('util.format', function()
   it('adds its commands and the format-on-save autocmd', function()
     format.setup()
     local commands = vim.api.nvim_get_commands({})
-    assert.is_not_nil(commands.DyNeoFormat)
-    assert.is_not_nil(commands.DyNeoFormatInfo)
+    assert.is_not_nil(commands.DyFormat)
+    assert.is_not_nil(commands.DyFormatInfo)
     assert.equals(1, #vim.api.nvim_get_autocmds({
       group = 'dyneo_format',
       event = 'BufWritePre',

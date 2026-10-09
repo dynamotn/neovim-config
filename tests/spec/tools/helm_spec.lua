@@ -131,6 +131,17 @@ describe('tools.helm', function()
     assert.same({ '13 No template uses unused' }, messages)
   end)
 
+  it('maps the usages and the unused values on a values file', function()
+    vim.cmd.edit(dir .. '/values.yaml')
+    helm.attach(0)
+    local descs = vim.tbl_map(
+      function(map) return map.desc end,
+      vim.api.nvim_buf_get_keymap(0, 'n')
+    )
+    assert.is_true(vim.tbl_contains(descs, 'Template Usages (Helm)'))
+    assert.is_true(vim.tbl_contains(descs, 'Unused Values (Helm)'))
+  end)
+
   it('says when it is not in a chart', function()
     local notes = {}
     local restore = h.stub(

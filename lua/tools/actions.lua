@@ -2,7 +2,7 @@
 ---
 --- `uses: actions/checkout@v4` runs whatever the tag points at today; a tag
 --- moved by whoever took over the repository runs in every workflow that
---- names it, secrets in reach. `:ActionsPin` rewrites each `uses:` of the
+--- names it, secrets in reach. `:DyActionsPin` rewrites each `uses:` of the
 --- workflow to the full commit its ref points at, the ref kept in a
 --- comment for Renovate and Dependabot to follow:
 ---

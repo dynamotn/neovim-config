@@ -4,8 +4,8 @@
 
 The name reads two ways.  Said aloud, DyNeo is a playful spelling of the
 Vietnamese "đi nào" -- "let's go", the cute way of saying it.  Written down,
-it is Dy, from dynamo, the author's handle (and the prefix of this setup's own
-tools, |:DySpell| and the rest), plus Neovim.
+it is Dy, from dynamo, the author's handle (and the prefix of every command
+this setup defines, |:DySpell| and the rest), plus Neovim.
 
 This is DyNeo, a standalone lazy.nvim configuration, not a distribution to
 install over yours.  Every language it knows about is one declarative entry in
@@ -28,22 +28,40 @@ CONTENTS                                                      *dyneo-contents*
        3.2 Globals ........................................... |dyneo-globals|
        3.3 Plugin channels .................................. |dyneo-channels|
        3.4 Updating plugins ................................... |dyneo-update|
-    4. Language support .................................... |dyneo-languages|
-    5. Beyond the defaults .................................. |dyneo-features|
-       5.1 Tooling that installs itself ................. |dyneo-lazy-install|
-       5.2 Quarantine ..................................... |dyneo-quarantine|
+    4. Languages ........................................... |dyneo-languages|
+       4.1 Tooling that installs itself ................. |dyneo-lazy-install|
+       4.2 Buffer servers and tools ....................... |dyneo-statusline|
+       4.3 Workspace diagnostics ........................... |dyneo-workspace|
+    5. Supply chain and secrets ............................. |dyneo-security|
+       5.1 Quarantine ..................................... |dyneo-quarantine|
+       5.2 SBOM and vulnerabilities ............................. |dyneo-sbom|
        5.3 Files kept from AI ............................... |dyneo-ai-guard|
-       5.4 Infrastructure ...................................... |dyneo-infra|
-       5.5 Buffer servers and tools ....................... |dyneo-statusline|
-       5.6 Spelling ............................................ |dyneo-spell|
-       5.7 Diagrams .......................................... |dyneo-diagram|
-       5.8 Workspace diagnostics ........................... |dyneo-workspace|
-       5.9 Integrations ................................. |dyneo-integrations|
-    6. Mappings ............................................. |dyneo-mappings|
-    7. Commands ............................................. |dyneo-commands|
-    8. Layout ................................................. |dyneo-layout|
-    9. Development ....................................... |dyneo-development|
-   10. Troubleshooting ............................... |dyneo-troubleshooting|
+       5.4 Encrypted files ................................. |dyneo-encrypted|
+    6. Infrastructure .......................................... |dyneo-infra|
+       6.1 YAML and JSON schemas .............................. |dyneo-schema|
+       6.2 Kubernetes ........................................... |dyneo-kube|
+       6.3 Helm values .......................................... |dyneo-helm|
+       6.4 Container images ................................... |dyneo-images|
+       6.5 Policy checks ...................................... |dyneo-policy|
+       6.6 Terraform plan ..................................... |dyneo-tfplan|
+       6.7 Architecture diagrams ........................ |dyneo-architecture|
+    7. Operations ................................................ |dyneo-ops|
+       7.1 Runbooks .......................................... |dyneo-runbook|
+       7.2 Logs ................................................. |dyneo-logs|
+       7.3 Certificates and tokens ........................... |dyneo-inspect|
+       7.4 CI pipelines ........................................... |dyneo-ci|
+       7.5 OpenAPI requests .................................. |dyneo-openapi|
+    8. Project and writing .................................. |dyneo-features|
+       8.1 Project overview .................................. |dyneo-project|
+       8.2 Decision records ...................................... |dyneo-adr|
+       8.3 Spelling ............................................ |dyneo-spell|
+       8.4 Diagrams .......................................... |dyneo-diagram|
+       8.5 Integrations ................................. |dyneo-integrations|
+    9. Mappings ............................................. |dyneo-mappings|
+   10. Commands ............................................. |dyneo-commands|
+   11. Layout ................................................. |dyneo-layout|
+   12. Development ....................................... |dyneo-development|
+   13. Troubleshooting ............................... |dyneo-troubleshooting|
 
 ------------------------------------------------------------------------------
 1. REQUIREMENTS                                           *dyneo-requirements*
@@ -232,7 +250,7 @@ repository, so:
        line in `:Lazy`.
 
 ------------------------------------------------------------------------------
-4. LANGUAGE SUPPORT                                          *dyneo-languages*
+4. LANGUAGES                                                 *dyneo-languages*
 
 103 entries over 126 filetypes: 42 languages, 13 frameworks, 38 tools and
 markup languages.  The authoritative list is `lua/config/languages.lua`, and
@@ -267,10 +285,7 @@ only when its language is in |DyNeo.enabled_languages| and its program is on
 `$PATH`; make, just, npm, cargo, mix and the rest of overseer's own templates
 are left to it.
 
-------------------------------------------------------------------------------
-5. BEYOND THE DEFAULTS                                        *dyneo-features*
-
-5.1 Tooling that installs itself                          *dyneo-lazy-install*
+4.1 Tooling that installs itself                          *dyneo-lazy-install*
 
 One |FileType| autocmd, one table of handlers (`lua/util/lazy_install.lua`).
 Opening a Go file installs the Go parser, `gopls`, its linters, its formatters
@@ -295,7 +310,36 @@ without dytoy.  When the package manager needs `sudo`, the password is asked
 for in Neovim, with |inputsecret()|, and handed to sudo through
 `SUDO_ASKPASS`.
 
-5.2 Quarantine                                              *dyneo-quarantine*
+4.2 Buffer servers and tools                                *dyneo-statusline*
+
+The statusline counts the language servers and the tools that are up rather
+than spelling them out; the full list is one key or one click away.
+
+    `<leader>cL`       Language servers of the buffer
+    `<leader>cT`       Formatters and linters of the buffer
+
+Each entry says whether the tool is installed, running, or missing, so a
+formatter that quietly never fires stops being a mystery.  Linters and
+formatters only ever run when they are actually installed.
+
+4.3 Workspace diagnostics                                    *dyneo-workspace*
+
+`<leader>xw` asks a language server about the whole project, not only the
+files that happen to be open, by handing it every file with
+`textDocument/didOpen`.
+
+Unlike the plugin it replaces, the file list and the contents are read off the
+main loop, so a big repository does not freeze the editor, and each document
+is closed again before Neovim opens the same file for real, so no server ever
+sees two `didOpen` for one URI.
+
+------------------------------------------------------------------------------
+5. SUPPLY CHAIN AND SECRETS                                   *dyneo-security*
+
+What reaches the editor from outside, and what leaves it.  Every mapping of
+this section is under `<leader>k`, except the ones of a decrypted buffer.
+
+5.1 Quarantine                                              *dyneo-quarantine*
 
 Anything freshly published is held back for a week before it may be installed
 -- the same window `min-release-age` (npm), `minimumReleaseAge` (bun, pnpm)
@@ -321,27 +365,33 @@ commit for commit, and a pinned plugin stays where it is.  A repository
 younger than the window is installed as lazy.nvim resolved it, since the
 alternative is not installing it at all.
 
-A week of waiting only helps if someone looks.  |:LazyQuarantine| `review`
-reads every update on its way, held or already through: the commits each
-plugin would move across, and the lines they add that start a process, load
-code at runtime, reach the network, touch a credential, delete files, carry an
-encoded blob, change the build or add a binary.  Prose, CI and tests are left
-out, and a flag raised many times in one file is said once.  A flag is a
-reason to read the diff, not a verdict.
+A week of waiting only helps if someone looks.  `<leader>kq` (|:DyQuarantine|)
+lists what is held back and for how long; `<leader>kr` (`:DyQuarantine
+review`) reads every update on its way, held or already through: the commits
+each plugin would move across, and the lines they add that start a process,
+load code at runtime, reach the network, touch a credential, delete files,
+carry an encoded blob, change the build or add a binary.  Prose, CI and tests
+are left out, and a flag raised many times in one file is said once.  A flag
+is a reason to read the diff, not a verdict.
 
-What is already installed is the other half.  |:DySbom| lists the plugins at
-their lockfile commits and the Mason packages at the versions of their
-receipts as a CycloneDX 1.5 document, and `:DySbom osv` asks OSV
-(https://osv.dev) about them in one request -- names, versions and commits,
-nothing else of the machine.
+5.2 SBOM and vulnerabilities                                      *dyneo-sbom*
 
-The project being edited has a supply chain of its own.  `:DySbom lock`
-reads the lockfile of the buffer, or every one git tracks in the project
-(at its top only outside git): `go.mod`, `Cargo.lock`, `package-lock.json`
-(npm 7 and later), `uv.lock` and `poetry.lock`.  Their packages go to OSV in
-batches of a thousand, and each one with a known vulnerability gets a warning
-on its line of the lockfile, its advisories named, and a quickfix entry.  A
-package of the project itself is left out.
+What is already installed is the other half.  `<leader>ks` (|:DySbom|) lists
+the plugins at their lockfile commits and the Mason packages at the versions
+of their receipts as a CycloneDX 1.5 document, and `<leader>ko`
+(`:DySbom osv`) asks OSV (https://osv.dev) about them in one request --
+names, versions and commits, nothing else of the machine.
+
+The project being edited has a supply chain of its own.  `<leader>kl`
+(`:DySbom lock`) reads the lockfile of the buffer, or every one git tracks in
+the project (at its top only outside git): `go.mod`, `Cargo.lock`,
+`package-lock.json` (npm 7 and later), `uv.lock` and `poetry.lock`.  Their
+packages go to OSV in batches of a thousand, and each one with a known
+vulnerability gets a warning on its line of the lockfile, its advisories
+named, and a quickfix entry.  A package of the project itself is left out.
+
+The container images a file names are checked the same way, see
+|dyneo-images|: `<leader>ki` scans them, `<leader>kp` pins them.
 
 5.3 Files kept from AI                                        *dyneo-ai-guard*
 
@@ -359,35 +409,77 @@ its way out.
 A wrapper that no longer finds what it wraps leaves the plugin as it is and
 says so, rather than breaking it on an upstream rename.
 
+`<leader>ka` (|:DyAiGuardCheck|) says why the buffer is held back.  A pattern
+that matched something that is not a credential is let past with
+`<leader>kA` (|:DyAiGuardAllow|), for that buffer, for as long as it is open;
+`<leader>kR` puts it back under the check.
+
 Every decision a guard makes is logged as well, so what left the editor can
 be looked back on and not only what was kept in: which integration, which
 file, when, and whether it went out or was refused.  Only the path and a line
-range are kept, never the text.  |:AiGuardLog| lists this session, and
-|:AiGuardLog!| every session still in `stdpath('state')/dyneo/ai_audit.jsonl`.
-The same handover is logged once a minute at most, since Claude Code is handed
-the selection on every cursor move.
+range are kept, never the text.  `<leader>kL` (|:DyAiGuardLog|) lists this
+session, and `:DyAiGuardLog!` every session still in
+`stdpath('state')/dyneo/ai_audit.jsonl`.  The same handover is logged once a
+minute at most, since Claude Code is handed the selection on every cursor
+move.
 
-5.4 Infrastructure                                               *dyneo-infra*
+5.4 Encrypted files                                          *dyneo-encrypted*
+
+A SOPS file, an Ansible Vault, or an `encrypted_*.age` / `encrypted_*.asc`
+file of a chezmoi source opens decrypted, and `:w` encrypts it again: SOPS
+through `sops edit`, which keeps the data key and the recipients of the
+file, Ansible Vault through `ansible-vault encrypt` with its vault id, and
+chezmoi through `chezmoi encrypt`, to the recipients of its configuration.
+The clear text never reaches the file it came from, and a failed encryption
+writes nothing.
+
+The buffer is held back from every AI integration before the clear text goes
+in (|dyneo-ai-guard|), keeps no swap or undo file, and cannot be undone back
+to the ciphertext.  Ansible Vault cannot ask for a password inside Neovim:
+give it `ANSIBLE_VAULT_PASSWORD_FILE`, or `vault_password_file` in
+`ansible.cfg`.
+
+A diff of ciphertext says nothing, so `<localleader>D` in a decrypted
+buffer, or |:DyEncryptedDiff|, diffs its clear text with the clear text of
+the file at `HEAD`, or at any revision given, in a split held back the same
+way.  The old version goes through the same tool from a private copy in a
+directory of its own, both removed once read.
+
+In a sops file, `<localleader>K` (|:DyEncryptedKeys|) lists who can open it
+-- the age recipients, KMS keys, PGP fingerprints, GCP, Azure and Vault keys
+its metadata names, read off the ciphertext on disk.
+|:DyEncryptedRotate| puts a change in place: `<localleader>U` (`updatekeys`,
+the default) sets the recipients to what `.sops.yaml` says now, after
+someone joined or left; `<localleader>N` (`rotate`) gives the file a new
+data key.  Both ask first, need the buffer written, run sops in the
+background, and open the file again -- unless it was edited meanwhile, which
+they say rather than lose the edits.  Ansible Vault is left out: rekeying it
+asks for passwords Neovim cannot type.
+
+------------------------------------------------------------------------------
+6. INFRASTRUCTURE                                                *dyneo-infra*
 
 The files an operator edits, and what to do with them without leaving
 the editor: the schema a YAML file is checked against, the cluster a
-manifest goes to, the plan a Terraform module would apply, the runbook
-whose steps are run where they are written, and the secrets kept encrypted
-beside them.
+manifest goes to, the images it runs, the plan a Terraform module would
+apply, and the picture of what a directory declares.  Mappings of the
+buffer are under `<localleader>`; the ones that need no particular buffer
+are under `<leader>i`.
 
-YAML and JSON schemas                                           *dyneo-schema*
+6.1 YAML and JSON schemas                                       *dyneo-schema*
 
 YAML schemas are detected from the content of the buffer -- Kubernetes
-manifests, CRDs, cloud-init.  `<leader>cys`, or |:YamlSchema|, opens a picker
-to set one for the buffer or write it in as a modeline.  Candidates come from
-the public catalogs, from the project, from |DyNeo.yaml_schema_dirs|, and from
-any path typed in.
+manifests, CRDs, cloud-init.  `<leader>cys`, or |:DyYamlSchema|, opens a
+picker to set one for the buffer, `<leader>cym` to write it in as a
+modeline, and `<leader>cyr` hands the buffer back to detection.  Candidates
+come from the public catalogs, from the project, from
+|DyNeo.yaml_schema_dirs|, and from any path typed in.
 
-Kubernetes                                                        *dyneo-kube*
+6.2 Kubernetes                                                    *dyneo-kube*
 
 A YAML buffer a cluster would take -- a manifest with `apiVersion` and
 `kind`, a `kustomization.yaml`, or any file of a Helm chart -- gets mappings
-under `<localleader>k`, and |:Kube| does the same from the command line:
+under `<localleader>k`, and |:DyKube| does the same from the command line:
 
     `<localleader>kd`  Diff with the cluster (`kubectl diff`)
     `<localleader>kv`  Validate with a server-side dry run
@@ -396,37 +488,41 @@ under `<localleader>k`, and |:Kube| does the same from the command line:
     `<localleader>kc`  Switch the context
     `<localleader>kn`  Switch the namespace of the context
 
+The context and the namespace can be switched from any buffer too, with
+`<leader>ic` and `<leader>in`.
+
 A manifest goes to `kubectl -f`, a kustomization to `kubectl -k`, and a file
 of a chart is rendered first and piped in, with the values file being edited
 as its values.  A diff or a render can hold Secret data, so its buffer is
 kept from every AI integration.
 
-Helm values                                                      *dyneo-helm*
+6.3 Helm values                                                   *dyneo-helm*
 
-In a template of a chart, `<localleader>v` (|:HelmValue|) goes from the
+In a template of a chart, `<localleader>v` (|:DyHelmValue|) goes from the
 `.Values` path under the cursor to its line in the chart's `values.yaml`, or
 to the deepest key of it the file sets.  In `values.yaml`, `<localleader>u`
-(|:HelmUsages|) lists in the quickfix list every template line using the key
-under the cursor, and |:HelmUnused| marks the keys no template uses.  A key
-is used when a template names it, a parent of it -- `toYaml .Values.resources`
-uses all of `resources` -- or a child; `global` and the values of a subchart
-are left to their owner.
+(|:DyHelmUsages|) lists in the quickfix list every template line using the
+key under the cursor, and `<localleader>U` (|:DyHelmUnused|) marks the keys
+no template uses.  A key is used when a template names it, a parent of it
+-- `toYaml .Values.resources` uses all of `resources` -- or a child;
+`global` and the values of a subchart are left to their owner.
 
-Container images                                               *dyneo-images*
+6.4 Container images                                            *dyneo-images*
 
 A Dockerfile names its bases in `FROM`, a manifest or a compose file in
 `image:`; build stages, `scratch` and names holding a variable are left out.
-|:ImageScan| asks `trivy image` (or `grype`) about each image once, and puts
-what it knows on each line naming it: how many vulnerabilities by severity
-and the worst of their ids, an error with any critical or high one.  The
-first scan downloads the vulnerability database.
+`<leader>ki` (|:DyImageScan|) asks `trivy image` (or `grype`) about each
+image once, and puts what it knows on each line naming it: how many
+vulnerabilities by severity and the worst of their ids, an error with any
+critical or high one.  The first scan downloads the vulnerability database.
 
-|:ImagePin| pins each tag to the digest it points at now, through `crane` or
-`skopeo`: `nginx:1.27` becomes `nginx:1.27@sha256:…`, so a tag pushed again
-does not change what runs.  An image pinned already is left alone, and
-nothing is pinned if the file was edited while the registry answered.
+`<leader>kp` (|:DyImagePin|) pins each tag to the digest it points at now,
+through `crane` or `skopeo`: `nginx:1.27` becomes `nginx:1.27@sha256:…`, so
+a tag pushed again does not change what runs.  An image pinned already is
+left alone, and nothing is pinned if the file was edited while the registry
+answered.
 
-Policy checks                                                  *dyneo-policy*
+6.5 Policy checks                                               *dyneo-policy*
 
 Infrastructure code is linted against policies as well as for style, each
 checker installed by Mason the first time a file of its kind opens:
@@ -447,9 +543,9 @@ policy, not a line: a finding lands on the line naming its object, or on the
 first line.  A checkov check is silenced with `# checkov:skip=<ID>: <why>`
 inside the block it is about.
 
-Terraform plan                                                  *dyneo-tfplan*
+6.6 Terraform plan                                              *dyneo-tfplan*
 
-In a Terraform buffer, `<localleader>p` (or |:TfPlan|) runs `tofu plan`,
+In a Terraform buffer, `<localleader>p` (or |:DyTfPlan|) runs `tofu plan`,
 or `terraform plan` without OpenTofu, in the directory of the file, and
 shows what it would do on the blocks that ask for it: `+ create`,
 `~ update in place`, `-/+ replace` with the attributes forcing it, and
@@ -458,12 +554,12 @@ list.  A module call carries every change below it.  The plan runs with
 `-lock=false`, and its file -- every planned value in plain text -- is
 deleted once read.  `<localleader>P` clears it.
 
-`<localleader>d` (`:TfPlan drift`) runs a `-refresh-only` plan instead and
+`<localleader>d` (`:DyTfPlan drift`) runs a `-refresh-only` plan instead and
 shows what changed or was deleted outside the code, on the blocks that
 declare it.  It runs only when asked: a refresh reads every object of the
 state.
 
-`<localleader>i` (`:TfPlan impact`) plans, and shows besides what each
+`<localleader>i` (`:DyTfPlan impact`) plans, and shows besides what each
 block replaced or destroyed takes with it: every block of the module that
 refers to it, or names it in `depends_on`, directly or through another, gets
 `↳ depends on aws_instance.web (replace)`.  The graph is read off the
@@ -471,181 +567,17 @@ configuration the plan carries -- expressions, `count`, `for_each` and
 `depends_on` -- the root module only.  A reference made through a `local`
 is not in it, and not followed.
 
-`<localleader>c` (`:TfPlan cost`) plans, then hands the plan to `infracost
+`<localleader>c` (`:DyTfPlan cost`) plans, then hands the plan to `infracost
 breakdown` and puts the monthly cost of each block at the end of its line,
 summed per module call, with the total in a notification.  The plan goes to
 `infracost` through a file only its owner can read, deleted once priced.  A
 resource priced by usage alone adds nothing.  `infracost` keeps its own API
 key: run `infracost auth login` once.
 
-Runbooks                                                       *dyneo-runbook*
+6.7 Architecture diagrams                                 *dyneo-architecture*
 
-In a Markdown file, `<localleader>r` runs the fenced block under the cursor
-from the directory of the file, and puts what it printed right under it in an
-`output` fence, replaced on the next run.  `sh`, `bash`, `shell`, `zsh`,
-`fish`, `python` and `js` blocks run as they are; a `console` block runs only
-its `$ ` lines.  `<localleader>R` runs every block in turn and stops at the
-first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
-what is running.  A block that deletes, destroys or reaches for root asks
-first.  See |:Runbook|.
-
-A block can leave a value to the moment it runs: `${input:name}` is asked
-for once per buffer and filled in, everywhere it appears, before the block
-is checked for what it would destroy -- the check sees the command that
-runs.  `:Runbook inputs` forgets the values typed.  `<localleader>F` runs
-every block from the one under the cursor down, where a runbook is picked up
-after a step failed and was fixed.
-
-`<localleader>L` (`:Runbook record`) starts a record of the session, and
-stops it: each block run is appended, with the time, how it ended and how
-long it took, the code as written and what it printed, to a Markdown file
-under `stdpath('state')/dyneo/runbook/` that only its owner can read -- the
-timeline of an incident, written as it happens.  The code keeps its
-`${input:…}`: a value typed for one, a password or a token, is never written
-to the record.
-
-OpenAPI requests                                               *dyneo-openapi*
-
-In an OpenAPI document (`openapi*.yaml`, `openapi*.json`), `<localleader>h`
-opens the operation under the cursor as a kulala request, and
-`<localleader>H` as a Hurl one (|:OpenApiRequest|).  The cursor may be
-anywhere inside the method, or on the path for its first method.  The first
-server becomes `baseUrl`; each path, query and header parameter becomes a
-variable holding its example; a JSON body is made from the example of the
-request, or from its schema.  `$ref`s inside the document are followed.  A
-YAML document is read through `yq`.  The request opens in a new buffer, to
-save where it belongs.
-
-`<localleader>d` (|:OpenApiDiff|) compares the document as it is in the
-buffer, written or not, with itself at `HEAD` or at any revision given,
-through `oasdiff breaking`: each change that breaks a client is an error on
-its operation, one that may break it a warning, and the rest notes.  The old
-version, and the buffer when it is not written, are put beside the document
-under hidden names for the run, so a relative `$ref` resolves from both, and
-removed after it.  A run that fails is reported as such, never as nothing
-breaking.  Install `oasdiff` once with `:MasonInstall oasdiff`.
-
-CI pipelines                                                        *dyneo-ci*
-
-In a `.gitlab-ci.yml` or a GitHub Actions workflow, `<localleader>s` (or
-|:CiStatus|) asks the forge for the last pipeline of the current branch and
-puts the status of each job at the end of the line defining it: `✓` passed,
-`✗` failed, `●` running, `○` waiting, `⊘` skipped.  The jobs of a matrix are
-counted on their one line, the worst of them shown.  `<localleader>x` clears
-them.  The forge is the first of the remotes `upstream`, `gh`, `github` and
-`origin` on GitHub or GitLab, asked through `gh` or `glab`, which keep the
-token.
-
-In a `.gitlab-ci.yml`, `<localleader>l` (or |:CiLint|) has GitLab check the
-saved file with `glab ci lint`, and puts what it finds on the jobs it names.
-This sends the file to GitLab, so a file held back from AI is not sent.  A
-workflow is checked by `actionlint` and `zizmor` as it is edited
-(|dyneo-policy|).
-
-A tag such as `actions/checkout@v4` runs whatever it points at the day the
-workflow runs.  In a workflow, `<localleader>P` (|:ActionsPin|) pins every
-`uses:` to the full commit its ref points at now, the ref kept as a comment
-for Renovate and Dependabot: `actions/checkout@<sha> # v4`, any comment of
-your own kept after it.  Each commit is
-asked of GitHub through `gh`; a local action, a `docker://` image and a ref
-that is already a commit are left alone, and nothing is pinned if the
-workflow was edited while GitHub answered.
-
-Logs                                                              *dyneo-logs*
-
-|:DyLog| opens a log file, the journal (`journalctl`) or the logs of a pod
-(`kubectl logs`) as records, one per line: time, level, message and request
-id, whatever the source names them.  JSON lines, logfmt and plain text are
-read line by line, and the level is coloured.  At most the last 20000 lines
-of a file are read, and 2000 of the journal or of a pod.  In the buffer:
-
-    `<localleader>l`   Show only a level and louder
-    `<localleader>i`   Show only the request under the cursor; again for all
-    `<localleader>f`   Show only the JSON records a `jq` expression selects,
-                     as in `select(…)`
-    `<localleader>c`   Clear the filters
-    `<localleader>r`   Read the source again
-
-Logs carry tokens and personal data, so the buffer is kept from every AI
-integration (|dyneo-ai-guard|).
-
-Certificates and tokens                                        *dyneo-inspect*
-
-|:DyInspect| decodes what is under the cursor into a split held back from
-every AI integration: a certificate -- a PEM block, or its base64 in a
-Kubernetes Secret -- through `openssl x509` (subject, issuer, names, key
-usage, validity, fingerprint), a certificate request or a public key the
-same way, and a JWT read in place: its header, its claims, and `iat`, `nbf`
-and `exp` as dates.  The signature of a JWT is never shown, and a private
-key is named, never decoded.
-
-`:DyInspect expiry` checks every certificate of the buffer and puts an error
-on one that expired, a warning on one ending within 30 days.
-
-Encrypted files                                              *dyneo-encrypted*
-
-A SOPS file, an Ansible Vault, or an `encrypted_*.age` / `encrypted_*.asc`
-file of a chezmoi source opens decrypted, and `:w` encrypts it again: SOPS
-through `sops edit`, which keeps the data key and the recipients of the
-file, Ansible Vault through `ansible-vault encrypt` with its vault id, and
-chezmoi through `chezmoi encrypt`, to the recipients of its configuration.
-The clear text never reaches the file it came from, and a failed encryption
-writes nothing.
-
-The buffer is held back from every AI integration before the clear text goes
-in (|dyneo-ai-guard|), keeps no swap or undo file, and cannot be undone back
-to the ciphertext.  Ansible Vault cannot ask for a password inside Neovim:
-give it `ANSIBLE_VAULT_PASSWORD_FILE`, or `vault_password_file` in
-`ansible.cfg`.
-
-A diff of ciphertext says nothing, so `<localleader>D` in a decrypted
-buffer, or |:EncryptedDiff|, diffs its clear text with the clear text of the
-file at `HEAD`, or at any revision given, in a split held back the same way.
-The old version goes through the same tool from a private copy in a
-directory of its own, both removed once read.
-
-|:EncryptedKeys| lists who can open a sops file -- the age recipients, KMS
-keys, PGP fingerprints, GCP, Azure and Vault keys its metadata names, read
-off the ciphertext on disk.  |:EncryptedRotate| puts a change in place:
-`updatekeys` (the default) sets the recipients to what `.sops.yaml` says
-now, after someone joined or left; `rotate` gives the file a new data key.
-Both ask first, need the buffer written, run sops in the background, and
-open the file again -- unless it was edited meanwhile, which they say rather
-than lose the edits.  Ansible
-Vault is left out: rekeying it asks for passwords Neovim cannot type.
-
-5.5 Buffer servers and tools                                *dyneo-statusline*
-
-The statusline counts the language servers and the tools that are up rather
-than spelling them out; the full list is one key or one click away.
-
-    `<leader>cL`       Language servers of the buffer
-    `<leader>cT`       Formatters and linters of the buffer
-
-Each entry says whether the tool is installed, running, or missing, so a
-formatter that quietly never fires stops being a mystery.  Linters and
-formatters only ever run when they are actually installed.
-
-5.6 Spelling                                                     *dyneo-spell*
-
-|:DySpell| rebuilds a spell file with |:mkspell| from the word lists under
-|DyNeo.dictionaries_path| and `spell/`: Vietnamese, Chinese, plus the `proper`
-and `technical` lists kept in the repository.
-
-Comments are spell-checked as well as prose, through `ltcc`
-(languagetool-code-comments), as diagnostics and as code actions.  The word
-under the cursor, or a Visual selection for anything with an apostrophe or a
-dot in it -- `<cword>` stops at both -- can be added to a list from a mapping.
-
-5.7 Diagrams                                                   *dyneo-diagram*
-
-D2 diagrams render inline on kitty-graphics terminals, zellij included.
-`<leader>cp` previews the diagram under the cursor; Markdown and Typst get
-their own preview on the same key.
-
-                                                          *dyneo-architecture*
-|:DyArchitecture| draws what the directory of the buffer declares, as D2 in
-a new buffer to preview or to keep:
+`<leader>ia` (|:DyArchitecture|) draws what the directory of the buffer
+declares, as D2 in a new buffer to preview (|dyneo-diagram|) or to keep:
 
     Terraform     each `resource`, `data` and `module` block, and an arrow
                   to every block its body refers to -- read off the files,
@@ -661,20 +593,140 @@ a new buffer to preview or to keep:
 YAML is read through `yq`, a file at a time: a template of a chart (`{{ }}`)
 or a file yq cannot read is left out, and named, rather than ending it.
 
-5.8 Workspace diagnostics                                    *dyneo-workspace*
+------------------------------------------------------------------------------
+7. OPERATIONS                                                      *dyneo-ops*
 
-`<leader>xw` asks a language server about the whole project, not only the
-files that happen to be open, by handing it every file with
-`textDocument/didOpen`.
+Running things and reading what they say: runbooks, logs, certificates,
+pipelines and APIs.
 
-Unlike the plugin it replaces, the file list and the contents are read off the
-main loop, so a big repository does not freeze the editor, and each document
-is closed again before Neovim opens the same file for real, so no server ever
-sees two `didOpen` for one URI.
+7.1 Runbooks                                                   *dyneo-runbook*
 
-Decision records                                                   *dyneo-adr*
+In a Markdown file, `<localleader>r` runs the fenced block under the cursor
+from the directory of the file, and puts what it printed right under it in an
+`output` fence, replaced on the next run.  `sh`, `bash`, `shell`, `zsh`,
+`fish`, `python` and `js` blocks run as they are; a `console` block runs only
+its `$ ` lines.  `<localleader>R` runs every block in turn and stops at the
+first that fails, `<localleader>x` clears the outputs, `<localleader>s` stops
+what is running.  A block that deletes, destroys or reaches for root asks
+first.  See |:DyRunbook|.
 
-|:Adr| keeps the architecture decisions of a project as adr-tools does: one
+A block can leave a value to the moment it runs: `${input:name}` is asked
+for once per buffer and filled in, everywhere it appears, before the block
+is checked for what it would destroy -- the check sees the command that
+runs.  `<localleader>I` (`:DyRunbook inputs`) forgets the values typed.
+`<localleader>F` runs every block from the one under the cursor down, where
+a runbook is picked up after a step failed and was fixed.
+
+`<localleader>L` (`:DyRunbook record`) starts a record of the session, and
+stops it: each block run is appended, with the time, how it ended and how
+long it took, the code as written and what it printed, to a Markdown file
+under `stdpath('state')/dyneo/runbook/` that only its owner can read -- the
+timeline of an incident, written as it happens.  The code keeps its
+`${input:…}`: a value typed for one, a password or a token, is never written
+to the record.
+
+7.2 Logs                                                          *dyneo-logs*
+
+|:DyLog| opens a log file, the journal (`journalctl`) or the logs of a pod
+(`kubectl logs`) as records, one per line: time, level, message and request
+id, whatever the source names them.  `<leader>il` reads the file of the
+buffer, `<leader>ij` the journal, and `<leader>ip` starts the command line
+for a pod.  JSON lines, logfmt and plain text are read line by line, and the
+level is coloured.  At most the last 20000 lines of a file are read, and
+2000 of the journal or of a pod.  In the buffer:
+
+    `<localleader>l`   Show only a level and louder
+    `<localleader>i`   Show only the request under the cursor; again for all
+    `<localleader>f`   Show only the JSON records a `jq` expression selects,
+                     as in `select(…)`
+    `<localleader>c`   Clear the filters
+    `<localleader>r`   Read the source again
+
+Logs carry tokens and personal data, so the buffer is kept from every AI
+integration (|dyneo-ai-guard|).
+
+7.3 Certificates and tokens                                    *dyneo-inspect*
+
+`<leader>ii` (|:DyInspect|) decodes what is under the cursor into a split
+held back from every AI integration: a certificate -- a PEM block, or its
+base64 in a Kubernetes Secret -- through `openssl x509` (subject, issuer,
+names, key usage, validity, fingerprint), a certificate request or a public
+key the same way, and a JWT read in place: its header, its claims, and
+`iat`, `nbf` and `exp` as dates.  The signature of a JWT is never shown, and
+a private key is named, never decoded.
+
+`<leader>ie` (`:DyInspect expiry`) checks every certificate of the buffer
+and puts an error on one that expired, a warning on one ending within 30
+days.
+
+7.4 CI pipelines                                                    *dyneo-ci*
+
+In a `.gitlab-ci.yml` or a GitHub Actions workflow, `<localleader>s` (or
+|:DyCiStatus|) asks the forge for the last pipeline of the current branch and
+puts the status of each job at the end of the line defining it: `✓` passed,
+`✗` failed, `●` running, `○` waiting, `⊘` skipped.  The jobs of a matrix are
+counted on their one line, the worst of them shown.  `<localleader>x` clears
+them.  The forge is the first of the remotes `upstream`, `gh`, `github` and
+`origin` on GitHub or GitLab, asked through `gh` or `glab`, which keep the
+token.
+
+In a `.gitlab-ci.yml`, `<localleader>l` (or |:DyCiLint|) has GitLab check the
+saved file with `glab ci lint`, and puts what it finds on the jobs it names.
+This sends the file to GitLab, so a file held back from AI is not sent.  A
+workflow is checked by `actionlint` and `zizmor` as it is edited
+(|dyneo-policy|).
+
+A tag such as `actions/checkout@v4` runs whatever it points at the day the
+workflow runs.  In a workflow, `<localleader>P` (|:DyActionsPin|) pins every
+`uses:` to the full commit its ref points at now, the ref kept as a comment
+for Renovate and Dependabot: `actions/checkout@<sha> # v4`, any comment of
+your own kept after it.  Each commit is asked of GitHub through `gh`; a
+local action, a `docker://` image and a ref that is already a commit are
+left alone, and nothing is pinned if the workflow was edited while GitHub
+answered.
+
+7.5 OpenAPI requests                                           *dyneo-openapi*
+
+In an OpenAPI document (`openapi*.yaml`, `openapi*.json`), `<localleader>h`
+opens the operation under the cursor as a kulala request, and
+`<localleader>H` as a Hurl one (|:DyOpenApiRequest|).  The cursor may be
+anywhere inside the method, or on the path for its first method.  The first
+server becomes `baseUrl`; each path, query and header parameter becomes a
+variable holding its example; a JSON body is made from the example of the
+request, or from its schema.  `$ref`s inside the document are followed.  A
+YAML document is read through `yq`.  The request opens in a new buffer, to
+save where it belongs.
+
+`<localleader>d` (|:DyOpenApiDiff|) compares the document as it is in the
+buffer, written or not, with itself at `HEAD` or at any revision given,
+through `oasdiff breaking`: each change that breaks a client is an error on
+its operation, one that may break it a warning, and the rest notes.  The old
+version, and the buffer when it is not written, are put beside the document
+under hidden names for the run, so a relative `$ref` resolves from both, and
+removed after it.  A run that fails is reported as such, never as nothing
+breaking.  Install `oasdiff` once with `:MasonInstall oasdiff`.
+
+------------------------------------------------------------------------------
+8. PROJECT AND WRITING                                        *dyneo-features*
+
+The project as a whole, its decisions, and the prose and pictures written
+in it.
+
+8.1 Project overview                                           *dyneo-project*
+
+`<leader>pp`, or |:DyProject|, opens one page on the state of the project
+of the current buffer: the branch, how far ahead and behind its upstream,
+and the files changed; the diagnostics of its open buffers, by file; the
+tasks overseer ran; the open merge or pull requests and the last pipeline of
+the branch, from the forge of |dyneo-ci|; and the Jira issues assigned
+(|:DyJira|).  Each section fills in as its answer comes, or says why it
+cannot.  `<CR>` opens the file, the page or the issue of the line, `r` asks
+everything again, `q` closes it.  `<leader>pR` (|:DyRoot|) lists the roots
+found for the buffer.
+
+8.2 Decision records                                               *dyneo-adr*
+
+|:DyAdr| keeps the architecture decisions of a project as adr-tools does: one
 Markdown file per decision, numbered `0001-<title>.md` and on, in the
 directory a `.adr-dir` file at the root names, else `docs/adr`, `doc/adr`,
 `docs/decisions` or `adr` when one exists, else `docs/adr`.  A record has a
@@ -683,18 +735,31 @@ its context, decision and consequences.  A decision that replaces another
 links both ways: the old one says what superseded it, the new one what it
 supersedes.
 
-Project overview                                               *dyneo-project*
+    `<leader>prr`      Pick a record and open it
+    `<leader>prn`      Write a new record
+    `<leader>prs`      Set the status of the record open
+    `<leader>prS`      Write a record replacing the one open
 
-`<leader>pp`, or |:DyProject|, opens one page on the state of the project
-of the current buffer: the branch, how far ahead and behind its upstream,
-and the files changed; the diagnostics of its open buffers, by file; the
-tasks overseer ran; the open merge or pull requests and the last pipeline of
-the branch, from the forge of |dyneo-ci|; and the Jira issues assigned
-(|:Jira|).  Each section fills in as its answer comes, or says why it
-cannot.  `<CR>` opens the file, the page or the issue of the line, `r` asks
-everything again, `q` closes it.
+8.3 Spelling                                                     *dyneo-spell*
 
-5.9 Integrations                                          *dyneo-integrations*
+|:DySpell|, or `<leader>zm`, rebuilds a spell file with |:mkspell| from the
+word lists under |DyNeo.dictionaries_path| and `spell/`: Vietnamese,
+Chinese, plus the `proper` and `technical` lists kept in the repository.
+
+Comments are spell-checked as well as prose, through `ltcc`
+(languagetool-code-comments), as diagnostics and as code actions.  The word
+under the cursor, or a Visual selection for anything with an apostrophe or a
+dot in it -- `<cword>` stops at both -- is added to a list with `<leader>zt`
+(technical) or `<leader>zp` (proper nouns).
+
+8.4 Diagrams                                                   *dyneo-diagram*
+
+D2 diagrams render inline on kitty-graphics terminals, zellij included.
+`<leader>cp` previews the diagram under the cursor; Markdown and Typst get
+their own preview on the same key.  The diagram of what a directory
+declares is drawn by |dyneo-architecture|.
+
+8.5 Integrations                                          *dyneo-integrations*
 
 Obsidian            Vaults from |DyNeo.obsidian|.
 chezmoi             Templates edited with the target language injected, not
@@ -710,9 +775,10 @@ GitHub, GitLab      Pull requests and issues through Octo when `gh` is
                     GitLab token comes from `.gitlab.nvim`, `GITLAB_TOKEN`
                     or `glab`, the instance from the remote.  CI checks of
                     the branch are on `<leader>pc`.
-Jira                |:Jira|: the issues assigned, and the chores of one --
-                    a branch named after it, a move, a worklog -- through
-                    jira-cli, whose own configuration holds the credentials.
+Jira                |:DyJira|, under `<leader>pj`: the issues assigned, and
+                    the chores of one -- a branch named after it, a move, a
+                    worklog -- through jira-cli, whose own configuration
+                    holds the credentials.
 
 Smaller gaps filled in `lua/tools` and `lua/lint`, each with a spec of its
 own: `jira` issue completion in commit messages, `shellcheck` code actions,
@@ -724,7 +790,7 @@ build an ignore comment for `markdownlint`, `ansible-lint`, `swiftlint` and
 friends.
 
 ------------------------------------------------------------------------------
-6. MAPPINGS                                                   *dyneo-mappings*
+9. MAPPINGS                                                   *dyneo-mappings*
 
 The leader key is `<Space>`.  Press it and wait: which-key lists every mapping
 under it, and `<Space>sk` searches all of them.  Custom mappings live in
@@ -735,31 +801,70 @@ diagnostics, `<leader>u` toggles, git -- at the top of
 
 Every mapping, grouped the way which-key shows them, is listed in
 |dyneo-keymaps|.  The ones worth knowing before which-key gets a
-chance to tell you:
+chance to tell you, grouped like the sections above:
 
-    `<leader>fy`       n      Copy the path of the file: relative or
-                            absolute, with line, with column, the
-                            directory, the project root, the file name
+Code ~
     `<leader>cL`       n      Language servers of this buffer
     `<leader>cT`       n      Formatters and linters of this buffer
     `<leader>cys`      n      Pick a YAML schema
     `<leader>cym`      n      Write the YAML schema in as a modeline
-    `<leader>cp`       n      Preview the diagram, Markdown or Typst under
-                            the cursor
+    `<leader>cyr`      n      Hand the YAML schema back to detection
     `<leader>xw`       n      Workspace diagnostics
+    `<leader>ct`       n      Translate
+
+Supply chain and secrets (|dyneo-security|) ~
+    `<leader>kq`       n      Updates the quarantine holds back
+    `<leader>kr`       n      Review the updates on their way
+    `<leader>ks`       n      SBOM of the editor
+    `<leader>ko`       n      Ask OSV about the plugins and packages
+    `<leader>kl`       n      Ask OSV about the project's lockfiles
+    `<leader>ki`       n      Scan the images this file names
+    `<leader>kp`       n      Pin the images to their digests
+    `<leader>ka`       n      Why this buffer is kept from AI
+    `<leader>kA`       n      Let this buffer past the content check
+    `<leader>kR`       n      Put it back under the check
+    `<leader>kL`       n      What the AI integrations were handed
+    `<leader>uk`       n      Camouflage: hide the values in a secret file
+
+Infrastructure and operations (|dyneo-infra|, |dyneo-ops|) ~
+    `<leader>ia`       n      Architecture diagram of this directory
+    `<leader>ii`       n      Decode the certificate, key or JWT
+    `<leader>ie`       n      Certificates of this buffer expired or ending
+    `<leader>il`       n      Read this file as a log
+    `<leader>ij`       n      Read the journal
+    `<leader>ip`       n      Read the logs of a pod
+    `<leader>ic`       n      Switch the Kubernetes context
+    `<leader>in`       n      Switch the Kubernetes namespace
+
+Project and forges (|dyneo-features|) ~
+    `<leader>pp`       n      Project overview
+    `<leader>pR`       n      Roots of this buffer
+    `<leader>pr`       n      Decision records: list, new, status, supersede
     `<leader>pc`       n      CI checks of the branch
     `<leader>ph`       n      GitHub (Octo): issues, pull requests
     `<leader>pl`       n      GitLab: review a merge request, approve, merge
     `<leader>pj`       n      Jira: my issues, search, branch, move, log
-                            work, view, open
-    `<leader>uk`       n      Camouflage: hide the values in a secret file
-    `<leader>ct`       n      Translate
+                            work, view, open, insert or copy the key
+    `<leader>ps`       n      Project LSP settings (codesettings)
+
+Writing ~
+    `<leader>cp`       n      Preview the diagram, Markdown or Typst under
+                            the cursor
+    `<leader>zt`       n, x   Add the word to the technical list
+    `<leader>zp`       n, x   Add the word to the proper nouns
+    `<leader>zm`       n      Rebuild a spell file
+
+AI ~
     `<leader>a`        n, x   AI CLIs through sidekick
     `<leader>ac`       n, v   Claude Code
     `<leader>av`       n, v   Avante: chat, inline edit, history, model
+
+Editing ~
+    `<leader>fy`       n      Copy the path of the file: relative or
+                            absolute, with line, with column, the
+                            directory, the project root, the file name
     `<leader>yh`       n, x   Yank history
     `<leader>yi`       n      Paste an image from the clipboard
-    `<leader>ps`       n      Project LSP settings (codesettings)
     `<leader>v`        n, x   Multiple cursors
     `<C-c>`            n      Change word
     `d` `x` `c` `C` `X`        n, v   Smart delete: a blank line goes to the
@@ -768,15 +873,45 @@ chance to tell you:
     `<C-f>`            x      Search the selected text
     `<C-r>`            x      Replace the selected text
 
+Mappings under `<localleader>` belong to one kind of buffer and are listed
+with the feature they drive: |dyneo-encrypted|, |dyneo-kube|, |dyneo-helm|,
+|dyneo-tfplan|, |dyneo-runbook|, |dyneo-logs|, |dyneo-ci| and
+|dyneo-openapi|.
+
 Command-line abbreviations, which only fire as a whole command line, so a
 `/W` in a search is left alone:
 
     `:W` `:Q` `:Wq` `:Wa` `:WQ` `:Qa`         the typo you meant
     `:W!` `:Q!` `:Qa!`
-    `:ww`                           save through `sudo tee`
+    `:ww`                           save as root, |:DySudoWrite|
 
 ------------------------------------------------------------------------------
-7. COMMANDS                                                   *dyneo-commands*
+10. COMMANDS                                                  *dyneo-commands*
+
+Every command this configuration defines starts with `Dy`, so `:Dy<Tab>`
+lists them all.  They are grouped like the sections above.
+
+General ~
+                                                                   *:DyFormat*
+:DyFormat               Format the buffer, whether or not it formats on save.
+                        `<leader>cf` formats the selection in Visual mode.
+
+                                                               *:DyFormatInfo*
+:DyFormatInfo           Which formatters would run, and whether the buffer
+                        formats on save.  `<leader>uf` and `<leader>uF` turn
+                        formatting on save off, globally or for the buffer.
+
+                                                                     *:DyRoot*
+:DyRoot                 The roots found for this buffer, the one in use first.
+
+                                                                   *:DyRename*
+:DyRename[!] [{name}]   Rename the file of the buffer, asking for {name} when
+                        not given; with [!], over an existing file.
+                        `<leader>cR` does the same.
+
+                                                                *:DySudoWrite*
+:DySudoWrite            Write the buffer as root, through `sudo` in a terminal
+                        of its own.  `:ww` is short for it.
 
                                                                     *:DySpell*
 :DySpell {lang}         Rebuild the spell file of {lang} with |:mkspell| from
@@ -784,35 +919,14 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         or `technical`; an unknown one is reported, not
                         raised.  See |dyneo-spell|.
 
-                                                                 *:YamlSchema*
-:YamlSchema             Open the schema picker for this YAML buffer.  Only
-                        defined once `yamlls` has attached to it.
-:YamlSchema {path}      Use the schema at {path}, a file or a URL.
-:YamlSchema modeline [{path}]
-                        Write the schema in as a modeline instead of setting
-                        it for this session only.
-:YamlSchema reset       Hand detection back the wheel.
-                        See |dyneo-schema|.
-
-                                                                *:DyNeoFormat*
-:DyNeoFormat            Format the buffer, whether or not it formats on save.
-                        `<leader>cf` formats the selection in Visual mode.
-
-                                                            *:DyNeoFormatInfo*
-:DyNeoFormatInfo        Which formatters would run, and whether the buffer
-                        formats on save.  `<leader>uf` and `<leader>uF` turn
-                        formatting on save off, globally or for the buffer.
-
-                                                                  *:DyNeoRoot*
-:DyNeoRoot              The roots found for this buffer, the one in use first.
-
-                                                             *:LazyQuarantine*
-:LazyQuarantine         Plugins the release quarantine is holding back, and
+Supply chain and secrets ~
+                                                               *:DyQuarantine*
+:DyQuarantine           Plugins the release quarantine is holding back, and
                         for how much longer.  See |dyneo-quarantine|.
-:LazyQuarantine review  Every update on its way, held or not: its commits,
+:DyQuarantine review    Every update on its way, held or not: its commits,
                         and the lines it adds flagged.  `<CR>` on a plugin
                         opens its diff.
-:LazyQuarantine review {plugin}
+:DyQuarantine review {plugin}
                         The full diff of the update of {plugin}.
 
                                                                      *:DySbom*
@@ -823,53 +937,97 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         vulnerabilities.
 :DySbom lock            Ask OSV about the packages of the project's
                         lockfiles, and warn on the line of each vulnerable
-                        one.  See |dyneo-quarantine|.
+                        one.  See |dyneo-sbom|.
 
-                                               *:AiGuardCheck* *:AiGuardAllow*
-:AiGuardCheck           Why this buffer is kept from the AI integrations.
-:AiGuardAllow[!]        Let this buffer past the content check, for as long
+                                           *:DyAiGuardCheck* *:DyAiGuardAllow*
+:DyAiGuardCheck         Why this buffer is kept from the AI integrations.
+:DyAiGuardAllow[!]      Let this buffer past the content check, for as long
                         as it is open; with [!], put it back under the check.
                         Refused for a file the name rules hold back.  See
                         |dyneo-ai-guard|.
 
-                                                                    *:Runbook*
-:Runbook [run]          Run the code block under the cursor.
-:Runbook all            Run every block in turn, stopping at a failure.
-:Runbook from           The same, from the block under the cursor down.
-:Runbook record         Start recording each run to a file, or stop.
-:Runbook inputs         Forget the values typed for `${input:…}`.
-:Runbook clear          Remove every `output` fence.
-:Runbook stop           Stop what the buffer is running.
-                        See |dyneo-runbook|.
+                                                               *:DyAiGuardLog*
+:DyAiGuardLog[!]        What the AI integrations were handed, and refused,
+                        this session, newest first; with [!], every session
+                        the log file still holds.  See |dyneo-ai-guard|.
 
-                                                                   *:CiStatus*
-:CiStatus               Show the last pipeline of the branch on the jobs of
-                        this `.gitlab-ci.yml` or workflow.
-:CiStatus clear         Clear it.  See |dyneo-ci|.
+                                                            *:DyEncryptedDiff*
+:DyEncryptedDiff [{rev}]
+                        Diff the clear text of this decrypted buffer with its
+                        clear text at {rev}, `HEAD` unless given.  See
+                        |dyneo-encrypted|.
 
-                                                                     *:CiLint*
-:CiLint                 Have GitLab check this saved `.gitlab-ci.yml`.
+                                                            *:DyEncryptedKeys*
+:DyEncryptedKeys        The recipients of this sops file.
 
-                                                                 *:ActionsPin*
-:ActionsPin             Pin every action of this GitHub workflow to the full
-                        commit its ref points at.  See |dyneo-ci|.
+                                                          *:DyEncryptedRotate*
+:DyEncryptedRotate [updatekeys]
+                        Set the recipients of this sops file to `.sops.yaml`.
+:DyEncryptedRotate rotate
+                        Give it a new data key.  See |dyneo-encrypted|.
 
-                                                                        *:Adr*
-:Adr [list]             Pick a decision record of the project and open it.
-:Adr new [{title}]      Write a new record, numbered after the last one.
-:Adr status [{status}]  Set the status of the record open.
-:Adr supersede [{title}]
-                        Write a record replacing the one open, linking both.
-                        See |dyneo-adr|.
+Infrastructure ~
+                                                               *:DyYamlSchema*
+:DyYamlSchema           Open the schema picker for this YAML buffer.  Only
+                        defined once `yamlls` has attached to it.
+:DyYamlSchema {path}    Use the schema at {path}, a file or a URL.
+:DyYamlSchema modeline [{path}]
+                        Write the schema in as a modeline instead of setting
+                        it for this session only.
+:DyYamlSchema reset     Hand detection back the wheel.
+                        See |dyneo-schema|.
+
+                                                                     *:DyKube*
+:DyKube [diff]          Diff this manifest, kustomization or chart with the
+                        cluster.
+:DyKube dryrun          Validate it with a server-side dry run.
+:DyKube apply           Apply it, after a confirmation naming the context.
+:DyKube render          Render the chart or the kustomization.
+:DyKube context         Switch the current context.
+:DyKube namespace       Switch the namespace of the current context.
+                        See |dyneo-kube|.
+
+                                                                *:DyHelmValue*
+:DyHelmValue            Go to the value under the cursor in values.yaml.
+                                                               *:DyHelmUsages*
+:DyHelmUsages           List the template lines using the key under the
+                        cursor.
+                                                               *:DyHelmUnused*
+:DyHelmUnused           Mark the values no template uses.  See |dyneo-helm|.
+
+                                                                *:DyImageScan*
+:DyImageScan            Scan the images this file names for known
+                        vulnerabilities.
+                                                                 *:DyImagePin*
+:DyImagePin             Pin them to their digests.  See |dyneo-images|.
+
+                                                                   *:DyTfPlan*
+:DyTfPlan               Plan the module of this buffer and show it on its
+                        blocks.
+:DyTfPlan drift         Show what changed outside the code, with a
+                        `-refresh-only` plan.
+:DyTfPlan cost          Plan, and show the monthly cost of each block with
+                        `infracost`.
+:DyTfPlan impact        Plan, and show what depends on each block replaced
+                        or destroyed.
+:DyTfPlan clear         Clear the plan, drift and costs shown.  See
+                        |dyneo-tfplan|.
 
                                                              *:DyArchitecture*
 :DyArchitecture         Draw what this directory declares -- Terraform,
                         manifests or compose -- as D2.  See
                         |dyneo-architecture|.
 
-                                                                  *:DyProject*
-:DyProject              The state of the project on one page.  See
-                        |dyneo-project|.
+Operations ~
+                                                                  *:DyRunbook*
+:DyRunbook [run]        Run the code block under the cursor.
+:DyRunbook all          Run every block in turn, stopping at a failure.
+:DyRunbook from         The same, from the block under the cursor down.
+:DyRunbook record       Start recording each run to a file, or stop.
+:DyRunbook inputs       Forget the values typed for `${input:…}`.
+:DyRunbook clear        Remove every `output` fence.
+:DyRunbook stop         Stop what the buffer is running.
+                        See |dyneo-runbook|.
 
                                                                       *:DyLog*
 :DyLog {file}           Read {file} as log records.
@@ -878,92 +1036,77 @@ Command-line abbreviations, which only fire as a whole command line, so a
                         Read the logs of {pod}, {args} passed to
                         `kubectl logs`.  See |dyneo-logs|.
 
-                                                             *:OpenApiRequest*
-:OpenApiRequest [http]  Open the OpenAPI operation under the cursor as a
-                        kulala request.
-:OpenApiRequest hurl    The same, as a Hurl request.  See |dyneo-openapi|.
-
-                                                                *:OpenApiDiff*
-:OpenApiDiff [{rev}]    The breaking changes of this OpenAPI document since
-                        {rev}, `HEAD` unless given.
-
                                                                   *:DyInspect*
 :DyInspect              Decode the certificate, key or JWT under the cursor.
 :DyInspect expiry       Warn on each certificate of the buffer expired or
                         ending soon.  See |dyneo-inspect|.
 
-                                                              *:EncryptedDiff*
-:EncryptedDiff [{rev}]  Diff the clear text of this decrypted buffer with its
-                        clear text at {rev}, `HEAD` unless given.  See
-                        |dyneo-encrypted|.
+                                                                 *:DyCiStatus*
+:DyCiStatus             Show the last pipeline of the branch on the jobs of
+                        this `.gitlab-ci.yml` or workflow.
+:DyCiStatus clear       Clear it.  See |dyneo-ci|.
 
-                                                              *:EncryptedKeys*
-:EncryptedKeys          The recipients of this sops file.
+                                                                   *:DyCiLint*
+:DyCiLint               Have GitLab check this saved `.gitlab-ci.yml`.
 
-                                                            *:EncryptedRotate*
-:EncryptedRotate [updatekeys]
-                        Set the recipients of this sops file to `.sops.yaml`.
-:EncryptedRotate rotate Give it a new data key.  See |dyneo-encrypted|.
+                                                               *:DyActionsPin*
+:DyActionsPin           Pin every action of this GitHub workflow to the full
+                        commit its ref points at.  See |dyneo-ci|.
 
-                                                                     *:TfPlan*
-:TfPlan                 Plan the module of this buffer and show it on its
-                        blocks.
-:TfPlan drift           Show what changed outside the code, with a
-                        `-refresh-only` plan.
-:TfPlan cost            Plan, and show the monthly cost of each block with
-                        `infracost`.
-:TfPlan impact          Plan, and show what depends on each block replaced
-                        or destroyed.
-:TfPlan clear           Clear the plan, drift and costs shown.  See
-                        |dyneo-tfplan|.
+                                                           *:DyOpenApiRequest*
+:DyOpenApiRequest [http]
+                        Open the OpenAPI operation under the cursor as a
+                        kulala request.
+:DyOpenApiRequest hurl  The same, as a Hurl request.  See |dyneo-openapi|.
 
-                                                                  *:HelmValue*
-:HelmValue              Go to the value under the cursor in values.yaml.
-                                                                 *:HelmUsages*
-:HelmUsages             List the template lines using the key under the
-                        cursor.
-                                                                 *:HelmUnused*
-:HelmUnused             Mark the values no template uses.  See |dyneo-helm|.
+                                                              *:DyOpenApiDiff*
+:DyOpenApiDiff [{rev}]  The breaking changes of this OpenAPI document since
+                        {rev}, `HEAD` unless given.
 
-                                                                  *:ImageScan*
-:ImageScan              Scan the images this file names for known
-                        vulnerabilities.
-                                                                   *:ImagePin*
-:ImagePin               Pin them to their digests.  See |dyneo-images|.
+Project ~
+                                                                  *:DyProject*
+:DyProject              The state of the project on one page.  See
+                        |dyneo-project|.
 
-                                                                       *:Kube*
-:Kube [diff]            Diff this manifest, kustomization or chart with the
-                        cluster.
-:Kube dryrun            Validate it with a server-side dry run.
-:Kube apply             Apply it, after a confirmation naming the context.
-:Kube render            Render the chart or the kustomization.
-:Kube context           Switch the current context.
-:Kube namespace         Switch the namespace of the current context.
-                        See |dyneo-kube|.
+                                                                      *:DyAdr*
+:DyAdr [list]           Pick a decision record of the project and open it.
+:DyAdr new [{title}]    Write a new record, numbered after the last one.
+:DyAdr status [{status}]
+                        Set the status of the record open.
+:DyAdr supersede [{title}]
+                        Write a record replacing the one open, linking both.
+                        See |dyneo-adr|.
 
-                                                                       *:Jira*
-:Jira                   Pick among the issues assigned to you, then choose
+                                                                     *:DyJira*
+:DyJira                 Pick among the issues assigned to you, then choose
                         what to do with it.  In the picker, `<C-b>` starts a
                         branch, `<C-o>` opens the issue, `<C-y>` inserts its
                         key.
-:Jira search [{jql}]    The same, among the issues matching {jql}, asked for
+:DyJira search [{jql}]  The same, among the issues matching {jql}, asked for
                         when not given.
-:Jira {action} [{key}]  Do {action} on {key}, on the issue the current branch
+:DyJira {action} [{key}]
+                        Do {action} on {key}, on the issue the current branch
                         is named after, or on one picked.  {action} is one of
                         `branch`, `move`, `worklog`, `view`, `open`, `insert`
                         or `copy`.  `branch` names the branch
                         `<type>/<KEY>-<summary>` and offers it for editing.
 
-                                                                 *:AiGuardLog*
-:AiGuardLog[!]          What the AI integrations were handed, and refused,
-                        this session, newest first; with [!], every session
-                        the log file still holds.  See |dyneo-ai-guard|.
+Language servers ~
+                                                           *:DySonarlintToken*
+:DySonarlintToken {org}
+                        Ask for the SonarQube or SonarCloud token of {org},
+                        without echoing it, and keep it in a file only its
+                        owner can read.
+                                                  *:DySonarlintDeactivateRule*
+:DySonarlintDeactivateRule {rule}
+                        Turn off a sonarlint rule.  Both are defined in the
+                        buffers `sonarlint` attaches to.
 
 The plugins' own commands are unchanged: `:Lazy`, `:Mason`, `:ConformInfo`,
 and the rest.
 
 ------------------------------------------------------------------------------
-8. LAYOUT                                                       *dyneo-layout*
+11. LAYOUT                                                      *dyneo-layout*
 
 `init.lua`            Globals, per-machine overrides, the version gate,
                     lazy.nvim
@@ -983,7 +1126,8 @@ and the rest.
 `lua/per_machine/`    The per-machine overrides, rendered by chezmoi
 `lsp/` `ftplugin/`      Native Neovim configuration, filetype by filetype
 `after/` `queries/`
-`plugin/`             `ai_guard`, `spell`
+`plugin/`             The commands of `lua/tools`, defined without loading
+                    them, and the guards needed from the first buffer
 `snippets/` `spell/`    The rest of the runtime path
 `colors/` `ftdetect/`
 `scripts/`            Benchmarks, checks, the test runner
@@ -991,7 +1135,7 @@ and the rest.
 `doc/`                This file, and |dyneo-keymaps|
 
 ------------------------------------------------------------------------------
-9. DEVELOPMENT                                             *dyneo-development*
+12. DEVELOPMENT                                            *dyneo-development*
 
 58 spec files under `tests/spec` run with plenary-busted in a headless Neovim
 that loads only the module each spec requires: >sh
@@ -1028,7 +1172,7 @@ After editing this help file, regenerate its tags with: >vim
     :helptags doc
 <
 ------------------------------------------------------------------------------
-10. TROUBLESHOOTING                                    *dyneo-troubleshooting*
+13. TROUBLESHOOTING                                    *dyneo-troubleshooting*
 
 Neovim says it is too old ~
     The version gate in `init.lua` wants 0.13 on the `latest` channel and 0.12

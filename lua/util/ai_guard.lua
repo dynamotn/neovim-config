@@ -441,16 +441,16 @@ local function on_load(name, fn)
   })
 end
 
---- `:AiGuardCheck` and `:AiGuardAllow`
+--- `:DyAiGuardCheck` and `:DyAiGuardAllow`
 ---
 --- A buffer held back for its name says so by its name; one held back for
 --- what is written in it does not, and the first sign of it is a chat that
---- answers nothing. `:AiGuardCheck` says what was found and where, and
---- `:AiGuardAllow` is the way past a pattern that matched something that is
+--- answers nothing. `:DyAiGuardCheck` says what was found and where, and
+--- `:DyAiGuardAllow` is the way past a pattern that matched something that is
 --- not a credential -- for that buffer, for as long as it is open, and never
 --- for a file the name rules already named.
 M.commands = function()
-  vim.api.nvim_create_user_command('AiGuardCheck', function()
+  vim.api.nvim_create_user_command('DyAiGuardCheck', function()
     local bufnr = vim.api.nvim_get_current_buf()
     local waived = sensitive.is_allowed(bufnr)
     local reasons = sensitive.reasons(bufnr, { ignore_waiver = true })
@@ -462,7 +462,7 @@ M.commands = function()
       )
     end
     local headline = waived
-        and 'Waived by :AiGuardAllow, and otherwise held back for:'
+        and 'Waived by :DyAiGuardAllow, and otherwise held back for:'
       or 'Held back from every AI integration:'
     vim.notify(
       headline .. '\n- ' .. table.concat(reasons, '\n- '),
@@ -471,7 +471,7 @@ M.commands = function()
     )
   end, { desc = 'Why this buffer is kept from the AI integrations' })
 
-  vim.api.nvim_create_user_command('AiGuardAllow', function(args)
+  vim.api.nvim_create_user_command('DyAiGuardAllow', function(args)
     local bufnr = vim.api.nvim_get_current_buf()
     if args.bang then
       sensitive.allow(bufnr, false)
@@ -498,7 +498,7 @@ M.commands = function()
     end
     sensitive.allow(bufnr)
     vim.notify(
-      'This buffer may now be sent to the AI integrations; :AiGuardAllow! '
+      'This buffer may now be sent to the AI integrations; :DyAiGuardAllow! '
         .. 'takes it back',
       vim.log.levels.WARN,
       { title = 'AI guard' }

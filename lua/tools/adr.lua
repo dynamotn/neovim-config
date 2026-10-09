@@ -274,7 +274,7 @@ end
 function M.pick()
   local records = M.list(M.dir(root()))
   if #records == 0 then
-    return notify('No decision recorded yet: `:Adr new` starts one')
+    return notify('No decision recorded yet: `:DyAdr new` starts one')
   end
   vim.ui.select(records, {
     prompt = 'Decisions',
@@ -290,11 +290,11 @@ function M.pick()
   end)
 end
 
---- The subcommands of `:Adr`
+--- The subcommands of `:DyAdr`
 M.SUBCOMMANDS = { 'new', 'list', 'status', 'supersede' }
 
---- `:Adr new [{title}]`, `:Adr list`, `:Adr status [{status}]`,
---- `:Adr supersede [{title}]`
+--- `:DyAdr new [{title}]`, `:DyAdr list`, `:DyAdr status [{status}]`,
+--- `:DyAdr supersede [{title}]`
 ---@param args { fargs: string[] }
 function M.command(args)
   local sub = args.fargs[1] or 'list'

@@ -104,7 +104,7 @@ describe('util.ai_audit', function()
     audit.record('Avante', 'sent', '/one', nil, 1000)
     audit.record('Avante', 'sent', '/two', nil, 1001)
 
-    vim.cmd('AiGuardLog')
+    vim.cmd('DyAiGuardLog')
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     assert.equals('Handed to the AI integrations, this session', lines[1])
     assert.is_truthy(lines[3]:find('/two', 1, true))
@@ -112,14 +112,14 @@ describe('util.ai_audit', function()
     vim.cmd('close')
 
     audit.reset()
-    vim.cmd('AiGuardLog')
+    vim.cmd('DyAiGuardLog')
     assert.equals(
       'Nothing was handed over.',
       vim.api.nvim_buf_get_lines(0, 2, 3, false)[1]
     )
     vim.cmd('close')
 
-    vim.cmd('AiGuardLog!')
+    vim.cmd('DyAiGuardLog!')
     assert.equals(4, vim.api.nvim_buf_line_count(0))
     vim.cmd('close')
   end)

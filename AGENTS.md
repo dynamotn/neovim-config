@@ -43,10 +43,14 @@ the machine-wide agent rules in `~/.config/AGENTS.md`, and
 
 ## Naming
 
-- The configuration is **DyNeo**. User-visible names follow it: commands
-  `:DyNeo*` or `:Dy*`, notification titles `DyNeo`, health `dyneo`, help tags
-  `*dyneo-...*`. There is no `LazyVim` global; its old helpers live in
-  `lua/util/*`.
+- The configuration is **DyNeo**. User-visible names follow it: every
+  command is `:Dy*` (so `:Dy<Tab>` lists them all), notification titles
+  `DyNeo`, health `dyneo`, help tags `*dyneo-...*`. There is no `LazyVim`
+  global; its old helpers live in `lua/util/*`.
+- A command that needs no particular buffer gets a mapping under the
+  which-key group of its area (`<leader>k` supply chain and secrets,
+  `<leader>i` infrastructure, `<leader>p` project); one that acts on a kind
+  of buffer gets a `<localleader>` mapping where that buffer is set up.
 - Settings shared across the config are fields of the global table `DyNeo`,
   declared with their default, type and an explanation in
   `lua/config/globals.lua`, and overridden per machine in

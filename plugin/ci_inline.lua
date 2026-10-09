@@ -1,8 +1,8 @@
--- `:CiStatus`, `:CiLint`: the last pipeline of the branch on the jobs of a
+-- `:DyCiStatus`, `:DyCiLint`: the last pipeline of the branch on the jobs of a
 -- `.gitlab-ci.yml` or a GitHub Actions workflow, and GitLab's own check of
 -- the former. The module only loads when asked, or when such a file opens.
 vim.api.nvim_create_user_command(
-  'CiStatus',
+  'DyCiStatus',
   function(args) require('tools.ci_inline').command(args) end,
   {
     nargs = '?',
@@ -12,7 +12,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-  'CiLint',
+  'DyCiLint',
   function() require('tools.ci_inline').lint(0) end,
   { desc = 'Have GitLab check this .gitlab-ci.yml' }
 )

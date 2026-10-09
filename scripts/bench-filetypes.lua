@@ -137,6 +137,7 @@ end
 --------------------------------------------------------------------------
 
 local readme = root .. '/README.md'
+local wrap = dofile(root .. '/scripts/lib/wrap.lua')
 local runs = tonumber(vim.env.BENCH_FT_RUNS) or 5
 local warmups = tonumber(vim.env.BENCH_FT_WARMUPS) or 2
 local threshold = tonumber(vim.env.BENCH_FT_THRESHOLD) or 25
@@ -484,6 +485,8 @@ local ok, err = pcall(function()
   end
   lines[#lines + 1] = end_marker
 
+  -- Prose filled to 80 columns, as the rest of the README is
+  lines = wrap.prose(lines)
   local updated = splice(text, table.concat(lines, '\n'))
   if updated ~= text then
     vim.fn.writefile(vim.split(updated, '\n', { plain = true }), readme, 'b')

@@ -332,7 +332,7 @@ local function ai_guard()
       entries,
       entry(
         'warn',
-        ':AiGuardAllow waived this buffer, which would otherwise be held back: '
+        ':DyAiGuardAllow waived this buffer, which would otherwise be held back: '
           .. table.concat(reasons, ', ')
       )
     )
@@ -462,13 +462,13 @@ local function requirements()
   -- Asked for by one command each and installed by hand: their absence is
   -- only worth knowing about, not a warning
   local on_demand = {
-    infracost = '`:TfPlan cost`',
-    glab = '`:CiStatus` and `:CiLint` on GitLab',
+    infracost = '`:DyTfPlan cost`',
+    glab = '`:DyCiStatus` and `:DyCiLint` on GitLab',
     jq = 'the jq filter of `:DyLog`',
-    yq = '`:OpenApiRequest` on a YAML document, and `:DyArchitecture`',
+    yq = '`:DyOpenApiRequest` on a YAML document, and `:DyArchitecture`',
     openssl = '`:DyInspect` on a certificate',
-    oasdiff = '`:OpenApiDiff` (`:MasonInstall oasdiff`)',
-    crane = '`:ImagePin` (or `skopeo`)',
+    oasdiff = '`:DyOpenApiDiff` (`:MasonInstall oasdiff`)',
+    crane = '`:DyImagePin` (or `skopeo`)',
   }
   for _, command in ipairs(required) do
     table.insert(

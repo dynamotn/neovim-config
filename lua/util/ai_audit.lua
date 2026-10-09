@@ -19,7 +19,7 @@ local M = {}
 ---@field what string The path handed over, or the name of the buffer
 ---@field detail? string How: `attached`, `selection`, `lines 3-9`, ...
 
---- Entries kept for `:AiGuardLog`, of this session alone
+--- Entries kept for `:DyAiGuardLog`, of this session alone
 local MAX_ENTRIES = 500
 
 --- Seconds within which the same handover is not logged again
@@ -164,7 +164,7 @@ function M.history()
   return entries
 end
 
---- One line of `:AiGuardLog`
+--- One line of `:DyAiGuardLog`
 ---@param entry DyAiAuditEntry
 ---@return string
 function M.format(entry)
@@ -206,9 +206,9 @@ function M.show(entries, title)
   )
 end
 
---- `:AiGuardLog`, and `:AiGuardLog!` for every session the file still holds
+--- `:DyAiGuardLog`, and `:DyAiGuardLog!` for every session the file still holds
 function M.command()
-  vim.api.nvim_create_user_command('AiGuardLog', function(args)
+  vim.api.nvim_create_user_command('DyAiGuardLog', function(args)
     if args.bang then
       return M.show(
         M.history(),

@@ -69,6 +69,26 @@ describe('config.keymaps', function()
     end
   end)
 
+  it('maps the tools of this configuration', function()
+    for lhs, rhs in pairs({
+      [' prr'] = '<cmd>DyAdr list<cr>',
+      [' pjy'] = '<cmd>DyJira copy<cr>',
+      [' ia'] = '<cmd>DyArchitecture<cr>',
+      [' ii'] = '<cmd>DyInspect<cr>',
+      [' ic'] = '<cmd>DyKube context<cr>',
+      [' kq'] = '<cmd>DyQuarantine<cr>',
+      [' ks'] = '<cmd>DySbom<cr>',
+      [' kl'] = '<cmd>DySbom lock<cr>',
+      [' ki'] = '<cmd>DyImageScan<cr>',
+      [' ka'] = '<cmd>DyAiGuardCheck<cr>',
+      [' kL'] = '<cmd>DyAiGuardLog<cr>',
+    }) do
+      assert.are.equal(rhs, map('n', lhs).rhs, lhs)
+    end
+    assert.is_not_nil(map('n', ' il').callback)
+    assert.is_not_nil(map('n', ' zm').callback)
+  end)
+
   it('drops the LSP keys `gr` hides', function()
     for _, lhs in ipairs({ 'grn', 'gra', 'grr', 'gri', 'grt', 'grx' }) do
       assert.are.same({}, map('n', lhs), lhs)
@@ -157,7 +177,7 @@ describe('config.keymaps', function()
     it('expands a whole command', function()
       assert.are.equal('w', expand('W', ':', 'W'))
       assert.are.equal('wq', expand('WQ', ':', 'WQ'))
-      assert.are.equal('SudoWrite', expand('ww', ':', 'ww'))
+      assert.are.equal('DySudoWrite', expand('ww', ':', 'ww'))
     end)
 
     it('leaves the word inside a longer command', function()
@@ -185,7 +205,7 @@ describe('config.keymaps', function()
     vim.cmd.edit(target)
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { 'new' })
     local bufnr = vim.api.nvim_get_current_buf()
-    vim.cmd('SudoWrite')
+    vim.cmd('DySudoWrite')
     vim.cmd.stopinsert()
     vim.wait(500, function() return not vim.bo[bufnr].modified end)
     restore_job()

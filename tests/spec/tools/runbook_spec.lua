@@ -362,6 +362,7 @@ describe('tools.runbook', function()
       assert.is_true(vim.tbl_contains(lhs, 'Run Block (Runbook)'))
       assert.is_true(vim.tbl_contains(lhs, 'Run From Here (Runbook)'))
       assert.is_true(vim.tbl_contains(lhs, 'Record Runs (Runbook)'))
+      assert.is_true(vim.tbl_contains(lhs, 'Forget Inputs (Runbook)'))
     end)
 
     describe('inputs', function()

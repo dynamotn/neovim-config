@@ -254,7 +254,7 @@ end
 --- Every plugin whose checkout is behind what lazy.nvim would update it to
 ---
 --- Held back or not: a commit out of quarantine lands on the next `:Lazy
---- update` as unread as one still in it, so `:LazyQuarantine review` reads
+--- update` as unread as one still in it, so `:DyQuarantine review` reads
 --- both. `to` is lazy.nvim's own target, not the window's -- the review is
 --- of everything on its way, before the window lets it through.
 ---@param now? integer Seconds since the epoch, for the specs
@@ -293,10 +293,10 @@ function M.pending(now)
   return rows
 end
 
---- What `:LazyQuarantine` completes its first argument with
+--- What `:DyQuarantine` completes its first argument with
 local SUBCOMMANDS = { 'review' }
 
---- What `:LazyQuarantine` completes the word being typed with
+--- What `:DyQuarantine` completes the word being typed with
 ---@param line string The command line so far
 ---@return string[]
 local function complete(_, line)
@@ -313,14 +313,14 @@ local function complete(_, line)
   return {}
 end
 
---- `:LazyQuarantine`, and `:LazyQuarantine review [{plugin}]`
+--- `:DyQuarantine`, and `:DyQuarantine review [{plugin}]`
 ---
 --- The window is otherwise invisible: `:Lazy` shows a plugin as up to date
 --- when it is a week behind on purpose, and nothing says which plugins those
 --- are or how long is left. `review` reads what the updates on their way
 --- would bring in, see `tools.plugin-review`.
 function M.command()
-  vim.api.nvim_create_user_command('LazyQuarantine', function(args)
+  vim.api.nvim_create_user_command('DyQuarantine', function(args)
     if args.fargs[1] == 'review' then
       return require('tools.plugin-review').show(
         M.pending(),

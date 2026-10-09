@@ -1,7 +1,7 @@
--- `:Jira`: the issues assigned, and the chores of one -- a branch, a move, a
+-- `:DyJira`: the issues assigned, and the chores of one -- a branch, a move, a
 -- worklog -- through jira-cli. The module only loads when asked.
 vim.api.nvim_create_user_command(
-  'Jira',
+  'DyJira',
   function(args) require('tools.jira').command(args) end,
   {
     nargs = '*',

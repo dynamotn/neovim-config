@@ -22,7 +22,7 @@ local function rename(buf, from, to, force)
   if to == from then return end
   if vim.uv.fs_stat(to) and not force then
     return notify(
-      ('`%s` exists, use `:DyNeoRename!` to overwrite it'):format(
+      ('`%s` exists, use `:DyRename!` to overwrite it'):format(
         vim.fn.fnamemodify(to, ':~:.')
       )
     )
@@ -62,10 +62,10 @@ function M.rename_file(opts)
   end)
 end
 
---- Add `:DyNeoRename[!] [name]`
+--- Add `:DyRename[!] [name]`
 function M.setup()
   vim.api.nvim_create_user_command(
-    'DyNeoRename',
+    'DyRename',
     function(args)
       M.rename_file({
         to = args.args ~= '' and args.args or nil,

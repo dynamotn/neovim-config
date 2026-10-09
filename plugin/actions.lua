@@ -1,8 +1,8 @@
--- `:ActionsPin`: every action of this GitHub workflow pinned to the commit
+-- `:DyActionsPin`: every action of this GitHub workflow pinned to the commit
 -- its ref points at. The module only loads when asked, or when a workflow
 -- opens.
 vim.api.nvim_create_user_command(
-  'ActionsPin',
+  'DyActionsPin',
   function() require('tools.actions').pin(0) end,
   { desc = 'Pin the actions of this workflow to full commits' }
 )

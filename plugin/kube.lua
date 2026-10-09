@@ -1,8 +1,8 @@
--- `:Kube`: diff, validate, apply and render the manifest, kustomization or
+-- `:DyKube`: diff, validate, apply and render the manifest, kustomization or
 -- Helm chart being edited. The module only loads when asked, or when a YAML
 -- buffer opens.
 vim.api.nvim_create_user_command(
-  'Kube',
+  'DyKube',
   function(args) require('tools.kube').command(args) end,
   {
     nargs = '?',
