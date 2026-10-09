@@ -325,6 +325,28 @@ describe('tools.runbook', function()
       assert.is_false(finished)
     end)
 
+    it('stops a run that prints without end, and keeps its head', function()
+      local max = runbook.MAX_OUTPUT
+      runbook.MAX_OUTPUT = 4096
+      local bufnr = buffer({ '```sh', 'yes', '```' })
+      local finished
+      runbook.run_block(
+        bufnr,
+        runbook.block_at(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), 2),
+        function(ok) finished = ok end
+      )
+      settle(function() return finished ~= nil end)
+      runbook.MAX_OUTPUT = max
+      assert.is_false(finished)
+      local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      local text = table.concat(lines, '\n')
+      assert.is_truthy(
+        text:find('[output cut at 4 KiB, the run was stopped]', 1, true)
+      )
+      -- 4096 bytes of `y\n` and the fences around them, no more
+      assert.is_true(#lines < 2100)
+    end)
+
     it('does not take a line opening with inline code for a fence', function()
       local lines = { '```js``` is inline', 'text', '```sh', 'ls', '```' }
       assert.equals('sh', runbook.block_at(lines, 4).lang)

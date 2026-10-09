@@ -32,6 +32,11 @@ M.RUNNERS = {
 --- Milliseconds a block may run before it is stopped
 M.TIMEOUT = 5 * 60 * 1000
 
+--- Most bytes of output a run keeps, both streams together. Past it the run
+--- is stopped: `yes` or `kubectl logs -f` would otherwise fill memory, and
+--- then the Markdown file, for the whole of `M.TIMEOUT`.
+M.MAX_OUTPUT = 1024 * 1024
+
 --- What a block is asked about before it runs, by Lua pattern, matched
 --- against each line in lower case. Flags may come before the verb
 --- (`kubectl -n prod delete`), so the verb is looked for anywhere after the
@@ -241,7 +246,7 @@ function M.fence(output, indent)
 end
 
 --- What a finished run shows: its output, then how it ended unless well
----@param result vim.SystemCompleted
+---@param result vim.SystemCompleted|{ cut?: boolean }
 ---@return string[]
 function M.render(result)
   -- stdout, then stderr: `vim.system` keeps them apart, so how they
@@ -253,7 +258,14 @@ function M.render(result)
       vim.list_extend(output, vim.split(text, '\n', { plain = true }))
     end
   end
-  if result.signal and result.signal ~= 0 then
+  if result.cut then
+    table.insert(
+      output,
+      ('[output cut at %d KiB, the run was stopped]'):format(
+        M.MAX_OUTPUT / 1024
+      )
+    )
+  elseif result.signal and result.signal ~= 0 then
     table.insert(output, ('[stopped: signal %d]'):format(result.signal))
   elseif result.code ~= 0 then
     table.insert(output, ('[exit %d]'):format(result.code))
@@ -376,14 +388,40 @@ function M.run_block(bufnr, block, on_done)
   local command = vim.list_extend(vim.deepcopy(runner), { code })
 
   local timer = assert(vim.uv.new_timer())
-  -- Declared ahead, so the exit callback can find itself in `running`
+  -- Read as it comes, so a run printing without end is stopped at
+  -- `M.MAX_OUTPUT` rather than kept whole
+  local streams = { stdout = {}, stderr = {} }
+  local size, cut = 0, false
+  -- Declared ahead, so the exit callback can find itself in `running`, and
+  -- the readers can stop it
   local ok, process
+  local function reader(name)
+    return function(_, data)
+      if not data or cut then return end
+      size = size + #data
+      if size > M.MAX_OUTPUT then
+        cut = true
+        data = data:sub(1, #data - (size - M.MAX_OUTPUT))
+        if process then kill(process) end
+      end
+      table.insert(streams[name], data)
+    end
+  end
   ok, process = pcall(vim.system, command, {
     cwd = cwd,
     text = true,
     -- A session of its own, so stopping it reaches what it started
     detach = true,
-  }, function(result)
+    stdout = reader('stdout'),
+    stderr = reader('stderr'),
+  }, function(completed)
+    local result = {
+      code = completed.code,
+      signal = completed.signal,
+      stdout = table.concat(streams.stdout),
+      stderr = table.concat(streams.stderr),
+      cut = cut,
+    }
     vim.schedule(function()
       timer:stop()
       timer:close()
@@ -393,7 +431,12 @@ function M.run_block(bufnr, block, on_done)
         running[bufnr] or {}
       )
       local done = pcall(place, bufnr, mark, block.indent, M.render(result))
-      on_done(done and result.code == 0 and (result.signal or 0) == 0)
+      on_done(
+        done
+          and not result.cut
+          and result.code == 0
+          and (result.signal or 0) == 0
+      )
     end)
   end)
   if not ok then
