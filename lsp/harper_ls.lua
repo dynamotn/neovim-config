@@ -261,27 +261,52 @@ local function sh_docs_option(line)
   return s, e
 end
 
+--- The byte spans of `line` that are directives or tags, not prose
 ---@param line string
----@param col integer 1-based byte column
----@return boolean
-local function in_directive(line, col)
+---@return integer[][] spans `{ start, finish }`, 1-based and inclusive
+local function directive_spans(line)
+  local spans = {}
   for _, pattern in ipairs(tag_patterns) do
     local s, e = line:find(pattern)
-    if s and col >= s and col <= e then return true end
+    if s then table.insert(spans, { s, e }) end
   end
   local option_start, option_end = sh_docs_option(line)
-  if option_start and col >= option_start and col <= option_end then
-    return true
-  end
+  if option_start then table.insert(spans, { option_start, option_end }) end
   for _, pattern in ipairs(directive_patterns) do
     local init = 1
     while init <= #line do
       local s, e = line:find(pattern, init)
       if not s then break end
       local in_word = s > 1 and line:sub(s - 1, s - 1):match('[%w_`]')
-      if not in_word and col >= s and col <= e then return true end
+      if not in_word then table.insert(spans, { s, e }) end
       init = s + 1
     end
+  end
+  return spans
+end
+
+-- The spans of the lines seen lately, by their text. A publish covers the
+-- whole buffer, and its lines run through over a hundred patterns each; an
+-- edit changes few of them. Dropped whole once full, which keeps it bounded.
+---@type table<string, integer[][]>
+local spans_of = {}
+local spans_count = 0
+local SPANS_MAX = 4096
+
+---@param line string
+---@param col integer 1-based byte column
+---@return boolean
+local function in_directive(line, col)
+  local spans = spans_of[line]
+  if not spans then
+    if spans_count >= SPANS_MAX then
+      spans_of, spans_count = {}, 0
+    end
+    spans = directive_spans(line)
+    spans_of[line], spans_count = spans, spans_count + 1
+  end
+  for _, span in ipairs(spans) do
+    if col >= span[1] and col <= span[2] then return true end
   end
   return false
 end

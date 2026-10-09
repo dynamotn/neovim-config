@@ -141,6 +141,18 @@ describe('lsp', function()
         )
       end
 
+      it('answers the same for a line seen before', function()
+        local line = 'x = 1  # noqa: E501 tralala'
+        local positions = { { 0, 0 }, { 0, line:find('noqa') - 1 } }
+        local first = survivors({ line }, positions)
+        assert.are.same(first, survivors({ line }, positions))
+        -- The same column in another line is prose again
+        assert.are.same(
+          positions,
+          survivors({ 'x = 1  # a comment about something' }, positions)
+        )
+      end)
+
       it('drops a diagnostic inside another tool directive', function()
         local line = 'x = 1  # noqa: E501 tralala'
         assert.are.same(
