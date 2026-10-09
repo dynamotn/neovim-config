@@ -37,6 +37,11 @@ return {
           'Makefile',
           '.git'
         )
+      -- A source that reads a file (`ltcc`) gets a copy of the buffer.
+      -- Next to the file, a copy left by a quit mid-run lands in the
+      -- repository, ready to be committed; Neovim's own temp folder is
+      -- private to the user and removed when it exits.
+      opts.temp_dir = opts.temp_dir or vim.fs.dirname(vim.fn.tempname())
       opts.sources = {}
 
       -- Unified null_ls source configs
