@@ -728,7 +728,6 @@ Other keys
 `<c-_>`                nt     which_key_ignore
 `<c-b>`                ins    Scroll Backward
 `<c-f>`                ins    Scroll Forward
-`<c-k>`                i      Signature Help  (LSP)
 `<c-s>`                c      Toggle Flash Search
 `<c-space>`            nox    Treesitter Incremental Selection
 `<c-w><space>`         n      Window Hydra Mode (which-key)

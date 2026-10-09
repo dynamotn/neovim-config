@@ -65,7 +65,6 @@ return {
       { '<leader>/', pick('grep'), desc = 'Grep (Root Dir)' },
       { '<leader>:', function() Snacks.picker.command_history() end, desc = 'Command History' },
       { '<leader><space>', pick('files'), desc = 'Find Files (Root Dir)' },
-      { '<leader>n', function() Snacks.picker.notifications() end, desc = 'Notification History' },
       -- find
       { '<leader>fb', function() Snacks.picker.buffers() end, desc = 'Buffers' },
       { '<leader>fB', function() Snacks.picker.buffers({ hidden = true, nofile = true }) end, desc = 'Buffers (all)' },

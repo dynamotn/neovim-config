@@ -14,6 +14,16 @@
 --
 -- Groups come from which-key's `spec`. Mappings a plugin makes on its own,
 -- with no `keys` entry here, are left to `:help` of that plugin.
+--
+-- It also fails on two mistakes nothing else catches, so the hook stops the
+-- commit that brings one in:
+--
+-- - a dead mapping: `util.plugin.safe_keymap_set` leaves out a key some
+--   plugin's `keys` already takes, so `config.keymaps` setting it does
+--   nothing at all;
+-- - a conflict: the same key in the same mode, everywhere, given two
+--   different meanings by two different places, where whichever comes last
+--   silently wins.
 
 -- The tree as Lua names its files: `stdpath('config')` is the link
 -- `keymaps-doc.sh` points at it
@@ -22,6 +32,21 @@ local output = vim.fs.joinpath(root, 'doc', 'dyneo-keymaps.txt')
 -- Modules may be named by the link or by the tree it points at, depending on
 -- which loader found them
 local roots = { root, vim.fs.normalize(vim.fn.stdpath('config')) }
+
+--- `source` as a path inside this tree, or nil for a file outside it
+---@param source string
+---@return string?
+local function relative(source)
+  for _, prefix in ipairs(roots) do
+    if source:sub(1, #prefix + 1) == prefix .. '/' then
+      return source:sub(#prefix + 2)
+    end
+  end
+end
+
+--- Mappings `config.keymaps` sets in vain, see the top of this file
+---@type string[]
+local dead = {}
 
 -- Every plugin, whatever this machine turns off
 package.preload['per_machine'] = function() DyNeo.used_full_plugins = true end
@@ -40,7 +65,30 @@ package.preload['util.plugin'] = function()
     })
     return setup(spec, opts)
   end
-  return assert(loadfile(vim.fs.joinpath(root, 'lua/util/plugin.lua')))()
+  local Plugin =
+    assert(loadfile(vim.fs.joinpath(root, 'lua/util/plugin.lua')))()
+  -- What it leaves out, as dead mappings
+  local safe_keymap_set = Plugin.safe_keymap_set
+  Plugin.safe_keymap_set = function(mode, lhs, rhs, opts)
+    local keys = require('lazy.core.handler').handlers.keys
+    for _, m in ipairs(type(mode) == 'table' and mode or { mode }) do
+      if keys and keys.have and keys:have(lhs, m) then
+        local info = debug.getinfo(2, 'Sl')
+        table.insert(
+          dead,
+          ("%s %s (%s) at %s:%d: a plugin's `keys` takes it"):format(
+            m,
+            lhs,
+            (opts or {}).desc or 'no description',
+            relative(info.source:gsub('^@', '')) or info.short_src,
+            info.currentline
+          )
+        )
+      end
+    end
+    return safe_keymap_set(mode, lhs, rhs, opts)
+  end
+  return Plugin
 end
 
 ---@class DyKeymap
@@ -48,6 +96,7 @@ end
 ---@field modes string[]
 ---@field desc string
 ---@field scope string Where it applies: '' for everywhere
+---@field from string The file, or the plugin spec, it comes from
 
 ---@type DyKeymap[]
 local maps = {}
@@ -82,14 +131,7 @@ vim.keymap.set = function(mode, lhs, rhs, opts)
   for level = 2, 12 do
     local info = debug.getinfo(level, 'S')
     if not info then break end
-    local source = info.source:gsub('^@', '')
-    local file
-    for _, prefix in ipairs(roots) do
-      if source:sub(1, #prefix + 1) == prefix .. '/' then
-        file = source:sub(#prefix + 2)
-        break
-      end
-    end
+    local file = relative((info.source:gsub('^@', '')))
     -- lazy.nvim's own `keys` stubs come through `config.lazy`, and the
     -- wrappers of `util.plugin` pass on what they were given
     if
@@ -103,6 +145,7 @@ vim.keymap.set = function(mode, lhs, rhs, opts)
           modes = mode_list(mode),
           desc = opts.desc,
           scope = opts.buffer and 'buffer' or '',
+          from = file,
         })
       end
       break
@@ -114,7 +157,8 @@ end
 --- Keys of a lazy.nvim style list
 ---@param keys table[]
 ---@param scope fun(key: table): string
-local function add_keys(keys, scope)
+---@param from string
+local function add_keys(keys, scope, from)
   local Keys = require('lazy.core.handler.keys')
   for _, key in pairs(Keys.resolve(keys)) do
     if key.rhs == '' and key.desc and vim.startswith(key.desc, '+') then
@@ -130,6 +174,7 @@ local function add_keys(keys, scope)
         modes = mode_list(key.mode),
         desc = key.desc,
         scope = scope(key),
+        from = from,
       })
     end
   end
@@ -187,7 +232,7 @@ local function collect()
         local ft = key.ft
         if not ft then return '' end
         return 'ft: ' .. (type(ft) == 'table' and table.concat(ft, ', ') or ft)
-      end)
+      end, name)
     end
   end
   local servers = require('util.plugin').opts('nvim-lspconfig').servers or {}
@@ -198,10 +243,47 @@ local function collect()
     if type(opts) == 'table' and opts.keys and opts.enabled ~= false then
       add_keys(
         opts.keys,
-        function() return server == '*' and 'LSP' or 'LSP: ' .. server end
+        function() return server == '*' and 'LSP' or 'LSP: ' .. server end,
+        'nvim-lspconfig'
       )
     end
   end
+end
+
+--- Keys set everywhere, in one mode, with two meanings from two places
+---@return string[]
+local function conflicts()
+  local by_key = {} ---@type table<string, DyKeymap[]>
+  for _, map in ipairs(maps) do
+    if map.scope == '' then
+      for _, mode in ipairs(map.modes) do
+        local id = mode .. ' ' .. map.lhs
+        by_key[id] = by_key[id] or {}
+        table.insert(by_key[id], map)
+      end
+    end
+  end
+  local found = {}
+  for id, list in pairs(by_key) do
+    local first = list[1]
+    for _, other in ipairs(list) do
+      if other.desc ~= first.desc and other.from ~= first.from then
+        table.insert(
+          found,
+          ('%s: "%s" (%s) and "%s" (%s)'):format(
+            id,
+            first.desc,
+            first.from,
+            other.desc,
+            other.from
+          )
+        )
+        break
+      end
+    end
+  end
+  table.sort(found)
+  return found
 end
 
 --- One line per key and scope, its modes merged
@@ -330,15 +412,22 @@ vim.api.nvim_create_autocmd('VimEnter', {
     pcall(vim.cmd.edit, vim.fn.fnameescape(vim.fn.tempname()))
     attach(vim.api.nvim_get_current_buf())
     vim.defer_fn(function()
+      local problems = {}
       local ok, err = pcall(function()
         collect()
         render(names)
+        for _, line in ipairs(dead) do
+          table.insert(problems, 'dead mapping: ' .. line)
+        end
+        for _, line in ipairs(conflicts()) do
+          table.insert(problems, 'conflicting mapping: ' .. line)
+        end
       end)
-      if not ok then
-        io.stderr:write('keymaps-doc: ' .. tostring(err) .. '\n')
-        vim.cmd('cquit')
+      if not ok then table.insert(problems, tostring(err)) end
+      for _, line in ipairs(problems) do
+        io.stderr:write('keymaps-doc: ' .. line .. '\n')
       end
-      vim.cmd('qall!')
+      vim.cmd(#problems > 0 and 'cquit' or 'qall!')
     end, 1000)
   end,
 })

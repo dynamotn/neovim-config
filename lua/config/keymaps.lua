@@ -36,21 +36,8 @@ map('n', '<C-j>', '<C-w>j', { desc = 'Go to Lower Window', remap = true })
 map('n', '<C-k>', '<C-w>k', { desc = 'Go to Upper Window', remap = true })
 map('n', '<C-l>', '<C-w>l', { desc = 'Go to Right Window', remap = true })
 
--- Resize window using <ctrl> arrow keys
-map('n', '<C-Up>', '<cmd>resize +2<cr>', { desc = 'Increase Window Height' })
-map('n', '<C-Down>', '<cmd>resize -2<cr>', { desc = 'Decrease Window Height' })
-map(
-  'n',
-  '<C-Left>',
-  '<cmd>vertical resize -2<cr>',
-  { desc = 'Decrease Window Width' }
-)
-map(
-  'n',
-  '<C-Right>',
-  '<cmd>vertical resize +2<cr>',
-  { desc = 'Increase Window Width' }
-)
+-- Resizing with <ctrl> arrow keys is smart-splits' (`plugins.toolbox.navigation`),
+-- which carries on into the multiplexer's panes
 
 -- Move Lines
 map(
@@ -212,23 +199,8 @@ map('n', '<leader>l', '<cmd>Lazy<cr>', { desc = 'Lazy' })
 -- new file
 map('n', '<leader>fn', '<cmd>enew<cr>', { desc = 'New File' })
 
--- location list
-map('n', '<leader>xl', function()
-  local success, err = pcall(
-    vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose
-      or vim.cmd.lopen
-  )
-  if not success and err then vim.notify(err, vim.log.levels.ERROR) end
-end, { desc = 'Location List' })
-
--- quickfix list
-map('n', '<leader>xq', function()
-  local success, err = pcall(
-    vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose
-      or vim.cmd.copen
-  )
-  if not success and err then vim.notify(err, vim.log.levels.ERROR) end
-end, { desc = 'Quickfix List' })
+-- `<leader>xl` and `<leader>xq` toggle the lists through quicker.nvim
+-- (`plugins.toolbox.navigation`)
 
 -- `[q` and `]q` are Neovim's own, which take a count; `trouble.nvim` claims
 -- them when it is loaded.
