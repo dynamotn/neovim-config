@@ -56,8 +56,14 @@ return vim.list_contains(DyNeo.enabled_languages, 'go')
               -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
               Snacks.util.lsp.on({ name = 'gopls' }, function(_, client)
                 if not client.server_capabilities.semanticTokensProvider then
-                  local semantic =
-                    client.config.capabilities.textDocument.semanticTokens
+                  -- The capabilities the client sent, merged; `config` only
+                  -- holds what was configured, which may have no
+                  -- `textDocument` at all
+                  local semantic = vim.tbl_get(
+                    client.capabilities,
+                    'textDocument',
+                    'semanticTokens'
+                  )
                   if not semantic then return end
                   client.server_capabilities.semanticTokensProvider = {
                     full = true,

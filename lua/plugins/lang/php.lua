@@ -13,18 +13,6 @@ return vim.list_contains(DyNeo.enabled_languages, 'php')
         },
       },
       {
-        -- Debug adapters & configurations
-        'mfussenegger/nvim-dap',
-        opts = function()
-          local dap = require('dap')
-          dap.adapters.php = {
-            type = 'executable',
-            command = 'php-debug-adapter',
-            args = {},
-          }
-        end,
-      },
-      {
         -- Test adapter
         'nvim-neotest/neotest',
         dependencies = {

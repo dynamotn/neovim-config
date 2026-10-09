@@ -34,7 +34,9 @@ return vim.list_contains(DyNeo.enabled_languages, 'java')
         'mfussenegger/nvim-jdtls',
         ft = language.filetypes,
         opts = function()
-          local cmd = { vim.fn.exepath('jdtls') }
+          -- Looked up on `$PATH` when the server starts: Mason may still be
+          -- installing it when the first Java file loads this
+          local cmd = { 'jdtls' }
           if require('util.plugin').has('mason.nvim') then
             table.insert(
               cmd,
@@ -241,14 +243,14 @@ return vim.list_contains(DyNeo.enabled_languages, 'java')
                     if
                       opts.test and mason_registry.is_installed('java-test')
                     then
-                      -- custom keymaps for Java test runner (not yet compatible with neotest)
+                      -- The jdtls runner, beside neotest-java: on the local
+                      -- leader, so `<leader>t` stays neotest's
                       wk.add({
                         {
                           mode = 'n',
                           buffer = args.buf,
-                          { '<leader>t', group = 'test' },
                           {
-                            '<leader>tt',
+                            '<localleader>t',
                             function()
                               require('jdtls.dap').test_class({
                                 config_overrides = type(opts.test) ~= 'boolean'
@@ -259,7 +261,7 @@ return vim.list_contains(DyNeo.enabled_languages, 'java')
                             desc = 'Run All Test',
                           },
                           {
-                            '<leader>tr',
+                            '<localleader>r',
                             function()
                               require('jdtls.dap').test_nearest_method({
                                 config_overrides = type(opts.test) ~= 'boolean'
@@ -270,7 +272,7 @@ return vim.list_contains(DyNeo.enabled_languages, 'java')
                             desc = 'Run Nearest Test',
                           },
                           {
-                            '<leader>tT',
+                            '<localleader>T',
                             require('jdtls.dap').pick_test,
                             desc = 'Run Test',
                           },

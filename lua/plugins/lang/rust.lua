@@ -96,11 +96,15 @@ return vim.list_contains(DyNeo.enabled_languages, 'rust')
       {
         -- Test adapter
         'nvim-neotest/neotest',
-        opts = {
-          adapters = {
-            ['rustaceanvim.neotest'] = {},
-          },
-        },
+        -- Requiring the adapter loads rustaceanvim, whose `config` complains
+        -- about rust-analyzer: only where Rust can be built at all
+        opts = function(_, opts)
+          opts.adapters = opts.adapters or {}
+          opts.adapters['rustaceanvim.neotest'] = vim.fn.executable('cargo')
+                == 1
+              and {}
+            or false
+        end,
       },
     }
   or {}

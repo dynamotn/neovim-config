@@ -593,7 +593,7 @@ return {
       },
     },
     dap = { 'coreclr' },
-    test = { 'neotest-dotnet' },
+    test = { 'neotest-vstest' },
     autopairs = block_comment_autopairs,
   },
   blade = { -- See `php` and `html`

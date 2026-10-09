@@ -18,7 +18,11 @@ return vim.list_contains(DyNeo.enabled_languages, 'vue')
         -- Extend LSP config of vtsls by plugin for Vue
         'neovim/nvim-lspconfig',
         opts = function(_, opts)
-          table.insert(opts.servers.vtsls.filetypes, 'vue')
+          require('util.plugin').extend(
+            opts.servers.vtsls,
+            'filetypes',
+            { 'vue' }
+          )
           require('util.plugin').extend(
             opts.servers.vtsls,
             'settings.vtsls.tsserver.globalPlugins',

@@ -90,6 +90,13 @@ return vim.list_contains(DyNeo.enabled_languages, 'cpp')
         end,
       },
       {
+        -- The configurations above are the ones; mason-nvim-dap would list its
+        -- `LLDB:` ones a second time beside them
+        'jay-babu/mason-nvim-dap.nvim',
+        optional = true,
+        opts = { handlers = { codelldb = function() end } },
+      },
+      {
         -- Test adapter
         'nvim-neotest/neotest',
         dependencies = {

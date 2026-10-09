@@ -76,6 +76,13 @@ return vim.list_contains(DyNeo.enabled_languages, 'c_sharp')
         end,
       },
       {
+        -- netcoredbg is set up above; mason-nvim-dap would add a `coreclr`
+        -- adapter and its `NetCoreDbg:` configurations beside it
+        'jay-babu/mason-nvim-dap.nvim',
+        optional = true,
+        opts = { handlers = { coreclr = function() end } },
+      },
+      {
         -- Test adapter
         'nvim-neotest/neotest',
         dependencies = {

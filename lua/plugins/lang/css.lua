@@ -11,16 +11,5 @@ return vim.list_contains(DyNeo.enabled_languages, 'css')
           },
         },
       },
-      {
-        -- Extend LSP config
-        'neovim/nvim-lspconfig',
-        opts = function(_, opts)
-          require('util.plugin').extend(
-            opts.servers.tailwindcss,
-            'filetypes',
-            language.filetypes
-          )
-        end,
-      },
     }
   or {}
