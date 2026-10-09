@@ -49,7 +49,6 @@ local function default_opts()
       virtual_text = not Plugin.has('tiny-inline-diagnostic.nvim') and {
         spacing = 4,
         source = 'if_many',
-        -- `icons` picks the icon of each severity
         prefix = '●',
       },
       severity_sort = true,
@@ -283,7 +282,6 @@ return {
         )
       end
 
-      -- Diagnostic signs come from `vim.diagnostic.config` alone since 0.12
       if
         type(opts.diagnostics.virtual_text) == 'table'
         and opts.diagnostics.virtual_text.prefix == 'icons'

@@ -5,9 +5,8 @@ local function augroup(name)
   return vim.api.nvim_create_augroup('dyneo_' .. name, { clear = true })
 end
 
--- Keep a sensitive file's content out of the undo, swap and backup files,
--- which outlive it on disk in plain text. The same goes for a file under the
--- temporary directory, such as the decrypted copy `chezmoi edit` works on.
+-- Those files outlive it on disk in plain text. A file under the temporary
+-- directory counts too, such as the decrypted copy `chezmoi edit` works on.
 local function leaves_no_copy(file)
   if file == '' then return false end
   local tmp = vim.fs.normalize(vim.env.TMPDIR or '/tmp')

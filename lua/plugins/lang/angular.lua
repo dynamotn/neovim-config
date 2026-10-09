@@ -1,5 +1,3 @@
-local language = require('config.languages').angular
-
 return vim.list_contains(DyNeo.enabled_languages, 'angular')
     and {
       {

@@ -243,8 +243,8 @@ M.JOBS = 4
 --- `M.MAX_OUTPUT`
 ---
 --- In the background, as lazy's partial clones fetch the blobs of a commit
---- only when `git diff` asks for them, over the network: waiting on that
---- froze the editor.
+--- only when `git diff` asks for them, over the network, and waiting on that
+--- would freeze the editor.
 ---@param dir string
 ---@param args string[]
 ---@param callback fun(lines: string[]?, cut: boolean?)

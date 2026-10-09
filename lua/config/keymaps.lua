@@ -36,9 +36,6 @@ map('n', '<C-j>', '<C-w>j', { desc = 'Go to Lower Window', remap = true })
 map('n', '<C-k>', '<C-w>k', { desc = 'Go to Upper Window', remap = true })
 map('n', '<C-l>', '<C-w>l', { desc = 'Go to Right Window', remap = true })
 
--- Resizing with <ctrl> arrow keys is smart-splits' (`plugins.toolbox.navigation`),
--- which carries on into the multiplexer's panes
-
 -- Move Lines
 map(
   'n',
@@ -198,9 +195,6 @@ map('n', '<leader>l', '<cmd>Lazy<cr>', { desc = 'Lazy' })
 
 -- new file
 map('n', '<leader>fn', '<cmd>enew<cr>', { desc = 'New File' })
-
--- `<leader>xl` and `<leader>xq` toggle the lists through quicker.nvim
--- (`plugins.toolbox.navigation`)
 
 -- `[q` and `]q` are Neovim's own, which take a count; `trouble.nvim` claims
 -- them when it is loaded.

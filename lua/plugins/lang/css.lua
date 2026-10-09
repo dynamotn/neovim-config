@@ -1,5 +1,3 @@
-local language = require('config.languages').css
-
 return vim.list_contains(DyNeo.enabled_languages, 'css')
     and {
       {

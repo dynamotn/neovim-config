@@ -190,8 +190,8 @@ function M.skip_installs()
         type(parsers) == 'table' and parsers or {}
       )
       -- Callers chain `:await` onto the task `install` hands back. The
-      -- callback is never run: it reloads the buffer with `:e!`, which fires
-      -- `FileType` again, finds the parser still missing, and so on forever.
+      -- callback is never run: nothing was installed for it to set the
+      -- buffer up again with.
       return { await = function() end }
     end
     -- `build` only makes sure the tree-sitter CLI and a C compiler are there
