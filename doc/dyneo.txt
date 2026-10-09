@@ -597,6 +597,17 @@ main loop, so a big repository does not freeze the editor, and each document
 is closed again before Neovim opens the same file for real, so no server ever
 sees two `didOpen` for one URI.
 
+Decision records                                                   *dyneo-adr*
+
+|:Adr| keeps the architecture decisions of a project as adr-tools does: one
+Markdown file per decision, `0001-record-decisions.md` and on, in the
+directory a `.adr-dir` file at the root names, else `docs/adr`, `doc/adr`,
+`docs/decisions` or `adr` when one exists, else `docs/adr`.  A record has a
+title, a date, a status -- proposed, accepted, deprecated, superseded -- and
+its context, decision and consequences.  A decision that replaces another
+links both ways: the old one says what superseded it, the new one what it
+supersedes.
+
 Project overview                                               *dyneo-project*
 
 `<leader>pp`, or |:DyProject|, opens one page on the state of the project
@@ -763,6 +774,14 @@ Command-line abbreviations, which only fire as a whole command line, so a
 
                                                                      *:CiLint*
 :CiLint                 Have GitLab check this saved `.gitlab-ci.yml`.
+
+                                                                        *:Adr*
+:Adr [list]             Pick a decision record of the project and open it.
+:Adr new [{title}]      Write a new record, numbered after the last one.
+:Adr status [{status}]  Set the status of the record open.
+:Adr supersede [{title}]
+                        Write a record replacing the one open, linking both.
+                        See |dyneo-adr|.
 
                                                                   *:DyProject*
 :DyProject              The state of the project on one page.  See

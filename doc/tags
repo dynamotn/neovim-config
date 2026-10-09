@@ -1,3 +1,4 @@
+:Adr	dyneo.txt	/*:Adr*
 :AiGuardAllow	dyneo.txt	/*:AiGuardAllow*
 :AiGuardCheck	dyneo.txt	/*:AiGuardCheck*
 :AiGuardLog	dyneo.txt	/*:AiGuardLog*
@@ -38,6 +39,7 @@ DyNeo.test_strategy	dyneo.txt	/*DyNeo.test_strategy*
 DyNeo.used_full_plugins	dyneo.txt	/*DyNeo.used_full_plugins*
 DyNeo.yaml_schema_dirs	dyneo.txt	/*DyNeo.yaml_schema_dirs*
 dyneo	dyneo.txt	/*dyneo*
+dyneo-adr	dyneo.txt	/*dyneo-adr*
 dyneo-ai-guard	dyneo.txt	/*dyneo-ai-guard*
 dyneo-channels	dyneo.txt	/*dyneo-channels*
 dyneo-ci	dyneo.txt	/*dyneo-ci*
