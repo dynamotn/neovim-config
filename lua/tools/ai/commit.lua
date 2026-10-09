@@ -20,11 +20,7 @@ M.HISTORY = 10
 --- project's trusted `.nvim` folder
 M.PROMPT = 'git/commit.md'
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'DyAi commit' })
-end
+local notify = require('util.notify').titled('AI commit')
 
 --- The prompt template: the project's own, else the shipped one
 ---@return DyAiPrompt?

@@ -10,11 +10,7 @@ local M = {}
 --- Subcommands other than the names of prompts
 M.SUBCOMMANDS = { 'pick', 'prompts', 'commit', 'model' }
 
----@param msg string
----@param level? integer
-local function notify(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = 'DyAi' })
-end
+local notify = require('util.notify').titled('AI')
 
 --- Hand `text` to the AI of `DyNeo.ai.target`, unless `bufnr`, the buffer
 --- it was taken from, is kept from AI
