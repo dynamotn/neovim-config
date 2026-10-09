@@ -205,6 +205,24 @@ describe('tools.plugin-review', function()
   describe('report', function()
     local dir, cleanup, from, to
 
+    --- What `report` hands its callback, once git has answered
+    local function report(rows)
+      local lines
+      review.report(rows, 7 * 86400, function(result) lines = result end)
+      assert.is_true(vim.wait(10000, function() return lines ~= nil end))
+      return lines
+    end
+
+    --- The lines of the current buffer once they no longer say `waiting`
+    local function settled(waiting)
+      local text
+      assert.is_true(vim.wait(10000, function()
+        text = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), '\n')
+        return not text:find(waiting, 1, true)
+      end))
+      return text
+    end
+
     before_each(function()
       dir, cleanup = h.tmpdir()
       git(dir, { 'init', '--initial-branch=main', '--quiet' })
@@ -224,7 +242,7 @@ describe('tools.plugin-review', function()
     end)
 
     it('lists the commits and the flags of each plugin', function()
-      local lines = review.report({
+      local lines = report({
         {
           name = 'p.nvim',
           dir = dir,
@@ -233,7 +251,7 @@ describe('tools.plugin-review', function()
           held = true,
           clears = 3 * 86400,
         },
-      }, 7 * 86400)
+      })
       local text = table.concat(lines, '\n')
       assert.is_truthy(text:find('# Plugin updates waiting: 1', 1, true))
       assert.is_truthy(
@@ -261,7 +279,7 @@ describe('tools.plugin-review', function()
     end)
 
     it('says when nothing is waiting', function()
-      local lines = review.report({}, 7 * 86400)
+      local lines = report({})
       assert.equals(
         'Every plugin is on the commit it would update to.',
         lines[#lines]
@@ -280,12 +298,53 @@ describe('tools.plugin-review', function()
         },
       }, 7 * 86400)
       assert.equals('markdown', vim.bo.filetype)
+      settled('Reading the updates')
       vim.fn.search('^## p.nvim')
       vim.api.nvim_feedkeys(vim.keycode('<CR>'), 'x', false)
       assert.equals('git', vim.bo.filetype)
-      local text =
-        table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), '\n')
+      local text = settled('Reading the commits')
       assert.is_truthy(text:find("+vim.system({ 'curl', url })", 1, true))
+    end)
+
+    it('keeps the order of the plugins, whichever is read first', function()
+      local rows = {}
+      for index = 1, 6 do
+        table.insert(rows, {
+          name = ('p%d.nvim'):format(index),
+          dir = dir,
+          from = from,
+          to = to,
+          held = false,
+          clears = 0,
+        })
+      end
+      local names = {}
+      for _, line in ipairs(report(rows)) do
+        local name = line:match('^## (%S+)')
+        if name then table.insert(names, name) end
+      end
+      assert.same(
+        { 'p1.nvim', 'p2.nvim', 'p3.nvim', 'p4.nvim', 'p5.nvim', 'p6.nvim' },
+        names
+      )
+    end)
+
+    it('reads a diff only up to its cap, and says so', function()
+      local max = review.MAX_OUTPUT
+      review.MAX_OUTPUT = 64
+      local lines = report({
+        {
+          name = 'p.nvim',
+          dir = dir,
+          from = from,
+          to = to,
+          held = false,
+          clears = 0,
+        },
+      })
+      review.MAX_OUTPUT = max
+      local text = table.concat(lines, '\n')
+      assert.is_truthy(text:find('diff cut at', 1, true))
     end)
 
     it('warns about a plugin with nothing waiting', function()

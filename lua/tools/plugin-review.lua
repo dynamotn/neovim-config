@@ -220,38 +220,87 @@ function M.scan(diff)
   return findings
 end
 
---- Run `git` in `dir`, and hand back its output as lines, or nil on failure
+--- Longest a `git` run may take, in milliseconds
+M.TIMEOUT = 60000
+
+--- Most bytes of `git` output read: a plugin vendoring a big file, or a
+--- year of commits, would otherwise fill a buffer with hundreds of MB
+M.MAX_OUTPUT = 4 * 1024 * 1024
+
+--- `M.MAX_OUTPUT` as it is shown
+---@return string
+local function max_output()
+  local mib = M.MAX_OUTPUT / 1024 / 1024
+  return mib >= 1 and ('%g MiB'):format(mib)
+    or ('%d bytes'):format(M.MAX_OUTPUT)
+end
+
+--- Plugins read at once
+M.JOBS = 4
+
+--- Run `git` in `dir` in the background, and hand its output as lines to
+--- `callback`, or nil on failure; `cut` is true when it was cut at
+--- `M.MAX_OUTPUT`
+---
+--- In the background, as lazy's partial clones fetch the blobs of a commit
+--- only when `git diff` asks for them, over the network: waiting on that
+--- froze the editor.
 ---@param dir string
 ---@param args string[]
----@return string[]?
-local function git(dir, args)
+---@param callback fun(lines: string[]?, cut: boolean?)
+local function git(dir, args, callback)
   -- Paths as they are, never quoted, for `scan` to read
   local command = { 'git', '-c', 'core.quotePath=false', '-C', dir }
   vim.list_extend(command, args)
-  local ok, result = pcall(
-    function() return vim.system(command, { text = true }):wait(30000) end
-  )
-  if not ok or result.code ~= 0 then return nil end
-  return vim.split(result.stdout or '', '\n', { trimempty = true })
+  local chunks, size, cut = {}, 0, false
+  ---@type vim.SystemObj
+  local process
+  local ok = pcall(function()
+    process = vim.system(command, {
+      text = true,
+      timeout = M.TIMEOUT,
+      stdout = function(_, data)
+        if not data or cut then return end
+        size = size + #data
+        if size > M.MAX_OUTPUT then
+          cut = true
+          table.insert(chunks, data:sub(1, #data - (size - M.MAX_OUTPUT)))
+          process:kill('sigterm')
+        else
+          table.insert(chunks, data)
+        end
+      end,
+    }, function(result)
+      vim.schedule(function()
+        -- Stopped for its size is not a failure
+        if not cut and result.code ~= 0 then return callback(nil) end
+        callback(
+          vim.split(table.concat(chunks), '\n', { trimempty = true }),
+          cut
+        )
+      end)
+    end)
+  end)
+  if not ok then vim.schedule(function() callback(nil) end) end
 end
 
 --- The commits `row` would bring in, newest first, as `short date subject`
 ---@param row DyPendingUpdate
----@return string[]
-function M.commits(row)
-  return git(row.dir, {
+---@param callback fun(commits: string[])
+function M.commits(row, callback)
+  git(row.dir, {
     'log',
     '--no-color',
     '--format=%h %cs %s',
     row.from .. '..' .. row.to,
-  }) or {}
+  }, function(lines) callback(lines or {}) end)
 end
 
 --- What the commits of `row` add, flagged
 ---@param row DyPendingUpdate
----@return DyReviewFinding[]
-function M.findings(row)
-  local diff = git(row.dir, {
+---@param callback fun(findings: DyReviewFinding[])
+function M.findings(row, callback)
+  git(row.dir, {
     'diff',
     '--no-color',
     '--no-ext-diff',
@@ -263,13 +312,24 @@ function M.findings(row)
     '--unified=0',
     row.from,
     row.to,
-  })
-  -- A diff that could not be read -- lazy's partial clones fetch the blobs
-  -- of a commit only now, and the network may be down -- is no clean diff
-  if not diff then
-    return { { file = row.dir, rule = 'diff unavailable, nothing was read' } }
-  end
-  return M.scan(diff)
+  }, function(diff, cut)
+    -- A diff that could not be read -- lazy's partial clones fetch the blobs
+    -- of a commit only now, and the network may be down -- is no clean diff
+    if not diff then
+      return callback({
+        { file = row.dir, rule = 'diff unavailable, nothing was read' },
+      })
+    end
+    local findings = M.scan(diff)
+    -- Nor is one read in part
+    if cut then
+      table.insert(findings, {
+        file = row.dir,
+        rule = ('diff cut at %s, the rest was not read'):format(max_output()),
+      })
+    end
+    callback(findings)
+  end)
 end
 
 --- Longest a line of code is quoted in the report
@@ -340,12 +400,54 @@ function M.describe(group)
   return line
 end
 
---- The report on `rows`, as Markdown lines
+--- The section of the report on `row`
+---@param row DyPendingUpdate
+---@param callback fun(lines: string[])
+local function section(row, callback)
+  M.commits(row, function(commits)
+    M.findings(row, function(findings)
+      local state = row.held
+          and ('held %d more days'):format(math.ceil(row.clears / 86400))
+        or 'out of quarantine'
+      local lines = {
+        '',
+        ('## %s  %s..%s  %d commits, %s'):format(
+          row.name,
+          row.from:sub(1, 7),
+          row.to:sub(1, 7),
+          #commits,
+          state
+        ),
+        '',
+      }
+      for index, commit in ipairs(commits) do
+        if index > 15 then
+          table.insert(lines, ('- … and %d more'):format(#commits - 15))
+          break
+        end
+        table.insert(lines, '- ' .. commit)
+      end
+
+      table.insert(lines, '')
+      if #findings == 0 then
+        table.insert(lines, 'No flags.')
+      else
+        table.insert(lines, ('Flags (%d):'):format(#findings))
+        for _, group in ipairs(M.group(findings)) do
+          table.insert(lines, M.describe(group))
+        end
+      end
+      callback(lines)
+    end)
+  end)
+end
+
+--- The header of the report on `rows`
 ---@param rows DyPendingUpdate[]
 ---@param window integer The quarantine window, in seconds
 ---@return string[]
-function M.report(rows, window)
-  local lines = {
+local function header(rows, window)
+  return {
     ('# Plugin updates waiting: %d'):format(#rows),
     '',
     (
@@ -353,50 +455,55 @@ function M.report(rows, window)
       .. 'closes.'
     ):format(math.floor(window / 86400)),
   }
+end
+
+--- The report on `rows`, as Markdown lines handed to `callback`
+---
+--- `M.JOBS` plugins are read at once, and their sections kept in the order
+--- of `rows` whichever finishes first.
+---@param rows DyPendingUpdate[]
+---@param window integer The quarantine window, in seconds
+---@param callback fun(lines: string[])
+function M.report(rows, window, callback)
+  local lines = header(rows, window)
   if #rows == 0 then
     vim.list_extend(
       lines,
       { '', 'Every plugin is on the commit it would update to.' }
     )
-    return lines
+    return callback(lines)
   end
 
-  for _, row in ipairs(rows) do
-    local commits = M.commits(row)
-    local state = row.held
-        and ('held %d more days'):format(math.ceil(row.clears / 86400))
-      or 'out of quarantine'
-    vim.list_extend(lines, {
-      '',
-      ('## %s  %s..%s  %d commits, %s'):format(
-        row.name,
-        row.from:sub(1, 7),
-        row.to:sub(1, 7),
-        #commits,
-        state
-      ),
-      '',
-    })
-    for index, commit in ipairs(commits) do
-      if index > 15 then
-        table.insert(lines, ('- … and %d more'):format(#commits - 15))
-        break
-      end
-      table.insert(lines, '- ' .. commit)
-    end
-
-    local findings = M.findings(row)
-    table.insert(lines, '')
-    if #findings == 0 then
-      table.insert(lines, 'No flags.')
-    else
-      table.insert(lines, ('Flags (%d):'):format(#findings))
-      for _, group in ipairs(M.group(findings)) do
-        table.insert(lines, M.describe(group))
-      end
+  local sections = {} ---@type string[][]
+  local started, running, finished = 0, 0, 0
+  local function start()
+    while running < M.JOBS and started < #rows do
+      started = started + 1
+      running = running + 1
+      local index = started
+      section(rows[index], function(section_lines)
+        sections[index] = section_lines
+        running = running - 1
+        finished = finished + 1
+        if finished < #rows then return start() end
+        for _, part in ipairs(sections) do
+          vim.list_extend(lines, part)
+        end
+        callback(lines)
+      end)
     end
   end
-  return lines
+  start()
+end
+
+--- Put `lines` in the read-only buffer `bufnr`, if it is still there
+---@param bufnr integer
+---@param lines string[]
+function M.fill(bufnr, lines)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  vim.bo[bufnr].modifiable = true
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+  vim.bo[bufnr].modifiable = false
 end
 
 --- A scratch buffer holding `lines`, in a window of its own
@@ -410,8 +517,7 @@ local function scratch(lines, filetype, open)
   vim.bo[bufnr].buftype = 'nofile'
   vim.bo[bufnr].bufhidden = 'wipe'
   vim.bo[bufnr].swapfile = false
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.bo[bufnr].modifiable = false
+  M.fill(bufnr, lines)
   vim.bo[bufnr].filetype = filetype
   vim.keymap.set(
     'n',
@@ -425,15 +531,23 @@ end
 --- The whole of what `row` brings in, commit by commit, in a tab
 ---@param row DyPendingUpdate
 function M.open_diff(row)
-  local log = git(row.dir, {
+  local bufnr = scratch(
+    { ('Reading the commits of %s…'):format(row.name) },
+    'git',
+    'tabnew'
+  )
+  git(row.dir, {
     'log',
     '--no-color',
     '--no-ext-diff',
     '--stat',
     '--patch',
     row.from .. '..' .. row.to,
-  }) or { 'git log failed in ' .. row.dir }
-  scratch(log, 'git', 'tabnew')
+  }, function(log, cut)
+    log = log or { 'git log failed in ' .. row.dir }
+    if cut then table.insert(log, ('[cut at %s]'):format(max_output())) end
+    M.fill(bufnr, log)
+  end)
 end
 
 --- The plugin whose section the cursor is in
@@ -452,7 +566,8 @@ end
 ---
 --- Without a plugin, the report on every update waiting; with one, its full
 --- diff. A `git log` and a `git diff` per plugin, which is why it is a
---- command and not something shown as updates are checked for.
+--- command and not something shown as updates are checked for. The tab
+--- opens at once, and fills in as git answers.
 ---@param rows DyPendingUpdate[]
 ---@param window integer
 ---@param name? string
@@ -474,7 +589,13 @@ function M.show(rows, window, name)
     return M.open_diff(by_name[name])
   end
 
-  local bufnr = scratch(M.report(rows, window), 'markdown', 'tabnew')
+  local waiting = header(rows, window)
+  vim.list_extend(
+    waiting,
+    { '', ('Reading the updates of %d plugins…'):format(#rows) }
+  )
+  local bufnr = scratch(waiting, 'markdown', 'tabnew')
+  M.report(rows, window, function(lines) M.fill(bufnr, lines) end)
   vim.keymap.set('n', '<CR>', function()
     local plugin = section_at_cursor(bufnr)
     if plugin and by_name[plugin] then M.open_diff(by_name[plugin]) end
