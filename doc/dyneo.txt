@@ -624,6 +624,23 @@ D2 diagrams render inline on kitty-graphics terminals, zellij included.
 `<leader>cp` previews the diagram under the cursor; Markdown and Typst get
 their own preview on the same key.
 
+                                                          *dyneo-architecture*
+|:DyArchitecture| draws what the directory of the buffer declares, as D2 in
+a new buffer to preview or to keep:
+
+    Terraform     each `resource`, `data` and `module` block, and an arrow
+                  to every block its body refers to -- read off the files,
+                  no plan, state or provider needed
+    Kubernetes    each object of the manifests of the directory, and the
+                  links the cluster makes: a Service to the workloads its
+                  selector matches, an Ingress to its Services, a workload
+                  to the ConfigMaps, Secrets, claims and service account it
+                  uses, an autoscaler to what it scales.  One named but not
+                  in the directory is drawn dashed, `(missing)`.
+    Compose       each service, and its `depends_on`
+
+YAML is read through `yq`.
+
 5.8 Workspace diagnostics                                    *dyneo-workspace*
 
 `<leader>xw` asks a language server about the whole project, not only the
@@ -824,6 +841,11 @@ Command-line abbreviations, which only fire as a whole command line, so a
 :Adr supersede [{title}]
                         Write a record replacing the one open, linking both.
                         See |dyneo-adr|.
+
+                                                             *:DyArchitecture*
+:DyArchitecture         Draw what this directory declares -- Terraform,
+                        manifests or compose -- as D2.  See
+                        |dyneo-architecture|.
 
                                                                   *:DyProject*
 :DyProject              The state of the project on one page.  See

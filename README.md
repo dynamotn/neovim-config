@@ -54,7 +54,7 @@ says what is missing.
 | 🌐 | **Forges & trackers** — GitHub (Octo), GitLab merge requests, CI checks, the last pipeline on the jobs of the file that defines them, Jira issues to branches and worklogs | `<leader>ph` `pl` `pc` `pj` |
 | 🔍 | **Whole-project diagnostics** — every file handed to the server, off the main loop; one page on the branch, diagnostics, tasks, reviews, pipeline and issues of the project; architecture decision records | `<leader>xw` · `<leader>pp` · `:Adr` |
 | 🛠 | **Tasks** — run, build and test the current file or project in ~50 languages | `<leader>oo` |
-| 🖼 | **Previews** — D2 diagrams inline on kitty-graphics terminals, Markdown, Typst | `<leader>cp` |
+| 🖼 | **Previews** — D2 diagrams inline on kitty-graphics terminals, Markdown, Typst; architecture diagrams drawn from Terraform, manifests and compose files | `<leader>cp` · `:DyArchitecture` |
 | 📚 | **Spelling** — Vietnamese, Chinese and technical word lists; code comments too | `:DySpell vi` |
 | 🔌 | **Integrations** — Obsidian, chezmoi templates, firenvim, zellij, AI CLIs; the OpenAPI operation under the cursor as a kulala or Hurl request, and the breaking changes of a spec since a revision | `:OpenApiRequest` · `:OpenApiDiff` |
 
