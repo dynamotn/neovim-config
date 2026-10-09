@@ -54,14 +54,100 @@ local function git(dir, args)
   return out ~= '' and out or nil, true
 end
 
+--- What git said about commits, kept across sessions
+---
+--- lazy.nvim's checker asks for the target of every plugin right after
+--- startup, on the main loop: a `git log` each is over half a second of a
+--- frozen editor. `times` holds when each commit was made, which never
+--- changes. `ancestors` holds the aged ancestor of a tip and the cutoff it was
+--- found for; it is reused for `M.ANCESTOR_REUSE` seconds of a moving cutoff,
+--- which can only hold a commit back longer, never let one through early.
+---@class DyQuarantineCache
+---@field times table<string, integer>
+---@field ancestors table<string, { commit: string, cutoff: integer }>
+
+---@type DyQuarantineCache?
+local cache
+local cache_dirty = false
+
+--- How long a found ancestor stands before git is asked again
+M.ANCESTOR_REUSE = 6 * 60 * 60
+
+---@return string
+function M.cache_file()
+  return vim.fs.joinpath(
+    vim.fn.stdpath('state') --[[@as string]],
+    'dyneo',
+    'quarantine-cache.json'
+  )
+end
+
+---@return DyQuarantineCache
+local function load_cache()
+  if cache then return cache end
+  cache = { times = {}, ancestors = {} }
+  local file = io.open(M.cache_file(), 'r')
+  if not file then return cache end
+  local ok, decoded = pcall(vim.json.decode, file:read('*a'))
+  file:close()
+  if not ok or type(decoded) ~= 'table' then return cache end
+  for hash, time in
+    pairs(type(decoded.times) == 'table' and decoded.times or {})
+  do
+    if type(time) == 'number' then cache.times[hash] = time end
+  end
+  for hash, found in
+    pairs(type(decoded.ancestors) == 'table' and decoded.ancestors or {})
+  do
+    if
+      type(found) == 'table'
+      and type(found.commit) == 'string'
+      and type(found.cutoff) == 'number'
+    then
+      cache.ancestors[hash] = found
+    end
+  end
+  return cache
+end
+
+--- Write the cache once the current batch of questions is answered
+local function save_cache()
+  if cache_dirty then return end
+  cache_dirty = true
+  vim.schedule(function()
+    cache_dirty = false
+    local path = M.cache_file()
+    vim.fn.mkdir(vim.fs.dirname(path), 'p')
+    local file = io.open(path, 'w')
+    if not file then return end
+    file:write(vim.json.encode(cache or {}))
+    file:close()
+  end)
+end
+
+--- `rev` when it is a full commit hash, the only name that never moves
+---@param rev string
+---@return string?
+local function full_hash(rev)
+  return #rev == 40 and rev:match('^%x+$') and rev or nil
+end
+
 --- When `rev` was committed, in seconds since the epoch
 ---@param dir string
 ---@param rev string
 ---@return integer?
 local function committed_at(dir, rev)
+  local hash = full_hash(rev)
+  local times = load_cache().times
+  if hash and times[hash] then return times[hash] end
   -- Parenthesised: `git` hands back two values, and `tonumber` reads the
   -- second as a base.
-  return tonumber((git(dir, { 'log', '-1', '--format=%ct', rev })))
+  local time = tonumber((git(dir, { 'log', '-1', '--format=%ct', rev })))
+  if hash and time then
+    times[hash] = time
+    save_cache()
+  end
+  return time
 end
 
 --- Whether `rev` has been in the repository for longer than the window
@@ -83,16 +169,32 @@ end
 ---@param now integer
 ---@return string?
 local function aged_ancestor(dir, rev, now)
-  return git(dir, {
+  local cutoff = now - M.window()
+  local hash = full_hash(rev)
+  local ancestors = load_cache().ancestors
+  local found = hash and ancestors[hash]
+  if
+    found
+    and cutoff >= found.cutoff
+    and cutoff - found.cutoff < M.ANCESTOR_REUSE
+  then
+    return found.commit
+  end
+  local commit = git(dir, {
     'log',
     '-1',
     -- The main line only: a branch merged today has commits of last week,
     -- and none of them was ever checked out upstream on its own
     '--first-parent',
-    '--until=' .. os.date('!%Y-%m-%dT%H:%M:%S+00:00', now - M.window()),
+    '--until=' .. os.date('!%Y-%m-%dT%H:%M:%S+00:00', cutoff),
     '--format=%H',
     rev,
   })
+  if hash and commit then
+    ancestors[hash] = { commit = commit, cutoff = cutoff }
+    save_cache()
+  end
+  return commit
 end
 
 --- The target lazy.nvim should check out instead of `target`

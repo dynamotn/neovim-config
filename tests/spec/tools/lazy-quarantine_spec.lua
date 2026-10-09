@@ -145,6 +145,37 @@ describe('tools.lazy-quarantine', function()
     assert.are.equal(commits[2], picked.commit)
   end)
 
+  describe('cache', function()
+    it('answers the next session without asking git', function()
+      local file = require('tools.lazy-quarantine').cache_file()
+      os.remove(file)
+      local dir, commits, cleanup = repository({ 30 * DAY, 8 * DAY, DAY })
+      assert.are.equal(commits[2], target(dir, commits[3]).commit)
+      assert.is_true(
+        vim.wait(1000, function() return vim.uv.fs_stat(file) ~= nil end)
+      )
+      -- The repository is gone: only what was written down can answer
+      cleanup()
+      assert.are.equal(commits[2], target(dir, commits[3]).commit)
+      assert.are.equal(commits[2], target(dir, commits[2]).commit)
+    end)
+
+    it('asks git again once the cutoff has moved on', function()
+      local dir, commits, cleanup =
+        repository({ 30 * DAY, 10 * DAY, 6 * DAY, DAY })
+      assert.are.equal(commits[2], target(dir, commits[4]).commit)
+      local quarantine = require('tools.lazy-quarantine')
+      local later = quarantine.target(
+        { dir = dir, name = 'spec.nvim' },
+        { branch = 'main', commit = commits[4] },
+        nil,
+        now + 2 * DAY
+      )
+      cleanup()
+      assert.are.equal(commits[3], later.commit)
+    end)
+  end)
+
   describe('window', function()
     it('waits a week unless a global says otherwise', function()
       h.unload('tools.lazy-quarantine')
