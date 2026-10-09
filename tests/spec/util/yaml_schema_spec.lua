@@ -1285,6 +1285,33 @@ describe('util.yaml_schema', function()
       assert.are.equal('yaml/get/jsonSchema', client.requests[2].method)
     end)
 
+    it('asks for the name again on the diagnostics of yamlls only', function()
+      yaml_schema.on_init(client)
+      local bufnr = open(dir .. '/a.yaml', {})
+      client.buffers[bufnr] = true
+      local function changed(namespace)
+        vim.api.nvim_exec_autocmds('DiagnosticChanged', {
+          buffer = bufnr,
+          modeline = false,
+          data = { diagnostics = { { namespace = namespace, lnum = 0 } } },
+        })
+      end
+      local yamlls = vim.api.nvim_create_namespace('dy_spec_yamlls')
+      -- The real module wants a running client to load
+      stub(vim.lsp, 'diagnostic', {
+        get_namespace = function(id) return id == client.id and yamlls or -1 end,
+      })
+      local before = #client.requests
+      changed(vim.api.nvim_create_namespace('dy_spec_yamllint'))
+      assert.are.equal(before, #client.requests)
+      changed(yamlls)
+      assert.are.equal(before + 1, #client.requests)
+      assert.are.equal(
+        'yaml/get/jsonSchema',
+        client.requests[#client.requests].method
+      )
+    end)
+
     it('leaves buffers of other servers alone', function()
       yaml_schema.on_init(client)
       local other = fake_client({ name = 'jsonls' })

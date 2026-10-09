@@ -246,10 +246,11 @@ function M.set_default(option, value)
 
   if l ~= g and not defaults[key] then
     local info = vim.api.nvim_get_option_info2(option, { scope = 'local' })
-    local scriptinfo = vim.tbl_filter(
-      function(e) return e.sid == info.last_set_sid end,
-      vim.fn.getscriptinfo()
-    )
+    -- Only the script that set it, not every script sourced so far. A
+    -- negative id is Lua, the API or a modeline: no script of `$VIMRUNTIME`.
+    local scriptinfo = info.last_set_sid > 0
+        and vim.fn.getscriptinfo({ sid = info.last_set_sid })
+      or {}
     local by_rtp = #scriptinfo == 1
       and vim.startswith(scriptinfo[1].name, vim.fn.expand('$VIMRUNTIME'))
     if not by_rtp then return false end

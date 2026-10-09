@@ -871,10 +871,23 @@ function M.on_init(client)
     end,
   })
   -- The server revalidates a buffer whenever its schema may have changed: a
-  -- new configuration, a modeline typed in, a schema finished loading
+  -- new configuration, a modeline typed in, a schema finished loading. Its
+  -- own diagnostics only: yamllint, betterleaks and the rest change nothing
+  -- of the schema, and each would cost a request.
   vim.api.nvim_create_autocmd('DiagnosticChanged', {
     group = group,
-    callback = function(ev) M.refresh_name(ev.buf) end,
+    callback = function(ev)
+      local client = get_client(ev.buf)
+      if not client then return end
+      local first = ((ev.data or {}).diagnostics or {})[1]
+      if
+        first
+        and first.namespace ~= vim.lsp.diagnostic.get_namespace(client.id)
+      then
+        return
+      end
+      M.refresh_name(ev.buf)
+    end,
   })
   vim.api.nvim_create_autocmd('BufWritePost', {
     group = group,
