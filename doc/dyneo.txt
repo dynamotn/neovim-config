@@ -404,6 +404,18 @@ list.  A module call carries every change below it.  The plan runs with
 `-lock=false`, and its file -- every planned value in plain text -- is
 deleted once read.  `<localleader>P` clears it.
 
+`<localleader>d` (`:TfPlan drift`) runs a `-refresh-only` plan instead and
+shows what changed or was deleted outside the code, on the blocks that
+declare it.  It runs only when asked: a refresh reads every object of the
+state.
+
+`<localleader>c` (`:TfPlan cost`) plans, then hands the plan to `infracost
+breakdown` and puts the monthly cost of each block at the end of its line,
+summed per module call, with the total in a notification.  The plan goes to
+`infracost` through a file only its owner can read, deleted once priced.  A
+resource priced by usage alone adds nothing.  `infracost` keeps its own API
+key: run `infracost auth login` once.
+
 Runbooks                                                       *dyneo-runbook*
 
 In a Markdown file, `<localleader>r` runs the fenced block under the cursor
@@ -616,7 +628,12 @@ Command-line abbreviations, which only fire as a whole command line, so a
                                                                      *:TfPlan*
 :TfPlan                 Plan the module of this buffer and show it on its
                         blocks.
-:TfPlan clear           Clear the plan shown.  See |dyneo-tfplan|.
+:TfPlan drift           Show what changed outside the code, with a
+                        `-refresh-only` plan.
+:TfPlan cost            Plan, and show the monthly cost of each block with
+                        `infracost`.
+:TfPlan clear           Clear the plan, drift and costs shown.  See
+                        |dyneo-tfplan|.
 
                                                                        *:Kube*
 :Kube [diff]            Diff this manifest, kustomization or chart with the

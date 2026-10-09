@@ -5,7 +5,7 @@ vim.api.nvim_create_user_command(
   function(args) require('tools.tfplan').command(args) end,
   {
     nargs = '?',
-    complete = function() return { 'clear' } end,
+    complete = function() return require('tools.tfplan').SUBCOMMANDS end,
     desc = 'Plan the module of this buffer, and show it on its blocks',
   }
 )

@@ -260,4 +260,234 @@ describe('tools.tfplan', function()
       )
     end
   )
+
+  describe('drift', function()
+    local DRIFTED = {
+      resource_drift = {
+        {
+          address = 'aws_s3_bucket.logs',
+          mode = 'managed',
+          type = 'aws_s3_bucket',
+          name = 'logs',
+          change = { actions = { 'update' } },
+        },
+        {
+          address = 'aws_sqs_queue.gone',
+          mode = 'managed',
+          type = 'aws_sqs_queue',
+          name = 'gone',
+          change = { actions = { 'delete' } },
+        },
+      },
+      resource_changes = {},
+    }
+
+    it('reads what changed outside the code, told as drift', function()
+      local changes = tfplan.changes(DRIFTED, 'resource_drift')
+      assert.equals(2, #changes)
+      assert.same({}, tfplan.changes(DRIFTED))
+
+      local entries = tfplan.entries(changes, tfplan.index(dir), true)
+      assert.equals('~ changed outside the code', entries[1].text)
+      assert.equals(1, entries[1].line)
+      assert.equals(vim.diagnostic.severity.WARN, entries[1].severity)
+      assert.equals(
+        'aws_sqs_queue.gone: - deleted outside the code',
+        entries[2].text
+      )
+    end)
+
+    it('sums drift up', function()
+      assert.equals('No drift', tfplan.drift_summary({}))
+      assert.equals(
+        'Drift: 1 changed, 1 deleted outside the code',
+        tfplan.drift_summary(tfplan.changes(DRIFTED, 'resource_drift'))
+      )
+    end)
+  end)
+
+  describe('cost', function()
+    local BREAKDOWN = {
+      currency = 'EUR',
+      projects = {
+        {
+          breakdown = {
+            resources = {
+              { name = 'aws_instance.web[0]', monthlyCost = '10.5' },
+              { name = 'aws_instance.web[1]', monthlyCost = '10.5' },
+              { name = 'module.vpc.aws_nat_gateway.this', monthlyCost = '32' },
+              { name = 'module.vpc.module.nat.aws_eip.x', monthlyCost = '3' },
+              -- Priced by usage only: no monthly cost to add
+              { name = 'aws_s3_bucket.logs', monthlyCost = vim.NIL },
+            },
+          },
+        },
+      },
+    }
+
+    it('keys each priced address by its block', function()
+      assert.equals(
+        'resource.aws_instance.web',
+        tfplan.cost_key('aws_instance.web[0]')
+      )
+      assert.equals(
+        'resource.aws_instance.web',
+        tfplan.cost_key('aws_instance.web["a.b"]')
+      )
+      assert.equals('module.vpc', tfplan.cost_key('module.vpc.aws_eip.x'))
+      assert.equals('module.vpc', tfplan.cost_key('module.vpc["x"].aws_eip.x'))
+    end)
+
+    it('sums the monthly cost of each block', function()
+      local costs = tfplan.costs(BREAKDOWN)
+      assert.same({
+        ['resource.aws_instance.web'] = 21,
+        ['module.vpc'] = 35,
+      }, costs.blocks)
+      assert.equals(56, costs.total)
+      assert.equals('EUR', costs.currency)
+      assert.equals('USD', tfplan.costs({}).currency)
+      assert.equals('≈ 21.00 EUR/month', tfplan.cost_text(21, 'EUR'))
+    end)
+
+    it('shows costs on loaded buffers, and on those opened later', function()
+      vim.cmd.edit(dir .. '/main.tf')
+      local main = vim.api.nvim_get_current_buf()
+      local cost_ns = vim.api.nvim_create_namespace('dy_tfplan_cost')
+      tfplan.show_costs(tfplan.costs(BREAKDOWN), tfplan.index(dir))
+
+      local marks =
+        vim.api.nvim_buf_get_extmarks(main, cost_ns, 0, -1, { details = true })
+      assert.equals(1, #marks)
+      assert.equals(4, marks[1][2])
+      assert.equals('  ≈ 21.00 EUR/month', marks[1][4].virt_text[1][1])
+
+      vim.cmd.edit(dir .. '/modules.tf')
+      local modules = vim.api.nvim_get_current_buf()
+      tfplan.attach(modules)
+      assert.equals(
+        1,
+        #vim.api.nvim_buf_get_extmarks(modules, cost_ns, 0, -1, {})
+      )
+
+      tfplan.clear()
+      assert.same({}, vim.api.nvim_buf_get_extmarks(main, cost_ns, 0, -1, {}))
+      tfplan.attach(modules)
+      assert.same(
+        {},
+        vim.api.nvim_buf_get_extmarks(modules, cost_ns, 0, -1, {})
+      )
+    end)
+  end)
+
+  describe('run', function()
+    local path, bin, restore_notify, notes
+
+    before_each(function()
+      bin = dir .. '/bin'
+      vim.fn.mkdir(bin, 'p')
+      h.write(dir .. '/plan.json', {
+        vim.json.encode({
+          resource_changes = PLAN.resource_changes,
+          resource_drift = {
+            {
+              address = 'aws_s3_bucket.logs',
+              mode = 'managed',
+              type = 'aws_s3_bucket',
+              name = 'logs',
+              change = { actions = { 'update' } },
+            },
+          },
+        }),
+      })
+      h.write(bin .. '/tofu', {
+        '#!/bin/sh',
+        'case "$1" in',
+        '  plan) for a; do case "$a" in -out=*) echo plan > "${a#-out=}";; esac; done',
+        '        echo "$@" > "' .. dir .. '/plan.args";;',
+        '  show) test -f "$3" || exit 3; cat "' .. dir .. '/plan.json";;',
+        'esac',
+      })
+      -- An infracost that records the file it prices, and how private it is
+      h.write(bin .. '/infracost', {
+        '#!/bin/sh',
+        'echo "$@" > "' .. dir .. '/infracost.args"',
+        'stat -c %a "$3" > "' .. dir .. '/infracost.mode"',
+        'test -s "$3" || exit 4',
+        'echo \'{"currency":"USD","projects":[{"breakdown":{"resources":'
+          .. '[{"name":"aws_instance.web[0]","monthlyCost":"7.25"}]}}]}\'',
+      })
+      vim.fn.setfperm(bin .. '/tofu', 'rwxr-xr-x')
+      vim.fn.setfperm(bin .. '/infracost', 'rwxr-xr-x')
+      path = vim.env.PATH
+      vim.env.PATH = bin .. ':' .. path
+      notes = {}
+      restore_notify = h.stub(
+        vim,
+        'notify',
+        function(msg) table.insert(notes, msg) end
+      )
+    end)
+    after_each(function()
+      vim.env.PATH = path
+      restore_notify()
+    end)
+
+    it('looks for drift with a refresh-only plan', function()
+      vim.cmd.edit(dir .. '/main.tf')
+      local bufnr = vim.api.nvim_get_current_buf()
+      tfplan.command({ fargs = { 'drift' } })
+      assert.is_true(vim.wait(10000, function() return #notes >= 2 end, 20))
+      assert.equals('Drift: 1 changed, 0 deleted outside the code', notes[2])
+
+      local args = table.concat(vim.fn.readfile(dir .. '/plan.args'), ' ')
+      assert.is_truthy(args:find('-refresh-only', 1, true))
+      assert.equals(0, vim.fn.filereadable(args:match('%-out=(%S+)')))
+
+      local diagnostics = vim.diagnostic.get(bufnr)
+      assert.equals(1, #diagnostics)
+      assert.equals('drift', diagnostics[1].source)
+      assert.equals('~ changed outside the code', diagnostics[1].message)
+      assert.is_truthy(
+        vim.fn.getqflist({ title = 0 }).title:find('^Terraform drift')
+      )
+    end)
+
+    it('prices the plan from a private copy, gone once read', function()
+      vim.cmd.edit(dir .. '/main.tf')
+      local bufnr = vim.api.nvim_get_current_buf()
+      tfplan.command({ fargs = { 'cost' } })
+      assert.is_true(vim.wait(10000, function() return #notes >= 3 end, 20))
+      assert.equals('Monthly cost: ≈ 7.25 USD/month', notes[3])
+
+      local args = table.concat(vim.fn.readfile(dir .. '/infracost.args'), ' ')
+      local jsonfile = args:match('%-%-path (%S+)')
+      assert.is_truthy(args:find('--format json', 1, true))
+      assert.same({ '600' }, vim.fn.readfile(dir .. '/infracost.mode'))
+      assert.equals(0, vim.fn.filereadable(jsonfile))
+
+      local cost_ns = vim.api.nvim_create_namespace('dy_tfplan_cost')
+      local marks = vim.api.nvim_buf_get_extmarks(bufnr, cost_ns, 0, -1, {})
+      assert.equals(1, #marks)
+      -- The plan itself is still shown alongside
+      assert.is_true(#vim.diagnostic.get(bufnr) > 0)
+    end)
+
+    it('says when infracost is missing, without planning', function()
+      vim.fn.delete(bin .. '/infracost')
+      local restore = h.stub(vim.fn, 'executable', function(name)
+        if name == 'infracost' then return 0 end
+        return 1
+      end)
+      tfplan.cost()
+      restore()
+      assert.same({ 'infracost is not installed' }, notes)
+      assert.equals(0, vim.fn.filereadable(dir .. '/plan.args'))
+    end)
+
+    it('refuses an unknown subcommand', function()
+      tfplan.command({ fargs = { 'nope' } })
+      assert.same({ 'Unknown subcommand: nope' }, notes)
+    end)
+  end)
 end)

@@ -204,4 +204,15 @@ describe('dyneo.health', function()
       end
     )
   end)
+
+  it('only mentions a tool one command needs, never warns', function()
+    local restore = h.stub(vim.fn, 'executable', function(name)
+      if name == 'infracost' then return 0 end
+      return 1
+    end)
+    local entries = section(report(), 'Requirements')
+    restore()
+    assert.is_true(says(entries, 'info', 'infracost is not installed'))
+    assert.is_false(says(entries, 'warn', 'infracost'))
+  end)
 end)

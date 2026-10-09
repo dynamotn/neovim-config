@@ -9,12 +9,21 @@
 --- The plan is saved to a private temporary file only to be read back with
 --- `show -json`, then deleted: a plan file holds every value it planned,
 --- secrets included, in plain text.
+---
+--- The same flow answers two more questions: what changed outside the code
+--- (`drift`, a `-refresh-only` plan), and what the planned resources cost a
+--- month (`cost`, the plan handed to `infracost`), shown at the end of the
+--- line of each block.
 local M = {}
 
 local ns = vim.api.nvim_create_namespace('dy_tfplan')
+local cost_ns = vim.api.nvim_create_namespace('dy_tfplan_cost')
 
 --- Milliseconds a plan may run before it is stopped
 M.TIMEOUT = 15 * 60 * 1000
+
+--- Milliseconds `infracost` may take to price a plan
+M.COST_TIMEOUT = 5 * 60 * 1000
 
 ---@alias DyTfAction 'create'|'update'|'replace'|'destroy'|'read'|'forget'
 
@@ -61,10 +70,12 @@ end
 
 --- The changes of a plan, from the output of `show -json`
 ---@param plan table
+---@param field? 'resource_changes'|'resource_drift' Which list to read: what
+--- the plan does (the default), or what changed outside the code
 ---@return DyTfChange[]
-function M.changes(plan)
+function M.changes(plan, field)
   local changes = {}
-  for _, rc in ipairs(plan.resource_changes or {}) do
+  for _, rc in ipairs(plan[field or 'resource_changes'] or {}) do
     local action = action_of(vim.tbl_get(rc, 'change', 'actions'))
     if action then
       local forces = {}
@@ -143,6 +154,21 @@ local ACTIONS = {
   },
 }
 
+--- How drift is told: a `-refresh-only` plan only ever finds an object
+--- changed or deleted outside the code
+local DRIFT = {
+  update = {
+    sign = '~',
+    word = 'changed outside the code',
+    severity = vim.diagnostic.severity.WARN,
+  },
+  destroy = {
+    sign = '-',
+    word = 'deleted outside the code',
+    severity = vim.diagnostic.severity.WARN,
+  },
+}
+
 --- The order the actions of one block are listed in, loudest first
 local ORDER = { 'destroy', 'forget', 'replace', 'update', 'create', 'read' }
 
@@ -156,8 +182,9 @@ local ORDER = { 'destroy', 'forget', 'replace', 'update', 'create', 'read' }
 --- is not in `blocks` -- one of a nested module, or of a file not read
 ---@param changes DyTfChange[]
 ---@param blocks table<string, { file: string, line: integer }>
+---@param drift? boolean Tell the changes as drift
 ---@return DyTfEntry[]
-function M.entries(changes, blocks)
+function M.entries(changes, blocks, drift)
   ---@type table<string, { where: table?, label: string, counts: table, forces: table }>
   local groups, order = {}, {}
   for _, change in ipairs(changes) do
@@ -195,7 +222,7 @@ function M.entries(changes, blocks)
     for _, action in ipairs(ORDER) do
       local count = group.counts[action]
       if count then
-        local info = ACTIONS[action]
+        local info = drift and DRIFT[action] or ACTIONS[action]
         table.insert(
           parts,
           ('%s %s%s'):format(
@@ -251,11 +278,124 @@ function M.summary(changes)
   return line
 end
 
---- Forget the plan shown, in every buffer
+--- The one-line summary of a `-refresh-only` plan
+---@param changes DyTfChange[]
+---@return string
+function M.drift_summary(changes)
+  local changed, deleted = 0, 0
+  for _, change in ipairs(changes) do
+    if change.action == 'destroy' then
+      deleted = deleted + 1
+    else
+      changed = changed + 1
+    end
+  end
+  if changed + deleted == 0 then return 'No drift' end
+  return ('Drift: %d changed, %d deleted outside the code'):format(
+    changed,
+    deleted
+  )
+end
+
+--- The block an address of `infracost` belongs to, keyed the way `M.index`
+--- keys them: `module.vpc` for anything in a module, else `resource.T.N`
+---@param address string
+---@return string
+function M.cost_key(address)
+  local module = address:match('^module%.([^.%[]+)')
+  if module then return 'module.' .. module end
+  return 'resource.' .. address:gsub('%[.*%]$', '')
+end
+
+---@class DyTfCosts
+---@field blocks table<string, number> Monthly cost by block key
+---@field total number
+---@field currency string
+
+--- The monthly cost of each block, from `infracost breakdown --format json`.
+--- A resource priced only by usage has no `monthlyCost` and adds nothing.
+---@param breakdown table
+---@return DyTfCosts
+function M.costs(breakdown)
+  local blocks, total = {}, 0
+  for _, project in ipairs(breakdown.projects or {}) do
+    local resources = vim.tbl_get(project, 'breakdown', 'resources') or {}
+    for _, resource in ipairs(resources) do
+      local monthly = tonumber(resource.monthlyCost)
+      if monthly and type(resource.name) == 'string' then
+        local key = M.cost_key(resource.name)
+        blocks[key] = (blocks[key] or 0) + monthly
+        total = total + monthly
+      end
+    end
+  end
+  return {
+    blocks = blocks,
+    total = total,
+    currency = type(breakdown.currency) == 'string' and breakdown.currency
+      or 'USD',
+  }
+end
+
+--- How a monthly cost reads: `≈ 12.30 USD/month`
+---@param amount number
+---@param currency string
+---@return string
+function M.cost_text(amount, currency)
+  return ('≈ %.2f %s/month'):format(amount, currency)
+end
+
+---@type table<string, { line: integer, text: string }[]> Costs shown, by file
+local shown_costs = {}
+
+--- Put the costs known for its file on a loaded buffer
+---@param bufnr integer
+local function place_costs(bufnr)
+  vim.api.nvim_buf_clear_namespace(bufnr, cost_ns, 0, -1)
+  local marks = shown_costs[vim.api.nvim_buf_get_name(bufnr)]
+  local count = vim.api.nvim_buf_line_count(bufnr)
+  for _, mark in ipairs(marks or {}) do
+    if mark.line <= count then
+      vim.api.nvim_buf_set_extmark(bufnr, cost_ns, mark.line - 1, 0, {
+        virt_text = { { '  ' .. mark.text, 'Comment' } },
+        virt_text_pos = 'eol',
+      })
+    end
+  end
+end
+
+--- Show the cost of each block found in `blocks`, on the buffers loaded now
+--- and on those opened later
+---@param costs DyTfCosts
+---@param blocks table<string, { file: string, line: integer }>
+function M.show_costs(costs, blocks)
+  shown_costs = {}
+  for key, amount in pairs(costs.blocks) do
+    local where = blocks[key]
+    if where then
+      shown_costs[where.file] = shown_costs[where.file] or {}
+      table.insert(shown_costs[where.file], {
+        line = where.line,
+        text = M.cost_text(amount, costs.currency),
+      })
+    end
+  end
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) then place_costs(bufnr) end
+  end
+end
+
+--- Forget the plan, drift and costs shown, in every buffer
 function M.clear()
   vim.diagnostic.reset(ns)
+  shown_costs = {}
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) then
+      vim.api.nvim_buf_clear_namespace(bufnr, cost_ns, 0, -1)
+    end
+  end
   local qf = vim.fn.getqflist({ title = 0 })
-  if qf.title and qf.title:find('^Terraform plan') then
+  if qf.title and qf.title:find('^Terraform ') then
     vim.fn.setqflist({}, 'r')
   end
 end
@@ -263,7 +403,8 @@ end
 --- Show `entries` as diagnostics of their files and in the quickfix list
 ---@param entries DyTfEntry[]
 ---@param title string
-function M.show(entries, title)
+---@param source? string `plan` unless given
+function M.show(entries, title, source)
   vim.diagnostic.reset(ns)
   ---@type table<integer, vim.Diagnostic[]>
   local per_buffer = {}
@@ -277,7 +418,7 @@ function M.show(entries, title)
         col = 0,
         message = entry.text,
         severity = entry.severity,
-        source = 'plan',
+        source = source or 'plan',
       })
     end
     table.insert(items, {
@@ -307,8 +448,26 @@ function M.binary()
   end
 end
 
---- Plan the module of the current buffer, and show the plan on its blocks
-function M.plan()
+--- Write `text` to a new file only its owner can read: a plan in JSON holds
+--- every value it planned
+---@param path string
+---@param text string
+---@return boolean
+local function write_private(path, text)
+  local fd = vim.uv.fs_open(path, 'w', tonumber('600', 8))
+  if not fd then return false end
+  local ok = vim.uv.fs_write(fd, text) ~= nil
+  vim.uv.fs_close(fd)
+  return ok
+end
+
+---@alias DyTfMode 'plan'|'drift'|'cost'
+
+--- Plan the module of the current buffer, and show on its blocks what the
+--- plan does, what drifted, or what it costs
+---@param mode? DyTfMode `plan` unless given
+function M.run(mode)
+  mode = mode or 'plan'
   local bin = M.binary()
   if not bin then
     return notify(
@@ -316,12 +475,25 @@ function M.plan()
       vim.log.levels.ERROR
     )
   end
+  if mode == 'cost' and vim.fn.executable('infracost') ~= 1 then
+    return notify('infracost is not installed', vim.log.levels.ERROR)
+  end
   local name = vim.api.nvim_buf_get_name(0)
   local dir = name ~= '' and vim.fs.dirname(name) or vim.uv.cwd() --[[@as string]]
   local planfile = vim.fn.tempname()
-  notify(('Planning %s with %s…'):format(vim.fn.fnamemodify(dir, ':~'), bin))
+  local jsonfile = planfile .. '.json'
+  notify(
+    ('%s %s with %s…'):format(
+      mode == 'drift' and 'Looking for drift in' or 'Planning',
+      vim.fn.fnamemodify(dir, ':~'),
+      bin
+    )
+  )
 
-  local function cleanup() vim.fn.delete(planfile) end
+  local function cleanup()
+    vim.fn.delete(planfile)
+    vim.fn.delete(jsonfile)
+  end
   local function failed(what, result)
     cleanup()
     local err = vim.trim(result.stderr or '')
@@ -329,52 +501,121 @@ function M.plan()
     notify(what .. ' failed:\n' .. err, vim.log.levels.ERROR)
   end
 
-  vim.system({
-    bin,
-    'plan',
-    '-input=false',
-    '-lock=false',
-    '-no-color',
-    '-out=' .. planfile,
-  }, { cwd = dir, text = true, timeout = M.TIMEOUT }, function(result)
-    vim.schedule(function()
-      if result.code ~= 0 then return failed('plan', result) end
-      vim.system(
-        { bin, 'show', '-json', planfile },
-        { cwd = dir, text = true, timeout = M.TIMEOUT },
-        function(show)
-          vim.schedule(function()
-            if show.code ~= 0 then return failed('show', show) end
-            cleanup()
-            local ok, plan = pcall(vim.json.decode, show.stdout or '')
-            if not ok or type(plan) ~= 'table' then
-              return notify(
-                'show -json printed something that is not JSON',
-                vim.log.levels.ERROR
-              )
-            end
-            local changes = M.changes(plan)
-            local summary = M.summary(changes)
-            M.show(
-              M.entries(changes, M.index(dir)),
-              'Terraform plan: ' .. summary
-            )
-            notify(summary)
-          end)
-        end
+  --- Price the plan, as `show -json` printed it, block by block
+  ---@param json string
+  ---@param blocks table<string, { file: string, line: integer }>
+  local function price(json, blocks)
+    if not write_private(jsonfile, json) then
+      cleanup()
+      return notify(
+        'Could not hand the plan to infracost',
+        vim.log.levels.ERROR
       )
+    end
+    vim.system({
+      'infracost',
+      'breakdown',
+      '--path',
+      jsonfile,
+      '--format',
+      'json',
+      '--no-color',
+    }, { cwd = dir, text = true, timeout = M.COST_TIMEOUT }, function(
+      result
+    )
+      vim.schedule(function()
+        if result.code ~= 0 then return failed('infracost', result) end
+        cleanup()
+        local ok, breakdown = pcall(vim.json.decode, result.stdout or '')
+        if not ok or type(breakdown) ~= 'table' then
+          return notify(
+            'infracost printed something that is not JSON',
+            vim.log.levels.ERROR
+          )
+        end
+        local costs = M.costs(breakdown)
+        M.show_costs(costs, blocks)
+        notify('Monthly cost: ' .. M.cost_text(costs.total, costs.currency))
+      end)
     end)
-  end)
+  end
+
+  local command = { bin, 'plan', '-input=false', '-lock=false', '-no-color' }
+  if mode == 'drift' then table.insert(command, '-refresh-only') end
+  table.insert(command, '-out=' .. planfile)
+
+  vim.system(
+    command,
+    { cwd = dir, text = true, timeout = M.TIMEOUT },
+    function(result)
+      vim.schedule(function()
+        if result.code ~= 0 then return failed('plan', result) end
+        vim.system(
+          { bin, 'show', '-json', planfile },
+          { cwd = dir, text = true, timeout = M.TIMEOUT },
+          function(show)
+            vim.schedule(function()
+              if show.code ~= 0 then return failed('show', show) end
+              -- The binary plan is read; only `price` still needs the JSON
+              vim.fn.delete(planfile)
+              local ok, plan = pcall(vim.json.decode, show.stdout or '')
+              if not ok or type(plan) ~= 'table' then
+                cleanup()
+                return notify(
+                  'show -json printed something that is not JSON',
+                  vim.log.levels.ERROR
+                )
+              end
+              local blocks = M.index(dir)
+              if mode == 'drift' then
+                cleanup()
+                local changes = M.changes(plan, 'resource_drift')
+                local summary = M.drift_summary(changes)
+                M.show(
+                  M.entries(changes, blocks, true),
+                  'Terraform drift: ' .. summary,
+                  'drift'
+                )
+                return notify(summary)
+              end
+              local changes = M.changes(plan)
+              local summary = M.summary(changes)
+              M.show(M.entries(changes, blocks), 'Terraform plan: ' .. summary)
+              notify(summary)
+              if mode == 'cost' then
+                price(show.stdout, blocks)
+              else
+                cleanup()
+              end
+            end)
+          end
+        )
+      end)
+    end
+  )
 end
 
---- `:TfPlan [clear]`
+--- Plan the module of the current buffer, and show the plan on its blocks
+function M.plan() M.run('plan') end
+
+--- Show what changed outside the code, on the blocks it changed
+function M.drift() M.run('drift') end
+
+--- Plan, and show what each block will cost a month
+function M.cost() M.run('cost') end
+
+--- The subcommands of `:TfPlan`
+M.SUBCOMMANDS = { 'clear', 'cost', 'drift' }
+
+--- `:TfPlan [clear|cost|drift]`
 ---@param args { fargs: string[] }
 function M.command(args)
-  if args.fargs[1] == 'clear' then return M.clear() end
-  if args.fargs[1] then
-    return notify('Unknown subcommand: ' .. args.fargs[1], vim.log.levels.ERROR)
-  end
-  M.plan()
+  local sub = args.fargs[1]
+  if not sub then return M.plan() end
+  if sub == 'clear' then return M.clear() end
+  if sub == 'cost' then return M.cost() end
+  if sub == 'drift' then return M.drift() end
+  notify('Unknown subcommand: ' .. sub, vim.log.levels.ERROR)
 end
 
 --- The mappings of a Terraform buffer
@@ -392,6 +633,19 @@ function M.attach(bufnr)
     M.clear,
     { buffer = bufnr, desc = 'Clear Plan (Terraform)' }
   )
+  vim.keymap.set(
+    'n',
+    '<localleader>d',
+    M.drift,
+    { buffer = bufnr, desc = 'Drift (Terraform)' }
+  )
+  vim.keymap.set(
+    'n',
+    '<localleader>c',
+    M.cost,
+    { buffer = bufnr, desc = 'Cost (Terraform)' }
+  )
+  place_costs(bufnr)
 end
 
 return M

@@ -459,6 +459,11 @@ local function requirements()
     lazygit = 'the `<leader>gg` git UI',
     gh = 'the GitHub API, which the Mason quarantine asks first',
   }
+  -- Asked for by one command each and installed by hand: their absence is
+  -- only worth knowing about, not a warning
+  local on_demand = {
+    infracost = '`:TfPlan cost`',
+  }
   for _, command in ipairs(required) do
     table.insert(
       entries,
@@ -484,6 +489,21 @@ local function requirements()
         or entry(
           'warn',
           ('%s is missing, needed for %s'):format(command, optional[command])
+        )
+    )
+  end
+  names = vim.tbl_keys(on_demand)
+  table.sort(names)
+  for _, command in ipairs(names) do
+    table.insert(
+      entries,
+      vim.fn.executable(command) == 1 and entry('ok', command .. ' found')
+        or entry(
+          'info',
+          ('%s is not installed, only %s needs it'):format(
+            command,
+            on_demand[command]
+          )
         )
     )
   end
