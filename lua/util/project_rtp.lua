@@ -62,6 +62,10 @@ function M.startup_path()
   return project_rtp
 end
 
+--- The project's `.nvim` folder while it is trusted and on the runtimepath
+---@return string?
+function M.current() return project_rtp end
+
 --- Follow the root as the working directory moves. Called once lazy.nvim has
 --- set up, after it has reset the runtimepath.
 function M.setup()

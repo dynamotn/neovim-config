@@ -219,6 +219,12 @@ return {
               lualine_a = {
                 function() return name or 'N/A' end,
               },
+              -- In Avante, the provider it is talking to
+              lualine_b = name == 'Avante'
+                  and {
+                    function() return require('tools.ai').status() or '' end,
+                  }
+                or nil,
             },
           },
         })

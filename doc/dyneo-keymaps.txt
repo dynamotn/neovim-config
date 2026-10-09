@@ -75,10 +75,17 @@ one of the same keys in those buffers.
 `<leader>aV`           x      Send Visual Selection
 `<leader>aa`           n      Sidekick Toggle CLI
 `<leader>ad`           n      Detach a CLI Session
+`<leader>ae`           nx     AI Explain
 `<leader>af`           n      Send File
+`<leader>ai`           nx     AI Actions
+`<leader>al`           nx     AI Prompt Library
+`<leader>ao`           nx     AI Document
 `<leader>ap`           nx     Sidekick Select Prompt
+`<leader>ar`           nx     AI Review
 `<leader>as`           n      Select CLI
 `<leader>at`           nx     Send This
+`<leader>au`           nx     AI Write Tests
+`<leader>ax`           nx     AI Fix Diagnostics
 
 ==============================================================================
 <leader>ac  claude

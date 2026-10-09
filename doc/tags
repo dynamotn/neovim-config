@@ -1,5 +1,6 @@
 :DyActionsPin	dyneo.txt	/*:DyActionsPin*
 :DyAdr	dyneo.txt	/*:DyAdr*
+:DyAi	dyneo.txt	/*:DyAi*
 :DyAiGuardAllow	dyneo.txt	/*:DyAiGuardAllow*
 :DyAiGuardCheck	dyneo.txt	/*:DyAiGuardCheck*
 :DyAiGuardLog	dyneo.txt	/*:DyAiGuardLog*
@@ -37,6 +38,7 @@
 :DyTfPlan	dyneo.txt	/*:DyTfPlan*
 :DyTfState	dyneo.txt	/*:DyTfState*
 :DyYamlSchema	dyneo.txt	/*:DyYamlSchema*
+DyNeo.ai	dyneo.txt	/*DyNeo.ai*
 DyNeo.bundle_languages	dyneo.txt	/*DyNeo.bundle_languages*
 DyNeo.completion_sources	dyneo.txt	/*DyNeo.completion_sources*
 DyNeo.dark_mode	dyneo.txt	/*DyNeo.dark_mode*
@@ -55,7 +57,10 @@ DyNeo.used_full_plugins	dyneo.txt	/*DyNeo.used_full_plugins*
 DyNeo.yaml_schema_dirs	dyneo.txt	/*DyNeo.yaml_schema_dirs*
 dyneo	dyneo.txt	/*dyneo*
 dyneo-adr	dyneo.txt	/*dyneo-adr*
+dyneo-ai	dyneo.txt	/*dyneo-ai*
+dyneo-ai-commit	dyneo.txt	/*dyneo-ai-commit*
 dyneo-ai-guard	dyneo.txt	/*dyneo-ai-guard*
+dyneo-ai-prompts	dyneo.txt	/*dyneo-ai-prompts*
 dyneo-architecture	dyneo.txt	/*dyneo-architecture*
 dyneo-channels	dyneo.txt	/*dyneo-channels*
 dyneo-ci	dyneo.txt	/*dyneo-ci*

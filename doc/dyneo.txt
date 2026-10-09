@@ -60,6 +60,7 @@ CONTENTS                                                      *dyneo-contents*
        8.3 Spelling ............................................ |dyneo-spell|
        8.4 Diagrams .......................................... |dyneo-diagram|
        8.5 Integrations ................................. |dyneo-integrations|
+       8.6 AI actions ............................................ |dyneo-ai|
     9. Mappings ............................................. |dyneo-mappings|
    10. Commands ............................................. |dyneo-commands|
    11. Layout ................................................. |dyneo-layout|
@@ -215,6 +216,17 @@ defaulted in `lua/config/globals.lua`.
                                                     *DyNeo.completion_sources*
 `DyNeo.completion_sources`     (default `{}`)
         Completion sources named in the completion menu.
+
+                                                                 *DyNeo.ai*
+`DyNeo.ai.target`              (default `'avante'`)
+        Where |:DyAi| sends a prompt: `'avante'`, or `'sidekick'` for the
+        AI CLI open in sidekick's terminal.
+`DyNeo.ai.commit_command`      (default `{ 'claude', '-p' }`)
+        Writes a commit message for |dyneo-ai-commit|, given the prompt on
+        its standard input.  It runs without a terminal, so it must answer
+        on standard output without asking anything.
+`DyNeo.ai.commit_timeout`      (default 90 seconds, in milliseconds)
+        How long `commit_command` may take.
 
 3.3 Plugin channels                                           *dyneo-channels*
 
@@ -854,6 +866,64 @@ into the diagnostics nvim-lint leaves them out of, so `nvim-rulebook` can
 build an ignore comment for `markdownlint`, `ansible-lint`, `swiftlint` and
 friends.
 
+8.6 AI actions                                                    *dyneo-ai*
+
+Avante, Claude Code and the CLIs of sidekick each have their own keys, under
+`<leader>av`, `<leader>ac` and `<leader>a`.  |:DyAi| sits above them: a
+prompt about the code under the cursor sent to whichever of them
+|DyNeo.ai| names, and one picker, `<leader>ai`, over every AI action of the
+configuration with the key that does each.
+
+The prompt and the code go through the same guard as everything else: a
+buffer |dyneo-ai-guard| holds back is refused with its reason, and what was
+sent is logged by path and line range.
+
+    `<leader>ae`       n, x   Explain the selection, or the whole buffer
+    `<leader>ar`       n, x   Review it for bugs and risks
+    `<leader>au`       n, x   Write unit tests for it
+    `<leader>ao`       n, x   Document it
+    `<leader>ax`       n, x   Fix its diagnostics
+    `<leader>al`       n, x   Pick a prompt
+    `<leader>ai`       n, x   Pick any AI action
+
+Avante's sidebar is dressed like the other panels: the editor's background
+and separator, no number or colour columns, and a plain title naming its
+provider.  The statusline shows that provider and model once Avante has
+loaded, in the warning colour while it answers; a click switches provider.
+
+Prompts                                                    *dyneo-ai-prompts*
+
+A prompt is a Markdown file.  The ones shipped are in `prompts/`; a project
+adds its own, or replaces a shipped one of the same name, in
+`.nvim/prompts/` -- read only once Neovim has asked whether to trust that
+`.nvim` folder, through |vim.secure.read()|, and been told yes, since its
+text is sent along with the code; |:trust| takes it back.  An
+optional front matter line `description:` names it in the picker.  These
+words are filled in:
+
+    `{selection}`     the selection, or the whole buffer, fenced, cut at
+                    256 KiB
+    `{file}`          the file name, relative to the working directory
+    `{filetype}`      the filetype
+    `{diagnostics}`   the diagnostics of the selection, one a line
+    `{input}`         asked for when the prompt runs
+
+Commit messages                                             *dyneo-ai-commit*
+
+In a commit message, `<localleader>g` (|:DyAi| `commit`) writes the message
+from the staged diff with |DyNeo.ai.commit_command|, in the style of the
+last ten subjects, and in Conventional Commits when the repository has a
+`.gitlint` or commitlint configuration.
+
+The commit message buffer itself is always kept from AI, since `git commit
+--verbose` puts the diff in it; the diff is read from git instead, and is
+refused when a staged file is one |dyneo-ai-guard| holds back, when it has
+the shape of a credential, or when `betterleaks` finds a secret in it or
+cannot run.  A diff over 512 KiB is cut, and the prompt says so.  The
+message goes where nothing has been typed yet; one already written is
+replaced only when you say so.  The prompt is `prompts/git/commit.md`, and a
+trusted project may replace it.
+
 ------------------------------------------------------------------------------
 9. MAPPINGS                                                   *dyneo-mappings*
 
@@ -925,6 +995,10 @@ AI ~
     `<leader>a`        n, x   AI CLIs through sidekick
     `<leader>ac`       n, v   Claude Code
     `<leader>av`       n, v   Avante: chat, inline edit, history, model
+    `<leader>ai`       n, x   Every AI action, |:DyAi|
+    `<leader>ae` `ar` `au` `ao` `ax`
+                     n, x   Explain, review, test, document, fix the
+                            selection; see |dyneo-ai|
 
 Editing ~
     `<leader>fy`       n      Copy the path of the file: relative or
@@ -942,8 +1016,8 @@ Editing ~
 
 Mappings under `<localleader>` belong to one kind of buffer and are listed
 with the feature they drive: |dyneo-encrypted|, |dyneo-kube|, |dyneo-helm|,
-|dyneo-tfplan|, |dyneo-tfstate|, |dyneo-runbook|, |dyneo-logs|, |dyneo-ci|
-and |dyneo-openapi|.
+|dyneo-tfplan|, |dyneo-tfstate|, |dyneo-runbook|, |dyneo-logs|, |dyneo-ci|,
+|dyneo-openapi| and |dyneo-ai-commit|.
 
 Command-line abbreviations, which only fire as a whole command line, so a
 `/W` in a search is left alone:
@@ -1174,6 +1248,17 @@ Project ~
                         `branch`, `move`, `worklog`, `view`, `open`, `insert`
                         or `copy`.  `branch` names the branch
                         `<type>/<KEY>-<summary>` and offers it for editing.
+
+AI ~
+                                                                     *:DyAi*
+:[range]DyAi            Pick among the prompts and the AI actions.  A prompt
+                        is sent with [range], or the whole buffer.
+:[range]DyAi {prompt}   Send {prompt} about [range], or the whole buffer, to
+                        |DyNeo.ai| `target`.  See |dyneo-ai-prompts|.
+:[range]DyAi prompts    Pick among the prompts only.
+:DyAi commit            Write the commit message of the staged diff into the
+                        commit message being edited.  See |dyneo-ai-commit|.
+:DyAi model             Pick a model for Avante's provider.
 
 Language servers ~
                                                            *:DySonarlintToken*

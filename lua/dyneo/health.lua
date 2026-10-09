@@ -470,6 +470,11 @@ local function requirements()
     oasdiff = '`:DyOpenApiDiff` (`:MasonInstall oasdiff`)',
     crane = '`:DyImagePin` (or `skopeo`)',
     tofu = '`:DyTfPlan` and `:DyTfState` (or `terraform`)',
+    claude = '`:DyAi commit` (`DyNeo.ai.commit_command`) and claudecode.nvim',
+    ['claude-agent-acp'] = "Avante's default `claude-code` provider",
+    ['codex-acp'] = "Avante's `codex` provider",
+    npm = 'installing the ACP adapters and mcphub.nvim',
+    ['mcp-hub'] = 'mcphub.nvim, the MCP servers of Avante',
   }
   for _, command in ipairs(required) do
     table.insert(

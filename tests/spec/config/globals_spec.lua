@@ -23,6 +23,11 @@ describe('config.globals', function()
     assert.are.same({}, DyNeo.completion_sources)
     assert.are.same({}, DyNeo.yaml_schema_dirs)
     assert.are.same({}, DyNeo.firenvim_site_settings)
+    assert.are.same({
+      target = 'avante',
+      commit_command = { 'claude', '-p' },
+      commit_timeout = 90 * 1000,
+    }, DyNeo.ai)
   end)
 
   it('enables every language of config.languages', function()

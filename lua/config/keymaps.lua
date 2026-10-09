@@ -373,6 +373,22 @@ map("n", "<leader>kA", "<cmd>DyAiGuardAllow<cr>", { desc = "Allow Buffer for AI"
 map("n", "<leader>kR", "<cmd>DyAiGuardAllow!<cr>", { desc = "Recheck Buffer for AI" })
 map("n", "<leader>kL", "<cmd>DyAiGuardLog<cr>", { desc = "AI Handover Log" })
 
+-- AI actions (`tools.ai`): a prompt about the selection, or the whole buffer
+map("n", "<leader>ai", "<cmd>DyAi<cr>", { desc = "AI Actions" })
+map("x", "<leader>ai", ":DyAi<cr>", { desc = "AI Actions" })
+map("n", "<leader>al", "<cmd>DyAi prompts<cr>", { desc = "AI Prompt Library" })
+map("x", "<leader>al", ":DyAi prompts<cr>", { desc = "AI Prompt Library" })
+map("n", "<leader>ae", "<cmd>DyAi explain<cr>", { desc = "AI Explain" })
+map("x", "<leader>ae", ":DyAi explain<cr>", { desc = "AI Explain" })
+map("n", "<leader>ar", "<cmd>DyAi review<cr>", { desc = "AI Review" })
+map("x", "<leader>ar", ":DyAi review<cr>", { desc = "AI Review" })
+map("n", "<leader>au", "<cmd>DyAi tests<cr>", { desc = "AI Write Tests" })
+map("x", "<leader>au", ":DyAi tests<cr>", { desc = "AI Write Tests" })
+map("n", "<leader>ao", "<cmd>DyAi docs<cr>", { desc = "AI Document" })
+map("x", "<leader>ao", ":DyAi docs<cr>", { desc = "AI Document" })
+map("n", "<leader>ax", "<cmd>DyAi fix<cr>", { desc = "AI Fix Diagnostics" })
+map("x", "<leader>ax", ":DyAi fix<cr>", { desc = "AI Fix Diagnostics" })
+
 -- spell files from the word lists (`plugin/spell.lua`); the list is typed
 map("n", "<leader>zm", function() vim.api.nvim_feedkeys(":DySpell ", "n", false) end, { desc = "Make Spell File" })
 

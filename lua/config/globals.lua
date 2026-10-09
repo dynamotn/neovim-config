@@ -52,6 +52,27 @@ DyNeo.plugin_channel = 'latest'
 --- from nothing may need.
 DyNeo.quarantine_window = 7 * 24 * 60 * 60
 
+---@alias DyAiTarget
+---| 'avante' # Avante's sidebar, with whatever provider it is on
+---| 'sidekick' # The AI CLI sidekick has open in its terminal
+
+---@class DyAi
+---@field target DyAiTarget Where `:DyAi` sends a prompt
+---@field commit_command string[] Command writing a commit message, given the
+--- prompt and the staged diff on its standard input. It runs with no terminal,
+--- so it must answer on standard output without asking anything.
+---@field commit_timeout integer Milliseconds `commit_command` may take
+
+---@type DyAi The AI actions of `tools.ai`. Avante speaks to every provider
+--- it knows, so it is where prompts go unless a machine prefers the CLI in
+--- sidekick; a commit message wants one quick answer, which a headless
+--- `claude -p` gives without a chat around it.
+DyNeo.ai = {
+  target = 'avante',
+  commit_command = { 'claude', '-p' },
+  commit_timeout = 90 * 1000,
+}
+
 ---@class DyEnabledPlugins
 ---@field obsidian boolean
 ---@field leetcode boolean

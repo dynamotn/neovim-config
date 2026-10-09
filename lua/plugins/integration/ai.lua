@@ -39,44 +39,6 @@ local function install_agy_acp()
   vim.fn.delete(zip)
 end
 
---- Pick a model for Avante's current provider. An ACP agent lists its models
---- only once the sidebar has connected to it, so the sidebar is opened first
---- and the list waited for.
-local function avante_select_model()
-  local config = require('avante.config')
-  -- `:AvanteModels` only knows Avante's own providers, and fails on an ACP
-  -- one such as the default `claude-code`
-  if not config.acp_providers[config.provider] then
-    vim.cmd.AvanteModels()
-    return
-  end
-  local avante = require('avante')
-  if not avante.is_sidebar_open() then avante.open_sidebar({}) end
-  local tries = 150
-  local function try()
-    local sidebar = avante.get(false)
-    local client = sidebar and sidebar.acp_client
-    local session = sidebar
-      and sidebar.chat_history
-      and sidebar.chat_history.acp_session_id
-    if client and client.config_options and session then
-      require('avante.api').select_acp_model()
-    elseif client and session and client:is_ready() then
-      -- Connected, with no choice to offer: waiting longer changes nothing
-      vim.notify(
-        'Avante: the ACP agent offers no model to pick',
-        vim.log.levels.WARN
-      )
-    elseif tries > 0 then
-      tries = tries - 1
-      vim.defer_fn(try, 100)
-    else
-      vim.notify('Avante: the ACP agent did not connect', vim.log.levels.WARN)
-    end
-  end
-  try()
-end
-
 return {
   {
     -- Copilot with native LSP, its inline suggestions shown as ghost text
@@ -288,6 +250,20 @@ return {
             )
           return { fg = Snacks.util.color(hl) }
         end,
+      })
+
+      -- Avante's provider and model, once it has loaded; busy while it
+      -- answers
+      table.insert(lualine_x, pos, {
+        function() return '󰚩 ' .. require('tools.ai').status() end,
+        cond = function() return require('tools.ai').status() ~= nil end,
+        color = function()
+          local _, busy = require('tools.ai').status()
+          return {
+            fg = Snacks.util.color(busy and 'DiagnosticWarn' or 'Special'),
+          }
+        end,
+        on_click = function() vim.cmd.AvanteSwitchProvider() end,
       })
 
       table.insert(lualine_x, pos, {
@@ -559,7 +535,7 @@ return {
       },
       {
         '<leader>avm',
-        avante_select_model,
+        function() require('tools.ai').avante_model() end,
         desc = 'Avante Select Model',
       },
       {
