@@ -102,20 +102,19 @@ return {
             vim.notify('Syncing vale styles', vim.log.levels.INFO, {
               title = 'mason.nvim',
             })
-            vim.system(command, { text = true }, function(result)
-              vim.schedule(function()
-                if result.code == 0 then
-                  vim.notify('Synced vale styles', vim.log.levels.INFO, {
-                    title = 'mason.nvim',
-                  })
-                else
-                  vim.notify(
-                    'vale sync failed:\n' .. (result.stderr or result.stdout),
-                    vim.log.levels.ERROR,
-                    { title = 'mason.nvim' }
-                  )
-                end
-              end)
+            local system = require('util.system')
+            system.run(command, { timeout = 5 * 60 * 1000 }, function(result)
+              if result.code == 0 then
+                vim.notify('Synced vale styles', vim.log.levels.INFO, {
+                  title = 'mason.nvim',
+                })
+              else
+                vim.notify(
+                  'vale sync failed:\n' .. system.failure(result, 'vale'),
+                  vim.log.levels.ERROR,
+                  { title = 'mason.nvim' }
+                )
+              end
             end)
           end)
         end)

@@ -483,34 +483,32 @@ function M.explain()
     if object.api_version then
       table.insert(command, '--api-version=' .. object.api_version)
     end
-    vim.system(
+    require('util.system').run(
       command,
-      { text = true, timeout = M.EXPLAIN_TIMEOUT },
+      { timeout = M.EXPLAIN_TIMEOUT },
       function(result)
-        vim.schedule(function()
-          if result.code ~= 0 then
-            if depth > 0 then return try(depth - 1) end
-            return notify(
-              'kubectl explain failed:\n' .. vim.trim(result.stderr or ''),
-              vim.log.levels.ERROR
-            )
-          end
-          local out = vim.split(vim.trim(result.stdout or ''), '\n')
-          if depth < #path then
-            table.insert(
-              out,
-              1,
-              ('`%s` is not a field of `%s`'):format(path[depth + 1], field)
-            )
-            table.insert(out, 2, '')
-          end
-          vim.lsp.util.open_floating_preview(out, 'text', {
-            border = 'rounded',
-            focus_id = 'dy_kube_explain',
-            max_height = 30,
-            max_width = 90,
-          })
-        end)
+        if result.code ~= 0 then
+          if depth > 0 then return try(depth - 1) end
+          return notify(
+            'kubectl explain failed:\n' .. vim.trim(result.stderr or ''),
+            vim.log.levels.ERROR
+          )
+        end
+        local out = vim.split(vim.trim(result.stdout or ''), '\n')
+        if depth < #path then
+          table.insert(
+            out,
+            1,
+            ('`%s` is not a field of `%s`'):format(path[depth + 1], field)
+          )
+          table.insert(out, 2, '')
+        end
+        vim.lsp.util.open_floating_preview(out, 'text', {
+          border = 'rounded',
+          focus_id = 'dy_kube_explain',
+          max_height = 30,
+          max_width = 90,
+        })
       end
     )
   end

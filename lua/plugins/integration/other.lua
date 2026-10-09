@@ -194,15 +194,12 @@ return {
         local cmd = table.remove(queue, 1)
         running = cmd ~= nil
         if not cmd then return end
-        vim.system(cmd, { text = true }, function(result)
+        local system = require('util.system')
+        system.run(cmd, { timeout = 5000 }, function(result)
           if result.code ~= 0 then
-            vim.schedule(
-              function()
-                vim.notify(
-                  'im-switch: ' .. vim.trim(result.stderr or ''),
-                  vim.log.levels.ERROR
-                )
-              end
+            vim.notify(
+              'im-switch: ' .. system.failure(result, cmd[1]),
+              vim.log.levels.ERROR
             )
           end
           next_command()
@@ -220,7 +217,10 @@ return {
       local function can_select(cli, value)
         if vim.fn.has('mac') == 0 then return true end
         if not selectable then
-          local result = vim.system({ cli, 'list' }, { text = true }):wait()
+          local result = require('util.system').sync(
+            { cli, 'list' },
+            { text = true, timeout = 2000 }
+          )
           if result.code ~= 0 then return true end
           selectable = {}
           for _, id in

@@ -29,7 +29,9 @@ local function install_agy_acp()
     { 'curl', '-fsSL', '-o', zip, url },
     { 'unzip', '-o', '-q', zip, '-d', agy_acp.dir },
   }) do
-    local result = vim.system(cmd, { text = true }):wait()
+    -- A build step waits on it, but a stalled download must not hang lazy.nvim
+    local result =
+      require('util.system').sync(cmd, { text = true, timeout = 5 * 60 * 1000 })
     if result.code ~= 0 then
       error(table.concat(cmd, ' ') .. ': ' .. (result.stderr or ''))
     end

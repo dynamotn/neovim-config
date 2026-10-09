@@ -620,6 +620,9 @@ end
 --- Most questions OSV takes in one batch
 M.OSV_BATCH = 1000
 
+--- Most bytes of one OSV answer read
+M.MAX_OSV_ANSWER = 32 * 1024 * 1024
+
 --- Ask OSV about `queries` in batches, one after the other
 ---@param queries table[]
 ---@param asked DySbomComponent[]
@@ -629,7 +632,7 @@ function M.ask_osv(queries, asked, on_done)
   local function batch(first)
     if first > #queries then return on_done(findings) end
     local last = math.min(first + M.OSV_BATCH - 1, #queries)
-    vim.system({
+    require('util.system').run({
       'curl',
       '--silent',
       '--show-error',
@@ -642,28 +645,31 @@ function M.ask_osv(queries, asked, on_done)
       '@-',
       M.OSV_URL,
     }, {
-      text = true,
+      timeout = 90000,
+      max_bytes = M.MAX_OSV_ANSWER,
       stdin = vim.json.encode({
         queries = vim.list_slice(queries, first, last),
       }),
     }, function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then
-          return on_done(
-            nil,
-            'OSV query failed: ' .. vim.trim(result.stderr or '')
-          )
-        end
-        local ok, response = pcall(vim.json.decode, result.stdout or '')
-        if not ok or type(response) ~= 'table' then
-          return on_done(nil, 'OSV answered with something that is not JSON')
-        end
-        local found, err =
-          M.osv_findings(vim.list_slice(asked, first, last), response)
-        if not found then return on_done(nil, err) end
-        vim.list_extend(findings, found)
-        batch(last + 1)
-      end)
+      if result.code ~= 0 or result.cut then
+        return on_done(
+          nil,
+          'OSV query failed: '
+            .. (
+              result.cut and 'an answer larger than can be read'
+              or require('util.system').failure(result, 'curl')
+            )
+        )
+      end
+      local ok, response = pcall(vim.json.decode, result.stdout or '')
+      if not ok or type(response) ~= 'table' then
+        return on_done(nil, 'OSV answered with something that is not JSON')
+      end
+      local found, err =
+        M.osv_findings(vim.list_slice(asked, first, last), response)
+      if not found then return on_done(nil, err) end
+      vim.list_extend(findings, found)
+      batch(last + 1)
     end)
   end
   batch(1)

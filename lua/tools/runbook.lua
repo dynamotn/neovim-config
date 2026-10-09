@@ -598,77 +598,51 @@ start = function(bufnr, block, runner, code, on_done, written)
   local cwd = name ~= '' and vim.fs.dirname(name) or vim.uv.cwd()
   local command = vim.list_extend(vim.deepcopy(runner), { code })
 
-  local timer = assert(vim.uv.new_timer())
+  -- Declared ahead, so the exit callback can find itself in `running`
+  ---@type vim.SystemObj?
+  local process
   -- Read as it comes, so a run printing without end is stopped at
-  -- `M.MAX_OUTPUT` rather than kept whole
-  local streams = { stdout = {}, stderr = {} }
-  local size, cut = 0, false
-  -- Declared ahead, so the exit callback can find itself in `running`, and
-  -- the readers can stop it
-  local ok, process
-  local function reader(name)
-    return function(_, data)
-      if not data or cut then return end
-      size = size + #data
-      if size > M.MAX_OUTPUT then
-        cut = true
-        data = data:sub(1, #data - (size - M.MAX_OUTPUT))
-        if process then kill(process) end
-      end
-      table.insert(streams[name], data)
-    end
-  end
-  ok, process = pcall(vim.system, command, {
+  -- `M.MAX_OUTPUT` rather than kept whole; a session of its own, so
+  -- stopping it reaches what it started
+  process = require('util.system').run(command, {
     cwd = cwd,
-    text = true,
-    -- A session of its own, so stopping it reaches what it started
     detach = true,
-    stdout = reader('stdout'),
-    stderr = reader('stderr'),
-  }, function(completed)
-    local result = {
-      code = completed.code,
-      signal = completed.signal,
-      stdout = table.concat(streams.stdout),
-      stderr = table.concat(streams.stderr),
-      cut = cut,
-    }
-    vim.schedule(function()
-      timer:stop()
-      timer:close()
-      running[bufnr] = vim.tbl_filter(
-        -- `vim.SystemCompleted` carries no pid: compare the object itself
-        function(p) return p ~= process end,
-        running[bufnr] or {}
-      )
-      local output = M.render(result)
-      local done = pcall(place, bufnr, mark, block.indent, output)
-      record(bufnr, {
-        line = block.open,
-        lang = block.lang,
-        code = written or code,
-        output = output,
-        code_status = result.code,
-        signal = result.signal,
-        cut = result.cut,
-        started = started,
-        ms = math.floor((vim.uv.hrtime() - clock) / 1e6),
-      })
-      on_done(
-        done
-          and not result.cut
-          and result.code == 0
-          and (result.signal or 0) == 0
-      )
-    end)
+    timeout = M.TIMEOUT,
+    max_bytes = M.MAX_OUTPUT,
+  }, function(result)
+    -- Never started: said below, where `process` comes back nil
+    if result.missing then return end
+    running[bufnr] = vim.tbl_filter(
+      -- `vim.SystemCompleted` carries no pid: compare the object itself
+      function(p) return p ~= process end,
+      running[bufnr] or {}
+    )
+    local output = M.render(result)
+    local done = pcall(place, bufnr, mark, block.indent, output)
+    record(bufnr, {
+      line = block.open,
+      lang = block.lang,
+      code = written or code,
+      output = output,
+      code_status = result.code,
+      signal = result.signal,
+      cut = result.cut,
+      started = started,
+      ms = math.floor((vim.uv.hrtime() - clock) / 1e6),
+    })
+    on_done(
+      done and not result.cut and result.code == 0 and (result.signal or 0) == 0
+    )
   end)
-  if not ok then
-    timer:close()
+  if not process then
     vim.api.nvim_buf_del_extmark(bufnr, ns, mark)
-    vim.notify(tostring(process), vim.log.levels.ERROR, { title = 'Runbook' })
+    vim.notify(
+      ('%s cannot run'):format(command[1]),
+      vim.log.levels.ERROR,
+      { title = 'Runbook' }
+    )
     return on_done(false)
   end
-  timer:start(M.TIMEOUT, 0, function() kill(process) end)
   running[bufnr] = running[bufnr] or {}
   table.insert(running[bufnr], process)
 end
