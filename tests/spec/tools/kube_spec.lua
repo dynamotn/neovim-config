@@ -74,6 +74,60 @@ describe('tools.kube', function()
     )
   end)
 
+  describe('field_at', function()
+    local DEPLOY = {
+      'apiVersion: v1',
+      'kind: ConfigMap',
+      '---',
+      'apiVersion: "apps/v1"',
+      'kind: Deployment',
+      'metadata:',
+      '  labels:',
+      '    app.kubernetes.io/name: web # the app',
+      'spec:',
+      '  template:',
+      '    spec:',
+      '      containers:',
+      '      - name: web',
+      '        image: nginx',
+      '        args:',
+      '          - --port',
+      '        ports:',
+      '          - containerPort: 80',
+      '            protocol: TCP',
+      '      # a comment',
+      '      restartPolicy: Always',
+    }
+
+    it('reads the keys down to the line, in its own document', function()
+      local path, object = kube.field_at(DEPLOY, 14)
+      assert.same({ 'spec', 'template', 'spec', 'containers', 'image' }, path)
+      assert.same({ api_version = 'apps/v1', kind = 'Deployment' }, object)
+      assert.same(
+        { 'spec', 'template', 'spec', 'containers', 'ports', 'protocol' },
+        (kube.field_at(DEPLOY, 19))
+      )
+      assert.same(
+        { 'spec', 'template', 'spec', 'restartPolicy' },
+        (kube.field_at(DEPLOY, 21))
+      )
+      assert.same({ 'kind' }, (kube.field_at(DEPLOY, 2)))
+      assert.equals('ConfigMap', select(2, kube.field_at(DEPLOY, 1)).kind)
+    end)
+
+    it('puts a scalar item or a comment under the key above it', function()
+      assert.same(
+        { 'spec', 'template', 'spec', 'containers', 'args' },
+        (kube.field_at(DEPLOY, 16))
+      )
+      assert.same({ 'spec', 'template', 'spec' }, (kube.field_at(DEPLOY, 20)))
+      assert.same(
+        { 'metadata', 'labels', 'app.kubernetes.io/name' },
+        (kube.field_at(DEPLOY, 8))
+      )
+    end)
+  end)
+
   it('maps only a buffer a cluster would take', function()
     local function has_maps(file)
       vim.cmd.edit(file)
@@ -147,6 +201,49 @@ describe('tools.kube', function()
       assert.is_true(require('util.sensitive').is_sensitive(0))
       assert.same({ 'kubectl diff -f ' .. dir .. '/app/deploy.yaml' }, logged())
     end)
+
+    it(
+      'explains the field, or the one a key that is no field sits in',
+      function()
+        h.write(dir .. '/bin/kubectl', {
+          '#!/bin/sh',
+          'echo "kubectl $*" >> "' .. log .. '"',
+          'case "$2" in',
+          '  *.app) echo "field app does not exist" >&2; exit 1 ;;',
+          '  *) echo "FIELD: $2" ;;',
+          'esac',
+        })
+        vim.fn.setfperm(dir .. '/bin/kubectl', 'rwxr-xr-x')
+        local shown
+        local restore = h.stub(
+          vim.lsp.util,
+          'open_floating_preview',
+          function(lines) shown = lines end
+        )
+        vim.api.nvim_set_current_buf(h.buffer({
+          lines = {
+            'apiVersion: apps/v1',
+            'kind: Deployment',
+            'metadata:',
+            '  labels:',
+            '    app: web',
+          },
+        }))
+        vim.api.nvim_win_set_cursor(0, { 5, 4 })
+        kube.explain()
+        assert.is_true(vim.wait(10000, function() return shown ~= nil end, 20))
+        restore()
+        assert.same({
+          '`app` is not a field of `deployment.metadata.labels`',
+          '',
+          'FIELD: deployment.metadata.labels',
+        }, shown)
+        assert.same({
+          'kubectl explain deployment.metadata.labels.app --api-version=apps/v1',
+          'kubectl explain deployment.metadata.labels --api-version=apps/v1',
+        }, logged())
+      end
+    )
 
     it('says so when nothing differs', function()
       fake('kubectl', '', 0)

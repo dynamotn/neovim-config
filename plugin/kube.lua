@@ -1,6 +1,6 @@
--- `:DyKube`: diff, validate, apply and render the manifest, kustomization or
--- Helm chart being edited. The module only loads when asked, or when a YAML
--- buffer opens.
+-- `:DyKube`: explain, diff, validate, apply and render the manifest,
+-- kustomization or Helm chart being edited. The module only loads when asked,
+-- or when a YAML buffer opens.
 vim.api.nvim_create_user_command(
   'DyKube',
   function(args) require('tools.kube').command(args) end,
@@ -14,7 +14,7 @@ vim.api.nvim_create_user_command(
         names
       )
     end,
-    desc = 'Diff, validate, apply or render this manifest for a cluster',
+    desc = 'Explain, diff, validate, apply or render this manifest',
   }
 )
 

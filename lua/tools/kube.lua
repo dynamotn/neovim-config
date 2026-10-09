@@ -373,7 +373,140 @@ function M.namespace()
   )
 end
 
+--- Milliseconds `kubectl explain` may take: it only reads the API schema
+M.EXPLAIN_TIMEOUT = 30 * 1000
+
+--- The key a YAML line sets and the column it starts at, past any `- ` of a
+--- sequence item; nil for a comment, a scalar item or a line of a block
+---@param line string
+---@return string? key
+---@return integer column
+---@return boolean parent Whether the value is on the lines below
+local function key_of(line)
+  local indent, rest = line:match('^(%s*)(.*)$')
+  local column = #indent
+  while rest:match('^%-%s') or rest == '-' do
+    local dash, after = rest:match('^(%-%s*)(.*)$')
+    column = column + #dash
+    rest = after
+  end
+  if rest:match('^#') then return nil, column, false end
+  local key, value = rest:match('^([%w_%.%-/]+)%s*:%s*(.*)$')
+  if not key then
+    key, value = rest:match('^["\']([^"\']+)["\']%s*:%s*(.*)$')
+  end
+  if not key then return nil, column, false end
+  value = value:gsub('%s+#.*$', '')
+  return key, column, value == ''
+end
+
+--- The field of the YAML object at `row`: the keys from the top of its
+--- document down to the one the line sets, or the one it sits under, with
+--- the `apiVersion` and `kind` of that document
+---
+--- Read off the indentation rather than a parser, so it holds without the
+--- YAML parser installed and on a template of a chart, which is no YAML.
+---@param lines string[]
+---@param row integer 1-based
+---@return string[] path
+---@return { api_version?: string, kind?: string } object
+function M.field_at(lines, row)
+  local first, last = 1, #lines
+  for i = row, 1, -1 do
+    if lines[i]:match('^%-%-%-') then
+      first = i + 1
+      break
+    end
+  end
+  for i = row + 1, #lines do
+    if lines[i]:match('^%-%-%-') then
+      last = i - 1
+      break
+    end
+  end
+  local object = {}
+  for i = first, last do
+    local api = lines[i]:match('^apiVersion:%s*["\']?([^"\'%s#]+)')
+    local kind = lines[i]:match('^kind:%s*["\']?([^"\'%s#]+)')
+    object.api_version = object.api_version or api
+    object.kind = object.kind or kind
+  end
+
+  local path = {}
+  -- A scalar item counts from past its `- `, so the key it sits under is
+  -- left of it even when the sequence is not indented under that key
+  local key, column = key_of(lines[row] or '')
+  if key then table.insert(path, key) end
+  for i = row - 1, first, -1 do
+    if column == 0 then break end
+    local parent, at, opens = key_of(lines[i])
+    if parent and opens and at < column then
+      table.insert(path, 1, parent)
+      column = at
+    end
+  end
+  return path, object
+end
+
+--- What the API server says of the field under the cursor, in a float
+---
+--- A key that is no field -- one of `labels`, of the `data` of a ConfigMap
+--- -- is dropped, and the field it sits in explained instead.
+function M.explain()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local path, object = M.field_at(lines, row)
+  if not object.kind then
+    return notify('No `kind` in this document', vim.log.levels.WARN)
+  end
+  if vim.fn.executable('kubectl') ~= 1 then
+    return notify('kubectl is not installed', vim.log.levels.ERROR)
+  end
+  local function try(depth)
+    local field = table.concat(
+      vim.list_extend({ object.kind:lower() }, vim.list_slice(path, 1, depth)),
+      '.'
+    )
+    local command = { 'kubectl', 'explain', field }
+    if object.api_version then
+      table.insert(command, '--api-version=' .. object.api_version)
+    end
+    vim.system(
+      command,
+      { text = true, timeout = M.EXPLAIN_TIMEOUT },
+      function(result)
+        vim.schedule(function()
+          if result.code ~= 0 then
+            if depth > 0 then return try(depth - 1) end
+            return notify(
+              'kubectl explain failed:\n' .. vim.trim(result.stderr or ''),
+              vim.log.levels.ERROR
+            )
+          end
+          local out = vim.split(vim.trim(result.stdout or ''), '\n')
+          if depth < #path then
+            table.insert(
+              out,
+              1,
+              ('`%s` is not a field of `%s`'):format(path[depth + 1], field)
+            )
+            table.insert(out, 2, '')
+          end
+          vim.lsp.util.open_floating_preview(out, 'text', {
+            border = 'rounded',
+            focus_id = 'dy_kube_explain',
+            max_height = 30,
+            max_width = 90,
+          })
+        end)
+      end
+    )
+  end
+  try(#path)
+end
+
 M.SUBCOMMANDS = {
+  explain = M.explain,
   diff = M.diff,
   dryrun = M.dry_run,
   apply = M.apply,
@@ -431,6 +564,7 @@ function M.attach(bufnr)
   if ok then
     wk.add({ { '<localleader>k', group = 'kubernetes', buffer = bufnr } })
   end
+  map('<localleader>ke', M.explain, 'Explain Field')
   map('<localleader>kd', M.diff, 'Diff With Cluster')
   map('<localleader>kv', M.dry_run, 'Validate (Server Dry Run)')
   map('<localleader>ka', M.apply, 'Apply')

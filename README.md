@@ -84,8 +84,8 @@ below follow the sections of `:help dyneo`.
 ### 🏗 Infrastructure — `<leader>i`, `<localleader>`
 
 - **YAML schemas** detected: Kubernetes, CRDs, cloud-init. `<leader>cys`
-- **Kubernetes** — diff, server dry run, apply, Helm and Kustomize render.
-  `<localleader>k`
+- **Kubernetes** — the field under the cursor explained, diff, server dry
+  run, apply, Helm and Kustomize render. `<localleader>k`
 - **Helm values** to templates and back, unused values marked.
   `:DyHelmValue` · `:DyHelmUnused`
 - **Container images** scanned for vulnerabilities and pinned to digests.

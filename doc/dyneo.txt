@@ -481,6 +481,7 @@ A YAML buffer a cluster would take -- a manifest with `apiVersion` and
 `kind`, a `kustomization.yaml`, or any file of a Helm chart -- gets mappings
 under `<localleader>k`, and |:DyKube| does the same from the command line:
 
+    `<localleader>ke`  Explain the field under the cursor (`kubectl explain`)
     `<localleader>kd`  Diff with the cluster (`kubectl diff`)
     `<localleader>kv`  Validate with a server-side dry run
     `<localleader>ka`  Apply, after a confirmation naming the context
@@ -495,6 +496,13 @@ A manifest goes to `kubectl -f`, a kustomization to `kubectl -k`, and a file
 of a chart is rendered first and piped in, with the values file being edited
 as its values.  A diff or a render can hold Secret data, so its buffer is
 kept from every AI integration.
+
+`<localleader>ke` reads the field under the cursor off the indentation --
+`spec.template.spec.containers.image` -- and the `apiVersion` and `kind` of
+its document, and shows what `kubectl explain` says of it in a float.  A key
+that is no field, one of `labels` or of the `data` of a ConfigMap, gives way
+to the field it sits in.  The schema comes from the cluster, so a CRD is
+explained as well as a Deployment.
 
 6.3 Helm values                                                   *dyneo-helm*
 
@@ -980,6 +988,7 @@ Infrastructure ~
                                                                      *:DyKube*
 :DyKube [diff]          Diff this manifest, kustomization or chart with the
                         cluster.
+:DyKube explain         Explain the field under the cursor, from the cluster.
 :DyKube dryrun          Validate it with a server-side dry run.
 :DyKube apply           Apply it, after a confirmation naming the context.
 :DyKube render          Render the chart or the kustomization.
