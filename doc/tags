@@ -25,6 +25,7 @@
 :DyOpenApiRequest	dyneo.txt	/*:DyOpenApiRequest*
 :DyProject	dyneo.txt	/*:DyProject*
 :DyQuarantine	dyneo.txt	/*:DyQuarantine*
+:DyQuery	dyneo.txt	/*:DyQuery*
 :DyRename	dyneo.txt	/*:DyRename*
 :DyRoot	dyneo.txt	/*:DyRoot*
 :DyRunbook	dyneo.txt	/*:DyRunbook*
@@ -86,6 +87,7 @@ dyneo-per-machine	dyneo.txt	/*dyneo-per-machine*
 dyneo-policy	dyneo.txt	/*dyneo-policy*
 dyneo-project	dyneo.txt	/*dyneo-project*
 dyneo-quarantine	dyneo.txt	/*dyneo-quarantine*
+dyneo-query	dyneo.txt	/*dyneo-query*
 dyneo-requirements	dyneo.txt	/*dyneo-requirements*
 dyneo-runbook	dyneo.txt	/*dyneo-runbook*
 dyneo-sbom	dyneo.txt	/*dyneo-sbom*

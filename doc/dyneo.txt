@@ -52,6 +52,7 @@ CONTENTS                                                      *dyneo-contents*
        7.4 CI pipelines ........................................... |dyneo-ci|
        7.5 OpenAPI requests .................................. |dyneo-openapi|
        7.6 Cron schedules ....................................... |dyneo-cron|
+       7.7 Querying JSON and YAML .............................. |dyneo-query|
     8. Project and writing .................................. |dyneo-features|
        8.1 Project overview .................................. |dyneo-project|
        8.2 Decision records ...................................... |dyneo-adr|
@@ -735,6 +736,19 @@ every five minutes in a workflow, which GitHub does not run.
 `<leader>it` (|:DyCron|) says the same of the schedule on the cursor line in
 a notification, and `:DyCron {expr}` of any schedule typed.
 
+7.7 Querying JSON and YAML                                       *dyneo-query*
+
+`<leader>iq` (|:DyQuery|) opens a jq expression on a line of its own above
+a split showing what it gives for the JSON buffer -- or a yq expression for
+YAML -- and runs it again a moment after the expression, or the buffer,
+stops changing.  `<CR>` runs it at once, `q` closes both windows.  The window
+bar says how many lines came back, or that the tool failed, with what it
+said in the split.
+
+One run at a time: a new one stops the last, a run that takes five seconds
+is stopped, and a result over 1 MiB is cut and says so.  The result of a
+buffer held back from AI is held back too.
+
 ------------------------------------------------------------------------------
 8. PROJECT AND WRITING                                        *dyneo-features*
 
@@ -863,6 +877,7 @@ Infrastructure and operations (|dyneo-infra|, |dyneo-ops|) ~
     `<leader>ij`       n      Read the journal
     `<leader>ip`       n      Read the logs of a pod
     `<leader>it`       n      The cron schedule of this line in words
+    `<leader>iq`       n      Try a jq or yq expression on this buffer
     `<leader>ic`       n      Switch the Kubernetes context
     `<leader>in`       n      Switch the Kubernetes namespace
 
@@ -1098,6 +1113,10 @@ Operations ~
 :DyCron                 The schedule on the cursor line in words, with its
                         next runs.
 :DyCron {expr}          The same of {expr}, in local time.  See |dyneo-cron|.
+
+                                                                    *:DyQuery*
+:DyQuery [{expr}]       Try {expr}, `.` unless given, against this JSON or
+                        YAML buffer as it is typed.  See |dyneo-query|.
 
 Project ~
                                                                   *:DyProject*

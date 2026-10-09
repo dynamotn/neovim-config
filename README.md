@@ -116,6 +116,8 @@ below follow the sections of `:help dyneo`.
   `:DyOpenApiDiff`
 - **Cron** — each schedule of a crontab, a CronJob or a workflow read out at
   the end of its line, with its next runs; a broken one flagged. `:DyCron`
+- **jq / yq playground** — an expression tried against the JSON or YAML
+  buffer as it is typed, the result beside it. `:DyQuery`
 - **Tasks** — run, build and test the current file or project in ~50
   languages. `<leader>oo`
 
