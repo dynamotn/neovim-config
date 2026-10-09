@@ -50,8 +50,10 @@ function M.detectors.lsp(buf)
     end
     if client.root_dir then roots[#roots + 1] = client.root_dir end
   end
+  -- Resolved like `bufpath`: a root reached through a symlink (a chezmoi
+  -- `mode: symlink` home) still holds the file it links to
   return vim.tbl_filter(function(path)
-    path = Plugin.norm(path)
+    path = M.realpath(path) or Plugin.norm(path)
     return path and M.contains(path, bufpath)
   end, roots)
 end
