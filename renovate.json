@@ -25,7 +25,7 @@
       "description": "Tools the own Mason registry installs with `go install`",
       "managerFilePatterns": ["/^lua/tools/mason-registry/[^/]+\\.lua$/"],
       "matchStrings": [
-        "'pkg:golang/(?<depName>[^@']+)@(?<currentValue>v\\d[^']*)'"
+        "'pkg:golang/(?<depName>[^@']+)@(?<currentValue>v\\d[^'#]*)(?:#[^']*)?'"
       ],
       "datasourceTemplate": "go"
     },
