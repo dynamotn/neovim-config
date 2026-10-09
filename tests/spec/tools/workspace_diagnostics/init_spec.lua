@@ -13,15 +13,18 @@ describe('tools.workspace_diagnostics', function()
     dir, cleanup = h.tmpdir()
     -- What `git ls-files` lists, relative to the root; nil fails it
     listing = {}
-    stub(vim, 'system', function(cmd, opts, on_exit)
+    stub(require('util.system'), 'run', function(cmd, opts, on_done)
       assert.are.same({ 'git', 'ls-files' }, vim.list_slice(cmd, 1, 2))
       assert.are.equal(dir, opts.cwd)
+      local result = { signal = 0, cut = false, timed_out = false }
       if listing then
-        on_exit({ code = 0, stdout = table.concat(listing, '\0') })
+        result.code, result.stdout, result.stderr =
+          0, table.concat(listing, '\0'), ''
       else
-        on_exit({ code = 128, stderr = 'fatal: not a git repository\n' })
+        result.code, result.stdout, result.stderr =
+          128, '', 'fatal: not a git repository\n'
       end
-      return {}
+      on_done(result)
     end)
     stub(
       vim,

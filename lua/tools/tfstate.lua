@@ -116,27 +116,26 @@ local function state(dir, args, on_done)
       vim.log.levels.ERROR
     )
   end
-  vim.system(vim.list_extend({ bin, 'state' }, args), {
+  local system = require('util.system')
+  system.run(vim.list_extend({ bin, 'state' }, args), {
     cwd = dir,
-    text = true,
     timeout = M.TIMEOUT,
     -- Never a prompt for backend input fighting the editor for the terminal
     env = { TF_INPUT = '0' },
     detach = true,
   }, function(result)
-    vim.schedule(function()
-      if result.code ~= 0 then
-        return notify(
-          ('%s state %s failed:\n%s'):format(
-            bin,
-            args[1],
-            vim.trim(result.stderr or '')
-          ),
-          vim.log.levels.ERROR
-        )
-      end
-      on_done(result.stdout or '')
-    end)
+    if result.code ~= 0 or result.cut then
+      return notify(
+        ('%s state %s failed:\n%s'):format(
+          bin,
+          args[1],
+          result.cut and 'more output than can be read'
+            or system.failure(result, bin)
+        ),
+        vim.log.levels.ERROR
+      )
+    end
+    on_done(result.stdout or '')
   end)
 end
 

@@ -157,7 +157,8 @@ end
 ---@param root string
 ---@param callback fun(paths?: string[], err?: string) Called on the main loop
 local function list(root, callback)
-  vim.system({
+  local system = require('util.system')
+  system.run({
     'git',
     'ls-files',
     '-z',
@@ -165,17 +166,18 @@ local function list(root, callback)
     '--others',
     '--exclude-standard',
     '--deduplicate',
-  }, { cwd = root, text = true }, function(result)
-    vim.schedule(function()
-      if result.code ~= 0 then
-        return callback(nil, vim.trim(result.stderr or ''))
-      end
-      local paths = {}
-      for name in vim.gsplit(result.stdout or '', '\0', { trimempty = true }) do
-        paths[#paths + 1] = vim.fs.joinpath(root, name)
-      end
-      callback(paths)
-    end)
+  }, { cwd = root, timeout = 30000 }, function(result)
+    if result.code ~= 0 and not result.cut then
+      return callback(nil, system.failure(result, 'git ls-files'))
+    end
+    -- Past the cap, the last name may be cut in half
+    local stdout = result.stdout or ''
+    if result.cut then stdout = stdout:match('^(.*)%z') or '' end
+    local paths = {}
+    for name in vim.gsplit(stdout, '\0', { trimempty = true }) do
+      paths[#paths + 1] = vim.fs.joinpath(root, name)
+    end
+    callback(paths)
   end)
 end
 

@@ -24,6 +24,9 @@ M.TAIL = 2000
 --- Milliseconds a source or `jq` may take
 M.TIMEOUT = 60 * 1000
 
+--- Most bytes read from a command; a source followed with `-f` stops here
+M.MAX_BYTES = 8 * 1024 * 1024
+
 ---@alias DyLogLevel 'trace'|'debug'|'info'|'warn'|'error'
 
 --- The levels, quietest first
@@ -259,7 +262,7 @@ end
 
 ---@class DyLogView
 ---@field title string
----@field load fun(on_lines: fun(lines: string[]?, err: string?))
+---@field load fun(on_lines: fun(lines: string[]?, err: string?, cut: boolean?))
 ---@field records DyLogRecord[]
 ---@field filter DyLogFilter
 ---@field shown integer[] Record index of each buffer line
@@ -314,9 +317,15 @@ end
 function M.reload(bufnr)
   local view = views[bufnr]
   if not view then return end
-  view.load(function(lines, err)
+  view.load(function(lines, err, cut)
     if not vim.api.nvim_buf_is_valid(bufnr) then return end
     if not lines then return notify(err or 'failed', vim.log.levels.ERROR) end
+    if cut then
+      notify(
+        ('Read the first %d MiB only'):format(M.MAX_BYTES / 1024 / 1024),
+        vim.log.levels.WARN
+      )
+    end
     if #lines > M.MAX_LINES then
       lines = vim.list_slice(lines, #lines - M.MAX_LINES + 1)
     end
@@ -396,26 +405,24 @@ function M.jq(bufnr, expr)
   if #lines == 0 then
     return notify('No JSON record to run jq on', vim.log.levels.WARN)
   end
-  vim.system({ 'jq', '-c', ('.i as $i | .r | select(%s) | $i'):format(expr) }, {
-    text = true,
+  local system = require('util.system')
+  system.run({ 'jq', '-c', ('.i as $i | .r | select(%s) | $i'):format(expr) }, {
     stdin = table.concat(lines, '\n') .. '\n',
     timeout = M.TIMEOUT,
   }, function(result)
-    vim.schedule(function()
-      if not vim.api.nvim_buf_is_valid(bufnr) then return end
-      if result.code ~= 0 then
-        return notify(
-          'jq failed: ' .. vim.trim(result.stderr or ''),
-          vim.log.levels.ERROR
-        )
-      end
-      local selected = {}
-      for number in (result.stdout or ''):gmatch('%d+') do
-        selected[tonumber(number)] = true
-      end
-      view.filter.selected = selected
-      render(bufnr)
-    end)
+    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    if result.code ~= 0 then
+      return notify(
+        'jq failed: ' .. system.failure(result, 'jq'),
+        vim.log.levels.ERROR
+      )
+    end
+    local selected = {}
+    for number in (result.stdout or ''):gmatch('%d+') do
+      selected[tonumber(number)] = true
+    end
+    view.filter.selected = selected
+    render(bufnr)
   end)
 end
 
@@ -430,7 +437,7 @@ end
 
 --- Open a view of what `load` reads
 ---@param title string
----@param load fun(on_lines: fun(lines: string[]?, err: string?))
+---@param load fun(on_lines: fun(lines: string[]?, err: string?, cut: boolean?))
 ---@return integer bufnr
 function M.open(title, load)
   local bufnr = scratch.open({ title .. ': loading…' }, {
@@ -465,23 +472,34 @@ end
 
 --- A source that runs `command` and reads what it printed
 ---@param command string[]
----@return fun(on_lines: fun(lines: string[]?, err: string?))
+---@return fun(on_lines: fun(lines: string[]?, err: string?, cut: boolean?))
 local function from_command(command)
   return function(on_lines)
     if vim.fn.executable(command[1]) ~= 1 then
       return on_lines(nil, command[1] .. ' is not installed')
     end
-    vim.system(command, { text = true, timeout = M.TIMEOUT }, function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then
+    local system = require('util.system')
+    -- Read as it comes and stopped at the cap: a log followed with `-f`
+    -- keeps printing until the deadline
+    system.run(
+      command,
+      { timeout = M.TIMEOUT, max_bytes = M.MAX_BYTES },
+      function(result)
+        if result.code ~= 0 and not result.cut then
           return on_lines(
             nil,
-            ('%s failed: %s'):format(command[1], vim.trim(result.stderr or ''))
+            ('%s failed: %s'):format(
+              command[1],
+              system.failure(result, command[1])
+            )
           )
         end
-        on_lines(vim.split(result.stdout or '', '\n', { trimempty = true }))
-      end)
-    end)
+        local lines = vim.split(result.stdout or '', '\n', { trimempty = true })
+        -- The last line of a cut read is half a record
+        if result.cut then table.remove(lines) end
+        on_lines(lines, nil, result.cut)
+      end
+    )
   end
 end
 

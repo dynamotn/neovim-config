@@ -9,6 +9,12 @@
 --- tag pushed again does not change what runs.
 local M = {}
 
+--- The most a scan report may take; trivy's JSON of a large image is big
+M.MAX_REPORT = 64 * 1024 * 1024
+
+--- Digest lookups running at once
+M.PARALLEL = 4
+
 local ns = vim.api.nvim_create_namespace('dy_images')
 
 --- Milliseconds a scan of one image may take: the first one downloads the
@@ -219,25 +225,29 @@ function M.scan(bufnr)
         (vulnerable > 0 or #failed > 0) and vim.log.levels.WARN or nil
       )
     end
-    vim.system(
+    require('util.system').run(
       M.scan_command(image),
-      { text = true, timeout = M.TIMEOUT },
+      { timeout = M.TIMEOUT, max_bytes = M.MAX_REPORT },
       function(result)
-        vim.schedule(function()
-          local ok, report = pcall(
-            vim.json.decode,
-            result.stdout or '',
-            { luanil = { object = true, array = true } }
-          )
-          if result.code ~= 0 or not ok or type(report) ~= 'table' then
-            table.insert(failed, image)
-          else
-            local findings = M.findings(report)
-            if next(findings.counts) then vulnerable = vulnerable + 1 end
-            found[image] = findings
-          end
-          next_image()
-        end)
+        local ok, report = pcall(
+          vim.json.decode,
+          result.stdout or '',
+          { luanil = { object = true, array = true } }
+        )
+        -- A report cut short is no report: never read as fewer findings
+        if
+          result.code ~= 0
+          or result.cut
+          or not ok
+          or type(report) ~= 'table'
+        then
+          table.insert(failed, image)
+        else
+          local findings = M.findings(report)
+          if next(findings.counts) then vulnerable = vulnerable + 1 end
+          found[image] = findings
+        end
+        next_image()
       end
     )
   end
@@ -286,12 +296,12 @@ function M.pin(bufnr)
     return notify('Neither crane nor skopeo is installed', vim.log.levels.ERROR)
   end
   local tick = vim.api.nvim_buf_get_changedtick(bufnr)
-  local digests, failed, pending = {}, {}, 0
-  local asked = {}
+  local digests, failed = {}, {}
+  local asked, seen = {}, {}
   for _, ref in ipairs(todo) do
-    if not asked[ref.image] then
-      asked[ref.image] = true
-      pending = pending + 1
+    if not seen[ref.image] then
+      seen[ref.image] = true
+      table.insert(asked, ref.image)
     end
   end
   local function finish()
@@ -327,24 +337,22 @@ function M.pin(bufnr)
       #failed > 0 and vim.log.levels.WARN or nil
     )
   end
-  for image in pairs(asked) do
-    vim.system(
+  -- A few at a time: one request per image, all to the same registries
+  require('util.system').each(asked, M.PARALLEL, function(image, done)
+    require('util.system').run(
       M.digest_command(image),
-      { text = true, timeout = 60000 },
+      { timeout = 60000 },
       function(result)
-        vim.schedule(function()
-          local digest = vim.trim(result.stdout or ''):match('^(sha256:%x+)$')
-          if result.code == 0 and digest then
-            digests[image] = digest
-          else
-            table.insert(failed, image)
-          end
-          pending = pending - 1
-          if pending == 0 then finish() end
-        end)
+        local digest = vim.trim(result.stdout or ''):match('^(sha256:%x+)$')
+        if result.code == 0 and digest then
+          digests[image] = digest
+        else
+          table.insert(failed, image)
+        end
+        done()
       end
     )
-  end
+  end, finish)
 end
 
 return M

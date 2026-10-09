@@ -205,6 +205,31 @@ describe('tools.images', function()
     assert.same({ 'Every image is pinned already' }, notes)
   end)
 
+  it('looks up no more than a few digests at once', function()
+    -- Each lookup leaves a mark while it runs; the most marks seen together
+    -- is how many ran at once
+    tool('crane', {
+      'touch "' .. dir .. '/running.$$"',
+      'ls "' .. dir .. '" | grep -c "^running" >> "' .. dir .. '/counts"',
+      'sleep 0.2',
+      'rm "' .. dir .. '/running.$$"',
+      'echo "' .. DIGEST .. '"',
+    })
+    local lines = {}
+    for index = 1, 8 do
+      lines[index] = ('FROM registry.example/app%d:1'):format(index)
+    end
+    local bufnr = h.buffer({ lines = lines })
+    images.pin(bufnr)
+    assert.is_true(vim.wait(10000, function() return #notes > 0 end, 10))
+    assert.equals('8 images pinned', notes[1])
+    local most = 0
+    for _, count in ipairs(vim.fn.readfile(dir .. '/counts')) do
+      most = math.max(most, tonumber(count))
+    end
+    assert.is_true(most <= images.PARALLEL, ('%d at once'):format(most))
+  end)
+
   it('splits a digest off an image', function()
     assert.same(
       { 'nginx:1.27', DIGEST },

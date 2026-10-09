@@ -388,34 +388,26 @@ function M.yaml_docs(files, on_done)
       table.insert(skipped, vim.fs.basename(file))
       return next_file()
     end
-    local ok = pcall(
-      vim.system,
+    require('util.system').run(
       { 'yq', '-o=json', '-I=0', '.', file },
-      { text = true, timeout = 30000 },
+      { timeout = 30000 },
       function(result)
-        vim.schedule(function()
-          if result.code ~= 0 then
-            table.insert(skipped, vim.fs.basename(file))
-          else
-            for line in (result.stdout or ''):gmatch('[^\n]+') do
-              local decoded, doc = pcall(
-                vim.json.decode,
-                line,
-                { luanil = { object = true, array = true } }
-              )
-              if decoded and type(doc) == 'table' then
-                table.insert(docs, doc)
-              end
-            end
+        -- Cut short, its documents would be read as all there is
+        if result.code ~= 0 or result.cut then
+          table.insert(skipped, vim.fs.basename(file))
+        else
+          for line in (result.stdout or ''):gmatch('[^\n]+') do
+            local decoded, doc = pcall(
+              vim.json.decode,
+              line,
+              { luanil = { object = true, array = true } }
+            )
+            if decoded and type(doc) == 'table' then table.insert(docs, doc) end
           end
-          next_file()
-        end)
+        end
+        next_file()
       end
     )
-    if not ok then
-      table.insert(skipped, vim.fs.basename(file))
-      vim.schedule(next_file)
-    end
   end
   next_file()
 end

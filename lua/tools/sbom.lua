@@ -559,25 +559,21 @@ function M.find_lockfiles(root, on_files)
     end
     on_files(files)
   end
-  local ok = pcall(
-    vim.system,
+  require('util.system').run(
     vim.list_extend({ 'git', 'ls-files', '-z', '--' }, patterns),
-    { cwd = root, text = true, timeout = 10000 },
+    { cwd = root, timeout = 10000 },
     function(result)
-      vim.schedule(function()
-        if result.code ~= 0 then return at_top() end
-        local files = {}
-        for _, path in
-          ipairs(vim.split(result.stdout or '', '\0', { trimempty = true }))
-        do
-          local file = vim.fs.joinpath(root, path)
-          if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
-        end
-        on_files(files)
-      end)
+      if result.code ~= 0 and not result.cut then return at_top() end
+      local files = {}
+      for _, path in
+        ipairs(vim.split(result.stdout or '', '\0', { trimempty = true }))
+      do
+        local file = vim.fs.joinpath(root, path)
+        if vim.fn.filereadable(file) == 1 then table.insert(files, file) end
+      end
+      on_files(files)
     end
   )
-  if not ok then vim.schedule(at_top) end
 end
 
 local ns = vim.api.nvim_create_namespace('dy_sbom')

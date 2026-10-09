@@ -462,35 +462,33 @@ function M.lint(bufnr)
     return notify('glab is not installed', vim.log.levels.ERROR)
   end
   context(bufnr, function(ctx)
-    vim.system(
+    require('util.system').run(
       { 'glab', 'ci', 'lint', ctx.file },
-      { cwd = ctx.dir, text = true, timeout = forge.TIMEOUT },
+      { cwd = ctx.dir, timeout = forge.TIMEOUT },
       function(result)
-        vim.schedule(function()
-          if not vim.api.nvim_buf_is_valid(bufnr) then return end
-          local output = (result.stdout or '') .. '\n' .. (result.stderr or '')
-          local diagnostics = M.lint_diagnostics(
-            output,
-            vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-          )
-          if result.code ~= 0 and #diagnostics == 0 then
-            diagnostics = {
-              {
-                lnum = 0,
-                col = 0,
-                message = vim.trim(output),
-                severity = vim.diagnostic.severity.ERROR,
-                source = 'gitlab ci lint',
-              },
-            }
-          end
-          vim.diagnostic.set(lint_ns, bufnr, diagnostics)
-          notify(
-            #diagnostics == 0 and 'GitLab says the file is valid'
-              or ('GitLab found %d problems'):format(#diagnostics),
-            #diagnostics > 0 and vim.log.levels.WARN or nil
-          )
-        end)
+        if not vim.api.nvim_buf_is_valid(bufnr) then return end
+        local output = (result.stdout or '') .. '\n' .. (result.stderr or '')
+        local diagnostics = M.lint_diagnostics(
+          output,
+          vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+        )
+        if result.code ~= 0 and #diagnostics == 0 then
+          diagnostics = {
+            {
+              lnum = 0,
+              col = 0,
+              message = vim.trim(output),
+              severity = vim.diagnostic.severity.ERROR,
+              source = 'gitlab ci lint',
+            },
+          }
+        end
+        vim.diagnostic.set(lint_ns, bufnr, diagnostics)
+        notify(
+          #diagnostics == 0 and 'GitLab says the file is valid'
+            or ('GitLab found %d problems'):format(#diagnostics),
+          #diagnostics > 0 and vim.log.levels.WARN or nil
+        )
       end
     )
   end)

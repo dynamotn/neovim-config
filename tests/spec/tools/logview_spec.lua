@@ -238,6 +238,25 @@ describe('tools.logview', function()
       assert.equals('kubectl failed: pod broke', notes[#notes])
     end)
 
+    it('stops a source that keeps printing, and says so', function()
+      vim.fn.mkdir(dir .. '/bin', 'p')
+      -- `journalctl -f`: a record a line, for as long as it is let run
+      h.write(dir .. '/bin/journalctl', {
+        '#!/bin/sh',
+        [[exec yes '{"PRIORITY":"6","MESSAGE":"tick"}']],
+      })
+      vim.fn.setfperm(dir .. '/bin/journalctl', 'rwxr-xr-x')
+      local path = vim.env.PATH
+      vim.env.PATH = dir .. '/bin:' .. path
+      local restore = h.stub(logview, 'MAX_BYTES', 4096)
+      logview.command({ fargs = { 'journal', '-f' } })
+      assert.is_true(vim.wait(5000, function() return #notes > 0 end, 20))
+      restore()
+      vim.env.PATH = path
+      assert.is_truthy(notes[1]:find('^Read the first'))
+      assert.is_true(#lines() > 10)
+    end)
+
     it('says what it needs', function()
       logview.command({ fargs = {} })
       logview.command({ fargs = { 'kube' } })
