@@ -5,12 +5,7 @@ return {
   'hrsh7th/cmp-calc', -- Math calculation
   'mgalliou/blink-cmp-tmux', -- Tmux buffer source
   'dynamotn/blink-cmp-zellij', -- Zellij source
-  {
-    -- Kitty source. The local checkout, while upstream has not taken the fix
-    -- for reading kitty on the main loop; other machines clone upstream.
-    'garyhurtz/blink_cmp_kitty',
-    dev = true,
-  },
+  'dynamotn/blink-cmp-kitty', -- Kitty source
   'moyiz/blink-emoji.nvim', -- Emoji source
   'MahanRahmati/blink-nerdfont.nvim', -- Nerdfont source
   {
@@ -62,7 +57,7 @@ return {
       'cmp-calc',
       'blink-cmp-tmux',
       'blink-cmp-zellij',
-      'blink_cmp_kitty',
+      'blink-cmp-kitty',
       'cmp-dynamic',
       'blink-ripgrep.nvim',
       'blink-emoji.nvim',
@@ -140,7 +135,7 @@ return {
           },
           -- kitty windows
           kitty = {
-            module = 'blink_cmp_kitty',
+            module = 'blink-cmp-kitty',
             name = 'kitty',
           },
           -- ripgrep all files in folder

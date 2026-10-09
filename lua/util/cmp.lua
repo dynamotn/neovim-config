@@ -17,11 +17,13 @@ end
 --- every completion.
 ---@type table<string, fun(): boolean>
 local pane_source_reachable = {
-  -- blink_cmp_kitty fails to decode the empty `kitty @ ls` output
+  -- Every read of a dead socket waits out its deadline, and finds nothing
   kitty = function()
     local listen_on = vim.env.KITTY_LISTEN_ON
     if not vim.env.KITTY_WINDOW_ID or not listen_on then return false end
-    if vim.fn.executable('kitty') == 0 then return false end
+    if vim.fn.executable('kitten') == 0 and vim.fn.executable('kitty') == 0 then
+      return false
+    end
     local path = listen_on:match('^unix:(.+)$')
     -- Abstract sockets (`unix:@name`) and TCP have nothing on disk to check
     if not path or vim.startswith(path, '@') then return true end
